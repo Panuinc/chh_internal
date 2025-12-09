@@ -1,3 +1,5 @@
+"use client";
+import { Button } from "@heroui/react";
 import { Ghost, Settings, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,7 +25,7 @@ export default function UIHome() {
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2">
       <div className="flex flex-col items-center justify-center w-full xl:w-2/12 h-fit xl:h-full gap-2">
-        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border-1 border-foreground text-foreground rounded-xl">
+        <div className="flex items-center justify-center w-full min-h-60 p-2 gap-2 border-1 border-foreground text-foreground rounded-xl">
           <Image src="/images/images.jpg" alt="logo" width={200} height={200} />
         </div>
         <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1 border-foreground text-foreground rounded-xl hidden">
@@ -70,18 +72,38 @@ export default function UIHome() {
               </div>
             </div>
           </div>
+          <div className="flex items-end justify-center w-full h-full p-2 gap-2">
+            <Button
+              color="none"
+              variant="solid"
+              size="lg"
+              className="w-full bg-foreground text-background font-black"
+            >
+              Chang Password
+            </Button>
+          </div>
         </div>
       </div>
-      <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full xl:w-8/12 h-full p-2 gap-2 border-1 border-foreground rounded-xl overflow-auto">
-        <HeaderMenu href="hr" icons={<User />} text="HR" />
-        <HeaderMenu href="hr" icons={<User />} text="HR" />
-        <HeaderMenu href="hr" icons={<User />} text="HR" />
-        <HeaderMenu href="hr" icons={<User />} text="HR" />
-        <HeaderMenu href="hr" icons={<User />} text="HR" />
-        <HeaderMenu href="hr" icons={<User />} text="HR" />
-        <HeaderMenu href="hr" icons={<User />} text="HR" />
-        <HeaderMenu href="hr" icons={<User />} text="HR" />
-        <HeaderMenu href="hr" icons={<Settings />} text="Setting" />
+      <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-full gap-2 overflow-hidden">
+        <div className="xl:flex flex-col items-center justify-start w-full min-h-60 p-2 gap-2 border-1 border-foreground rounded-xl hidden">
+          <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-3xl">
+            EverGreen Portal
+          </div>
+          <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-sm opacity-80">
+            Your tools. Your workflow. Your operations.
+          </div>
+        </div>
+        <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full h-full p-2 gap-2 border-1 border-foreground rounded-xl overflow-auto">
+          <HeaderMenu href="hr" icons={<User />} text="HR" />
+          <HeaderMenu href="hr" icons={<User />} text="HR" />
+          <HeaderMenu href="hr" icons={<User />} text="HR" />
+          <HeaderMenu href="hr" icons={<User />} text="HR" />
+          <HeaderMenu href="hr" icons={<User />} text="HR" />
+          <HeaderMenu href="hr" icons={<User />} text="HR" />
+          <HeaderMenu href="hr" icons={<User />} text="HR" />
+          <HeaderMenu href="hr" icons={<User />} text="HR" />
+          <HeaderMenu href="hr" icons={<Settings />} text="Setting" />
+        </div>
       </div>
     </div>
   );
