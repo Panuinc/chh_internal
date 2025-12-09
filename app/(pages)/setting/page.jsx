@@ -1,9 +1,6 @@
-import React from 'react'
+import UISetting from "@/module/setting/UISetting";
+import React from "react";
 
 export default function setting() {
-  return (
-    <div>
-      12
-    </div>
-  )
+  return <UISetting />;
 }
