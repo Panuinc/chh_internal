@@ -17,9 +17,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/logo/logo-01.png" />
+      </head>
       <body className={`${gruppo.variable} font-[var(--gruppo)] antialiased`}>
         <Providers>
-          <div className="flex items-center justify-center w-full h-screen p-2 gap-2 border bg-background text-foreground font-black">
+          <div className="flex items-center justify-center w-full h-screen bg-background text-foreground font-black">
             {children}
           </div>
         </Providers>
