@@ -25,7 +25,7 @@ export default function UIHome() {
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2">
       <div className="flex flex-col items-center justify-center w-full xl:w-2/12 h-fit xl:h-full gap-2">
-        <div className="flex items-center justify-center w-full min-h-52 p-2 gap-2">
+        <div className="flex items-center justify-center w-full min-h-52 p-2 gap-2 border-1 xl:border-none border-foreground rounded-xl">
           <Image src="/images/images.jpg" alt="logo" width={200} height={200} />
         </div>
         <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1 border-foreground text-foreground rounded-xl hidden">
@@ -93,7 +93,7 @@ export default function UIHome() {
             Your tools. Your workflow. Your operations.
           </div>
         </div>
-        <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full h-full p-2 gap-2 overflow-auto">
+        <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full h-full p-2 gap-2 border-1 xl:border-none border-foreground rounded-xl overflow-auto">
           <HeaderMenu href="setting" icons={<Settings />} text="Setting" />
         </div>
       </div>
