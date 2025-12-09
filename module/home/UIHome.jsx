@@ -1,15 +1,20 @@
-import { Ghost } from "lucide-react";
+import { Ghost, Settings, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-function HeaderMenu({ Text, href }) {
+function HeaderMenu({ icons, text, href }) {
   return (
     <Link
       href={href}
-      className="flex items-center justify-center w-40 h-40 p-2 gap-2 bg-background rounded-xl shadow hover:scale-105"
+      className="flex flex-col items-center justify-center w-40 h-40 p-2 gap-2 bg-background rounded-xl shadow hover:scale-105"
     >
-      {Text}
+      <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-success">
+        {icons}
+      </div>
+      <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
+        {text}
+      </div>
     </Link>
   );
 }
@@ -33,15 +38,16 @@ export default function UIHome() {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-2 xl:grid-cols-4 place-items-center w-full xl:w-9/12 h-full p-2 gap-2 border-2 border-default rounded-xl overflow-auto">
-        <HeaderMenu Text="HR" href="hr" />
-        <HeaderMenu Text="HR" href="hr" />
-        <HeaderMenu Text="HR" href="hr" />
-        <HeaderMenu Text="HR" href="hr" />
-        <HeaderMenu Text="HR" href="hr" />
-        <HeaderMenu Text="HR" href="hr" />
-        <HeaderMenu Text="HR" href="hr" />
-        <HeaderMenu Text="HR" href="hr" />
+      <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full xl:w-9/12 h-full p-2 gap-2 border-2 border-default rounded-xl overflow-auto">
+        <HeaderMenu href="hr" icons={<User />} text="HR" />
+        <HeaderMenu href="hr" icons={<User />} text="HR" />
+        <HeaderMenu href="hr" icons={<User />} text="HR" />
+        <HeaderMenu href="hr" icons={<User />} text="HR" />
+        <HeaderMenu href="hr" icons={<User />} text="HR" />
+        <HeaderMenu href="hr" icons={<User />} text="HR" />
+        <HeaderMenu href="hr" icons={<User />} text="HR" />
+        <HeaderMenu href="hr" icons={<User />} text="HR" />
+        <HeaderMenu href="hr" icons={<Settings />} text="Setting" />
       </div>
     </div>
   );
