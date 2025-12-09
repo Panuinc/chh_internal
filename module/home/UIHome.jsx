@@ -1,42 +1,47 @@
+import { Ghost } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
+
+function HeaderMenu({ Text, href }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-center w-40 h-40 p-2 gap-2 bg-background rounded-xl shadow hover:scale-105"
+    >
+      {Text}
+    </Link>
+  );
+}
 
 export default function UIHome() {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border">
-      <div className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border">
-        <div className="flex items-center justify-center w-3/12 h-full p-2 gap-2 border-2 border-warning bg-warning/75 rounded-xl">
+    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2">
+      <div className="flex flex-col items-center justify-center w-full xl:w-3/12 h-fit xl:h-full gap-2">
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border-2 border-warning bg-warning/75 text-background rounded-xl">
           <Image src="/images/images.png" alt="logo" width={200} height={200} />
         </div>
-        <div className="flex items-center justify-center w-9/12 h-full p-2 gap-2 border">
-          1
+        <div className="xl:flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-2 border-foreground bg-foreground/75 text-background rounded-xl hidden">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-4xl">
+            <Ghost /> Welcome Back
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-xl">
+            Panuwat Jangchudjai
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Description
+          </div>
         </div>
       </div>
-      <div className="grid grid-cols-2 xl:grid-cols-4 place-items-center w-full h-full p-2 gap-2 border overflow-auto">
-        <div className="flex items-center justify-center w-40 h-40 p-2 gap-2 rounded-xl shadow">
-          1
-        </div>
-        <div className="flex items-center justify-center w-40 h-40 p-2 gap-2 rounded-xl shadow">
-          1
-        </div>
-        <div className="flex items-center justify-center w-40 h-40 p-2 gap-2 rounded-xl shadow">
-          1
-        </div>
-        <div className="flex items-center justify-center w-40 h-40 p-2 gap-2 rounded-xl shadow">
-          1
-        </div>
-        <div className="flex items-center justify-center w-40 h-40 p-2 gap-2 rounded-xl shadow">
-          1
-        </div>
-        <div className="flex items-center justify-center w-40 h-40 p-2 gap-2 rounded-xl shadow">
-          1
-        </div>
-        <div className="flex items-center justify-center w-40 h-40 p-2 gap-2 rounded-xl shadow">
-          1
-        </div>
-        <div className="flex items-center justify-center w-40 h-40 p-2 gap-2 rounded-xl shadow">
-          1
-        </div>
+      <div className="grid grid-cols-2 xl:grid-cols-4 place-items-center w-full xl:w-9/12 h-full p-2 gap-2 border-2 border-default rounded-xl overflow-auto">
+        <HeaderMenu Text="HR" href="hr" />
+        <HeaderMenu Text="HR" href="hr" />
+        <HeaderMenu Text="HR" href="hr" />
+        <HeaderMenu Text="HR" href="hr" />
+        <HeaderMenu Text="HR" href="hr" />
+        <HeaderMenu Text="HR" href="hr" />
+        <HeaderMenu Text="HR" href="hr" />
+        <HeaderMenu Text="HR" href="hr" />
       </div>
     </div>
   );
