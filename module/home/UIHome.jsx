@@ -9,7 +9,7 @@ function HeaderMenu({ icons, text, href }) {
   return (
     <Link
       href={href}
-      className="flex flex-col items-center justify-center w-40 h-40 p-2 gap-2 border-1 border-foreground rounded-xl shadow hover:scale-105"
+      className="flex flex-col items-center justify-center w-36 h-36 p-2 gap-2 border-1 border-foreground rounded-xl shadow hover:scale-105"
     >
       <div className="flex items-center justify-center w-full h-full p-2 gap-2">
         {icons}
@@ -25,7 +25,7 @@ export default function UIHome() {
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2">
       <div className="flex flex-col items-center justify-center w-full xl:w-2/12 h-fit xl:h-full gap-2">
-        <div className="flex items-center justify-center w-full min-h-60 p-2 gap-2">
+        <div className="flex items-center justify-center w-full min-h-52 p-2 gap-2">
           <Image src="/images/images.jpg" alt="logo" width={200} height={200} />
         </div>
         <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1 border-foreground text-foreground rounded-xl hidden">
@@ -85,7 +85,7 @@ export default function UIHome() {
         </div>
       </div>
       <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-full gap-2 overflow-hidden">
-        <div className="xl:flex flex-col items-center justify-start w-full min-h-60 p-2 gap-2 border-1 border-foreground rounded-xl hidden">
+        <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-2 gap-2 border-1 border-foreground rounded-xl hidden">
           <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-3xl">
             EverGreen Portal
           </div>
@@ -94,15 +94,7 @@ export default function UIHome() {
           </div>
         </div>
         <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full h-full p-2 gap-2 overflow-auto">
-          <HeaderMenu href="hr" icons={<User />} text="HR" />
-          <HeaderMenu href="hr" icons={<User />} text="HR" />
-          <HeaderMenu href="hr" icons={<User />} text="HR" />
-          <HeaderMenu href="hr" icons={<User />} text="HR" />
-          <HeaderMenu href="hr" icons={<User />} text="HR" />
-          <HeaderMenu href="hr" icons={<User />} text="HR" />
-          <HeaderMenu href="hr" icons={<User />} text="HR" />
-          <HeaderMenu href="hr" icons={<User />} text="HR" />
-          <HeaderMenu href="hr" icons={<Settings />} text="Setting" />
+          <HeaderMenu href="setting" icons={<Settings />} text="Setting" />
         </div>
       </div>
     </div>
