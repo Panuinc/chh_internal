@@ -61,6 +61,7 @@ model EmpAcc {
   empAccEmpId     String       @unique
   empAccUsername  String
   empAccPassword  String
+  empAccPinNumber String?
   empAccStatus    empAccStatus @default(Inactive)
   empAccCreatedBy String?
   empAccCreatedAt DateTime?
