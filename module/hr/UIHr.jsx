@@ -1,5 +1,5 @@
 "use client";
-import { User2 } from "lucide-react";
+import { LoaderCircle, User2 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -20,7 +20,7 @@ export default function UIHr() {
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
       <div className="flex flex-col items-center justify-center w-full xl:w-2/12 h-full gap-2 border-1 border-foreground rounded-xl">
-        1
+        <LoaderCircle />
       </div>
       <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-full gap-2 overflow-hidden">
         <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-2 gap-2 border-1 border-foreground rounded-xl hidden">
