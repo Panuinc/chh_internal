@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@heroui/react";
-import { Ghost, Settings, User } from "lucide-react";
+import { Ghost, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
