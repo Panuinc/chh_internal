@@ -5,7 +5,7 @@ import React from "react";
 
 export default function UIDepartment() {
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full gap-2 overflow-auto">
+    <div className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full gap-2 overflow-auto">
       <Link href="department/create" className="flex items-center justify-center w-full min-h-96 p-2 gap-2 border">
         <Button
           color="success"

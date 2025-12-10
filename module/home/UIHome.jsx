@@ -87,7 +87,7 @@ export default function UIHome() {
       <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-full gap-2 overflow-hidden">
         <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-2 gap-2 border-1 border-foreground rounded-xl hidden">
           <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-3xl">
-            EverGreen Portal
+            EverGreen Deshboard
           </div>
           <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-sm opacity-80">
             Your tools. Your workflow. Your operations.
