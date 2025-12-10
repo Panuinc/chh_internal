@@ -1,4 +1,4 @@
-import UIDepartmentForm from "@/module/setting/department/UIDepartmentForm";
+import UIDepartmentForm from "@/module/hr/department/UIDepartmentForm";
 import React from "react";
 
 export default function departmentCreate() {

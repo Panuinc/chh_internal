@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@heroui/react";
-import { Ghost, Settings } from "lucide-react";
+import { Ghost, Settings, User2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -95,6 +95,7 @@ export default function UIHome() {
         </div>
         <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full h-full p-2 gap-2 overflow-auto">
           <HeaderMenu href="setting" icons={<Settings />} text="Setting" />
+          <HeaderMenu href="hr" icons={<User2 />} text="Hr" />
         </div>
       </div>
     </div>
