@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum empStatus {
+  Active
+  Inactive
+}
+
+enum empAccStatus {
+  Active
+  Inactive
+}
+
+model Emp {
+  empId        String    @id @default(cuid())
+  empFirstName String
+  empLastName  String
+  empEmail     String    @unique
+  empStatus    empStatus @default(Active)
+  empCreatedBy String?
+  empCreatedAt DateTime?
+  empUpdatedBy String?
+  empUpdatedAt DateTime?
+
+  createdByEmp Emp? @relation("CreatedEmpBy", fields: [empCreatedBy], references: [empId])
+  updatedByEmp Emp? @relation("UpdatedEmpBy", fields: [empUpdatedBy], references: [empId])
+
+  createdEmps Emp[] @relation("CreatedEmpBy")
+  updatedEmps Emp[] @relation("UpdatedEmpBy")
+
+  createdEmpAccs EmpAcc[] @relation("CreatedEmpAccBy")
+  updatedEmpAccs EmpAcc[] @relation("UpdatedEmpAccBy")
+  empAcc         EmpAcc[]
+
+  createdPerms Perm[] @relation("CreatedPermBy")
+  updatedPerms Perm[] @relation("UpdatedPermBy")
+
+  @@index([empCreatedBy])
+  @@index([empUpdatedBy])
+}
+
+model EmpAcc {
+  empAccId        String       @id @default(cuid())
+  empAccEmpId     String
+  empAccUsername  String
+  empAccPassword  String
+  empAccStatus    empAccStatus @default(Inactive)
+  empAccCreatedBy String?
+  empAccCreatedAt DateTime?
+  empAccUpdatedBy String?
+  empAccUpdatedAt DateTime?
+
+  empAcc Emp @relation(fields: [empAccEmpId], references: [empId])
+
+  createdByEmp Emp? @relation("CreatedEmpAccBy", fields: [empAccCreatedBy], references: [empId])
+  updatedByEmp Emp? @relation("UpdatedEmpAccBy", fields: [empAccUpdatedBy], references: [empId])
+
+  @@index([empAccEmpId])
+  @@index([empAccCreatedBy])
+  @@index([empAccUpdatedBy])
+}
+
+model EmpPerm {
+  empPermId        String    @id @default(cuid())
+  empPermEmpId     String
+  empPermPermId    String
+  empPermCreatedBy String?
+  empPermCreatedAt DateTime?
+  empPermUpdatedBy String?
+  empPermUpdatedAt String?
+
+  @@index([empPermEmpId, empPermPermId])
+  @@index([empPermCreatedBy])
+  @@index([empPermUpdatedBy])
+}
+
+model Perm {
+  permId        String    @id @default(cuid())
+  permName      String    @unique
+  permStatus    String
+  permCreatedBy String?
+  permCreatedAt DateTime?
+  permUpdatedBy String?
+  permUpdatedAt DateTime?
+
+  createdByEmp Emp? @relation("CreatedPermBy", fields: [permCreatedBy], references: [empId])
+  updatedByEmp Emp? @relation("UpdatedPermBy", fields: [permUpdatedBy], references: [empId])
+
+  @@index([permCreatedBy])
+  @@index([permUpdatedBy])
+}
