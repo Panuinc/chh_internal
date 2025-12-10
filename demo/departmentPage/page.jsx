@@ -1,4 +1,4 @@
-import UIDepartment from "@/module/hr/department/UIDepartment";
+import UIDepartment from "@/demo/departmentUI/UIDepartment";
 import React from "react";
 
 export default function department() {
