@@ -10,7 +10,7 @@ export default function UINotFound() {
       <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
         <Image src="/icon/icon-ghost.png" alt="logo" width={250} height={250} />
       </div>
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-8xl">
+      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-7xl">
         Whoops!
       </div>
       <div className="flex items-center justify-center text-center w-6/12 h-fit p-2 gap-2 text-xl opacity-50">
