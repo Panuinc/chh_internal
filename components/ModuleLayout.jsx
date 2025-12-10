@@ -2,6 +2,7 @@
 import { Breadcrumbs, BreadcrumbItem } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { Home } from "lucide-react";
 
 export default function ModuleLayout({ children }) {
   const pathname = usePathname();
@@ -10,7 +11,10 @@ export default function ModuleLayout({ children }) {
 
   const breadcrumbItems = pathSegments.map((segment, index) => {
     const href = "/" + pathSegments.slice(0, index + 1).join("/");
-    const name = segment.charAt(0).toUpperCase() + segment.slice(1);
+    const name = segment
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
     return { name, href };
   });
 
@@ -19,13 +23,16 @@ export default function ModuleLayout({ children }) {
       <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border-b-1 border-foreground">
         <Breadcrumbs color="foreground" variant="solid" size="lg">
           <BreadcrumbItem>
-            <Link href="/home">Home</Link>
+            <Link href="/home" className="flex items-center gap-2">
+              <Home />
+              <span>Home</span>
+            </Link>
           </BreadcrumbItem>
 
           {breadcrumbItems.map((item, index) => (
             <BreadcrumbItem key={item.href}>
               {index === breadcrumbItems.length - 1 ? (
-                <span>{item.name}</span>
+                <span className="font-medium">{item.name}</span>
               ) : (
                 <Link href={item.href}>{item.name}</Link>
               )}
@@ -33,6 +40,7 @@ export default function ModuleLayout({ children }) {
           ))}
         </Breadcrumbs>
       </div>
+
       <div className="flex items-center justify-center w-full h-full gap-2 overflow-hidden">
         {children}
       </div>
