@@ -17,8 +17,8 @@ export default function SettingLayout({ children }) {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border overflow-hidden">
-      <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border">
+    <div className="flex flex-col items-center justify-center w-full h-full gap-2 overflow-hidden">
+      <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border-b-1 border-foreground">
         <Breadcrumbs color="foreground" variant="solid" size="lg">
           <BreadcrumbItem>
             <Link href="/home">Home</Link>
@@ -35,7 +35,7 @@ export default function SettingLayout({ children }) {
           ))}
         </Breadcrumbs>
       </div>
-      <div className="flex items-center justify-center w-full h-full p-2 gap-2 border overflow-hidden">
+      <div className="flex items-center justify-center w-full h-full gap-2 overflow-hidden">
         {children}
       </div>
     </div>
