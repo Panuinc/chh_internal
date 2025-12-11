@@ -20,7 +20,7 @@ export default function ModuleLayout({ children }) {
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full gap-2 overflow-hidden">
-      <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border-b-1 border-foreground">
+      <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border-b-2 border-foreground">
         <Breadcrumbs color="foreground" variant="solid" size="lg">
           <BreadcrumbItem>
             <Link href="/home" className="flex items-center gap-2">

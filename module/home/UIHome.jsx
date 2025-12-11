@@ -7,7 +7,7 @@ import { useMenu } from "@/hooks/useMenu";
 
 function UserProfileCard({ user }) {
   return (
-    <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1 border-foreground rounded-xl hidden overflow-auto">
+    <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-2 border-foreground rounded-xl hidden overflow-auto">
       <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-2xl">
         <Ghost /> Welcome Back
       </div>
@@ -81,7 +81,7 @@ export default function UIHome() {
       </div>
 
       <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-full gap-2 overflow-hidden">
-        <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-4 gap-2 border-1 border-foreground rounded-xl hidden">
+        <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-4 gap-2 border-2 border-foreground rounded-xl hidden">
           <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-3xl font-semibold">
             EverGreen Dashboard
           </div>

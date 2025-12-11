@@ -31,7 +31,7 @@ export default function UISetting() {
 
   if (!menu) {
     return (
-      <div className="flex items-center justify-center w-full h-full">
+      <div className="flex items-center justify-center w-full h-full p-2 gap-2">
         <div className="flex items-center gap-2 text-danger">
           <AlertCircle />
           <span>Module configuration not found</span>

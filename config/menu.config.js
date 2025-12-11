@@ -82,6 +82,13 @@ export const menuConfig = {
           icon: CalendarCheck,
           permission: "hr.attendance.view",
         },
+          {
+          id: "permission",
+          href: "/hr/permission",
+          text: "Permission",
+          icon: CalendarCheck,
+          permission: "hr.permission.view",
+        },
       ],
     },
   },

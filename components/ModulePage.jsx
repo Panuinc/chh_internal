@@ -13,7 +13,7 @@ export default function ModulePage({
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
       {showSidebar && (
-        <div className="flex flex-col items-center justify-center w-full xl:w-2/12 h-full p-2 gap-2 border-1 border-foreground rounded-xl">
+        <div className="flex flex-col items-center justify-center w-full xl:w-2/12 h-full p-2 gap-2 border-2 border-foreground rounded-xl">
           {sidebar || (
             <div className="text-sm text-foreground/50">No sidebar content</div>
           )}
@@ -26,7 +26,7 @@ export default function ModulePage({
         } h-full  gap-2 overflow-hidden`}
       >
         {showHeader && (
-          <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-4 gap-2 border-1 border-foreground rounded-xl hidden">
+          <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-4 gap-2 border-2 border-foreground rounded-xl hidden">
             <div className="flex items-center justify-start w-full h-fit p-2 gap-3 text-3xl font-semibold">
               {icon} {title}
             </div>
