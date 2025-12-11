@@ -36,7 +36,7 @@ export default function ModulePage({
           </div>
         )}
 
-        <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full h-full p-2 gap-2 overflow-auto">
+        <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full h-full p-2 gap-2 border-2 border-foreground rounded-xl overflow-auto">
           {children}
         </div>
       </div>
