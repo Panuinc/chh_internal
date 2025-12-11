@@ -12,7 +12,6 @@ export function usePermissions() {
     "hr.view",
     "hr.department.view",
     "hr.employee.view",
-    "hr.attendance.view",
     "hr.permission.view",
   ];
 

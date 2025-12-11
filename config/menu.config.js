@@ -3,7 +3,6 @@ import {
   User2,
   Building2,
   Users,
-  CalendarCheck,
   FileText,
   Shield,
   Database,
@@ -63,13 +62,6 @@ export const menuConfig = {
       description: "Manage employees and departments",
       items: [
         {
-          id: "department",
-          href: "/hr/department",
-          text: "Department",
-          icon: Building2,
-          permission: "hr.department.view",
-        },
-        {
           id: "employee",
           href: "/hr/employee",
           text: "Employee",
@@ -77,18 +69,18 @@ export const menuConfig = {
           permission: "hr.employee.view",
         },
         {
-          id: "attendance",
-          href: "/hr/attendance",
-          text: "Attendance",
-          icon: CalendarCheck,
-          permission: "hr.attendance.view",
-        },
-        {
           id: "permission",
           href: "/hr/permission",
           text: "Permission",
           icon: ScrollText,
           permission: "hr.permission.view",
+        },
+        {
+          id: "department",
+          href: "/hr/department",
+          text: "Department",
+          icon: Building2,
+          permission: "hr.department.view",
         },
       ],
     },
