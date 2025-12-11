@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@heroui/react": "^2.8.5",
-    "@prisma/client": "^7.1.0",
+    "@prisma/client": "6.18.0",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.23.25",
     "lucide-react": "^0.556.0",
@@ -23,7 +23,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.8",
-    "prisma": "^7.1.0",
+    "prisma": "6.18.0",
     "tailwindcss": "^4"
   }
 }
