@@ -23,7 +23,7 @@ export default function ModulePage({
       <div
         className={`flex flex-col items-center justify-center w-full ${
           showSidebar ? "xl:w-8/12" : "xl:w-10/12"
-        } h-full  gap-2 overflow-hidden`}
+        } h-full gap-2 overflow-hidden`}
       >
         {showHeader && (
           <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-4 gap-2 border-2 border-foreground rounded-xl hidden">

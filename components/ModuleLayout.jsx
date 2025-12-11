@@ -2,7 +2,6 @@
 import { Breadcrumbs, BreadcrumbItem } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home } from "lucide-react";
 
 export default function ModuleLayout({ children }) {
   const pathname = usePathname();
@@ -24,8 +23,7 @@ export default function ModuleLayout({ children }) {
         <Breadcrumbs color="foreground" variant="solid" size="lg">
           <BreadcrumbItem>
             <Link href="/home" className="flex items-center gap-2">
-              <Home />
-              <span>Home</span>
+              Home
             </Link>
           </BreadcrumbItem>
 
