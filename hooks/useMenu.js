@@ -4,11 +4,6 @@ import { menuConfig } from "@/config/menu.config";
 
 export function usePermissions() {
   const mockPermissions = [
-    "setting.view",
-    "setting.aa.view",
-    "setting.bb.view",
-    "setting.cc.view",
-
     "hr.view",
     "hr.department.view",
     "hr.employee.view",

@@ -26,8 +26,8 @@ export default function ModulePage({
         } h-full gap-2 overflow-hidden`}
       >
         {showHeader && (
-          <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-4 gap-2 border-2 border-foreground rounded-xl hidden">
-            <div className="flex items-center justify-start w-full h-fit p-2 gap-3 text-3xl font-semibold">
+          <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-2 gap-2 border-2 border-foreground rounded-xl hidden">
+            <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-3xl font-semibold">
               {icon} {title}
             </div>
             <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-sm opacity-80">
@@ -36,7 +36,7 @@ export default function ModulePage({
           </div>
         )}
 
-        <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full h-full p-2 gap-4 overflow-auto">
+        <div className="grid grid-cols-2 xl:grid-cols-3 place-items-center w-full h-full p-2 gap-2 overflow-auto">
           {children}
         </div>
       </div>

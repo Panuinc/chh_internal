@@ -12,13 +12,6 @@ import {
 export const menuConfig = {
   modules: [
     {
-      id: "setting",
-      href: "/setting",
-      text: "Setting",
-      icon: Settings,
-      permission: "setting.view",
-    },
-    {
       id: "hr",
       href: "/hr",
       text: "Human Resource",
@@ -28,34 +21,6 @@ export const menuConfig = {
   ],
 
   submenus: {
-    setting: {
-      title: "Setting",
-      icon: Settings,
-      description: "Manage system configurations",
-      items: [
-        {
-          id: "aa",
-          href: "/setting/aa",
-          text: "AA",
-          icon: FileText,
-          permission: "setting.aa.view",
-        },
-        {
-          id: "bb",
-          href: "/setting/bb",
-          text: "BB",
-          icon: Shield,
-          permission: "setting.bb.view",
-        },
-        {
-          id: "cc",
-          href: "/setting/cc",
-          text: "CC",
-          icon: Database,
-          permission: "setting.cc.view",
-        },
-      ],
-    },
     hr: {
       title: "Human Resource",
       icon: User2,

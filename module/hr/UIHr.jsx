@@ -11,7 +11,7 @@ function HrSidebar() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full gap-4 p-2">
+    <div className="flex flex-col items-center justify-start w-full h-full gap-2 p-2">
       <div className="text-lg font-semibold">Quick Stats</div>
 
       <div className="flex flex-col w-full gap-2 text-sm">
