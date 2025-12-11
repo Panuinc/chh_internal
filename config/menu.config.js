@@ -7,6 +7,7 @@ import {
   FileText,
   Shield,
   Database,
+  ScrollText,
 } from "lucide-react";
 
 export const menuConfig = {
@@ -82,11 +83,11 @@ export const menuConfig = {
           icon: CalendarCheck,
           permission: "hr.attendance.view",
         },
-          {
+        {
           id: "permission",
           href: "/hr/permission",
           text: "Permission",
-          icon: CalendarCheck,
+          icon: ScrollText,
           permission: "hr.permission.view",
         },
       ],
