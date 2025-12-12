@@ -7,6 +7,7 @@ import {
   Shield,
   Database,
   ScrollText,
+  Key,
 } from "lucide-react";
 
 export const menuConfig = {
@@ -46,6 +47,13 @@ export const menuConfig = {
           text: "Department",
           icon: Building2,
           permission: "hr.department.view",
+        },
+         {
+          id: "assignPermission",
+          href: "/hr/assignPermission",
+          text: "AssignPermission",
+          icon: Key,
+          permission: "hr.assignPermission.view",
         },
       ],
     },

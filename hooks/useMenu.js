@@ -8,6 +8,7 @@ export function usePermissions() {
     "hr.department.view",
     "hr.employee.view",
     "hr.permission.view",
+    "hr.assignPermission.view",
   ];
 
   return mockPermissions;
