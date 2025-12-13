@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
-// GET /api/employees - ดึง employees ทั้งหมดพร้อม permissions
 export async function GET() {
   try {
     const session = await auth();
@@ -35,7 +34,6 @@ export async function GET() {
       },
     });
 
-    // Format response
     const formattedEmployees = employees.map((emp) => ({
       empId: emp.empId,
       empFirstName: emp.empFirstName,

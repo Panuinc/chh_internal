@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
-// POST /api/employees/[empId]/permissions - Assign permission ให้ employee
 export async function POST(request, { params }) {
   try {
     const session = await auth();
@@ -11,7 +10,6 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ตรวจสอบว่าเป็น superAdmin
     if (!session.user.isSuperAdmin) {
       return NextResponse.json(
         { error: "Only Super Admin can assign permissions" },
@@ -30,7 +28,6 @@ export async function POST(request, { params }) {
       );
     }
 
-    // ตรวจสอบว่า employee มีอยู่จริง
     const employee = await prisma.emp.findUnique({
       where: { empId },
     });
@@ -39,7 +36,6 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: "Employee not found" }, { status: 404 });
     }
 
-    // ตรวจสอบว่า permission มีอยู่จริง
     const permission = await prisma.perm.findUnique({
       where: { permId },
     });
@@ -51,7 +47,6 @@ export async function POST(request, { params }) {
       );
     }
 
-    // ตรวจสอบว่ามี permission นี้อยู่แล้วหรือไม่
     const existing = await prisma.empPerm.findFirst({
       where: {
         empPermEmpId: empId,
@@ -66,7 +61,6 @@ export async function POST(request, { params }) {
       );
     }
 
-    // สร้าง permission assignment
     const empPerm = await prisma.empPerm.create({
       data: {
         empPermEmpId: empId,
@@ -102,7 +96,6 @@ export async function POST(request, { params }) {
   }
 }
 
-// DELETE /api/employees/[empId]/permissions - Remove permission จาก employee
 export async function DELETE(request, { params }) {
   try {
     const session = await auth();
@@ -111,7 +104,6 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ตรวจสอบว่าเป็น superAdmin
     if (!session.user.isSuperAdmin) {
       return NextResponse.json(
         { error: "Only Super Admin can remove permissions" },
@@ -130,7 +122,6 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // ตรวจสอบว่า permission assignment มีอยู่จริงและเป็นของ employee นี้
     const empPerm = await prisma.empPerm.findFirst({
       where: {
         empPermId,
@@ -145,7 +136,6 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // ลบ permission assignment
     await prisma.empPerm.delete({
       where: { empPermId },
     });
@@ -162,7 +152,6 @@ export async function DELETE(request, { params }) {
   }
 }
 
-// GET /api/employees/[empId]/permissions - ดึง permissions ของ employee
 export async function GET(request, { params }) {
   try {
     const session = await auth();
