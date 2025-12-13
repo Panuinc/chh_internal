@@ -1,170 +1,78 @@
-import PermissionRepository from "@/repositories/permission.repository";
+import PermissionUseCases from "@/usecases/permission.usecase";
 
 /**
  * Permission Service
- * จัดการ Business Logic สำหรับ Permission
+ * Facade Layer - รวม Use Cases ให้เรียกใช้ง่ายขึ้น
+ * Service นี้ทำหน้าที่เป็น entry point สำหรับ business logic
  */
-export const PermissionService = {
+export class PermissionService {
   /**
    * ดึง permissions ทั้งหมด
+   * @param {Object} options - Query options
    */
-  async getAllPermissions(options = {}) {
-    const permissions = await PermissionRepository.findAll(options);
-
-    // Transform data
-    return permissions.map((perm) => ({
-      permId: perm.permId,
-      permName: perm.permName,
-      permStatus: perm.permStatus,
-      userCount: perm._count?.empPerms || 0,
-      createdBy: perm.createdByEmp
-        ? `${perm.createdByEmp.empFirstName} ${perm.createdByEmp.empLastName}`
-        : null,
-      createdAt: perm.permCreatedAt,
-      updatedBy: perm.updatedByEmp
-        ? `${perm.updatedByEmp.empFirstName} ${perm.updatedByEmp.empLastName}`
-        : null,
-      updatedAt: perm.permUpdatedAt,
-    }));
-  },
+  static async getAllPermissions(options = {}) {
+    return await PermissionUseCases.getAllPermissions.execute(options);
+  }
 
   /**
    * ดึง permission ด้วย ID
+   * @param {string} permId
    */
-  async getPermissionById(permId) {
-    const perm = await PermissionRepository.findById(permId);
-
-    if (!perm) {
-      throw new Error("Permission not found");
-    }
-
-    return {
-      permId: perm.permId,
-      permName: perm.permName,
-      permStatus: perm.permStatus,
-      userCount: perm._count?.empPerms || 0,
-      createdBy: perm.createdByEmp
-        ? `${perm.createdByEmp.empFirstName} ${perm.createdByEmp.empLastName}`
-        : null,
-      createdAt: perm.permCreatedAt,
-    };
-  },
+  static async getPermissionById(permId) {
+    return await PermissionUseCases.getPermissionById.execute(permId);
+  }
 
   /**
    * สร้าง permission ใหม่
+   * @param {Object} data
+   * @param {string} data.permName
+   * @param {string} data.createdBy
    */
-  async createPermission(data) {
-    // Validation
-    if (!data.permName || !data.permName.trim()) {
-      throw new Error("Permission name is required");
-    }
-
-    const permName = data.permName.trim();
-
-    // Validate format
-    if (!this.isValidPermissionName(permName)) {
-      throw new Error(
-        "Invalid permission name format. Use: module.action or module.submodule.action"
-      );
-    }
-
-    // Check duplicate
-    const existing = await PermissionRepository.findByName(permName);
-    if (existing) {
-      throw new Error("Permission already exists");
-    }
-
-    // Create
-    const permission = await PermissionRepository.create({
-      permName,
-      permStatus: "Active",
-      createdBy: data.createdBy,
-    });
-
-    return {
-      permId: permission.permId,
-      permName: permission.permName,
-      permStatus: permission.permStatus,
-    };
-  },
+  static async createPermission(data) {
+    return await PermissionUseCases.createPermission.execute(data);
+  }
 
   /**
    * อัพเดท permission
+   * @param {string} permId
+   * @param {Object} data
    */
-  async updatePermission(permId, data) {
-    // Check exists
-    const existing = await PermissionRepository.findById(permId);
-    if (!existing) {
-      throw new Error("Permission not found");
-    }
-
-    // Check duplicate name (if changing name)
-    if (data.permName && data.permName !== existing.permName) {
-      const duplicate = await PermissionRepository.findByName(data.permName);
-      if (duplicate) {
-        throw new Error("Permission name already exists");
-      }
-    }
-
-    // Update
-    const permission = await PermissionRepository.update(permId, {
-      permName: data.permName || existing.permName,
-      permStatus: data.permStatus || existing.permStatus,
-      updatedBy: data.updatedBy,
-    });
-
-    return {
-      permId: permission.permId,
-      permName: permission.permName,
-      permStatus: permission.permStatus,
-    };
-  },
+  static async updatePermission(permId, data) {
+    return await PermissionUseCases.updatePermission.execute(permId, data);
+  }
 
   /**
-   * ลบ permission (Soft delete)
+   * ลบ permission (soft delete)
+   * @param {string} permId
+   * @param {string} userId
    */
-  async deletePermission(permId, updatedBy) {
-    // Check exists
-    const existing = await PermissionRepository.findById(permId);
-    if (!existing) {
-      throw new Error("Permission not found");
-    }
+  static async deletePermission(permId, userId) {
+    return await PermissionUseCases.deletePermission.execute(permId, userId);
+  }
 
-    // Prevent delete superAdmin
-    if (existing.permName === "superAdmin") {
-      throw new Error("Cannot delete superAdmin permission");
-    }
+  /**
+   * ดึงสถิติ permissions
+   */
+  static async getStatistics() {
+    return await PermissionUseCases.getStatistics.execute();
+  }
 
-    await PermissionRepository.softDelete(permId, updatedBy);
-
-    return { message: "Permission deleted successfully" };
-  },
+  /**
+   * ตรวจสอบว่า permission มีอยู่หรือไม่
+   * @param {string} permName
+   */
+  static async checkPermissionExists(permName) {
+    return await PermissionUseCases.checkExists.execute(permName);
+  }
 
   /**
    * Validate permission name format
+   * Static utility method
    */
-  isValidPermissionName(name) {
-    // Allow: superAdmin, admin, hr.view, hr.employee.view, hr.*
+  static isValidPermissionName(name) {
     const pattern = /^[a-zA-Z]+(\.[a-zA-Z*]+)*$/;
     return pattern.test(name);
-  },
-
-  /**
-   * ดึง permission statistics
-   */
-  async getStatistics() {
-    const [activeCount, inactiveCount, totalCount] = await Promise.all([
-      PermissionRepository.count("Active"),
-      PermissionRepository.count("Inactive"),
-      PermissionRepository.count(),
-    ]);
-
-    return {
-      total: totalCount,
-      active: activeCount,
-      inactive: inactiveCount,
-    };
-  },
-};
+  }
+}
 
 export default PermissionService;
