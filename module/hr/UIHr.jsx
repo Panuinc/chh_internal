@@ -1,6 +1,4 @@
-"use client";
 import { ModulePage, SubMenu } from "@/components";
-import { useModuleMenu } from "@/hooks/useMenu";
 import { AlertCircle } from "lucide-react";
 
 function HrSidebar() {
@@ -32,9 +30,7 @@ function StatItem({ label, value }) {
   );
 }
 
-export default function UIHr() {
-  const { menu, isEmpty } = useModuleMenu("hr");
-
+export default function UIHr({ menu, isEmpty }) {
   if (!menu) {
     return (
       <div className="flex items-center justify-center w-full h-full">

@@ -11,10 +11,11 @@ export default function UIForbidden() {
         <Image src="/icon/icon-ghost.png" alt="logo" width={250} height={250} />
       </div>
       <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-7xl">
-        Whoops!
+        Access Denied!
       </div>
       <div className="flex items-center justify-center text-center w-6/12 h-fit p-2 gap-2 text-xl opacity-50">
-        We Couldn't find the page you were looking for.
+        You do not have permission to access this page. Please contact your
+        administrator if you need additional access rights.
       </div>
       <Link
         href="/home"

@@ -1,0 +1,57 @@
+"use client";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
+import { showToast } from "@/components";
+import { AUTH_MESSAGES } from "@/lib/auth-messages";
+import UISignIn from "@/module/signIn/UISignIn";
+
+export default function SignIn() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/home";
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const result = await signIn("credentials", {
+        username: username.trim(),
+        password: password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        const errorMessage = result.code || AUTH_MESSAGES.UNKNOWN_ERROR;
+        setError(errorMessage);
+        showToast("danger", errorMessage);
+        setIsLoading(false);
+      } else if (result?.ok) {
+        showToast("success", AUTH_MESSAGES.LOGIN_SUCCESS);
+        window.location.href = callbackUrl;
+      }
+    } catch (err) {
+      setError(AUTH_MESSAGES.LOGIN_ERROR);
+      showToast("danger", AUTH_MESSAGES.LOGIN_ERROR);
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <UISignIn
+      username={username}
+      password={password}
+      isLoading={isLoading}
+      error={error}
+      onUsernameChange={setUsername}
+      onPasswordChange={setPassword}
+      onSubmit={handleSubmit}
+    />
+  );
+}

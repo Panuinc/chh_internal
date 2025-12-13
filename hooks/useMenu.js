@@ -1,47 +1,75 @@
 "use client";
 import { useMemo, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { menuConfig } from "@/config/menu.config";
 
+/**
+ * Hook สำหรับดึง permissions จาก session
+ */
 export function usePermissions() {
-  const mockPermissions = [
-    "hr.view",
-    "hr.department.view",
-    "hr.employee.view",
-    "hr.permission.view",
-    "hr.assignPermission.view",
-  ];
+  const { data: session, status } = useSession();
 
-  return mockPermissions;
+  const permissions = useMemo(() => {
+    if (status === "loading" || !session?.user?.permissions) {
+      return [];
+    }
+    return session.user.permissions;
+  }, [session, status]);
+
+  const isSuperAdmin = useMemo(() => {
+    return session?.user?.isSuperAdmin || false;
+  }, [session]);
+
+  return {
+    permissions,
+    isSuperAdmin,
+    isLoading: status === "loading",
+    isAuthenticated: status === "authenticated",
+  };
 }
 
+/**
+ * Hook หลักสำหรับจัดการ menu และ permissions
+ */
 export function useMenu() {
-  const permissions = usePermissions();
+  const { permissions, isSuperAdmin, isLoading, isAuthenticated } =
+    usePermissions();
+
   const hasPermission = useCallback(
     (permission) => {
+      // ถ้าไม่มี permission required -> อนุญาต
       if (!permission) return true;
 
+      // SuperAdmin เข้าได้ทุกที่
+      if (isSuperAdmin) return true;
+
+      // ตรวจสอบ exact match
       if (permissions.includes(permission)) return true;
 
+      // ตรวจสอบ wildcard permissions (เช่น hr.* -> hr.employee.view)
       const wildcardPermissions = permissions.filter((p) => p.endsWith(".*"));
       for (const wp of wildcardPermissions) {
         const prefix = wp.slice(0, -2);
         if (permission.startsWith(prefix)) return true;
       }
 
+      // ตรวจสอบ admin หรือ * permission
       if (permissions.includes("*") || permissions.includes("admin")) {
         return true;
       }
 
       return false;
     },
-    [permissions]
+    [permissions, isSuperAdmin]
   );
 
   const modules = useMemo(() => {
+    if (!isAuthenticated) return [];
+
     return menuConfig.modules.filter((module) =>
       hasPermission(module.permission)
     );
-  }, [hasPermission]);
+  }, [hasPermission, isAuthenticated]);
 
   const getSubmenu = useCallback(
     (moduleId) => {
@@ -84,6 +112,9 @@ export function useMenu() {
 
   return {
     permissions,
+    isSuperAdmin,
+    isLoading,
+    isAuthenticated,
     modules,
     getSubmenu,
     hasPermission,
@@ -91,14 +122,19 @@ export function useMenu() {
   };
 }
 
+/**
+ * Hook สำหรับใช้กับ module เฉพาะ
+ */
 export function useModuleMenu(moduleId) {
-  const { getSubmenu, hasPermission } = useMenu();
+  const { getSubmenu, hasPermission, isLoading, isAuthenticated } = useMenu();
   const menu = getSubmenu(moduleId);
 
   return {
     menu,
     hasPermission,
     isEmpty: !menu || menu.items.length === 0,
+    isLoading,
+    isAuthenticated,
   };
 }
 

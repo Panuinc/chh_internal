@@ -11,7 +11,7 @@ export default function ModulePage({
   showSidebar = true,
 }) {
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
+    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2 border-4 border-danger border-dashed">
       {showSidebar && (
         <div className="flex flex-col items-center justify-center w-full xl:w-2/12 h-full p-2 gap-2 border-2 border-foreground rounded-xl">
           {sidebar || (

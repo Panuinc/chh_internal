@@ -1,41 +1,54 @@
-"use client";
 import { Ghost } from "lucide-react";
 import { Button } from "@heroui/react";
-import Image from "next/image";
 import { SubMenu } from "@/components";
-import { useMenu } from "@/hooks/useMenu";
+import Image from "next/image";
 
 function UserProfileCard({ user }) {
   return (
-    <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-2 border-foreground rounded-xl hidden overflow-auto">
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-2xl">
-        <Ghost /> Welcome Back
-      </div>
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-xl">
-        {user.name}
-      </div>
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
-        Description
-      </div>
-
-      <div className="flex flex-col items-center justify-start w-full h-fit gap-2 text-xs">
-        <UserInfoRow label="Position" value={user.position} />
-        <UserInfoRow label="Department" value={user.department} />
-        <UserInfoRow label="Role" value={user.role} />
-        <UserInfoRow label="Email" value={user.email} />
+    <>
+      <div className="flex items-center justify-center w-full min-h-52 p-2 gap-2">
+        <Image
+          src={user.avatar}
+          alt="profile"
+          width={200}
+          height={200}
+          className="rounded-full"
+        />
       </div>
 
-      <div className="flex items-end justify-center w-full h-full p-2 gap-2">
-        <Button
-          color="none"
-          variant="solid"
-          size="lg"
-          className="w-full bg-foreground text-background font-black"
-        >
-          Change Password
-        </Button>
+      <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-2 border-foreground rounded-xl hidden overflow-auto">
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-2xl">
+          <Ghost /> Welcome Back
+        </div>
+
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-xl">
+          {user.name}
+        </div>
+
+        <div className="flex flex-col items-center justify-start w-full h-fit gap-2 text-xs">
+          <UserInfoRow label="Email" value={user.email} />
+          <UserInfoRow
+            label="Role"
+            value={user.isSuperAdmin ? "Super Admin" : "User"}
+          />
+          <UserInfoRow
+            label="Permissions"
+            value={user.permissions?.length || 0}
+          />
+        </div>
+
+        <div className="flex flex-col items-end justify-end w-full h-full p-2 gap-2">
+          <Button
+            color="none"
+            variant="solid"
+            size="lg"
+            className="w-full bg-foreground text-background font-black"
+          >
+            Change Password
+          </Button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -52,32 +65,11 @@ function UserInfoRow({ label, value }) {
   );
 }
 
-export default function UIHome() {
-  const { modules } = useMenu();
-
-  const currentUser = {
-    name: "Panuwat Jangchudjai",
-    position: "Software Developer",
-    department: "IT Department",
-    role: "SuperAdmin",
-    email: "panuwat@company.com",
-    avatar: "/images/images.jpg",
-  };
-
+export default function UIHome({ user, modules }) {
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
       <div className="flex flex-col items-center justify-start w-full xl:w-2/12 h-fit xl:h-full gap-2">
-        <div className="flex items-center justify-center w-full min-h-52 p-2 gap-2">
-          <Image
-            src={currentUser.avatar}
-            alt="profile"
-            width={200}
-            height={200}
-            className="rounded-full"
-          />
-        </div>
-
-        <UserProfileCard user={currentUser} />
+        {user && <UserProfileCard user={user} />}
       </div>
 
       <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-full gap-2 overflow-hidden">
@@ -101,7 +93,7 @@ export default function UIHome() {
               />
             ))
           ) : (
-            <div className="col-span-full text-center text-foreground/50">
+            <div className="col-span-full place-items-center text-center p-2 gap-2">
               No modules available. Please contact administrator.
             </div>
           )}

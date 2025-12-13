@@ -1,14 +1,4 @@
-import {
-  Settings,
-  User2,
-  Building2,
-  Users,
-  FileText,
-  Shield,
-  Database,
-  ScrollText,
-  Key,
-} from "lucide-react";
+import { User2, Building2, Users, ScrollText, Key } from "lucide-react";
 
 export const menuConfig = {
   modules: [
@@ -25,7 +15,7 @@ export const menuConfig = {
     hr: {
       title: "Human Resource",
       icon: User2,
-      description: "Manage employees and departments",
+      description: "จัดการพนักงานและแผนก",
       items: [
         {
           id: "employee",
@@ -33,6 +23,12 @@ export const menuConfig = {
           text: "Employee",
           icon: Users,
           permission: "hr.employee.view",
+          actions: {
+            view: "hr.employee.view",
+            create: "hr.employee.create",
+            edit: "hr.employee.edit",
+            delete: "hr.employee.delete",
+          },
         },
         {
           id: "permission",
@@ -40,6 +36,7 @@ export const menuConfig = {
           text: "Permission",
           icon: ScrollText,
           permission: "hr.permission.view",
+          requireSuperAdmin: true,
         },
         {
           id: "department",
@@ -47,17 +44,75 @@ export const menuConfig = {
           text: "Department",
           icon: Building2,
           permission: "hr.department.view",
+          actions: {
+            view: "hr.department.view",
+            create: "hr.department.create",
+            edit: "hr.department.edit",
+            delete: "hr.department.delete",
+          },
         },
-         {
+        {
           id: "assignPermission",
           href: "/hr/assignPermission",
-          text: "AssignPermission",
+          text: "Assign Permission",
           icon: Key,
           permission: "hr.assignPermission.view",
+          requireSuperAdmin: true,
         },
       ],
     },
   },
 };
+
+export function getProtectedRoutes() {
+  const routes = {};
+
+  menuConfig.modules.forEach((module) => {
+    if (module.href && module.permission) {
+      routes[module.href] = {
+        permission: module.permission,
+        requireSuperAdmin: module.requireSuperAdmin || false,
+      };
+    }
+  });
+
+  Object.values(menuConfig.submenus).forEach((submenu) => {
+    submenu.items.forEach((item) => {
+      if (item.href && item.permission) {
+        routes[item.href] = {
+          permission: item.permission,
+          requireSuperAdmin: item.requireSuperAdmin || false,
+        };
+      }
+    });
+  });
+
+  return routes;
+}
+
+export function getAllDefinedPermissions() {
+  const permissions = new Set();
+
+  menuConfig.modules.forEach((module) => {
+    if (module.permission) {
+      permissions.add(module.permission);
+    }
+  });
+
+  Object.values(menuConfig.submenus).forEach((submenu) => {
+    submenu.items.forEach((item) => {
+      if (item.permission) {
+        permissions.add(item.permission);
+      }
+      if (item.actions) {
+        Object.values(item.actions).forEach((action) => {
+          permissions.add(action);
+        });
+      }
+    });
+  });
+
+  return Array.from(permissions).sort();
+}
 
 export default menuConfig;

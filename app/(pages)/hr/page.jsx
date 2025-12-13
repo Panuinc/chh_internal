@@ -1,6 +1,10 @@
+"use client";
+
+import { useModuleMenu } from "@/hooks/useMenu";
 import UIHr from "@/module/hr/UIHr";
-import React from "react";
 
 export default function Hr() {
-  return <UIHr />;
+  const { menu, isEmpty } = useModuleMenu("hr");
+
+  return <UIHr menu={menu} isEmpty={isEmpty} />;
 }

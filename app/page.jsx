@@ -1,7 +1,5 @@
-"use client";
-import UISignIn from "@/module/signIn/UISignIn";
-import React from "react";
+import { redirect } from "next/navigation";
 
-export default function signIn() {
-  return <UISignIn />;
+export default function Index() {
+  redirect("/signIn");
 }

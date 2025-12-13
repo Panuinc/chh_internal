@@ -1,0 +1,11 @@
+"use client";
+import { Spinner } from "@heroui/react";
+
+export default function LoadingState({ label = "Loading..." }) {
+  return (
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
+      <Spinner size="lg" color="none" />
+      <span className="text-foreground/70">{label}</span>
+    </div>
+  );
+}
