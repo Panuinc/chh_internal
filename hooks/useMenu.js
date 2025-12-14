@@ -3,9 +3,6 @@ import { useMemo, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { menuConfig } from "@/config/menu.config";
 
-/**
- * Hook สำหรับดึง permissions จาก session
- */
 export function usePermissions() {
   const { data: session, status } = useSession();
 
@@ -28,32 +25,22 @@ export function usePermissions() {
   };
 }
 
-/**
- * Hook หลักสำหรับจัดการ menu และ permissions
- */
 export function useMenu() {
   const { permissions, isSuperAdmin, isLoading, isAuthenticated } =
     usePermissions();
 
   const hasPermission = useCallback(
     (permission) => {
-      // ถ้าไม่มี permission required -> อนุญาต
       if (!permission) return true;
-
-      // SuperAdmin เข้าได้ทุกที่
       if (isSuperAdmin) return true;
-
-      // ตรวจสอบ exact match
       if (permissions.includes(permission)) return true;
 
-      // ตรวจสอบ wildcard permissions (เช่น hr.* -> hr.employee.view)
       const wildcardPermissions = permissions.filter((p) => p.endsWith(".*"));
       for (const wp of wildcardPermissions) {
         const prefix = wp.slice(0, -2);
         if (permission.startsWith(prefix)) return true;
       }
 
-      // ตรวจสอบ admin หรือ * permission
       if (permissions.includes("*") || permissions.includes("admin")) {
         return true;
       }
@@ -122,9 +109,6 @@ export function useMenu() {
   };
 }
 
-/**
- * Hook สำหรับใช้กับ module เฉพาะ
- */
 export function useModuleMenu(moduleId) {
   const { getSubmenu, hasPermission, isLoading, isAuthenticated } = useMenu();
   const menu = getSubmenu(moduleId);

@@ -7,112 +7,112 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum empStatus {
+enum employeeStatus {
   Active
   Inactive
 }
 
-enum empAccStatus {
+enum accountStatus {
   Active
   Inactive
 }
 
-enum PermStatus {
+enum PermissionStatus {
   Active
   Inactive
 }
 
-model Emp {
-  empId        String    @id @default(cuid())
-  empFirstName String
-  empLastName  String
-  empEmail     String    @unique
-  empStatus    empStatus @default(Active)
-  empCreatedBy String?
-  empCreatedAt DateTime?
-  empUpdatedBy String?
-  empUpdatedAt DateTime?
+model Employee {
+  employeeId        String         @id @default(cuid())
+  employeeFirstName String
+  employeeLastName  String
+  employeeEmail     String         @unique
+  employeeStatus    employeeStatus @default(Active)
+  employeeCreatedBy String?
+  employeeCreatedAt DateTime?
+  employeeUpdatedBy String?
+  employeeUpdatedAt DateTime?
 
-  createdByEmp Emp? @relation("EmpCreatedBy", fields: [empCreatedBy], references: [empId])
-  updatedByEmp Emp? @relation("EmpUpdatedBy", fields: [empUpdatedBy], references: [empId])
+  createdByEmployee Employee? @relation("EmployeeCreatedBy", fields: [employeeCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("EmployeeUpdatedBy", fields: [employeeUpdatedBy], references: [employeeId])
 
-  createdEmps Emp[] @relation("EmpCreatedBy")
-  updatedEmps Emp[] @relation("EmpUpdatedBy")
+  createdEmployees Employee[] @relation("EmployeeCreatedBy")
+  updatedEmployees Employee[] @relation("EmployeeUpdatedBy")
 
-  empAcc EmpAcc?
+  account Account?
 
-  empPerms EmpPerm[]
+  assigns Assign[]
 
-  createdEmpAccs EmpAcc[] @relation("EmpAccCreatedBy")
-  updatedEmpAccs EmpAcc[] @relation("EmpAccUpdatedBy")
+  createdAccounts Account[] @relation("AccountCreatedBy")
+  updatedAccounts Account[] @relation("AccountUpdatedBy")
 
-  createdEmpPerms EmpPerm[] @relation("EmpPermCreatedBy")
-  updatedEmpPerms EmpPerm[] @relation("EmpPermUpdatedBy")
+  createdAssigns Assign[] @relation("AssignCreatedBy")
+  updatedAssigns Assign[] @relation("AssignUpdatedBy")
 
-  createdPerms Perm[] @relation("PermCreatedBy")
-  updatedPerms Perm[] @relation("PermUpdatedBy")
+  createdPermissions Permission[] @relation("PermissionCreatedBy")
+  updatedPermissions Permission[] @relation("PermissionUpdatedBy")
 
-  @@index([empCreatedBy])
-  @@index([empUpdatedBy])
+  @@index([employeeCreatedBy])
+  @@index([employeeUpdatedBy])
 }
 
-model EmpAcc {
-  empAccId        String       @id @default(cuid())
-  empAccEmpId     String       @unique
-  empAccUsername  String
-  empAccPassword  String
-  empAccPinNumber String?
-  empAccStatus    empAccStatus @default(Inactive)
-  empAccCreatedBy String?
-  empAccCreatedAt DateTime?
-  empAccUpdatedBy String?
-  empAccUpdatedAt DateTime?
+model Account {
+  accountId         String                @id @default(cuid())
+  accountEmployeeId String                @unique
+  accountUsername   String
+  accountPassword   String
+  accountPinNumber  String?
+  accountStatus     accountStatus @default(Inactive)
+  accountCreatedBy  String?
+  accountCreatedAt  DateTime?
+  accountUpdatedBy  String?
+  accountUpdatedAt  DateTime?
 
-  empAccEmp Emp @relation(fields: [empAccEmpId], references: [empId])
+  accountEmployee Employee @relation(fields: [accountEmployeeId], references: [employeeId])
 
-  createdByEmp Emp? @relation("EmpAccCreatedBy", fields: [empAccCreatedBy], references: [empId])
-  updatedByEmp Emp? @relation("EmpAccUpdatedBy", fields: [empAccUpdatedBy], references: [empId])
+  createdByEmployee Employee? @relation("AccountCreatedBy", fields: [accountCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("AccountUpdatedBy", fields: [accountUpdatedBy], references: [employeeId])
 
-  @@index([empAccCreatedBy])
-  @@index([empAccUpdatedBy])
+  @@index([accountCreatedBy])
+  @@index([accountUpdatedBy])
 }
 
-model EmpPerm {
-  empPermId        String    @id @default(cuid())
-  empPermEmpId     String
-  empPermPermId    String
-  empPermCreatedBy String?
-  empPermCreatedAt DateTime?
-  empPermUpdatedBy String?
-  empPermUpdatedAt DateTime?
+model Assign {
+  assignId           String    @id @default(cuid())
+  assignEmployeeId   String
+  assignPermissionId String
+  assignCreatedBy    String?
+  assignCreatedAt    DateTime?
+  assignUpdatedBy    String?
+  assignUpdatedAt    DateTime?
 
-  emp Emp @relation(fields: [empPermEmpId], references: [empId])
+  employee Employee @relation(fields: [assignEmployeeId], references: [employeeId])
 
-  perm Perm @relation(fields: [empPermPermId], references: [permId])
+  permission Permission @relation(fields: [assignPermissionId], references: [permissionId])
 
-  createdByEmp Emp? @relation("EmpPermCreatedBy", fields: [empPermCreatedBy], references: [empId])
-  updatedByEmp Emp? @relation("EmpPermUpdatedBy", fields: [empPermUpdatedBy], references: [empId])
+  createdByEmployee Employee? @relation("AssignCreatedBy", fields: [assignCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("AssignUpdatedBy", fields: [assignUpdatedBy], references: [employeeId])
 
-  @@index([empPermEmpId])
-  @@index([empPermPermId])
-  @@index([empPermCreatedBy])
-  @@index([empPermUpdatedBy])
+  @@index([assignEmployeeId])
+  @@index([assignPermissionId])
+  @@index([assignCreatedBy])
+  @@index([assignUpdatedBy])
 }
 
-model Perm {
-  permId        String     @id @default(cuid())
-  permName      String     @unique
-  permStatus    PermStatus @default(Active)
-  permCreatedBy String?
-  permCreatedAt DateTime?
-  permUpdatedBy String?
-  permUpdatedAt DateTime?
+model Permission {
+  permissionId        String           @id @default(cuid())
+  permissionName      String           @unique
+  permissionStatus    PermissionStatus @default(Active)
+  permissionCreatedBy String?
+  permissionCreatedAt DateTime?
+  permissionUpdatedBy String?
+  permissionUpdatedAt DateTime?
 
-  empPerms EmpPerm[]
+  assigns Assign[]
 
-  createdByEmp Emp? @relation("PermCreatedBy", fields: [permCreatedBy], references: [empId])
-  updatedByEmp Emp? @relation("PermUpdatedBy", fields: [permUpdatedBy], references: [empId])
+  createdByEmployee Employee? @relation("PermissionCreatedBy", fields: [permissionCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("PermissionUpdatedBy", fields: [permissionUpdatedBy], references: [employeeId])
 
-  @@index([permCreatedBy])
-  @@index([permUpdatedBy])
+  @@index([permissionCreatedBy])
+  @@index([permissionUpdatedBy])
 }

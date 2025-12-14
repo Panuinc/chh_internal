@@ -6,7 +6,6 @@ export default function UISignIn({
   username,
   password,
   isLoading,
-  error,
   onUsernameChange,
   onPasswordChange,
   onSubmit,
