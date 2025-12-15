@@ -30,7 +30,7 @@ export default function ModuleLayout({ children }) {
           {breadcrumbItems.map((item, index) => (
             <BreadcrumbItem key={item.href}>
               {index === breadcrumbItems.length - 1 ? (
-                <span className="font-semibold">{item.name}</span>
+                <span>{item.name}</span>
               ) : (
                 <Link href={item.href}>{item.name}</Link>
               )}

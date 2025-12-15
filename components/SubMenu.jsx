@@ -25,7 +25,7 @@ export default function SubMenu({
             <Icon />
           </div>
         )}
-        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-center text-sm">
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-center">
           {text}
         </div>
       </div>
@@ -39,7 +39,7 @@ export default function SubMenu({
           <Icon />
         </div>
       )}
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-center text-sm">
+      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-center">
         {text}
       </div>
     </Link>

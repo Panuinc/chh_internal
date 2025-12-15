@@ -17,11 +17,11 @@ function UserProfileCard({ user }) {
       </div>
 
       <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border hidden overflow-auto">
-        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-2xl">
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border">
           <Ghost /> Welcome Back
         </div>
 
-        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-xl">
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border">
           {user.name}
         </div>
 
@@ -74,10 +74,10 @@ export default function UIHome({ user, modules }) {
 
       <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-full p-2 gap-2 border overflow-hidden">
         <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-2 gap-2 border hidden">
-          <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border text-3xl font-semibold">
+          <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border">
             EverGreen Dashboard
           </div>
-          <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border text-sm opacity-80">
+          <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border opacity-80">
             Your tools. Your workflow. Your operations.
           </div>
         </div>

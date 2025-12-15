@@ -84,7 +84,7 @@ export default function UIPermissionForm({
                 type="submit"
                 color="primary"
                 size="lg"
-                className="w-full p-2 gap-2 border font-semibold"
+                className="w-full p-2 gap-2 border"
               >
                 Submit
               </Button>

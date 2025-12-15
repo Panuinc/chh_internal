@@ -26,7 +26,7 @@ export default function PagesLayout({ children }) {
     "U";
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border">
+    <div className="flex flex-col items-center justify-center w-full h-full gap-2">
       <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 border">
         <Link
           href="/home"
@@ -37,7 +37,7 @@ export default function PagesLayout({ children }) {
 
         <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 border hidden"></div>
 
-        <div className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 border rounded-full font-semibold">
+        <div className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 border rounded-full">
           {userInitial}
         </div>
 
@@ -50,6 +50,7 @@ export default function PagesLayout({ children }) {
           isDisabled={isSigningOut}
           isIconOnly
           radius="full"
+          color="none"
           className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 border"
         >
           <LogOut />

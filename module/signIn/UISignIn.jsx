@@ -13,7 +13,7 @@ export default function UISignIn({
   return (
     <div className="flex flex-row items-center justify-center w-full h-full p-2 gap-2 border">
       <div className="flex flex-col items-center justify-center w-full xl:w-4/12 h-full p-2 gap-2 border xl:border-r-2 border-foreground">
-        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-3xl">
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border">
           Ever<span className="text-success">Green</span> Internal
         </div>
 

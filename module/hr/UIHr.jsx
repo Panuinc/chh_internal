@@ -10,9 +10,9 @@ function HrSidebar() {
 
   return (
     <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border">
-      <div className="text-lg font-semibold">Quick Stats</div>
+      <div >Quick Stats</div>
 
-      <div className="flex flex-col w-full p-2 gap-2 border text-sm">
+      <div className="flex flex-col w-full p-2 gap-2 border">
         <StatItem label="Total Employees" value={stats.totalEmployees} />
         <StatItem label="Departments" value={stats.departments} />
         <StatItem label="Pending Approvals" value={stats.pendingApprovals} />
@@ -25,7 +25,7 @@ function StatItem({ label, value }) {
   return (
     <div className="flex justify-between w-full border-b border-foreground/20">
       <span className="opacity-70">{label}</span>
-      <span className="font-medium">{value}</span>
+      <span>{value}</span>
     </div>
   );
 }
