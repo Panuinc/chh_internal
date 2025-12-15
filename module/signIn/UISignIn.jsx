@@ -12,7 +12,7 @@ export default function UISignIn({
 }) {
   return (
     <div className="flex flex-row items-center justify-center w-full h-full">
-      <div className="flex flex-col items-center justify-center w-full xl:w-4/12 h-full p-2 gap-2 xl:border-r-2">
+      <div className="flex flex-col items-center justify-center w-full xl:w-4/12 h-full p-2 gap-2 xl:border-r-1">
         <div className="flex items-end justify-center w-full h-fit p-2 gap-2 text-3xl font-black">
           Ever
           <span className="text-primary text-6xl">
@@ -76,7 +76,7 @@ export default function UISignIn({
               color="none"
               variant="solid"
               size="lg"
-              className="w-6/12 border-2"
+              className="w-6/12 border-1"
               isLoading={isLoading}
               spinner={<Spinner size="sm" color="current" />}
             >

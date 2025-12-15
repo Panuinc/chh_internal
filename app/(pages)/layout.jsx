@@ -27,7 +27,7 @@ export default function PagesLayout({ children }) {
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full">
-      <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 border-2">
+      <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 border-1">
         <Link
           href="/home"
           className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2"
@@ -37,15 +37,15 @@ export default function PagesLayout({ children }) {
 
         <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 hidden"></div>
 
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-2 rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
           {userInitial}
         </div>
 
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-2 rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
           <BellDot />
         </div>
 
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-2 rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
           <Button
             onPress={handleSignOut}
             isDisabled={isSigningOut}
@@ -62,7 +62,7 @@ export default function PagesLayout({ children }) {
         {children}
       </main>
 
-      <footer className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border-2">
+      <footer className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border-1">
         <div className="flex items-center justify-center w-full h-full p-2 gap-2">
           EVERGREEN BY CHH
         </div>

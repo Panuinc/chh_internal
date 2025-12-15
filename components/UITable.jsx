@@ -155,7 +155,7 @@ export default function DataTable({
     const descKey = cardDescriptionKey || columns[1]?.uid;
 
     return (
-      <Card key={item.id} className="w-full border-2" shadow="none">
+      <Card key={item.id} className="w-full border-1" shadow="none">
         <CardHeader className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
             <h4 className="text-lg font-semibold">{item[titleKey]}</h4>
@@ -258,7 +258,7 @@ export default function DataTable({
               isIconOnly
               variant={viewMode === "table" ? "solid" : "bordered"}
               onPress={() => setViewMode("table")}
-              className={viewMode === "table" ? "border-2" : ""}
+              className={viewMode === "table" ? "border-1" : ""}
               color="none"
               aria-label="Table View"
             >
@@ -268,7 +268,7 @@ export default function DataTable({
               isIconOnly
               variant={viewMode === "card" ? "solid" : "bordered"}
               onPress={() => setViewMode("card")}
-              className={viewMode === "card" ? "border-2" : ""}
+              className={viewMode === "card" ? "border-1" : ""}
               color="none"
               aria-label="Card View"
             >
@@ -283,7 +283,7 @@ export default function DataTable({
                   color="none"
                   endContent={<ChevronDown />}
                   size="lg"
-                  className="w-full xl:w-52 border-2"
+                  className="w-full xl:w-52 border-1"
                 >
                   Status
                 </Button>
@@ -310,7 +310,7 @@ export default function DataTable({
               color="none"
               onPress={onAddNew}
               size="lg"
-              className="w-full xl:w-52 border-2"
+              className="w-full xl:w-52 border-1"
             >
               Add New
             </Button>
@@ -353,7 +353,7 @@ export default function DataTable({
                   key={column.uid}
                   align={column.uid === "actions" ? "center" : "start"}
                   allowsSorting={column.sortable}
-                  className="p-4 gap-2 border-b-2 border-t-2"
+                  className="p-4 gap-2 border-b-1 border-t-1"
                 >
                   {column.name}
                 </TableColumn>
@@ -363,7 +363,7 @@ export default function DataTable({
               {(item) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (
-                    <TableCell className="border-b-2">
+                    <TableCell className="border-b-1">
                       {renderCell(item, columnKey)}
                     </TableCell>
                   )}
@@ -398,7 +398,7 @@ export default function DataTable({
             total={pages}
             onChange={setPage}
             classNames={{
-              cursor: "border-2",
+              cursor: "border-1",
             }}
           />
         </div>

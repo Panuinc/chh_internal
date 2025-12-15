@@ -17,7 +17,7 @@ export default function UIPermissionForm({
       className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full gap-2 overflow-auto"
     >
       <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
-        <div className="flex items-center justify-center h-full p-4 gap-2 border-2 rounded-xl">
+        <div className="flex items-center justify-center h-full p-4 gap-2 border-1 rounded-xl">
           {mode === "create"
             ? `Create By : ${operatedBy}`
             : `Update By : ${operatedBy}`}
@@ -80,7 +80,7 @@ export default function UIPermissionForm({
             type="submit"
             color="none"
             size="lg"
-            className="w-full border-2"
+            className="w-full border-1"
           >
             Submit
           </Button>

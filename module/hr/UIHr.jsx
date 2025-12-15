@@ -9,7 +9,7 @@ function HrSidebar() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-2 rounded-xl">
+    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1 rounded-xl">
       <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
         Quick Stats
       </div>
@@ -25,7 +25,7 @@ function HrSidebar() {
 
 function StatItem({ label, value }) {
   return (
-    <div className="flex justify-between w-full h-full p-2 border-b-2">
+    <div className="flex justify-between w-full h-full p-2 border-b-1">
       <span className="opacity-70">{label}</span>
       <span>{value}</span>
     </div>
