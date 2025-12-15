@@ -14,7 +14,7 @@ export default function UISignIn({
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="flex flex-col items-center justify-center w-full xl:w-4/12 h-full p-2 gap-2">
         <div className="flex items-end justify-center w-full h-fit p-2 gap-2 text-3xl font-black">
-          Ever<span className="text-success text-6xl">Green</span> Internal
+          Ever<span className="text-primary text-6xl">Green</span> Internal
         </div>
 
         <form
@@ -58,10 +58,10 @@ export default function UISignIn({
           <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
             <Button
               type="submit"
-              color="primary"
+              color="none"
               variant="solid"
               size="lg"
-              className="w-6/12 bg-foreground text-background"
+              className="w-6/12 border-2"
               isLoading={isLoading}
               spinner={<Spinner size="sm" color="current" />}
             >
@@ -71,7 +71,7 @@ export default function UISignIn({
         </form>
       </div>
 
-      <div className="xl:flex items-center justify-center xl:w-8/12 h-full p-2 gap-2 hidden bg-foreground">
+      <div className="xl:flex items-center justify-center xl:w-8/12 h-full p-2 gap-2 hidden bg-primary">
         <Image src="/logo/logo-05.png" alt="logo" width={300} height={300} />
       </div>
     </div>

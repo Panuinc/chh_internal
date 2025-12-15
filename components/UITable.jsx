@@ -258,9 +258,8 @@ export default function DataTable({
               isIconOnly
               variant={viewMode === "table" ? "solid" : "bordered"}
               onPress={() => setViewMode("table")}
-              className={
-                viewMode === "table" ? "text-background bg-foreground" : ""
-              }
+              className={viewMode === "table" ? "border-2" : ""}
+              color="none"
               aria-label="Table View"
             >
               <LayoutList size={20} />
@@ -269,9 +268,8 @@ export default function DataTable({
               isIconOnly
               variant={viewMode === "card" ? "solid" : "bordered"}
               onPress={() => setViewMode("card")}
-              className={
-                viewMode === "card" ? "text-background bg-foreground" : ""
-              }
+              className={viewMode === "card" ? "border-2" : ""}
+              color="none"
               aria-label="Card View"
             >
               <LayoutGrid size={20} />
@@ -285,7 +283,7 @@ export default function DataTable({
                   color="none"
                   endContent={<ChevronDown />}
                   size="lg"
-                  className="w-full xl:w-52 text-background bg-foreground"
+                  className="w-full xl:w-52 border-2"
                 >
                   Status
                 </Button>
@@ -312,7 +310,7 @@ export default function DataTable({
               color="none"
               onPress={onAddNew}
               size="lg"
-              className="w-full xl:w-52 text-background bg-foreground"
+              className="w-full xl:w-52 border-2"
             >
               Add New
             </Button>
@@ -343,7 +341,6 @@ export default function DataTable({
             aria-label="Data table with sorting and pagination"
             classNames={{
               wrapper: "min-h-full",
-              th: "!bg-foreground !text-background data-[hover=true]:!text-background",
             }}
             sortDescriptor={sortDescriptor}
             onSortChange={setSortDescriptor}
@@ -356,7 +353,7 @@ export default function DataTable({
                   key={column.uid}
                   align={column.uid === "actions" ? "center" : "start"}
                   allowsSorting={column.sortable}
-                  className="p-4 gap-2 bg-foreground text-background hover:text-background"
+                  className="p-4 gap-2 border-b-2 border-t-2"
                 >
                   {column.name}
                 </TableColumn>
@@ -401,7 +398,7 @@ export default function DataTable({
             total={pages}
             onChange={setPage}
             classNames={{
-              cursor: "text-background bg-foreground",
+              cursor: "border-2",
             }}
           />
         </div>
