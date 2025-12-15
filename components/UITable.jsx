@@ -110,7 +110,7 @@ export default function DataTable({
 
       if (columnKey === "actions") {
         return (
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
             <Dropdown>
               <DropdownTrigger>
                 <Button isIconOnly variant="light">
@@ -157,8 +157,8 @@ export default function DataTable({
   };
 
   const topContent = (
-    <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
-      <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
+    <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border">
+      <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2 border">
         <Input
           isClearable
           placeholder={searchPlaceholder}
@@ -212,14 +212,14 @@ export default function DataTable({
           </Button>
         )}
       </div>
-      <div className="flex flex-col xl:flex-row items-center justify-between w-full h-full gap-2">
-        <div className="flex items-center justify-between w-full h-full p-2 gap-2">
+      <div className="flex flex-col xl:flex-row items-center justify-between w-full h-full p-2 gap-2 border">
+        <div className="flex items-center justify-between w-full h-full p-2 gap-2 border">
           Total {data.length} {itemName}
         </div>
-        <label className="flex items-center justify-between w-fit h-full p-2 gap-2 whitespace-nowrap">
+        <label className="flex items-center justify-between w-fit h-full p-2 gap-2 border whitespace-nowrap">
           Rows per page:
           <select
-            className="flex items-center justify-between w-fit h-full p-2 gap-2"
+            className="flex items-center justify-between w-fit h-full p-2 gap-2 border"
             onChange={onRowsPerPageChange}
             defaultValue="5"
           >
@@ -234,8 +234,8 @@ export default function DataTable({
   );
 
   const bottomContent = (
-    <div className="flex flex-row items-center justify-center w-full h-fit gap-2">
-      <div className="flex items-center justify-end w-full h-full p-2 gap-2">
+    <div className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border">
+      <div className="flex items-center justify-end w-full h-full p-2 gap-2 border">
         <Pagination
           isCompact
           showControls
@@ -271,7 +271,7 @@ export default function DataTable({
             key={column.uid}
             align={column.uid === "actions" ? "center" : "start"}
             allowsSorting={column.sortable}
-            className="border-t-2 border-b-2 border-foreground p-4 gap-2"
+            className="border-t-2 border-b-2 border-foreground p-2 gap-2 border"
           >
             {column.name}
           </TableColumn>

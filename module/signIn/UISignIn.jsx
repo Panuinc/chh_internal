@@ -11,17 +11,17 @@ export default function UISignIn({
   onSubmit,
 }) {
   return (
-    <div className="flex flex-row items-center justify-center w-full h-full p-2 gap-2">
-      <div className="flex flex-col items-center justify-center w-full xl:w-4/12 h-full p-2 gap-2 xl:border-r-2 border-foreground">
-        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-3xl">
+    <div className="flex flex-row items-center justify-center w-full h-full p-2 gap-2 border">
+      <div className="flex flex-col items-center justify-center w-full xl:w-4/12 h-full p-2 gap-2 border xl:border-r-2 border-foreground">
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-3xl">
           Ever<span className="text-success">Green</span> Internal
         </div>
 
         <form
           onSubmit={onSubmit}
-          className="flex flex-col items-center justify-center w-full gap-2 p-2"
+          className="flex flex-col items-center justify-center w-full p-2 gap-2 border"
         >
-          <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
+          <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border">
             <Input
               type="text"
               label="Username"
@@ -38,7 +38,7 @@ export default function UISignIn({
             />
           </div>
 
-          <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
+          <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border">
             <Input
               type="password"
               label="Password"
@@ -55,7 +55,7 @@ export default function UISignIn({
             />
           </div>
 
-          <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
+          <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border">
             <Button
               type="submit"
               color="success"
@@ -71,7 +71,7 @@ export default function UISignIn({
         </form>
       </div>
 
-      <div className="xl:flex items-center justify-center xl:w-8/12 h-full p-2 gap-2 hidden">
+      <div className="xl:flex items-center justify-center xl:w-8/12 h-full p-2 gap-2 border hidden">
         <Image src="/logo/logo-01.png" alt="logo" width={300} height={300} />
       </div>
     </div>

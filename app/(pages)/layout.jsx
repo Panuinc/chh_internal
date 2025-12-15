@@ -26,22 +26,22 @@ export default function PagesLayout({ children }) {
     "U";
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full gap-2">
-      <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 bg-foreground">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border">
+      <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 border bg-foreground">
         <Link
           href="/home"
-          className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2"
+          className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2 border"
         >
           <Image src="/logo/logo-08.png" alt="logo" width={125} height={125} />
         </Link>
 
-        <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 hidden"></div>
+        <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 border hidden"></div>
 
-        <div className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 bg-background text-foreground rounded-full font-semibold">
+        <div className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 border bg-background text-foreground rounded-full font-semibold">
           {userInitial}
         </div>
 
-        <div className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 bg-background text-foreground rounded-full cursor-pointer hover:opacity-80 transition-opacity">
+        <div className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 border bg-background text-foreground rounded-full cursor-pointer hover:opacity-80 transition-opacity">
           <BellDot />
         </div>
 
@@ -50,18 +50,18 @@ export default function PagesLayout({ children }) {
           isDisabled={isSigningOut}
           isIconOnly
           radius="full"
-          className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 bg-background text-foreground"
+          className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 border bg-background text-foreground"
         >
           <LogOut />
         </Button>
       </header>
 
-      <main className="flex items-center justify-center w-full h-full gap-2 overflow-hidden">
+      <main className="flex items-center justify-center w-full h-full p-2 gap-2 border overflow-hidden">
         {children}
       </main>
 
-      <footer className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 bg-foreground">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-background">
+      <footer className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border bg-foreground">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border text-background">
           EVERGREEN BY CHH
         </div>
       </footer>

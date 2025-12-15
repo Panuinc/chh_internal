@@ -59,38 +59,38 @@ export default function UIPermission({
     : [];
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-4 border-danger border-dashed">
-      <div className="flex flex-col xl:flex-row items-center justify-center w-full xl:w-10/12 h-full p-2 gap-2 overflow-hidden">
-        <div className="xl:flex flex-col items-center justify-start w-full xl:w-2/12 h-full p-2 gap-2 overflow-auto hidden">
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-2 border-foreground rounded-xl">
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border">
+      <div className="flex flex-col xl:flex-row items-center justify-center w-full xl:w-10/12 h-full p-2 gap-2 border overflow-hidden">
+        <div className="xl:flex flex-col items-center justify-start w-full xl:w-2/12 h-full p-2 gap-2 border overflow-auto hidden">
+          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
               Total Permissions
             </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-foreground">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border text-foreground">
               {total}
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-2 border-foreground rounded-xl">
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
               Active Permissions
             </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-success">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border text-success">
               {enabled}
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-2 border-foreground rounded-xl">
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
               Inactive Permissions
             </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-danger">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border text-danger">
               {disabled}
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full p-2 gap-2 overflow-auto">
+        <div className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full p-2 gap-2 border overflow-auto">
           {loading ? (
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
               <LoadingState />
             </div>
           ) : (

@@ -6,7 +6,7 @@ import Image from "next/image";
 function UserProfileCard({ user }) {
   return (
     <>
-      <div className="flex items-center justify-center w-full min-h-52 p-2 gap-2">
+      <div className="flex items-center justify-center w-full min-h-52 p-2 gap-2 border">
         <Image
           src={user.avatar}
           alt="profile"
@@ -16,16 +16,16 @@ function UserProfileCard({ user }) {
         />
       </div>
 
-      <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-2 border-foreground rounded-xl hidden overflow-auto">
-        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-2xl">
+      <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border rounded-xl hidden overflow-auto">
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-2xl">
           <Ghost /> Welcome Back
         </div>
 
-        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-xl">
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-xl">
           {user.name}
         </div>
 
-        <div className="flex flex-col items-center justify-start w-full h-fit gap-2 text-xs">
+        <div className="flex flex-col items-center justify-start w-full h-fit p-2 gap-2 border text-xs">
           <UserInfoRow label="Email" value={user.email} />
           <UserInfoRow
             label="Role"
@@ -37,7 +37,7 @@ function UserProfileCard({ user }) {
           />
         </div>
 
-        <div className="flex flex-col items-end justify-end w-full h-full p-2 gap-2">
+        <div className="flex flex-col items-end justify-end w-full h-full p-2 gap-2 border">
           <Button
             color="none"
             variant="solid"
@@ -54,11 +54,11 @@ function UserProfileCard({ user }) {
 
 function UserInfoRow({ label, value }) {
   return (
-    <div className="flex flex-row items-center justify-center w-full h-full p-2 gap-2">
-      <div className="flex items-center justify-start w-full h-full p-2 gap-2">
+    <div className="flex flex-row items-center justify-center w-full h-full p-2 gap-2 border">
+      <div className="flex items-center justify-start w-full h-full p-2 gap-2 border">
         {label}:
       </div>
-      <div className="flex items-center justify-end w-full h-full p-2 gap-2 whitespace-nowrap">
+      <div className="flex items-center justify-end w-full h-full p-2 gap-2 border whitespace-nowrap">
         {value}
       </div>
     </div>
@@ -67,22 +67,22 @@ function UserInfoRow({ label, value }) {
 
 export default function UIHome({ user, modules }) {
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
-      <div className="flex flex-col items-center justify-start w-full xl:w-2/12 h-fit xl:h-full gap-2">
+    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2 border">
+      <div className="flex flex-col items-center justify-start w-full xl:w-2/12 h-fit xl:h-full p-2 gap-2 border">
         {user && <UserProfileCard user={user} />}
       </div>
 
-      <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-full gap-2 overflow-hidden">
-        <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-2 gap-2 border-2 border-foreground rounded-xl hidden">
-          <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-3xl font-semibold">
+      <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-full p-2 gap-2 border overflow-hidden">
+        <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-2 gap-2 border rounded-xl hidden">
+          <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border text-3xl font-semibold">
             EverGreen Dashboard
           </div>
-          <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-sm opacity-80">
+          <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border text-sm opacity-80">
             Your tools. Your workflow. Your operations.
           </div>
         </div>
 
-        <div className="grid grid-cols-2 xl:grid-cols-4 place-items-center w-full h-full p-2 gap-2 border-2 border-foreground rounded-xl overflow-auto">
+        <div className="grid grid-cols-2 xl:grid-cols-4 place-items-center w-full h-full p-2 gap-2 border rounded-xl overflow-auto">
           {modules.length > 0 ? (
             modules.map((module) => (
               <SubMenu
@@ -93,7 +93,7 @@ export default function UIHome({ user, modules }) {
               />
             ))
           ) : (
-            <div className="col-span-full place-items-center text-center p-2 gap-2">
+            <div className="col-span-full place-items-center text-center p-2 gap-2 border">
               No modules available. Please contact administrator.
             </div>
           )}

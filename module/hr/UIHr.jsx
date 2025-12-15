@@ -9,10 +9,10 @@ function HrSidebar() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full gap-2 p-2">
+    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border">
       <div className="text-lg font-semibold">Quick Stats</div>
 
-      <div className="flex flex-col w-full gap-2 text-sm">
+      <div className="flex flex-col w-full p-2 gap-2 border text-sm">
         <StatItem label="Total Employees" value={stats.totalEmployees} />
         <StatItem label="Departments" value={stats.departments} />
         <StatItem label="Pending Approvals" value={stats.pendingApprovals} />
@@ -23,7 +23,7 @@ function HrSidebar() {
 
 function StatItem({ label, value }) {
   return (
-    <div className="flex justify-between w-full p-2 border-b border-foreground/20">
+    <div className="flex justify-between w-full border-b border-foreground/20">
       <span className="opacity-70">{label}</span>
       <span className="font-medium">{value}</span>
     </div>
@@ -34,7 +34,7 @@ export default function UIHr({ menu, isEmpty }) {
   if (!menu) {
     return (
       <div className="flex items-center justify-center w-full h-full">
-        <div className="flex items-center gap-2 text-danger">
+        <div className="flex items-center p-2 gap-2 border text-danger">
           <AlertCircle />
           <span>Module configuration not found</span>
         </div>
