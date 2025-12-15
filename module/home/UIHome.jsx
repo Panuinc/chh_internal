@@ -67,7 +67,7 @@ function UserInfoRow({ label, value }) {
 
 export default function UIHome({ user, modules }) {
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2">
+    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full px-2 py-2 gap-2">
       <div className="flex flex-col items-center justify-start w-full xl:w-2/12 h-fit xl:h-full gap-2">
         {user && <UserProfileCard user={user} />}
       </div>
