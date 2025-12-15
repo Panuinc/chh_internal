@@ -26,43 +26,44 @@ export default function PagesLayout({ children }) {
     "U";
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full gap-2">
-      <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 border">
+    <div className="flex flex-col items-center justify-center w-full h-full">
+      <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 bg-foreground">
         <Link
           href="/home"
-          className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2 border"
+          className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2"
         >
           <Image src="/logo/logo-08.png" alt="logo" width={125} height={125} />
         </Link>
 
-        <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 border hidden"></div>
+        <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 hidden"></div>
 
-        <div className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 border rounded-full">
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 bg-background rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
           {userInitial}
         </div>
 
-        <div className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 border rounded-full cursor-pointer hover:opacity-80 transition-opacity">
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 bg-background rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
           <BellDot />
         </div>
 
-        <Button
-          onPress={handleSignOut}
-          isDisabled={isSigningOut}
-          isIconOnly
-          radius="full"
-          color="none"
-          className="flex items-center justify-center min-w-12 min-h-12 p-2 gap-2 border"
-        >
-          <LogOut />
-        </Button>
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 bg-background rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
+          <Button
+            onPress={handleSignOut}
+            isDisabled={isSigningOut}
+            isIconOnly
+            radius="none"
+            color="none"
+          >
+            <LogOut />
+          </Button>
+        </div>
       </header>
 
-      <main className="flex items-center justify-center w-full h-full p-2 gap-2 border overflow-hidden">
+      <main className="flex items-center justify-center w-full h-full gap-2 overflow-hidden">
         {children}
       </main>
 
-      <footer className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
+      <footer className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 bg-foreground">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-background">
           EVERGREEN BY CHH
         </div>
       </footer>

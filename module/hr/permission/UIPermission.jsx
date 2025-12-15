@@ -59,54 +59,52 @@ export default function UIPermission({
     : [];
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border">
-      <div className="flex flex-col xl:flex-row items-center justify-center w-full xl:w-10/12 h-full p-2 gap-2 border overflow-hidden">
-        <div className="xl:flex flex-col items-center justify-start w-full xl:w-2/12 h-full p-2 gap-2 border overflow-auto hidden">
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border">
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
-              Total Permissions
-            </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border text-secondary">
-              {total}
-            </div>
+    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2 overflow-hidden">
+      <div className="xl:flex flex-col items-center justify-start w-full xl:w-2/12 h-full gap-2 overflow-auto hidden">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 bg-foreground rounded-xl text-background">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Total Permissions
           </div>
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border">
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
-              Active Permissions
-            </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border text-success">
-              {enabled}
-            </div>
-          </div>
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border">
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
-              Inactive Permissions
-            </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border text-danger">
-              {disabled}
-            </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            {total}
           </div>
         </div>
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 bg-foreground rounded-xl text-success">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Active Permissions
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            {enabled}
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 bg-foreground rounded-xl text-danger">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Inactive Permissions
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            {disabled}
+          </div>
+        </div>
+      </div>
 
-        <div className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full p-2 gap-2 border overflow-auto">
-          {loading ? (
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
-              <LoadingState />
-            </div>
-          ) : (
-            <DataTable
-              columns={columns}
-              data={normalized}
-              statusOptions={statusOptions}
-              statusColorMap={statusColorMap}
-              searchPlaceholder="Search by permission name..."
-              emptyContent="No permissions found"
-              itemName="permissions"
-              onAddNew={onAddNew}
-              onEdit={onEdit}
-            />
-          )}
-        </div>
+      <div className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full p-2 gap-2 overflow-auto">
+        {loading ? (
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            <LoadingState />
+          </div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={normalized}
+            statusOptions={statusOptions}
+            statusColorMap={statusColorMap}
+            searchPlaceholder="Search by permission name..."
+            emptyContent="No permissions found"
+            itemName="permissions"
+            onAddNew={onAddNew}
+            onEdit={onEdit}
+          />
+        )}
       </div>
     </div>
   );

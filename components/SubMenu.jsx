@@ -8,7 +8,7 @@ export default function SubMenu({
   className = "",
 }) {
   const baseClasses =
-    "flex flex-col items-center justify-center w-36 h-36 p-2 gap-2 border shadow transition-all duration-200";
+    "flex flex-col items-center justify-center w-40 h-40 p-2 gap-2 border-2 rounded-xl transition-all duration-200";
 
   const enabledClasses = "hover:scale-105 hover:shadow-lg cursor-pointer";
   const disabledClasses = "opacity-50 cursor-not-allowed";
@@ -21,11 +21,11 @@ export default function SubMenu({
     return (
       <div className={combinedClasses}>
         {Icon && (
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Icon />
           </div>
         )}
-        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-center">
+        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-center">
           {text}
         </div>
       </div>
@@ -35,11 +35,11 @@ export default function SubMenu({
   return (
     <Link href={href} className={combinedClasses}>
       {Icon && (
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
           <Icon />
         </div>
       )}
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border text-center">
+      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-center">
         {text}
       </div>
     </Link>

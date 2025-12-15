@@ -110,7 +110,7 @@ export default function DataTable({
 
       if (columnKey === "actions") {
         return (
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Dropdown>
               <DropdownTrigger>
                 <Button isIconOnly variant="light">
@@ -157,8 +157,8 @@ export default function DataTable({
   };
 
   const topContent = (
-    <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border">
-      <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2 border">
+    <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2">
+      <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2">
         <Input
           isClearable
           placeholder={searchPlaceholder}
@@ -175,10 +175,10 @@ export default function DataTable({
           <Dropdown>
             <DropdownTrigger>
               <Button
-                color="default"
+                color="none"
                 endContent={<ChevronDown />}
                 size="lg"
-                className="w-full xl:w-52"
+                className="w-full xl:w-52 text-background bg-foreground"
               >
                 Status
               </Button>
@@ -203,27 +203,26 @@ export default function DataTable({
         {onAddNew && (
           <Button
             startContent={<Plus />}
-            color="primary"
+            color="none"
             onPress={onAddNew}
             size="lg"
-            className="w-full xl:w-52"
+            className="w-full xl:w-52 text-background bg-foreground"
           >
             Add New
           </Button>
         )}
       </div>
-      <div className="flex flex-col xl:flex-row items-center justify-between w-full h-full p-2 gap-2 border">
-        <div className="flex items-center justify-between w-full h-full p-2 gap-2 border">
+      <div className="flex flex-col xl:flex-row items-center justify-between w-full h-full p-2 gap-2">
+        <div className="flex items-center justify-between w-full h-full p-2 gap-2">
           Total {data.length} {itemName}
         </div>
-        <label className="flex items-center justify-between w-fit h-full p-2 gap-2 border whitespace-nowrap">
+        <label className="flex items-center justify-between w-fit h-full p-2 gap-2 whitespace-nowrap">
           Rows per page:
           <select
-            className="flex items-center justify-between w-fit h-full p-2 gap-2 border"
+            className="flex items-center justify-between w-fit h-full p-2 gap-2"
             onChange={onRowsPerPageChange}
             defaultValue="5"
           >
-            <option value="5">5</option>
             <option value="10">10</option>
             <option value="15">15</option>
             <option value="50">50</option>
@@ -234,13 +233,14 @@ export default function DataTable({
   );
 
   const bottomContent = (
-    <div className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border">
-      <div className="flex items-center justify-end w-full h-full p-2 gap-2 border">
+    <div className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2">
+      <div className="flex items-center justify-end w-full h-full p-2 gap-2">
         <Pagination
           isCompact
           showControls
           showShadow
-          color="primary"
+          color="none"
+          className="bg-foreground text-background rounded-xl"
           size="lg"
           page={page}
           total={pages}
@@ -257,6 +257,7 @@ export default function DataTable({
       bottomContentPlacement="outside"
       classNames={{
         wrapper: "max-h-[500px] overflow-auto",
+        th: "!bg-foreground !text-background data-[hover=true]:!text-background",
       }}
       sortDescriptor={sortDescriptor}
       topContent={topContent}
@@ -271,7 +272,7 @@ export default function DataTable({
             key={column.uid}
             align={column.uid === "actions" ? "center" : "start"}
             allowsSorting={column.sortable}
-            className="border-t-2 border-b-2 border-foreground p-2 gap-2 border"
+            className="p-4 gap-2 bg-foreground text-background hover:text-background"
           >
             {column.name}
           </TableColumn>
@@ -281,7 +282,7 @@ export default function DataTable({
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => (
-              <TableCell className="border-b-2 border-foreground">
+              <TableCell className="border-b-2">
                 {renderCell(item, columnKey)}
               </TableCell>
             )}

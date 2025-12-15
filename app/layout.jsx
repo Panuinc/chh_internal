@@ -36,7 +36,7 @@ export default function RootLayout({ children }) {
         `}
       >
         <Providers>
-          <div className="flex items-center justify-center w-full h-screen gap-2">
+          <div className="flex items-center justify-center w-full h-screen gap-2 text-sm">
             {children}
           </div>
         </Providers>
