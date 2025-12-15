@@ -32,7 +32,6 @@ export default function PermissionCreate() {
 
   return (
     <UIPermissionForm
-      headerTopic="Permission Create"
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}

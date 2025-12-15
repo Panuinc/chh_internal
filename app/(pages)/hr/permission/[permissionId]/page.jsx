@@ -54,7 +54,6 @@ export default function PermissionUpdate() {
 
   return (
     <UIPermissionForm
-      headerTopic="Permission Update"
       formHandler={formHandler}
       mode="update"
       operatedBy={userName}

@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import UIHeader from "@/components/UIHeader";
 import { DataTable } from "@/components";
 import { LoadingState } from "@/components";
 
@@ -26,7 +25,6 @@ const statusColorMap = {
 };
 
 export default function UIPermission({
-  headerTopic,
   Permissions = [],
   loading,
   onAddNew,
@@ -62,30 +60,29 @@ export default function UIPermission({
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-4 border-danger border-dashed">
-      <UIHeader header={headerTopic} />
       <div className="flex flex-col xl:flex-row items-center justify-center w-full xl:w-10/12 h-full p-2 gap-2 overflow-hidden">
         <div className="xl:flex flex-col items-center justify-start w-full xl:w-2/12 h-full p-2 gap-2 overflow-auto hidden">
-          <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-2 border-foreground rounded-xl">
+          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-2 border-foreground rounded-xl">
             <div className="flex items-center justify-center w-full h-full p-2 gap-2">
               Total Permissions
             </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-foreground text-2xl">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-foreground">
               {total}
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-2 border-foreground rounded-xl">
+          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-2 border-foreground rounded-xl">
             <div className="flex items-center justify-center w-full h-full p-2 gap-2">
               Active Permissions
             </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-success text-2xl">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-success">
               {enabled}
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-2 border-foreground rounded-xl">
+          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-2 border-foreground rounded-xl">
             <div className="flex items-center justify-center w-full h-full p-2 gap-2">
               Inactive Permissions
             </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-danger text-2xl">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-danger">
               {disabled}
             </div>
           </div>

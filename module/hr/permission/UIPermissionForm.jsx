@@ -1,10 +1,8 @@
 "use client";
-import UIHeader from "@/components/UIHeader";
 import React from "react";
 import { Button, Input, Select, SelectItem } from "@heroui/react";
 
 export default function UIPermissionForm({
-  headerTopic,
   formHandler,
   mode,
   isUpdate,
@@ -14,8 +12,6 @@ export default function UIPermissionForm({
 
   return (
     <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border overflow-auto">
-      <UIHeader header={headerTopic} />
-
       <form
         ref={formRef}
         onSubmit={handleSubmit}
@@ -45,7 +41,9 @@ export default function UIPermissionForm({
                 value={formData.permissionName || ""}
                 onChange={handleChange("permissionName")}
                 isInvalid={!!errors.permissionName}
-                errorMessage={errors.permissionName?.[0] || errors.permissionName}
+                errorMessage={
+                  errors.permissionName?.[0] || errors.permissionName
+                }
               />
             </div>
           </div>
@@ -69,7 +67,9 @@ export default function UIPermissionForm({
                     handleChange("permissionStatus")([...keys][0])
                   }
                   isInvalid={!!errors.permissionStatus}
-                  errorMessage={errors.permissionStatus?.[0] || errors.permissionStatus}
+                  errorMessage={
+                    errors.permissionStatus?.[0] || errors.permissionStatus
+                  }
                 >
                   <SelectItem key="Active">Active</SelectItem>
                   <SelectItem key="Inactive">Inactive</SelectItem>

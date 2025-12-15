@@ -22,7 +22,6 @@ export default function PermissionPage() {
 
   return (
     <UIPermission
-      headerTopic="Permission"
       Permissions={permissions}
       loading={loading}
       onAddNew={hasPermission("permission.create") ? handleAddNew : null}
