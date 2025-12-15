@@ -1,0 +1,12 @@
+[2025-12-15 08:06:16] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-15 08:06:16] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:06:16] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-15 08:06:19] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:06:19] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-15 08:06:20] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:06:20] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+///
+[2025-12-15 08:06:32] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:06:32] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-15 08:14:04] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:14:04] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}

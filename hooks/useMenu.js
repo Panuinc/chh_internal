@@ -3,6 +3,43 @@ import { useMemo, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { menuConfig } from "@/config/menu.config";
 
+// ============================================================
+// useSessionUser - ดึงข้อมูล user จาก session
+// ============================================================
+
+export function useSessionUser() {
+  const { data: session, status } = useSession();
+
+  return useMemo(() => {
+    if (status === "loading" || !session?.user) {
+      return {
+        userId: null,
+        userName: null,
+        userEmail: null,
+        isLoading: true,
+        isAuthenticated: false,
+      };
+    }
+
+    const user = session.user;
+
+    return {
+      userId: user.id || user.userId || user.employeeId || null,
+      userName: user.name || user.userName || 
+        (user.employeeFirstName && user.employeeLastName 
+          ? `${user.employeeFirstName} ${user.employeeLastName}` 
+          : null),
+      userEmail: user.email || null,
+      isLoading: false,
+      isAuthenticated: true,
+    };
+  }, [session, status]);
+}
+
+// ============================================================
+// usePermissions
+// ============================================================
+
 export function usePermissions() {
   const { data: session, status } = useSession();
 
@@ -24,6 +61,10 @@ export function usePermissions() {
     isAuthenticated: status === "authenticated",
   };
 }
+
+// ============================================================
+// useMenu
+// ============================================================
 
 export function useMenu() {
   const { permissions, isSuperAdmin, isLoading, isAuthenticated } =
@@ -108,6 +149,10 @@ export function useMenu() {
     getAllAccessibleMenus,
   };
 }
+
+// ============================================================
+// useModuleMenu
+// ============================================================
 
 export function useModuleMenu(moduleId) {
   const { getSubmenu, hasPermission, isLoading, isAuthenticated } = useMenu();
