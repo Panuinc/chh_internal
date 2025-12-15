@@ -1,23 +1,38 @@
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { getLocalNow } from "@/lib/getLocalNow";
-import { preprocessString, preprocessEnum, formatData } from "@/lib/zodSchema";
 import {
   NotFoundError,
   BadRequestError,
   validateOrThrow,
   normalizeString,
+  formatData,
   createBaseController,
   createLogger,
   handlePrismaUniqueError,
 } from "@/lib/shared/server";
 
 const ENTITY_NAME = "Permission";
+const ENTITY_KEY = "permissions";
+const ENTITY_SINGULAR = "permission";
+
 const EMPLOYEE_SELECT = {
   employeeId: true,
   employeeFirstName: true,
   employeeLastName: true,
 };
+
+const preprocessString = (message) =>
+  z.preprocess(
+    (val) => (typeof val === "string" ? val.trim() : val),
+    z.string({ required_error: message }).min(1, message)
+  );
+
+const preprocessEnum = (values, message) =>
+  z.preprocess(
+    (val) => (typeof val === "string" ? val.trim() : val),
+    z.enum(values, { required_error: message })
+  );
 
 export const createSchema = z.object({
   permissionName: preprocessString("Please provide permissionName"),
@@ -78,7 +93,10 @@ export const PermissionRepository = {
     return prisma.permission.update({
       where: { permissionId: id },
       data,
-      include: { updatedByEmployee: { select: EMPLOYEE_SELECT } },
+      include: {
+        createdByEmployee: { select: EMPLOYEE_SELECT },
+        updatedByEmployee: { select: EMPLOYEE_SELECT },
+      },
     });
   },
 };
@@ -210,24 +228,11 @@ const baseController = createBaseController({
   createUseCase: CreateUseCase,
   updateUseCase: (data) => UpdateUseCase({ ...data, permissionId: data.id }),
   formatData: formatPermissionData,
+  entityKey: ENTITY_KEY,
+  entitySingular: ENTITY_SINGULAR,
 });
 
 export const getAllPermission = baseController.getAll;
 export const getPermissionById = baseController.getById;
 export const createPermission = baseController.create;
-export const updatePermission = (request, id) => {
-  return (async () => {
-    const data = await request.json();
-    const item = await UpdateUseCase({ ...data, permissionId: id });
-    const { successResponse, SUCCESS_MESSAGES } = await import(
-      "@/lib/shared/server"
-    );
-    return successResponse({
-      message: SUCCESS_MESSAGES.UPDATED,
-      permission: formatPermissionData([item])[0],
-    });
-  })().catch(async (error) => {
-    const { errorResponse } = await import("@/lib/shared/server");
-    return errorResponse(error);
-  });
-};
+export const updatePermission = baseController.update;

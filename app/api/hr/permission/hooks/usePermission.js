@@ -62,10 +62,10 @@ export function usePermissions(apiUrl = API_URL) {
       try {
         const result = await fetchWithAbort(apiUrl, {}, controller.signal);
 
-        const formatted = Array.isArray(result.permissions)
-          ? result.permissions
-              .map((p, i) => formatPermission(p, i))
-              .filter(Boolean)
+        const items = result.permissions || result.data || [];
+
+        const formatted = Array.isArray(items)
+          ? items.map((p, i) => formatPermission(p, i)).filter(Boolean)
           : [];
 
         setPermissions(formatted);
@@ -106,12 +106,14 @@ export function usePermission(permissionId) {
           controller.signal
         );
 
-        if (!result.permission) {
+        const item = result.permission || result.data;
+
+        if (!item) {
           showToast(TOAST.WARNING, "No Permission data found.");
           return;
         }
 
-        setPermission(formatPermission(result.permission));
+        setPermission(formatPermission(item));
       } catch (err) {
         if (err.name === "AbortError") return;
         showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);

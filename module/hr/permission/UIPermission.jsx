@@ -7,7 +7,7 @@ import { LoadingState } from "@/components";
 const columns = [
   { name: "ID", uid: "permissionIndex", sortable: true },
   { name: "Permission Name", uid: "permissionName", sortable: true },
-  { name: "STatus", uid: "permissionStatus", sortable: true },
+  { name: "Status", uid: "permissionStatus", sortable: true },
   { name: "Created By", uid: "permissionCreatedBy", sortable: true },
   { name: "Created At", uid: "permissionCreatedAt", sortable: true },
   { name: "Updated By", uid: "permissionUpdatedBy", sortable: true },
@@ -45,11 +45,11 @@ export default function UIPermission({
         ...permission,
         id: permission.permissionId,
         permissionIndex: i + 1,
-        permissionCreatedBy: permission.createdByUser
-          ? `${permission.createdByUser.userFirstName} ${permission.createdByUser.userLastName}`
-          : permission.permissionCreatedBy,
-        permissionUpdatedBy: permission.updatedByUser
-          ? `${permission.updatedByUser.userFirstName} ${permission.updatedByUser.userLastName}`
+        permissionCreatedBy: permission.createdByEmployee
+          ? `${permission.createdByEmployee.employeeFirstName} ${permission.createdByEmployee.employeeLastName}`
+          : permission.permissionCreatedBy || "-",
+        permissionUpdatedBy: permission.updatedByEmployee
+          ? `${permission.updatedByEmployee.employeeFirstName} ${permission.updatedByEmployee.employeeLastName}`
           : permission.permissionUpdatedBy || "-",
         permissionCreatedAt: permission.permissionCreatedAt
           ? new Date(permission.permissionCreatedAt).toISOString().split("T")[0]
@@ -75,7 +75,7 @@ export default function UIPermission({
         </div>
         <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 text-foreground bg-background rounded-xl shadow-md">
           <div className="flex items-center justify-start w-full h-full p-2 gap-2">
-            Actived Permissions
+            Active Permissions
           </div>
           <div className="flex items-center justify-start w-full h-full p-2 gap-2 text-success text-lg">
             {enabled}
@@ -83,7 +83,7 @@ export default function UIPermission({
         </div>
         <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 text-foreground bg-background rounded-xl shadow-md">
           <div className="flex items-center justify-start w-full h-full p-2 gap-2">
-            Inactived Permissions
+            Inactive Permissions
           </div>
           <div className="flex items-center justify-start w-full h-full p-2 gap-2 text-danger text-lg">
             {disabled}

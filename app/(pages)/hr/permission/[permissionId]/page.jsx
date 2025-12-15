@@ -42,7 +42,12 @@ export default function PermissionUpdate() {
   );
 
   useEffect(() => {
-    if (permission) formHandler.setFormData(permission);
+    if (permission) {
+      formHandler.setFormData({
+        permissionName: permission.permissionName || "",
+        permissionStatus: permission.permissionStatus || "",
+      });
+    }
   }, [permission]);
 
   if (permissionLoading) return <LoadingState />;

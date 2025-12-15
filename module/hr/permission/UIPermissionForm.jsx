@@ -42,10 +42,10 @@ export default function UIPermissionForm({
                 labelPlacement="outside"
                 placeholder="Enter Permission Name"
                 isRequired
-                value={formData.permissionName}
+                value={formData.permissionName || ""}
                 onChange={handleChange("permissionName")}
                 isInvalid={!!errors.permissionName}
-                errorMessage={errors.permissionName}
+                errorMessage={errors.permissionName?.[0] || errors.permissionName}
               />
             </div>
           </div>
@@ -69,9 +69,9 @@ export default function UIPermissionForm({
                     handleChange("permissionStatus")([...keys][0])
                   }
                   isInvalid={!!errors.permissionStatus}
-                  errorMessage={errors.permissionStatus}
+                  errorMessage={errors.permissionStatus?.[0] || errors.permissionStatus}
                 >
-                  <SelectItem key="Enable">Enable</SelectItem>
+                  <SelectItem key="Active">Active</SelectItem>
                   <SelectItem key="Inactive">Inactive</SelectItem>
                 </Select>
               </div>
