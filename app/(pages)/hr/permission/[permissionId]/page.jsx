@@ -3,9 +3,12 @@
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import UIPermissionForm from "@/module/hr/permission/UIPermissionForm";
-import UILoading from "@/components/UILoading";
+import { LoadingState } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
-import { usePermission, useSubmitPermission } from "@/app/api/hr/permission/core";
+import {
+  usePermission,
+  useSubmitPermission,
+} from "@/app/api/hr/permission/core";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function PermissionUpdate() {
@@ -42,7 +45,7 @@ export default function PermissionUpdate() {
     if (permission) formHandler.setFormData(permission);
   }, [permission]);
 
-  if (permissionLoading) return <UILoading />;
+  if (permissionLoading) return <LoadingState />;
 
   return (
     <UIPermissionForm

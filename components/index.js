@@ -5,3 +5,4 @@ export { default as UINotFound } from "./UINotFound";
 export { default as UIForbidden } from "./UIForbidden";
 export { default as showToast } from "./UIToast";
 export { default as LoadingState } from "./LoadingState";
+export { default as DataTable } from "./UITable";

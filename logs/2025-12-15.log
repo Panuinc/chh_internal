@@ -10,3 +10,18 @@
 [2025-12-15 08:06:32] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
 [2025-12-15 08:14:04] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
 [2025-12-15 08:14:04] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-15 08:24:58] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-15 08:24:58] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:24:58] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-15 08:26:43] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:26:43] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-15 08:30:53] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:30:53] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-15 08:31:45] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:31:45] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-15 08:32:33] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:32:33] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-15 08:37:10] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:37:10] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-15 08:37:10] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 08:37:10] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
