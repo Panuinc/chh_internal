@@ -15,8 +15,19 @@ import {
   DropdownItem,
   Chip,
   Pagination,
+  Card,
+  CardBody,
+  CardHeader,
+  ButtonGroup,
 } from "@heroui/react";
-import { ChevronDown, Plus, Search, Settings2 } from "lucide-react";
+import {
+  ChevronDown,
+  Plus,
+  Search,
+  Settings2,
+  LayoutGrid,
+  LayoutList,
+} from "lucide-react";
 
 function capitalize(s) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
@@ -34,6 +45,10 @@ export default function DataTable({
   onEdit,
   onAssign,
   renderCustomCell,
+  renderCard,
+  cardTitleKey,
+  cardDescriptionKey,
+  defaultView = "table",
 }) {
   const [filterValue, setFilterValue] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
@@ -43,6 +58,7 @@ export default function DataTable({
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
+  const [viewMode, setViewMode] = React.useState(defaultView);
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -66,7 +82,6 @@ export default function DataTable({
         );
       });
     }
-
     return filtered;
   }, [data, filterValue, statusFilter, statusOptions.length, hasSearchFilter]);
 
@@ -90,12 +105,10 @@ export default function DataTable({
   const renderCell = React.useCallback(
     (item, columnKey) => {
       const cellValue = item[columnKey];
-
       if (renderCustomCell) {
         const customRender = renderCustomCell(item, columnKey);
         if (customRender !== undefined) return customRender;
       }
-
       if (statusColorMap && statusColorMap[cellValue]) {
         return (
           <Chip
@@ -107,7 +120,6 @@ export default function DataTable({
           </Chip>
         );
       }
-
       if (columnKey === "actions") {
         return (
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
@@ -117,14 +129,12 @@ export default function DataTable({
                   <Settings2 />
                 </Button>
               </DropdownTrigger>
-
               <DropdownMenu>
                 {onEdit && (
                   <DropdownItem key="edit" onPress={() => onEdit(item)}>
                     Edit
                   </DropdownItem>
                 )}
-
                 {onAssign && (
                   <DropdownItem key="assign" onPress={() => onAssign(item)}>
                     Assign Permissions
@@ -135,11 +145,82 @@ export default function DataTable({
           </div>
         );
       }
-
       return cellValue;
     },
     [statusColorMap, renderCustomCell, onEdit, onAssign]
   );
+
+  const defaultRenderCard = (item) => {
+    const titleKey = cardTitleKey || columns[0]?.uid || "id";
+    const descKey = cardDescriptionKey || columns[1]?.uid;
+
+    return (
+      <Card key={item.id} className="w-full border-2" shadow="none">
+        <CardHeader className="flex justify-between items-start">
+          <div className="flex flex-col gap-1">
+            <h4 className="text-lg font-semibold">{item[titleKey]}</h4>
+            {descKey && (
+              <p className="text-sm text-default-500">{item[descKey]}</p>
+            )}
+          </div>
+          {(onEdit || onAssign) && (
+            <Dropdown>
+              <DropdownTrigger>
+                <Button isIconOnly variant="light" size="sm">
+                  <Settings2 size={18} />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu>
+                {onEdit && (
+                  <DropdownItem key="edit" onPress={() => onEdit(item)}>
+                    Edit
+                  </DropdownItem>
+                )}
+                {onAssign && (
+                  <DropdownItem key="assign" onPress={() => onAssign(item)}>
+                    Assign Permissions
+                  </DropdownItem>
+                )}
+              </DropdownMenu>
+            </Dropdown>
+          )}
+        </CardHeader>
+        <CardBody className="pt-0">
+          <div className="flex flex-wrap gap-2">
+            {columns
+              .filter(
+                (col) =>
+                  col.uid !== "actions" &&
+                  col.uid !== titleKey &&
+                  col.uid !== descKey
+              )
+              .map((col) => {
+                const value = item[col.uid];
+                if (statusColorMap && statusColorMap[value]) {
+                  return (
+                    <Chip
+                      key={col.uid}
+                      className="capitalize"
+                      color={statusColorMap[value] || "default"}
+                      variant="dot"
+                      size="sm"
+                    >
+                      {value}
+                    </Chip>
+                  );
+                }
+                return (
+                  <div key={col.uid} className="text-sm">
+                    <span className="text-default-500">{col.name}: </span>
+                    <span>{value}</span>
+                  </div>
+                );
+              })}
+          </div>
+        </CardBody>
+      </Card>
+    );
+  };
 
   const onRowsPerPageChange = (e) => {
     setRowsPerPage(Number(e.target.value));
@@ -172,6 +253,31 @@ export default function DataTable({
             className="w-full"
           />
 
+          <ButtonGroup size="lg">
+            <Button
+              isIconOnly
+              variant={viewMode === "table" ? "solid" : "bordered"}
+              onPress={() => setViewMode("table")}
+              className={
+                viewMode === "table" ? "text-background bg-foreground" : ""
+              }
+              aria-label="Table View"
+            >
+              <LayoutList size={20} />
+            </Button>
+            <Button
+              isIconOnly
+              variant={viewMode === "card" ? "solid" : "bordered"}
+              onPress={() => setViewMode("card")}
+              className={
+                viewMode === "card" ? "text-background bg-foreground" : ""
+              }
+              aria-label="Card View"
+            >
+              <LayoutGrid size={20} />
+            </Button>
+          </ButtonGroup>
+
           {statusOptions.length > 0 && (
             <Dropdown>
               <DropdownTrigger>
@@ -200,7 +306,6 @@ export default function DataTable({
               </DropdownMenu>
             </Dropdown>
           )}
-
           {onAddNew && (
             <Button
               startContent={<Plus />}
@@ -233,41 +338,55 @@ export default function DataTable({
       </div>
 
       <div className="flex-1 min-h-0 overflow-auto">
-        <Table
-          aria-label="Data table with sorting and pagination"
-          classNames={{
-            wrapper: "min-h-full",
-            th: "!bg-foreground !text-background data-[hover=true]:!text-background",
-          }}
-          sortDescriptor={sortDescriptor}
-          onSortChange={setSortDescriptor}
-          size="lg"
-          shadow="none"
-        >
-          <TableHeader columns={columns}>
-            {(column) => (
-              <TableColumn
-                key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
-                allowsSorting={column.sortable}
-                className="p-4 gap-2 bg-foreground text-background hover:text-background"
-              >
-                {column.name}
-              </TableColumn>
+        {viewMode === "table" ? (
+          <Table
+            aria-label="Data table with sorting and pagination"
+            classNames={{
+              wrapper: "min-h-full",
+              th: "!bg-foreground !text-background data-[hover=true]:!text-background",
+            }}
+            sortDescriptor={sortDescriptor}
+            onSortChange={setSortDescriptor}
+            size="lg"
+            shadow="none"
+          >
+            <TableHeader columns={columns}>
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  align={column.uid === "actions" ? "center" : "start"}
+                  allowsSorting={column.sortable}
+                  className="p-4 gap-2 bg-foreground text-background hover:text-background"
+                >
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody emptyContent={emptyContent} items={sortedItems}>
+              {(item) => (
+                <TableRow key={item.id}>
+                  {(columnKey) => (
+                    <TableCell className="border-b-2">
+                      {renderCell(item, columnKey)}
+                    </TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
+            {sortedItems.length > 0 ? (
+              sortedItems.map((item) =>
+                renderCard ? renderCard(item) : defaultRenderCard(item)
+              )
+            ) : (
+              <div className="col-span-full text-center py-10 text-default-500">
+                {emptyContent}
+              </div>
             )}
-          </TableHeader>
-          <TableBody emptyContent={emptyContent} items={sortedItems}>
-            {(item) => (
-              <TableRow key={item.id}>
-                {(columnKey) => (
-                  <TableCell className="border-b-2">
-                    {renderCell(item, columnKey)}
-                  </TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+          </div>
+        )}
       </div>
 
       <div className="flex-shrink-0 flex flex-row items-center justify-center w-full h-fit gap-2">
