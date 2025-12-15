@@ -7,11 +7,15 @@
 }
 
 .border {
-  border: 2px dashed #000000;
+  border: 2px dashed #231F20;
 }
 
 .border-default-200 {
-  border: 2px solid #000000;
+  border: 2px solid #231F20;
+}
+
+.bg-content1 {
+  background-color: #EFEFEF;
 }
 
 svg.lucide {

@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const defaultPermissions = [
-  { name: "superAdmin", description: "Super Admin - Full access" },
+  { name: "superadmin", description: "Super Admin - Full access" },
 
   { name: "hr.view", description: "View HR module" },
   { name: "hr.*", description: "Full HR access" },
