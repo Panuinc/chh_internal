@@ -1,7 +1,3 @@
-/**
- * Hooks - Public Exports
- */
-
 export {
   useSessionUser,
   usePermissions,
@@ -9,6 +5,5 @@ export {
   useModuleMenu,
 } from "./useMenu";
 
-// Re-export default
 export { default } from "./useMenu";
 export { useFormHandler } from "./useFormHandler";

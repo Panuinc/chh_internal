@@ -1,17 +1,8 @@
 "use client";
 
-/**
- * Permission Hooks
- * Compatible กับ API เดิม
- */
-
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import showToast from "@/components/UIToast";
-
-// ============================================================
-// Constants
-// ============================================================
 
 const API_URL = "/api/hr/permission";
 
@@ -20,10 +11,6 @@ const TOAST = {
   DANGER: "danger",
   WARNING: "warning",
 };
-
-// ============================================================
-// Helpers
-// ============================================================
 
 function formatPermission(permission, index = null) {
   if (!permission) return null;
@@ -56,15 +43,13 @@ async function fetchWithAbort(url, options, signal) {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.error || `Request failed with status ${response.status}`);
+    throw new Error(
+      data.error || `Request failed with status ${response.status}`
+    );
   }
 
   return data;
 }
-
-// ============================================================
-// usePermissions - ดึงรายการทั้งหมด
-// ============================================================
 
 export function usePermissions(apiUrl = API_URL) {
   const [permissions, setPermissions] = useState([]);
@@ -78,7 +63,9 @@ export function usePermissions(apiUrl = API_URL) {
         const result = await fetchWithAbort(apiUrl, {}, controller.signal);
 
         const formatted = Array.isArray(result.permissions)
-          ? result.permissions.map((p, i) => formatPermission(p, i)).filter(Boolean)
+          ? result.permissions
+              .map((p, i) => formatPermission(p, i))
+              .filter(Boolean)
           : [];
 
         setPermissions(formatted);
@@ -97,10 +84,6 @@ export function usePermissions(apiUrl = API_URL) {
 
   return { permissions, loading };
 }
-
-// ============================================================
-// usePermission - ดึงรายการเดียว
-// ============================================================
 
 export function usePermission(permissionId) {
   const [permission, setPermission] = useState(null);
@@ -145,32 +128,21 @@ export function usePermission(permissionId) {
   return { permission, loading };
 }
 
-// ============================================================
-// useSubmitPermission - สร้าง/แก้ไข
-// ⚠️ Return function ตรงๆ เพื่อให้ compatible กับ useFormHandler
-// ============================================================
-
 export function useSubmitPermission({
   mode = "create",
   permissionId = null,
-  currentPermissionId,  // ใช้ชื่อเดิมเพื่อ backward compatible
+  currentPermissionId,
 }) {
   const router = useRouter();
 
-  // Return function ตรงๆ (ไม่ใช่ object) เพื่อให้ใช้กับ useFormHandler ได้
   return useCallback(
     async (formRefOrData, formDataOrSetErrors, setErrorsOptional) => {
-      // Support ทั้ง 2 แบบ:
-      // แบบเดิม: (formRef, formData, setErrors)
-      // แบบใหม่: (formData, setErrors)
       let formData, setErrors;
-      
+
       if (setErrorsOptional !== undefined) {
-        // แบบเดิม: (formRef, formData, setErrors)
         formData = formDataOrSetErrors;
         setErrors = setErrorsOptional;
       } else {
-        // แบบใหม่: (formData, setErrors)
         formData = formRefOrData;
         setErrors = formDataOrSetErrors || (() => {});
       }
@@ -206,10 +178,16 @@ export function useSubmitPermission({
             setErrors({});
           }
 
-          showToast(TOAST.DANGER, result.error || "Failed to submit Permission.");
+          showToast(
+            TOAST.DANGER,
+            result.error || "Failed to submit Permission."
+          );
         }
       } catch (err) {
-        showToast(TOAST.DANGER, `Failed to submit Permission: ${getErrorMessage(err)}`);
+        showToast(
+          TOAST.DANGER,
+          `Failed to submit Permission: ${getErrorMessage(err)}`
+        );
       }
     },
     [mode, permissionId, currentPermissionId, router]

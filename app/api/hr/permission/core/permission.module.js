@@ -1,32 +1,16 @@
-/**
- * Permission Module - ใช้ Shared Utilities
- * ตัวอย่างการสร้าง entity module แบบ minimal
- */
-
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { getLocalNow } from "@/lib/getLocalNow";
 import { preprocessString, preprocessEnum, formatData } from "@/lib/zodSchema";
 import {
-  // Errors
   NotFoundError,
   BadRequestError,
-  
-  // Schema helpers
   validateOrThrow,
   normalizeString,
-  
-  // Controller helpers
   createBaseController,
-  
-  // Logger helpers
   createLogger,
   handlePrismaUniqueError,
-} from "@/lib/shared/server";  // ⚠️ ใช้ /server สำหรับ server-side
-
-// ============================================================
-// Constants (Entity-specific)
-// ============================================================
+} from "@/lib/shared/server";
 
 const ENTITY_NAME = "Permission";
 const EMPLOYEE_SELECT = {
@@ -34,10 +18,6 @@ const EMPLOYEE_SELECT = {
   employeeFirstName: true,
   employeeLastName: true,
 };
-
-// ============================================================
-// Schemas
-// ============================================================
 
 export const createSchema = z.object({
   permissionName: preprocessString("Please provide permissionName"),
@@ -47,13 +27,12 @@ export const createSchema = z.object({
 export const updateSchema = z.object({
   permissionId: preprocessString("Please provide the permission ID"),
   permissionName: preprocessString("Please provide permissionName"),
-  permissionStatus: preprocessEnum(["Active", "Inactive"], "Please provide permissionStatus"),
+  permissionStatus: preprocessEnum(
+    ["Active", "Inactive"],
+    "Please provide permissionStatus"
+  ),
   permissionUpdatedBy: preprocessString("Please provide the updater ID"),
 });
-
-// ============================================================
-// Repository
-// ============================================================
 
 export const PermissionRepository = {
   async findMany(skip = 0, take = 10) {
@@ -104,10 +83,6 @@ export const PermissionRepository = {
   },
 };
 
-// ============================================================
-// Service
-// ============================================================
-
 export const PermissionService = {
   async getPaginated(skip, take) {
     const [items, total] = await Promise.all([
@@ -137,10 +112,6 @@ export const PermissionService = {
     return PermissionRepository.update(id, data);
   },
 };
-
-// ============================================================
-// Use Cases
-// ============================================================
 
 export async function GetAllUseCase(page = 1, limit = 1000000) {
   const log = createLogger("GetAllPermissionUseCase");
@@ -209,7 +180,10 @@ export async function UpdateUseCase(data) {
   const existingName = normalizeString(existing.permissionName);
 
   if (normalizedName !== existingName) {
-    await PermissionService.ensureNameNotDuplicate(normalizedName, permissionId);
+    await PermissionService.ensureNameNotDuplicate(
+      normalizedName,
+      permissionId
+    );
   }
 
   try {
@@ -226,17 +200,9 @@ export async function UpdateUseCase(data) {
   }
 }
 
-// ============================================================
-// Formatter
-// ============================================================
-
 export function formatPermissionData(items) {
   return formatData(items, ["permissionCreatedAt", "permissionUpdatedAt"], []);
 }
-
-// ============================================================
-// Controller (using factory)
-// ============================================================
 
 const baseController = createBaseController({
   getAllUseCase: GetAllUseCase,
@@ -246,16 +212,16 @@ const baseController = createBaseController({
   formatData: formatPermissionData,
 });
 
-// Export controller methods
 export const getAllPermission = baseController.getAll;
 export const getPermissionById = baseController.getById;
 export const createPermission = baseController.create;
 export const updatePermission = (request, id) => {
-  // Override to pass permissionId correctly
   return (async () => {
     const data = await request.json();
     const item = await UpdateUseCase({ ...data, permissionId: id });
-    const { successResponse, SUCCESS_MESSAGES } = await import("@/lib/shared/server");
+    const { successResponse, SUCCESS_MESSAGES } = await import(
+      "@/lib/shared/server"
+    );
     return successResponse({
       message: SUCCESS_MESSAGES.UPDATED,
       permission: formatPermissionData([item])[0],
