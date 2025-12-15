@@ -28,7 +28,7 @@ export default function UISignIn({
               labelPlacement="outside"
               placeholder="Enter your username"
               color="none"
-              variant="bordered"
+              variant="faded"
               size="lg"
               isRequired
               value={username}
@@ -45,7 +45,7 @@ export default function UISignIn({
               labelPlacement="outside"
               placeholder="Enter your password"
               color="none"
-              variant="bordered"
+              variant="faded"
               size="lg"
               isRequired
               value={password}

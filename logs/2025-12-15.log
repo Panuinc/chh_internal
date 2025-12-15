@@ -1,6 +1,4 @@
-[2025-12-15 14:40:02] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
-[2025-12-15 14:40:02] [INFO] GetAllPermissionUseCase success {"total":11,"returned":11}
-[2025-12-15 14:43:04] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
-[2025-12-15 14:43:04] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
-[2025-12-15 14:43:09] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
-[2025-12-15 14:43:09] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-15 14:53:29] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 14:53:29] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-15 14:53:53] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 14:53:53] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}

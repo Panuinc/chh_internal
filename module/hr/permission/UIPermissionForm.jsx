@@ -30,7 +30,7 @@ export default function UIPermissionForm({
             name="permissionName"
             type="text"
             label="Permission Name"
-            color="default"
+            color="none"
             variant="faded"
             size="lg"
             labelPlacement="outside"
@@ -52,7 +52,7 @@ export default function UIPermissionForm({
               label="Permission Status"
               labelPlacement="outside"
               placeholder="Please Select"
-              color="default"
+              color="none"
               variant="faded"
               size="lg"
               isRequired
