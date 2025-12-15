@@ -37,21 +37,22 @@ export default function PagesLayout({ children }) {
 
         <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 hidden"></div>
 
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
+        <div className="flex items-center justify-center aspect-square min-h-12 p-2 gap-2 bg-success shadow-lg text-background rounded-xl cursor-pointer hover:opacity-75 transition-opacity">
           {userInitial}
         </div>
 
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
+        <div className="flex items-center justify-center aspect-square min-h-12 p-2 gap-2 bg-success shadow-lg text-background rounded-xl cursor-pointer hover:opacity-75 transition-opacity">
           <BellDot />
         </div>
 
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:opacity-50 transition-opacity">
+        <div className="flex items-center justify-center aspect-square min-h-12 p-2 gap-2 bg-success shadow-lg text-background rounded-xl cursor-pointer hover:opacity-75 transition-opacity">
           <Button
             onPress={handleSignOut}
             isDisabled={isSigningOut}
             isIconOnly
             radius="none"
             color="none"
+            size="sm"
           >
             <LogOut />
           </Button>

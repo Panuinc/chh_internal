@@ -15,12 +15,12 @@ export default function UISignIn({
       <div className="flex flex-col items-center justify-center w-full xl:w-4/12 h-full p-2 gap-2 xl:border-r-1">
         <div className="flex items-end justify-center w-full h-fit p-2 gap-2 text-3xl font-black">
           Ever
-          <span className="text-primary text-6xl">
+          <span className="text-success text-6xl">
             G
             <span className="relative inline-block">
               r
               <svg
-                className="absolute -top-4 -right-1 w-5 h-5 text-green-600"
+                className="absolute -top-4 -right-1 w-7 h-7 text-success"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
@@ -73,10 +73,10 @@ export default function UISignIn({
           <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
             <Button
               type="submit"
-              color="none"
-              variant="solid"
+              color="success"
+              variant="shadow"
               size="lg"
-              className="w-6/12 border-1"
+              className="w-6/12 text-background"
               isLoading={isLoading}
               spinner={<Spinner size="sm" color="current" />}
             >

@@ -16,7 +16,7 @@ function UserProfileCard({ user }) {
         />
       </div>
       <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-xl font-black">
-        <Ghost /> Welcome Back
+        <Ghost /> Welcome Back <Ghost />
       </div>
 
       <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-lg font-black">
@@ -40,10 +40,10 @@ function UserProfileCard({ user }) {
 
       <div className="flex flex-col items-end justify-end w-full h-full p-2 gap-2">
         <Button
-          color="none"
-          variant="solid"
+          color="success"
+          variant="shadow"
           size="lg"
-          className="w-full border-1"
+          className="w-full text-background"
         >
           Change Password
         </Button>
