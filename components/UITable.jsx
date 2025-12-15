@@ -16,7 +16,7 @@ import {
   Chip,
   Pagination,
 } from "@heroui/react";
-import { ChevronDown, Plus, Search, EllipsisVertical } from "lucide-react";
+import { ChevronDown, Plus, Search, Settings2 } from "lucide-react";
 
 function capitalize(s) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
@@ -44,18 +44,7 @@ export default function DataTable({
   });
   const [page, setPage] = React.useState(1);
 
-  const [visibleColumns, setVisibleColumns] = React.useState(
-    new Set(columns.map((c) => c.uid))
-  );
-
   const hasSearchFilter = Boolean(filterValue);
-
-  const headerColumns = React.useMemo(() => {
-    if (visibleColumns === "all") return columns;
-    return columns.filter((column) =>
-      Array.from(visibleColumns).includes(column.uid)
-    );
-  }, [columns, visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
     let filtered = [...data];
@@ -125,7 +114,7 @@ export default function DataTable({
             <Dropdown>
               <DropdownTrigger>
                 <Button isIconOnly variant="light">
-                  <EllipsisVertical />
+                  <Settings2 />
                 </Button>
               </DropdownTrigger>
 
@@ -149,7 +138,7 @@ export default function DataTable({
 
       return cellValue;
     },
-    [statusColorMap, renderCustomCell, onEdit]
+    [statusColorMap, renderCustomCell, onEdit, onAssign]
   );
 
   const onRowsPerPageChange = (e) => {
@@ -182,33 +171,6 @@ export default function DataTable({
           className="w-full"
         />
 
-        <Dropdown>
-          <DropdownTrigger>
-            <Button
-              color="default"
-              endContent={<ChevronDown />}
-              size="lg"
-              className="w-full xl:w-44 p-2 gap-2 font-semibold"
-            >
-              Columns
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu
-            disallowEmptySelection
-            aria-label="Column Visibility"
-            closeOnSelect={false}
-            selectedKeys={visibleColumns}
-            selectionMode="multiple"
-            onSelectionChange={setVisibleColumns}
-          >
-            {columns.map((column) => (
-              <DropdownItem key={column.uid} className="capitalize">
-                {column.name}
-              </DropdownItem>
-            ))}
-          </DropdownMenu>
-        </Dropdown>
-
         {statusOptions.length > 0 && (
           <Dropdown>
             <DropdownTrigger>
@@ -216,7 +178,7 @@ export default function DataTable({
                 color="default"
                 endContent={<ChevronDown />}
                 size="lg"
-                className="w-full xl:w-44 p-2 gap-2 font-semibold"
+                className="w-full xl:w-52 text-foreground font-black"
               >
                 Status
               </Button>
@@ -244,7 +206,7 @@ export default function DataTable({
             color="primary"
             onPress={onAddNew}
             size="lg"
-            className="w-full xl:w-44 p-2 gap-2 text-background font-semibold"
+            className="w-full xl:w-52 text-background font-black"
           >
             Add New
           </Button>
@@ -303,13 +265,13 @@ export default function DataTable({
       size="lg"
       shadow="none"
     >
-      <TableHeader columns={headerColumns}>
+      <TableHeader columns={columns}>
         {(column) => (
           <TableColumn
             key={column.uid}
             align={column.uid === "actions" ? "center" : "start"}
             allowsSorting={column.sortable}
-            className="border-t-2 border-b-2 border-default p-4 gap-2"
+            className="border-t-2 border-b-2 border-foreground p-4 gap-2"
           >
             {column.name}
           </TableColumn>
@@ -319,7 +281,7 @@ export default function DataTable({
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => (
-              <TableCell className="border-b-1 border-default">
+              <TableCell className="border-b-2 border-foreground">
                 {renderCell(item, columnKey)}
               </TableCell>
             )}
