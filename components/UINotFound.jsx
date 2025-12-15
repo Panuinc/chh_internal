@@ -24,7 +24,7 @@ export default function UINotFound() {
           color="none"
           variant="solid"
           size="lg"
-          className="w-full bg-foreground text-background"
+          className="w-full"
         >
           Home
         </Button>

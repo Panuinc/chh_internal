@@ -61,3 +61,5 @@
 [2025-12-15 09:52:04] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
 [2025-12-15 09:53:13] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
 [2025-12-15 09:53:13] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-15 10:05:57] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-15 10:05:57] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}

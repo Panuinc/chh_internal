@@ -5,7 +5,7 @@ export default function UIHeader({ header }) {
   return (
     <>
       <div className="flex items-center justify-start w-full xl:w-10/12 h-fit p-2 gap-2 border">
-        <Box className="text-primary" />
+        <Box />
         {header}
       </div>
     </>

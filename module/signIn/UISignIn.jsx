@@ -61,7 +61,7 @@ export default function UISignIn({
               color="success"
               variant="solid"
               size="lg"
-              className="w-6/12 text-background"
+              className="w-6/12"
               isLoading={isLoading}
               spinner={<Spinner size="sm" color="current" />}
             >

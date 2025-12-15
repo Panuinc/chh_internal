@@ -62,15 +62,15 @@ export default function UIPermission({
     <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border">
       <div className="flex flex-col xl:flex-row items-center justify-center w-full xl:w-10/12 h-full p-2 gap-2 border overflow-hidden">
         <div className="xl:flex flex-col items-center justify-start w-full xl:w-2/12 h-full p-2 gap-2 border overflow-auto hidden">
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
+          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border">
             <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
               Total Permissions
             </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border text-foreground">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2 border text-secondary">
               {total}
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
+          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border">
             <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
               Active Permissions
             </div>
@@ -78,7 +78,7 @@ export default function UIPermission({
               {enabled}
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
+          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border">
             <div className="flex items-center justify-center w-full h-full p-2 gap-2 border">
               Inactive Permissions
             </div>

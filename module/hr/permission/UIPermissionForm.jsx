@@ -19,7 +19,7 @@ export default function UIPermissionForm({
       >
         <div className="flex flex-col items-center justify-start w-full h-fit p-2 gap-2 border overflow-auto">
           <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2 border">
-            <div className="flex items-center justify-center h-full p-2 gap-2 border bg-foreground text-background rounded-xl">
+            <div className="flex items-center justify-center h-full p-2 gap-2 border">
               {mode === "create"
                 ? `Create By : ${operatedBy}`
                 : `Update By : ${operatedBy}`}
@@ -84,7 +84,7 @@ export default function UIPermissionForm({
                 type="submit"
                 color="primary"
                 size="lg"
-                className="w-full p-2 gap-2 border text-background font-semibold"
+                className="w-full p-2 gap-2 border font-semibold"
               >
                 Submit
               </Button>
