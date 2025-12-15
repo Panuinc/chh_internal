@@ -87,7 +87,7 @@ export default function UIPermission({
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full p-2 gap-2 overflow-hidden">
+      <div className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <LoadingState />
