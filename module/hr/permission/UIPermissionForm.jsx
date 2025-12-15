@@ -14,7 +14,7 @@ export default function UIPermissionForm({
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="flex flex-col items-center justify-start w-full h-full gap-2 overflow-auto"
+      className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full gap-2 overflow-auto"
     >
       <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
         <div className="flex items-center justify-center h-full p-4 gap-2 bg-foreground text-background rounded-xl">

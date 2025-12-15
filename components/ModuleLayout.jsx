@@ -39,7 +39,7 @@ export default function ModuleLayout({ children }) {
         </Breadcrumbs>
       </div>
 
-      <div className="flex items-center justify-center w-full xl:w-10/12 h-full gap-2 overflow-hidden">
+      <div className="flex items-center justify-center w-full h-full px-2 gap-2 overflow-hidden">
         {children}
       </div>
     </div>
