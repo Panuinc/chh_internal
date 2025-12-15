@@ -13,13 +13,13 @@ export default function UIPermissionForm({
   const { formRef, formData, handleChange, handleSubmit, errors } = formHandler;
 
   return (
-    <div className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full p-2 gap-2 border overflow-auto">
+    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border overflow-auto">
       <UIHeader header={headerTopic} />
 
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="flex flex-col items-center justify-start w-full h-full overflow-auto"
+        className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full overflow-auto"
       >
         <div className="flex flex-col items-center justify-start w-full h-fit gap-2 overflow-auto">
           <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
