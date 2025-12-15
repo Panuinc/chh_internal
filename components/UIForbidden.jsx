@@ -25,7 +25,7 @@ export default function UIForbidden() {
           color="none"
           variant="solid"
           size="lg"
-          className="w-full bg-foreground text-background font-black"
+          className="w-full bg-foreground text-background"
         >
           Home
         </Button>

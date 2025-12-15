@@ -178,7 +178,7 @@ export default function DataTable({
                 color="default"
                 endContent={<ChevronDown />}
                 size="lg"
-                className="w-full xl:w-52 text-foreground font-black"
+                className="w-full xl:w-52 text-foreground"
               >
                 Status
               </Button>
@@ -206,7 +206,7 @@ export default function DataTable({
             color="primary"
             onPress={onAddNew}
             size="lg"
-            className="w-full xl:w-52 text-background font-black"
+            className="w-full xl:w-52 text-background"
           >
             Add New
           </Button>
