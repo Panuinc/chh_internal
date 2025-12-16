@@ -116,3 +116,36 @@
 [2025-12-16 13:24:39] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2025-12-16 13:24:39] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
 [2025-12-16 13:24:39] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-16 13:36:24] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:36:25] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:36:25] [INFO] GetAllAccountUseCase success {"total":1,"returned":1}
+[2025-12-16 13:37:11] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:37:11] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-16 13:37:14] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:37:14] [INFO] GetAllAccountUseCase success {"total":1,"returned":1}
+[2025-12-16 13:37:18] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:37:18] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-16 13:38:18] [INFO] CreateAccountUseCase start {"employeeId":"cmj875hfb0003crmkvku84kgf"}
+[2025-12-16 13:38:18] [INFO] CreateAccountUseCase success {"id":"cmj87odm80005crmk1hhi7srm","username":"Demo01"}
+[2025-12-16 13:38:20] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:38:20] [INFO] GetAllAccountUseCase success {"total":2,"returned":2}
+[2025-12-16 13:38:31] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:38:31] [INFO] GetAccountByIdUseCase start {"id":"cmj87odm80005crmk1hhi7srm"}
+[2025-12-16 13:38:31] [INFO] GetAccountByIdUseCase success {"id":"cmj87odm80005crmk1hhi7srm","username":"Demo01"}
+[2025-12-16 13:38:36] [INFO] UpdateAccountUseCase start {"id":"cmj87odm80005crmk1hhi7srm"}
+[2025-12-16 13:38:36] [INFO] UpdateAccountUseCase success {"id":"cmj87odm80005crmk1hhi7srm","username":"Demo01"}
+[2025-12-16 13:38:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:38:37] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:38:37] [INFO] GetAllAccountUseCase success {"total":2,"returned":2}
+[2025-12-16 13:39:14] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:39:14] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-16 13:39:18] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:39:18] [INFO] GetAllAccountUseCase success {"total":2,"returned":2}
+[2025-12-16 13:39:20] [INFO] GetAccountByIdUseCase start {"id":"cmj87odm80005crmk1hhi7srm"}
+[2025-12-16 13:39:20] [INFO] GetAccountByIdUseCase success {"id":"cmj87odm80005crmk1hhi7srm","username":"Demo01"}
+[2025-12-16 13:39:21] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:39:22] [INFO] UpdateAccountUseCase start {"id":"cmj87odm80005crmk1hhi7srm"}
+[2025-12-16 13:39:22] [INFO] UpdateAccountUseCase success {"id":"cmj87odm80005crmk1hhi7srm","username":"Demo01"}
+[2025-12-16 13:39:23] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:39:24] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:39:24] [INFO] GetAllAccountUseCase success {"total":2,"returned":2}

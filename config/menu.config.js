@@ -1,4 +1,11 @@
-import { User2, Building2, Users, ScrollText, Key } from "lucide-react";
+import {
+  User2,
+  Building2,
+  Users,
+  ScrollText,
+  Key,
+  UserLock,
+} from "lucide-react";
 
 export const menuConfig = {
   modules: [
@@ -29,6 +36,14 @@ export const menuConfig = {
             edit: "hr.employee.edit",
             delete: "hr.employee.delete",
           },
+        },
+        {
+          id: "account",
+          href: "/hr/account",
+          text: "Account",
+          icon: UserLock,
+          permission: "hr.account.view",
+          requireSuperAdmin: true,
         },
         {
           id: "permission",

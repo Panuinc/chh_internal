@@ -176,7 +176,7 @@ export async function CreateUseCase(data) {
 
     const normalizedFirstName = normalizeString(validated.employeeFirstName);
     const normalizedLastName = normalizeString(validated.employeeLastName);
-    const normalizedEmail = validated.employeeEmail; // Already lowercase from schema
+    const normalizedEmail = validated.employeeEmail;
 
     await EmployeeService.ensureEmailNotDuplicate(normalizedEmail);
 
@@ -212,7 +212,7 @@ export async function UpdateUseCase(data) {
 
     const normalizedFirstName = normalizeString(updateData.employeeFirstName);
     const normalizedLastName = normalizeString(updateData.employeeLastName);
-    const normalizedEmail = updateData.employeeEmail; // Already lowercase from schema
+    const normalizedEmail = updateData.employeeEmail;
 
     if (normalizedEmail !== existing.employeeEmail.toLowerCase()) {
       await EmployeeService.ensureEmailNotDuplicate(
