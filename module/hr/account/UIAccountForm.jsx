@@ -101,14 +101,17 @@ export default function UIAccountForm({
           <Input
             name="accountPassword"
             type="password"
-            label="Password"
+            label={isUpdate ? "New Password" : "Password"}
             labelPlacement="outside"
-            placeholder="Enter Password"
+            placeholder={
+              isUpdate ? "Leave blank to keep current" : "Enter Password"
+            }
+            description={isUpdate ? "Leave blank to keep current password" : ""}
             color="default"
             variant="bordered"
             size="lg"
             radius="sm"
-            isRequired
+            isRequired={!isUpdate}
             value={formData.accountPassword || ""}
             onChange={handleChange("accountPassword")}
             isInvalid={!!errors.accountPassword}
@@ -121,10 +124,15 @@ export default function UIAccountForm({
         <div className="flex items-center justify-center w-full h-full p-2 gap-2">
           <Input
             name="accountPinNumber"
-            type="text"
-            label="PIN Number"
+            type="password"
+            label={isUpdate ? "New PIN Number" : "PIN Number"}
             labelPlacement="outside"
-            placeholder="Enter PIN Number (Optional)"
+            placeholder={
+              isUpdate
+                ? "Leave blank to keep current"
+                : "Enter PIN Number (Optional)"
+            }
+            description={isUpdate ? "Leave blank to keep current PIN" : ""}
             color="default"
             variant="bordered"
             size="lg"

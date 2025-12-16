@@ -155,7 +155,7 @@ export function useSubmitAccount({
 
       const payload = {
         accountUsername: formData.accountUsername,
-        accountPassword: formData.accountPassword,
+        accountPassword: formData.accountPassword || null,
         accountPinNumber: formData.accountPinNumber || null,
         ...(isCreate
           ? { accountEmployeeId: formData.accountEmployeeId }

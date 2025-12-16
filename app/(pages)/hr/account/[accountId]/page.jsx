@@ -43,8 +43,8 @@ export default function AccountUpdate() {
     if (account) {
       formHandler.setFormData({
         accountUsername: account.accountUsername || "",
-        accountPassword: account.accountPassword || "",
-        accountPinNumber: account.accountPinNumber || "",
+        accountPassword: "",
+        accountPinNumber: "",
         accountStatus: account.accountStatus || "",
       });
     }

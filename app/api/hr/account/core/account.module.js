@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { getLocalNow } from "@/lib/getLocalNow";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
 import { preprocessString, preprocessEnum, formatData } from "@/lib/zodSchema";
 import {
   NotFoundError,
@@ -14,6 +15,8 @@ import {
 const ENTITY_NAME = "Account";
 const ENTITY_KEY = "accounts";
 const ENTITY_SINGULAR = "account";
+
+const SALT_ROUNDS = 10;
 
 const EMPLOYEE_SELECT = {
   employeeId: true,
@@ -33,7 +36,7 @@ export const createSchema = z.object({
 export const updateSchema = z.object({
   accountId: preprocessString("Please provide the account ID"),
   accountUsername: preprocessString("Please provide accountUsername"),
-  accountPassword: preprocessString("Please provide accountPassword"),
+  accountPassword: z.string().optional().nullable(),
   accountPinNumber: z.string().optional().nullable(),
   accountStatus: preprocessEnum(
     ["Active", "Inactive"],
@@ -41,6 +44,26 @@ export const updateSchema = z.object({
   ),
   accountUpdatedBy: preprocessString("Please provide the updater ID"),
 });
+
+async function hashPassword(password) {
+  if (!password) return null;
+  return bcrypt.hash(password, SALT_ROUNDS);
+}
+
+async function hashPinNumber(pin) {
+  if (!pin) return null;
+  return bcrypt.hash(pin, SALT_ROUNDS);
+}
+
+export async function verifyPassword(password, hashedPassword) {
+  if (!password || !hashedPassword) return false;
+  return bcrypt.compare(password, hashedPassword);
+}
+
+export async function verifyPinNumber(pin, hashedPin) {
+  if (!pin || !hashedPin) return false;
+  return bcrypt.compare(pin, hashedPin);
+}
 
 export const AccountRepository = {
   async findMany(skip = 0, take = 10) {
@@ -119,6 +142,10 @@ export const AccountService = {
     return AccountRepository.findById(id);
   },
 
+  async findByUsername(username) {
+    return AccountRepository.findByUsername(username);
+  },
+
   async ensureEmployeeNotHaveAccount(employeeId, excludeId = null) {
     const existing = await AccountRepository.findByEmployeeId(employeeId);
     if (existing && existing.accountId !== excludeId) {
@@ -194,8 +221,13 @@ export async function CreateUseCase(data) {
     );
     await AccountService.ensureUsernameNotDuplicate(validated.accountUsername);
 
+    const hashedPassword = await hashPassword(validated.accountPassword);
+    const hashedPin = await hashPinNumber(validated.accountPinNumber);
+
     const item = await AccountService.create({
       ...validated,
+      accountPassword: hashedPassword,
+      accountPinNumber: hashedPin,
       accountCreatedAt: getLocalNow(),
     });
 
@@ -233,10 +265,36 @@ export async function UpdateUseCase(data) {
       );
     }
 
-    const item = await AccountService.update(accountId, {
-      ...updateData,
+    const dataToUpdate = {
+      accountUsername: updateData.accountUsername,
+      accountStatus: updateData.accountStatus,
+      accountUpdatedBy: updateData.accountUpdatedBy,
       accountUpdatedAt: getLocalNow(),
-    });
+    };
+
+    if (
+      updateData.accountPassword &&
+      updateData.accountPassword.trim() !== ""
+    ) {
+      dataToUpdate.accountPassword = await hashPassword(
+        updateData.accountPassword
+      );
+    }
+
+    if (updateData.accountPinNumber !== undefined) {
+      if (
+        updateData.accountPinNumber &&
+        updateData.accountPinNumber.trim() !== ""
+      ) {
+        dataToUpdate.accountPinNumber = await hashPinNumber(
+          updateData.accountPinNumber
+        );
+      } else {
+        dataToUpdate.accountPinNumber = null;
+      }
+    }
+
+    const item = await AccountService.update(accountId, dataToUpdate);
 
     log.success({ id: accountId, username: item.accountUsername });
     return item;
