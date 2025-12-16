@@ -29,7 +29,6 @@ enum departmentStatus {
 
 enum VisitorStatus {
   CheckIn
-  Confirmed
   CheckOut
 }
 
