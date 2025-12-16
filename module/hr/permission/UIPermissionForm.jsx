@@ -14,18 +14,18 @@ export default function UIPermissionForm({
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full p-2 gap-2 border-1 overflow-auto"
+      className="flex flex-col items-center justify-start w-full xl:w-12/12 h-full gap-2 border-1 rounded-xl overflow-auto"
     >
-      <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2 border-1">
-        <div className="flex items-center justify-center h-full p-2 gap-2 border-1">
+      <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
+        <div className="flex items-center justify-center h-full p-4 gap-2 border-b-1">
           {mode === "create"
             ? `Create By : ${operatedBy}`
             : `Update By : ${operatedBy}`}
         </div>
       </div>
 
-      <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2 border-1">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
+      <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
           <Input
             name="permissionName"
             type="text"
@@ -45,8 +45,8 @@ export default function UIPermissionForm({
       </div>
 
       {isUpdate && (
-        <div className="flex flex-col xl:flex-row items-center justify-end w-full h-fit p-2 gap-2 border-1">
-          <div className="flex items-center justify-center w-full xl:w-6/12 h-full p-2 gap-2 border-1">
+        <div className="flex flex-col xl:flex-row items-center justify-end w-full h-fit p-2 gap-2">
+          <div className="flex items-center justify-center w-full xl:w-6/12 h-full p-2 gap-2">
             <Select
               name="permissionStatus"
               label="Permission Status"
@@ -74,8 +74,8 @@ export default function UIPermissionForm({
         </div>
       )}
 
-      <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2 border-1">
-        <div className="flex items-center justify-end w-full h-full p-2 gap-2 border-1">
+      <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
+        <div className="flex items-center justify-end w-full h-full p-2 gap-2">
           <Button
             type="submit"
             color="default"

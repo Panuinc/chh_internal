@@ -2,27 +2,20 @@
 
 import React from "react";
 
-// ============================================================================
-// IMPORTS - UI Components
-// ============================================================================
 import {
-  // Table
   Table,
   TableHeader,
   TableColumn,
   TableBody,
   TableRow,
   TableCell,
-  // Form & Input
   Input,
   Button,
   ButtonGroup,
-  // Dropdown
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  // Display
   Chip,
   Pagination,
   Card,
@@ -30,9 +23,6 @@ import {
   CardHeader,
 } from "@heroui/react";
 
-// ============================================================================
-// IMPORTS - Icons
-// ============================================================================
 import {
   ChevronDown,
   Plus,
@@ -42,19 +32,9 @@ import {
   LayoutList,
 } from "lucide-react";
 
-// ============================================================================
-// UTILITIES
-// ============================================================================
 const capitalize = (str) =>
   str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
 
-// ============================================================================
-// SUB-COMPONENTS
-// ============================================================================
-
-/**
- * Action Menu - Dropdown menu for row actions (Edit, Assign)
- */
 const ActionMenu = ({ item, onEdit, onAssign, size = "md" }) => (
   <Dropdown>
     <DropdownTrigger>
@@ -77,9 +57,6 @@ const ActionMenu = ({ item, onEdit, onAssign, size = "md" }) => (
   </Dropdown>
 );
 
-/**
- * Status Chip - Displays status with color coding
- */
 const StatusChip = ({ value, colorMap, size = "md" }) => (
   <Chip
     className="capitalize"
@@ -91,9 +68,6 @@ const StatusChip = ({ value, colorMap, size = "md" }) => (
   </Chip>
 );
 
-/**
- * View Toggle - Switch between table and card view
- */
 const ViewToggle = ({ viewMode, setViewMode }) => (
   <ButtonGroup size="lg">
     <Button
@@ -119,9 +93,6 @@ const ViewToggle = ({ viewMode, setViewMode }) => (
   </ButtonGroup>
 );
 
-/**
- * Status Filter Dropdown
- */
 const StatusFilterDropdown = ({
   statusOptions,
   statusFilter,
@@ -156,14 +127,11 @@ const StatusFilterDropdown = ({
   </Dropdown>
 );
 
-/**
- * Rows Per Page Selector
- */
 const RowsPerPageSelector = ({ onChange }) => (
-  <label className="flex items-center justify-between w-fit h-full p-2 gap-2 border-1 whitespace-nowrap">
+  <label className="flex items-center justify-between w-fit h-full p-2 gap-2 whitespace-nowrap">
     Rows per page:
     <select
-      className="flex items-center justify-between w-fit h-full p-2 gap-2 border-1"
+      className="flex items-center justify-between w-fit h-full p-2 gap-2"
       onChange={onChange}
       defaultValue="5"
     >
@@ -174,13 +142,6 @@ const RowsPerPageSelector = ({ onChange }) => (
   </label>
 );
 
-// ============================================================================
-// CUSTOM HOOKS
-// ============================================================================
-
-/**
- * useDataFiltering - Handles search and status filtering logic
- */
 const useDataFiltering = (data, statusOptions) => {
   const [filterValue, setFilterValue] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
@@ -188,7 +149,6 @@ const useDataFiltering = (data, statusOptions) => {
   const filteredItems = React.useMemo(() => {
     let filtered = [...data];
 
-    // Search filter
     if (filterValue) {
       const searchTerm = filterValue.toLowerCase();
       filtered = filtered.filter((item) =>
@@ -198,7 +158,6 @@ const useDataFiltering = (data, statusOptions) => {
       );
     }
 
-    // Status filter
     const isStatusFiltered =
       statusFilter !== "all" &&
       statusOptions.length > 0 &&
@@ -227,9 +186,6 @@ const useDataFiltering = (data, statusOptions) => {
   };
 };
 
-/**
- * usePagination - Handles pagination logic
- */
 const usePagination = (filteredItems) => {
   const [page, setPage] = React.useState(1);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -259,9 +215,6 @@ const usePagination = (filteredItems) => {
   };
 };
 
-/**
- * useSorting - Handles sorting logic
- */
 const useSorting = (items, defaultColumn) => {
   const [sortDescriptor, setSortDescriptor] = React.useState({
     column: defaultColumn,
@@ -280,36 +233,23 @@ const useSorting = (items, defaultColumn) => {
   return { sortDescriptor, setSortDescriptor, sortedItems };
 };
 
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
-
 export default function DataTable({
-  // Data
   columns = [],
   data = [],
-  // Status configuration
   statusOptions = [],
   statusColorMap = {},
-  // UI text
   searchPlaceholder = "Search...",
   emptyContent = "No data found",
   itemName = "items",
-  // View configuration
   defaultView = "table",
   cardTitleKey,
   cardDescriptionKey,
-  // Callbacks
   onAddNew,
   onEdit,
   onAssign,
-  // Custom renderers
   renderCustomCell,
   renderCard,
 }) {
-  // --------------------------------------------------------------------------
-  // State & Hooks
-  // --------------------------------------------------------------------------
   const [viewMode, setViewMode] = React.useState(defaultView);
 
   const {
@@ -335,9 +275,6 @@ export default function DataTable({
     columns[0]?.uid || "id"
   );
 
-  // --------------------------------------------------------------------------
-  // Event Handlers
-  // --------------------------------------------------------------------------
   const handleSearchChange = (value) => {
     setFilterValue(value);
     resetPage();
@@ -348,49 +285,38 @@ export default function DataTable({
     resetPage();
   };
 
-  // --------------------------------------------------------------------------
-  // Cell Renderer
-  // --------------------------------------------------------------------------
   const renderCell = React.useCallback(
     (item, columnKey) => {
       const cellValue = item[columnKey];
 
-      // Custom cell renderer (if provided)
       if (renderCustomCell) {
         const customRender = renderCustomCell(item, columnKey);
         if (customRender !== undefined) return customRender;
       }
 
-      // Status chip
       if (statusColorMap?.[cellValue]) {
         return <StatusChip value={cellValue} colorMap={statusColorMap} />;
       }
 
-      // Actions column
       if (columnKey === "actions") {
         return (
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <ActionMenu item={item} onEdit={onEdit} onAssign={onAssign} />
           </div>
         );
       }
 
-      // Default: raw value
       return cellValue;
     },
     [statusColorMap, renderCustomCell, onEdit, onAssign]
   );
 
-  // --------------------------------------------------------------------------
-  // Card Renderer
-  // --------------------------------------------------------------------------
   const defaultRenderCard = React.useCallback(
     (item) => {
       const titleKey = cardTitleKey || columns[0]?.uid || "id";
       const descKey = cardDescriptionKey || columns[1]?.uid;
       const hasActions = onEdit || onAssign;
 
-      // Filter out action, title, and description columns
       const displayColumns = columns.filter(
         (col) =>
           col.uid !== "actions" && col.uid !== titleKey && col.uid !== descKey
@@ -398,7 +324,6 @@ export default function DataTable({
 
       return (
         <Card key={item.id} className="w-full border-1" shadow="none">
-          {/* Card Header */}
           <CardHeader className="flex justify-between items-start">
             <div className="flex flex-col gap-1">
               <h4 className="text-lg font-semibold">{item[titleKey]}</h4>
@@ -416,7 +341,6 @@ export default function DataTable({
             )}
           </CardHeader>
 
-          {/* Card Body */}
           <CardBody className="pt-0">
             <div className="flex flex-wrap gap-2">
               {displayColumns.map((col) => {
@@ -455,16 +379,10 @@ export default function DataTable({
     ]
   );
 
-  // --------------------------------------------------------------------------
-  // Render
-  // --------------------------------------------------------------------------
   return (
-    <div className="flex flex-col w-full h-full p-2 gap-2 border-1 overflow-hidden">
-      {/* ===== TOOLBAR ===== */}
-      <div className="flex-shrink-0 flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1">
-        {/* Search & Filters Row */}
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2 border-1">
-          {/* Search Input */}
+    <div className="flex flex-col w-full h-full p-2 gap-2 border-1 rounded-3xl overflow-hidden">
+      <div className="flex-shrink-0 flex flex-col items-center justify-center w-full h-fit gap-2">
+        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
           <Input
             isClearable
             placeholder={searchPlaceholder}
@@ -478,10 +396,8 @@ export default function DataTable({
             className="w-full"
           />
 
-          {/* View Toggle */}
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
 
-          {/* Status Filter */}
           {statusOptions.length > 0 && (
             <StatusFilterDropdown
               statusOptions={statusOptions}
@@ -490,7 +406,6 @@ export default function DataTable({
             />
           )}
 
-          {/* Add New Button */}
           {onAddNew && (
             <Button
               startContent={<Plus />}
@@ -505,19 +420,16 @@ export default function DataTable({
           )}
         </div>
 
-        {/* Info Row */}
-        <div className="flex flex-col xl:flex-row items-center justify-between w-full h-full p-2 gap-2 border-1">
-          <div className="flex items-center justify-between w-full h-full p-2 gap-2 border-1">
+        <div className="flex flex-col xl:flex-row items-center justify-between w-full h-full gap-2">
+          <div className="flex items-center justify-between w-full h-full p-2 gap-2">
             Total {data.length} {itemName}
           </div>
           <RowsPerPageSelector onChange={handleRowsPerPageChange} />
         </div>
       </div>
 
-      {/* ===== CONTENT ===== */}
-      <div className="flex-1 min-h-0 overflow-auto p-2 gap-2 border-1">
+      <div className="flex-1 min-h-0 overflow-auto gap-2">
         {viewMode === "table" ? (
-          /* Table View */
           <Table
             aria-label="Data table with sorting and pagination"
             classNames={{ wrapper: "min-h-full" }}
@@ -551,7 +463,6 @@ export default function DataTable({
             </TableBody>
           </Table>
         ) : (
-          /* Card View */
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
             {sortedItems.length > 0 ? (
               sortedItems.map((item) =>
@@ -566,9 +477,8 @@ export default function DataTable({
         )}
       </div>
 
-      {/* ===== PAGINATION ===== */}
-      <div className="flex-shrink-0 flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border-1">
-        <div className="flex items-center justify-end w-full h-full p-2 gap-2 border-1">
+      <div className="flex-shrink-0 flex flex-row items-center justify-center w-full h-fit gap-2">
+        <div className="flex items-center justify-end w-full h-full p-2 gap-2">
           <Pagination
             isCompact
             showControls

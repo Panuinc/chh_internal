@@ -26,28 +26,28 @@ export default function PagesLayout({ children }) {
     "U";
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-1">
+    <div className="flex flex-col items-center justify-center w-full h-full gap-2">
       <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 border-1">
         <Link
           href="/home"
-          className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2 border-1"
+          className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2"
         >
           <Image src="/logo/logo-04.png" alt="logo" width={125} height={125} />
         </Link>
 
-        <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 border-1 hidden"></div>
+        <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 hidden"></div>
 
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 cursor-pointer hover:bg-default">
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:bg-default">
           {userInitial}
         </div>
 
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 cursor-pointer hover:bg-default">
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:bg-default">
           <BellDot />
         </div>
 
         <div
           onClick={!isSigningOut ? handleSignOut : undefined}
-          className={`flex items-center justify-center aspect-square h-full p-2 gap-2 border-1
+          className={`flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl
     ${
       isSigningOut
         ? "opacity-50 cursor-not-allowed"
@@ -58,12 +58,12 @@ export default function PagesLayout({ children }) {
         </div>
       </header>
 
-      <main className="flex items-center justify-center w-full h-full p-2 gap-2 border-8 border-danger overflow-hidden">
+      <main className="flex items-center justify-center w-full xl:w-11/12 h-full px-2 gap-2 overflow-hidden">
         {children}
       </main>
 
       <footer className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border-1">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
           EVERGREEN BY CHH
         </div>
       </footer>

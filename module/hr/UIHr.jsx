@@ -9,12 +9,12 @@ function HrSidebar() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1">
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border-1">
+    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1 rounded-xl">
+      <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
         Quick Stats
       </div>
 
-      <div className="flex flex-col items-center justify-center w-full h-fir p-2 gap-2 border-1">
+      <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
         <StatItem label="Total Employees" value={stats.totalEmployees} />
         <StatItem label="Departments" value={stats.departments} />
         <StatItem label="Pending Approvals" value={stats.pendingApprovals} />
@@ -25,11 +25,11 @@ function HrSidebar() {
 
 function StatItem({ label, value }) {
   return (
-    <div className="flex items-center justify-between w-full h-full p-2 gap-2 border-1">
-      <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
+    <div className="flex items-center justify-between w-full h-full gap-2 border-b-1">
+      <div className="flex items-center justify-center w-full h-full p-2 gap-2">
         {label}
       </div>
-      <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
+      <div className="flex items-center justify-center w-full h-full p-2 gap-2">
         {value}
       </div>
     </div>
