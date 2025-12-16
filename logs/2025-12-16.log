@@ -179,3 +179,5 @@
 [2025-12-16 13:52:23] [INFO] UpdateAccountUseCase start {"id":"cmj5t3o7c000004l73lzg14yz"}
 [2025-12-16 13:52:23] [INFO] UpdateAccountUseCase success {"id":"cmj5t3o7c000004l73lzg14yz","username":"Panuwat.J"}
 [2025-12-16 13:52:24] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:52:25] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:52:25] [INFO] GetAllAccountUseCase success {"total":2,"returned":2}
