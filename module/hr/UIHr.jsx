@@ -58,7 +58,7 @@ export default function UIHr({ menu, isEmpty }) {
       sidebar={<HrSidebar />}
     >
       {isEmpty ? (
-        <div className="col-span-full text-center w-full h-full p-2 gap-2 border-1">
+        <div className="col-span-full text-center justify-center w-full p-2 gap-2">
           No accessible menu items. Please contact administrator.
         </div>
       ) : (
