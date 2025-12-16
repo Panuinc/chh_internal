@@ -10,7 +10,7 @@ export default function UIForbidden() {
       <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
         <Image src="/icon/icon-ghost.png" alt="logo" width={250} height={250} />
       </div>
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
+      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-5xl font-black">
         Access Denied!
       </div>
       <div className="flex items-center justify-center text-center w-6/12 h-fit p-2 gap-2 opacity-50">
@@ -21,12 +21,7 @@ export default function UIForbidden() {
         href="/home"
         className="flex items-center justify-center text-center w-4/12 h-fit p-2 gap-2"
       >
-        <Button
-          color="none"
-          variant="solid"
-          size="lg"
-          className="w-full"
-        >
+        <Button color="default" variant="bordered" size="lg" className="w-full">
           Home
         </Button>
       </Link>

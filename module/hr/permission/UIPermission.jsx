@@ -4,13 +4,13 @@ import { DataTable } from "@/components";
 import { LoadingState } from "@/components";
 
 const columns = [
-  { name: "ID", uid: "permissionIndex", sortable: true },
-  { name: "Permission Name", uid: "permissionName", sortable: true },
-  { name: "Status", uid: "permissionStatus", sortable: true },
-  { name: "Created By", uid: "permissionCreatedBy", sortable: true },
-  { name: "Created At", uid: "permissionCreatedAt", sortable: true },
-  { name: "Updated By", uid: "permissionUpdatedBy", sortable: true },
-  { name: "Updated At", uid: "permissionUpdatedAt", sortable: true },
+  { name: "ID", uid: "permissionIndex" },
+  { name: "Permission Name", uid: "permissionName" },
+  { name: "Status", uid: "permissionStatus" },
+  { name: "Created By", uid: "permissionCreatedBy" },
+  { name: "Created At", uid: "permissionCreatedAt" },
+  { name: "Updated By", uid: "permissionUpdatedBy" },
+  { name: "Updated At", uid: "permissionUpdatedAt" },
   { name: "Actions", uid: "actions" },
 ];
 

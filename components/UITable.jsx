@@ -1,7 +1,5 @@
 "use client";
-
 import React from "react";
-
 import {
   Table,
   TableHeader,
@@ -22,7 +20,6 @@ import {
   CardBody,
   CardHeader,
 } from "@heroui/react";
-
 import {
   ChevronDown,
   Plus,
@@ -215,24 +212,6 @@ const usePagination = (filteredItems) => {
   };
 };
 
-const useSorting = (items, defaultColumn) => {
-  const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: defaultColumn,
-    direction: "ascending",
-  });
-
-  const sortedItems = React.useMemo(() => {
-    return [...items].sort((a, b) => {
-      const first = a[sortDescriptor.column];
-      const second = b[sortDescriptor.column];
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-  }, [sortDescriptor, items]);
-
-  return { sortDescriptor, setSortDescriptor, sortedItems };
-};
-
 export default function DataTable({
   columns = [],
   data = [],
@@ -269,11 +248,6 @@ export default function DataTable({
     handleRowsPerPageChange,
     resetPage,
   } = usePagination(filteredItems);
-
-  const { sortDescriptor, setSortDescriptor, sortedItems } = useSorting(
-    paginatedItems,
-    columns[0]?.uid || "id"
-  );
 
   const handleSearchChange = (value) => {
     setFilterValue(value);
@@ -316,7 +290,6 @@ export default function DataTable({
       const titleKey = cardTitleKey || columns[0]?.uid || "id";
       const descKey = cardDescriptionKey || columns[1]?.uid;
       const hasActions = onEdit || onAssign;
-
       const displayColumns = columns.filter(
         (col) =>
           col.uid !== "actions" && col.uid !== titleKey && col.uid !== descKey
@@ -340,12 +313,10 @@ export default function DataTable({
               />
             )}
           </CardHeader>
-
           <CardBody className="pt-0">
             <div className="flex flex-wrap gap-2">
               {displayColumns.map((col) => {
                 const value = item[col.uid];
-
                 if (statusColorMap?.[value]) {
                   return (
                     <StatusChip
@@ -356,7 +327,6 @@ export default function DataTable({
                     />
                   );
                 }
-
                 return (
                   <div key={col.uid} className="text-sm">
                     <span className="text-default-500">{col.name}: </span>
@@ -395,9 +365,7 @@ export default function DataTable({
             size="lg"
             className="w-full"
           />
-
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
-
           {statusOptions.length > 0 && (
             <StatusFilterDropdown
               statusOptions={statusOptions}
@@ -405,7 +373,6 @@ export default function DataTable({
               setStatusFilter={setStatusFilter}
             />
           )}
-
           {onAddNew && (
             <Button
               startContent={<Plus />}
@@ -419,7 +386,6 @@ export default function DataTable({
             </Button>
           )}
         </div>
-
         <div className="flex flex-col xl:flex-row items-center justify-between w-full h-full gap-2">
           <div className="flex items-center justify-between w-full h-full p-2 gap-2">
             Total {data.length} {itemName}
@@ -431,10 +397,8 @@ export default function DataTable({
       <div className="flex-1 min-h-0 overflow-auto gap-2">
         {viewMode === "table" ? (
           <Table
-            aria-label="Data table with sorting and pagination"
+            aria-label="Data table with pagination"
             classNames={{ wrapper: "min-h-full" }}
-            sortDescriptor={sortDescriptor}
-            onSortChange={setSortDescriptor}
             size="lg"
             shadow="none"
           >
@@ -443,14 +407,13 @@ export default function DataTable({
                 <TableColumn
                   key={column.uid}
                   align={column.uid === "actions" ? "center" : "start"}
-                  allowsSorting={column.sortable}
                   className="p-4 gap-2 border-b-1 border-t-1"
                 >
                   {column.name}
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody emptyContent={emptyContent} items={sortedItems}>
+            <TableBody emptyContent={emptyContent} items={paginatedItems}>
               {(item) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (
@@ -464,8 +427,8 @@ export default function DataTable({
           </Table>
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
-            {sortedItems.length > 0 ? (
-              sortedItems.map((item) =>
+            {paginatedItems.length > 0 ? (
+              paginatedItems.map((item) =>
                 renderCard ? renderCard(item) : defaultRenderCard(item)
               )
             ) : (
