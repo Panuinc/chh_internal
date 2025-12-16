@@ -10,6 +10,10 @@
   border: 1px dashed #15141A;
 }
 
+.border-default {
+  border: 1px solid #15141A;
+}
+
 .border-default-200 {
   border: 1px solid #15141A;
 }

@@ -9,3 +9,26 @@
 [2025-12-16 07:49:07] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
 [2025-12-16 07:49:11] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
 [2025-12-16 07:49:11] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 08:23:47] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 08:23:47] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 08:23:47] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 08:34:56] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 08:34:56] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 08:38:39] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 08:38:39] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 08:47:45] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 08:47:45] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 09:00:13] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 09:00:13] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 09:01:56] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 09:01:56] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 09:09:56] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 09:09:56] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 09:09:56] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 09:09:56] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 09:13:06] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 09:13:06] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 09:13:41] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 09:13:41] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}
+[2025-12-16 09:13:43] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 09:13:43] [INFO] GetAllPermissionUseCase success {"total":10,"returned":10}

@@ -14,28 +14,27 @@ export default function UIPermissionForm({
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full gap-2 overflow-auto"
+      className="flex flex-col items-center justify-start w-full xl:w-10/12 h-full p-2 gap-2 border-1 overflow-auto"
     >
-      <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
-        <div className="flex items-center justify-center h-full p-4 gap-2 border-1 rounded-xl">
+      <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2 border-1">
+        <div className="flex items-center justify-center h-full p-2 gap-2 border-1">
           {mode === "create"
             ? `Create By : ${operatedBy}`
             : `Update By : ${operatedBy}`}
         </div>
       </div>
 
-      <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+      <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2 border-1">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
           <Input
             name="permissionName"
             type="text"
             label="Permission Name"
-            color="none"
-            variant="none"
-            size="lg"
             labelPlacement="outside"
             placeholder="Enter Permission Name"
-            className="w-full border-1"
+            color="default"
+            variant="bordered"
+            size="lg"
             isRequired
             value={formData.permissionName || ""}
             onChange={handleChange("permissionName")}
@@ -46,15 +45,15 @@ export default function UIPermissionForm({
       </div>
 
       {isUpdate && (
-        <div className="flex flex-col xl:flex-row items-center justify-end w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full xl:w-6/12 h-full p-2 gap-2">
+        <div className="flex flex-col xl:flex-row items-center justify-end w-full h-fit p-2 gap-2 border-1">
+          <div className="flex items-center justify-center w-full xl:w-6/12 h-full p-2 gap-2 border-1">
             <Select
               name="permissionStatus"
               label="Permission Status"
               labelPlacement="outside"
               placeholder="Please Select"
-              color="none"
-              variant="none"
+              color="default"
+              variant="bordered"
               size="lg"
               isRequired
               selectedKeys={
@@ -75,14 +74,14 @@ export default function UIPermissionForm({
         </div>
       )}
 
-      <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
-        <div className="flex items-center justify-center w-full xl:w-2/12 h-full p-2 gap-2">
+      <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2 border-1">
+        <div className="flex items-center justify-end w-full h-full p-2 gap-2 border-1">
           <Button
             type="submit"
-            color="none"
-            variant="none"
+            color="default"
+            variant="bordered"
             size="lg"
-            className="w-full border-1"
+            className="w-2/12 "
           >
             Submit
           </Button>

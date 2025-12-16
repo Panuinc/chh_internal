@@ -26,45 +26,44 @@ export default function PagesLayout({ children }) {
     "U";
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-1">
       <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 border-1">
         <Link
           href="/home"
-          className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2"
+          className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2 border-1"
         >
           <Image src="/logo/logo-04.png" alt="logo" width={125} height={125} />
         </Link>
 
-        <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 hidden"></div>
+        <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 border-1 hidden"></div>
 
-        <div className="flex items-center justify-center aspect-square min-h-12 p-2 gap-2 border-1 rounded-xl cursor-pointer hover:opacity-75 transition-opacity">
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 cursor-pointer hover:bg-default">
           {userInitial}
         </div>
 
-        <div className="flex items-center justify-center aspect-square min-h-12 p-2 gap-2 border-1 rounded-xl cursor-pointer hover:opacity-75 transition-opacity">
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 cursor-pointer hover:bg-default">
           <BellDot />
         </div>
 
-        <div className="flex items-center justify-center aspect-square min-h-12 p-2 gap-2 border-1 rounded-xl cursor-pointer hover:opacity-75 transition-opacity">
-          <Button
-            onPress={handleSignOut}
-            isDisabled={isSigningOut}
-            isIconOnly
-            radius="none"
-            color="none"
-            size="sm"
-          >
-            <LogOut />
-          </Button>
+        <div
+          onClick={!isSigningOut ? handleSignOut : undefined}
+          className={`flex items-center justify-center aspect-square h-full p-2 gap-2 border-1
+    ${
+      isSigningOut
+        ? "opacity-50 cursor-not-allowed"
+        : "cursor-pointer hover:bg-default"
+    }`}
+        >
+          <LogOut />
         </div>
       </header>
 
-      <main className="flex items-center justify-center w-full h-full gap-2 overflow-hidden">
+      <main className="flex items-center justify-center w-full h-full p-2 gap-2 border-8 border-danger overflow-hidden">
         {children}
       </main>
 
       <footer className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border-1">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
           EVERGREEN BY CHH
         </div>
       </footer>

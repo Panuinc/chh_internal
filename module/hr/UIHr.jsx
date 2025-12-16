@@ -9,12 +9,12 @@ function HrSidebar() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1 rounded-xl">
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
+    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1">
+      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 border-1">
         Quick Stats
       </div>
 
-      <div className="flex flex-col items-center justify-center w-full h-fir p-2 gap-2">
+      <div className="flex flex-col items-center justify-center w-full h-fir p-2 gap-2 border-1">
         <StatItem label="Total Employees" value={stats.totalEmployees} />
         <StatItem label="Departments" value={stats.departments} />
         <StatItem label="Pending Approvals" value={stats.pendingApprovals} />
@@ -25,9 +25,13 @@ function HrSidebar() {
 
 function StatItem({ label, value }) {
   return (
-    <div className="flex justify-between w-full h-full p-2 border-b-1">
-      <span className="opacity-70">{label}</span>
-      <span>{value}</span>
+    <div className="flex items-center justify-between w-full h-full p-2 gap-2 border-1">
+      <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
+        {label}
+      </div>
+      <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
+        {value}
+      </div>
     </div>
   );
 }
@@ -35,8 +39,8 @@ function StatItem({ label, value }) {
 export default function UIHr({ menu, isEmpty }) {
   if (!menu) {
     return (
-      <div className="flex items-center justify-center w-full h-full">
-        <div className="flex items-center p-2 gap-2">
+      <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
           <AlertCircle />
           <span>Module configuration not found</span>
         </div>
@@ -54,7 +58,7 @@ export default function UIHr({ menu, isEmpty }) {
       sidebar={<HrSidebar />}
     >
       {isEmpty ? (
-        <div className="col-span-full text-center">
+        <div className="col-span-full text-center w-full h-full p-2 gap-2 border-1">
           No accessible menu items. Please contact administrator.
         </div>
       ) : (

@@ -11,7 +11,7 @@ export default function UISignIn({
   onSubmit,
 }) {
   return (
-    <div className="flex flex-row items-center justify-center w-full h-full">
+    <div className="flex flex-row items-center justify-center w-full h-full gap-2">
       <div className="flex flex-col items-center justify-center w-full xl:w-4/12 h-full p-2 gap-2 xl:border-r-1">
         <div className="flex items-end justify-center w-full h-fit p-2 gap-2 text-3xl font-black">
           Ever
@@ -42,14 +42,13 @@ export default function UISignIn({
               label="Username"
               labelPlacement="outside"
               placeholder="Enter your username"
-              color="none"
-              variant="faded"
+              color="default"
+              variant="bordered"
               size="lg"
               isRequired
               value={username}
               onChange={(e) => onUsernameChange(e.target.value)}
               isDisabled={isLoading}
-              autoComplete="username"
             />
           </div>
 
@@ -59,24 +58,23 @@ export default function UISignIn({
               label="Password"
               labelPlacement="outside"
               placeholder="Enter your password"
-              color="none"
-              variant="faded"
+              color="default"
+              variant="bordered"
               size="lg"
               isRequired
               value={password}
               onChange={(e) => onPasswordChange(e.target.value)}
               isDisabled={isLoading}
-              autoComplete="current-password"
             />
           </div>
 
           <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
             <Button
               type="submit"
-              color="none"
-              variant="none"
+              color="default"
+              variant="bordered"
               size="lg"
-              className="w-6/12 border-1"
+              className="w-6/12"
               isLoading={isLoading}
               spinner={<Spinner size="sm" color="current" />}
             >
@@ -86,7 +84,7 @@ export default function UISignIn({
         </form>
       </div>
 
-      <div className="xl:flex items-center justify-center xl:w-8/12 h-full p-2 gap-2 hidden">
+      <div className="xl:flex items-center justify-center xl:w-10/12 h-full p-2 gap-2 hidden">
         <Image src="/logo/logo-01.png" alt="logo" width={300} height={300} />
       </div>
     </div>

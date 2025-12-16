@@ -18,11 +18,19 @@ export default function ModuleLayout({ children }) {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full py-2 gap-2 overflow-hidden">
-      <div className="flex items-center justify-start w-full xl:w-10/12 h-fit p-2 gap-2 border-1 rounded-xl">
-        <Breadcrumbs color="none" variant="light" size="lg">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-1 overflow-hidden">
+      <div className="flex items-center justify-start w-full h-fit p-2 gap-2 border-1">
+        <Breadcrumbs
+          color="default"
+          variant="light"
+          size="lg"
+          className="flex items-center justify-start w-full h-full p-2 gap-2 border-1"
+        >
           <BreadcrumbItem>
-            <Link href="/home" className="flex items-center p-2 gap-2">
+            <Link
+              href="/home"
+              className="flex items-center justify-center w-full h-full p-2 gap-2 border-1"
+            >
               Home
             </Link>
           </BreadcrumbItem>
@@ -30,7 +38,9 @@ export default function ModuleLayout({ children }) {
           {breadcrumbItems.map((item, index) => (
             <BreadcrumbItem key={item.href}>
               {index === breadcrumbItems.length - 1 ? (
-                <span className="font-black">{item.name}</span>
+                <span className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 font-black">
+                  {item.name}
+                </span>
               ) : (
                 <Link href={item.href}>{item.name}</Link>
               )}
@@ -39,7 +49,7 @@ export default function ModuleLayout({ children }) {
         </Breadcrumbs>
       </div>
 
-      <div className="flex items-center justify-center w-full h-full px-2 gap-2 overflow-hidden">
+      <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 overflow-hidden">
         {children}
       </div>
     </div>

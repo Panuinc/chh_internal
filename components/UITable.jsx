@@ -1,25 +1,38 @@
 "use client";
+
 import React from "react";
+
+// ============================================================================
+// IMPORTS - UI Components
+// ============================================================================
 import {
+  // Table
   Table,
   TableHeader,
   TableColumn,
   TableBody,
   TableRow,
   TableCell,
+  // Form & Input
   Input,
   Button,
+  ButtonGroup,
+  // Dropdown
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  // Display
   Chip,
   Pagination,
   Card,
   CardBody,
   CardHeader,
-  ButtonGroup,
 } from "@heroui/react";
+
+// ============================================================================
+// IMPORTS - Icons
+// ============================================================================
 import {
   ChevronDown,
   Plus,
@@ -29,69 +42,231 @@ import {
   LayoutList,
 } from "lucide-react";
 
-function capitalize(s) {
-  return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
-}
+// ============================================================================
+// UTILITIES
+// ============================================================================
+const capitalize = (str) =>
+  str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
 
-export default function DataTable({
-  columns = [],
-  data = [],
-  statusOptions = [],
-  statusColorMap = {},
-  searchPlaceholder = "Search...",
-  emptyContent = "No data found",
-  itemName = "items",
-  onAddNew,
-  onEdit,
-  onAssign,
-  renderCustomCell,
-  renderCard,
-  cardTitleKey,
-  cardDescriptionKey,
-  defaultView = "table",
-}) {
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+/**
+ * Action Menu - Dropdown menu for row actions (Edit, Assign)
+ */
+const ActionMenu = ({ item, onEdit, onAssign, size = "md" }) => (
+  <Dropdown>
+    <DropdownTrigger>
+      <Button isIconOnly variant="light" size={size}>
+        <Settings2 size={size === "sm" ? 18 : 24} />
+      </Button>
+    </DropdownTrigger>
+    <DropdownMenu>
+      {onEdit && (
+        <DropdownItem key="edit" onPress={() => onEdit(item)}>
+          Edit
+        </DropdownItem>
+      )}
+      {onAssign && (
+        <DropdownItem key="assign" onPress={() => onAssign(item)}>
+          Assign Permissions
+        </DropdownItem>
+      )}
+    </DropdownMenu>
+  </Dropdown>
+);
+
+/**
+ * Status Chip - Displays status with color coding
+ */
+const StatusChip = ({ value, colorMap, size = "md" }) => (
+  <Chip
+    className="capitalize"
+    color={colorMap[value] || "default"}
+    variant="dot"
+    size={size}
+  >
+    {value}
+  </Chip>
+);
+
+/**
+ * View Toggle - Switch between table and card view
+ */
+const ViewToggle = ({ viewMode, setViewMode }) => (
+  <ButtonGroup size="lg">
+    <Button
+      isIconOnly
+      variant={viewMode === "table" ? "solid" : "bordered"}
+      onPress={() => setViewMode("table")}
+      className={viewMode === "table" ? "border-1" : ""}
+      color="none"
+      aria-label="Table View"
+    >
+      <LayoutList size={20} />
+    </Button>
+    <Button
+      isIconOnly
+      variant={viewMode === "card" ? "solid" : "bordered"}
+      onPress={() => setViewMode("card")}
+      className={viewMode === "card" ? "border-1" : ""}
+      color="none"
+      aria-label="Card View"
+    >
+      <LayoutGrid size={20} />
+    </Button>
+  </ButtonGroup>
+);
+
+/**
+ * Status Filter Dropdown
+ */
+const StatusFilterDropdown = ({
+  statusOptions,
+  statusFilter,
+  setStatusFilter,
+}) => (
+  <Dropdown>
+    <DropdownTrigger>
+      <Button
+        endContent={<ChevronDown />}
+        color="default"
+        variant="bordered"
+        size="lg"
+        className="w-full xl:w-52"
+      >
+        Status
+      </Button>
+    </DropdownTrigger>
+    <DropdownMenu
+      disallowEmptySelection
+      aria-label="Status Filter"
+      closeOnSelect={false}
+      selectedKeys={statusFilter}
+      selectionMode="multiple"
+      onSelectionChange={setStatusFilter}
+    >
+      {statusOptions.map((status) => (
+        <DropdownItem key={status.uid} className="capitalize">
+          {capitalize(status.name)}
+        </DropdownItem>
+      ))}
+    </DropdownMenu>
+  </Dropdown>
+);
+
+/**
+ * Rows Per Page Selector
+ */
+const RowsPerPageSelector = ({ onChange }) => (
+  <label className="flex items-center justify-between w-fit h-full p-2 gap-2 border-1 whitespace-nowrap">
+    Rows per page:
+    <select
+      className="flex items-center justify-between w-fit h-full p-2 gap-2 border-1"
+      onChange={onChange}
+      defaultValue="5"
+    >
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="50">50</option>
+    </select>
+  </label>
+);
+
+// ============================================================================
+// CUSTOM HOOKS
+// ============================================================================
+
+/**
+ * useDataFiltering - Handles search and status filtering logic
+ */
+const useDataFiltering = (data, statusOptions) => {
   const [filterValue, setFilterValue] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: columns[0]?.uid || "id",
-    direction: "ascending",
-  });
-  const [page, setPage] = React.useState(1);
-  const [viewMode, setViewMode] = React.useState(defaultView);
-
-  const hasSearchFilter = Boolean(filterValue);
 
   const filteredItems = React.useMemo(() => {
     let filtered = [...data];
-    if (hasSearchFilter) {
+
+    // Search filter
+    if (filterValue) {
+      const searchTerm = filterValue.toLowerCase();
       filtered = filtered.filter((item) =>
         Object.values(item).some((value) =>
-          String(value).toLowerCase().includes(filterValue.toLowerCase())
+          String(value).toLowerCase().includes(searchTerm)
         )
       );
     }
-    if (
+
+    // Status filter
+    const isStatusFiltered =
       statusFilter !== "all" &&
       statusOptions.length > 0 &&
-      Array.from(statusFilter).length !== statusOptions.length
-    ) {
-      filtered = filtered.filter((item) => {
-        return Object.values(item).some((value) =>
+      Array.from(statusFilter).length !== statusOptions.length;
+
+    if (isStatusFiltered) {
+      filtered = filtered.filter((item) =>
+        Object.values(item).some((value) =>
           Array.from(statusFilter).includes(String(value))
-        );
-      });
+        )
+      );
     }
+
     return filtered;
-  }, [data, filterValue, statusFilter, statusOptions.length, hasSearchFilter]);
+  }, [data, filterValue, statusFilter, statusOptions.length]);
 
-  const pages = Math.ceil(filteredItems.length / rowsPerPage) || 1;
+  const clearFilter = () => setFilterValue("");
 
-  const items = React.useMemo(() => {
+  return {
+    filterValue,
+    setFilterValue,
+    statusFilter,
+    setStatusFilter,
+    filteredItems,
+    clearFilter,
+  };
+};
+
+/**
+ * usePagination - Handles pagination logic
+ */
+const usePagination = (filteredItems) => {
+  const [page, setPage] = React.useState(1);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const totalPages = Math.ceil(filteredItems.length / rowsPerPage) || 1;
+
+  const paginatedItems = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    return filteredItems.slice(start, end);
+    return filteredItems.slice(start, start + rowsPerPage);
   }, [page, filteredItems, rowsPerPage]);
+
+  const handleRowsPerPageChange = (e) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  };
+
+  const resetPage = () => setPage(1);
+
+  return {
+    page,
+    setPage,
+    rowsPerPage,
+    totalPages,
+    paginatedItems,
+    handleRowsPerPageChange,
+    resetPage,
+  };
+};
+
+/**
+ * useSorting - Handles sorting logic
+ */
+const useSorting = (items, defaultColumn) => {
+  const [sortDescriptor, setSortDescriptor] = React.useState({
+    column: defaultColumn,
+    direction: "ascending",
+  });
 
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a, b) => {
@@ -102,113 +277,162 @@ export default function DataTable({
     });
   }, [sortDescriptor, items]);
 
+  return { sortDescriptor, setSortDescriptor, sortedItems };
+};
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+export default function DataTable({
+  // Data
+  columns = [],
+  data = [],
+  // Status configuration
+  statusOptions = [],
+  statusColorMap = {},
+  // UI text
+  searchPlaceholder = "Search...",
+  emptyContent = "No data found",
+  itemName = "items",
+  // View configuration
+  defaultView = "table",
+  cardTitleKey,
+  cardDescriptionKey,
+  // Callbacks
+  onAddNew,
+  onEdit,
+  onAssign,
+  // Custom renderers
+  renderCustomCell,
+  renderCard,
+}) {
+  // --------------------------------------------------------------------------
+  // State & Hooks
+  // --------------------------------------------------------------------------
+  const [viewMode, setViewMode] = React.useState(defaultView);
+
+  const {
+    filterValue,
+    setFilterValue,
+    statusFilter,
+    setStatusFilter,
+    filteredItems,
+    clearFilter,
+  } = useDataFiltering(data, statusOptions);
+
+  const {
+    page,
+    setPage,
+    totalPages,
+    paginatedItems,
+    handleRowsPerPageChange,
+    resetPage,
+  } = usePagination(filteredItems);
+
+  const { sortDescriptor, setSortDescriptor, sortedItems } = useSorting(
+    paginatedItems,
+    columns[0]?.uid || "id"
+  );
+
+  // --------------------------------------------------------------------------
+  // Event Handlers
+  // --------------------------------------------------------------------------
+  const handleSearchChange = (value) => {
+    setFilterValue(value);
+    resetPage();
+  };
+
+  const handleClearSearch = () => {
+    clearFilter();
+    resetPage();
+  };
+
+  // --------------------------------------------------------------------------
+  // Cell Renderer
+  // --------------------------------------------------------------------------
   const renderCell = React.useCallback(
     (item, columnKey) => {
       const cellValue = item[columnKey];
+
+      // Custom cell renderer (if provided)
       if (renderCustomCell) {
         const customRender = renderCustomCell(item, columnKey);
         if (customRender !== undefined) return customRender;
       }
-      if (statusColorMap && statusColorMap[cellValue]) {
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[cellValue] || "default"}
-            variant="dot"
-          >
-            {cellValue}
-          </Chip>
-        );
+
+      // Status chip
+      if (statusColorMap?.[cellValue]) {
+        return <StatusChip value={cellValue} colorMap={statusColorMap} />;
       }
+
+      // Actions column
       if (columnKey === "actions") {
         return (
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly variant="light">
-                  <Settings2 />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                {onEdit && (
-                  <DropdownItem key="edit" onPress={() => onEdit(item)}>
-                    Edit
-                  </DropdownItem>
-                )}
-                {onAssign && (
-                  <DropdownItem key="assign" onPress={() => onAssign(item)}>
-                    Assign Permissions
-                  </DropdownItem>
-                )}
-              </DropdownMenu>
-            </Dropdown>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
+            <ActionMenu item={item} onEdit={onEdit} onAssign={onAssign} />
           </div>
         );
       }
+
+      // Default: raw value
       return cellValue;
     },
     [statusColorMap, renderCustomCell, onEdit, onAssign]
   );
 
-  const defaultRenderCard = (item) => {
-    const titleKey = cardTitleKey || columns[0]?.uid || "id";
-    const descKey = cardDescriptionKey || columns[1]?.uid;
+  // --------------------------------------------------------------------------
+  // Card Renderer
+  // --------------------------------------------------------------------------
+  const defaultRenderCard = React.useCallback(
+    (item) => {
+      const titleKey = cardTitleKey || columns[0]?.uid || "id";
+      const descKey = cardDescriptionKey || columns[1]?.uid;
+      const hasActions = onEdit || onAssign;
 
-    return (
-      <Card key={item.id} className="w-full border-1" shadow="none">
-        <CardHeader className="flex justify-between items-start">
-          <div className="flex flex-col gap-1">
-            <h4 className="text-lg font-semibold">{item[titleKey]}</h4>
-            {descKey && (
-              <p className="text-sm text-default-500">{item[descKey]}</p>
+      // Filter out action, title, and description columns
+      const displayColumns = columns.filter(
+        (col) =>
+          col.uid !== "actions" && col.uid !== titleKey && col.uid !== descKey
+      );
+
+      return (
+        <Card key={item.id} className="w-full border-1" shadow="none">
+          {/* Card Header */}
+          <CardHeader className="flex justify-between items-start">
+            <div className="flex flex-col gap-1">
+              <h4 className="text-lg font-semibold">{item[titleKey]}</h4>
+              {descKey && (
+                <p className="text-sm text-default-500">{item[descKey]}</p>
+              )}
+            </div>
+            {hasActions && (
+              <ActionMenu
+                item={item}
+                onEdit={onEdit}
+                onAssign={onAssign}
+                size="sm"
+              />
             )}
-          </div>
-          {(onEdit || onAssign) && (
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly variant="light" size="sm">
-                  <Settings2 size={18} />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                {onEdit && (
-                  <DropdownItem key="edit" onPress={() => onEdit(item)}>
-                    Edit
-                  </DropdownItem>
-                )}
-                {onAssign && (
-                  <DropdownItem key="assign" onPress={() => onAssign(item)}>
-                    Assign Permissions
-                  </DropdownItem>
-                )}
-              </DropdownMenu>
-            </Dropdown>
-          )}
-        </CardHeader>
-        <CardBody className="pt-0">
-          <div className="flex flex-wrap gap-2">
-            {columns
-              .filter(
-                (col) =>
-                  col.uid !== "actions" &&
-                  col.uid !== titleKey &&
-                  col.uid !== descKey
-              )
-              .map((col) => {
+          </CardHeader>
+
+          {/* Card Body */}
+          <CardBody className="pt-0">
+            <div className="flex flex-wrap gap-2">
+              {displayColumns.map((col) => {
                 const value = item[col.uid];
-                if (statusColorMap && statusColorMap[value]) {
+
+                if (statusColorMap?.[value]) {
                   return (
-                    <Chip
+                    <StatusChip
                       key={col.uid}
-                      className="capitalize"
-                      color={statusColorMap[value] || "default"}
-                      variant="dot"
+                      value={value}
+                      colorMap={statusColorMap}
                       size="sm"
-                    >
-                      {value}
-                    </Chip>
+                    />
                   );
                 }
+
                 return (
                   <div key={col.uid} className="text-sm">
                     <span className="text-default-500">{col.name}: </span>
@@ -216,132 +440,87 @@ export default function DataTable({
                   </div>
                 );
               })}
-          </div>
-        </CardBody>
-      </Card>
-    );
-  };
+            </div>
+          </CardBody>
+        </Card>
+      );
+    },
+    [
+      columns,
+      cardTitleKey,
+      cardDescriptionKey,
+      statusColorMap,
+      onEdit,
+      onAssign,
+    ]
+  );
 
-  const onRowsPerPageChange = (e) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  };
-
-  const onSearchChange = (value) => {
-    setFilterValue(value);
-    setPage(1);
-  };
-
-  const onClear = () => {
-    setFilterValue("");
-    setPage(1);
-  };
-
+  // --------------------------------------------------------------------------
+  // Render
+  // --------------------------------------------------------------------------
   return (
-    <div className="flex flex-col w-full h-full overflow-hidden">
-      <div className="flex-shrink-0 flex flex-col items-center justify-center w-full h-fit gap-2">
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
+    <div className="flex flex-col w-full h-full p-2 gap-2 border-1 overflow-hidden">
+      {/* ===== TOOLBAR ===== */}
+      <div className="flex-shrink-0 flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1">
+        {/* Search & Filters Row */}
+        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full p-2 gap-2 border-1">
+          {/* Search Input */}
           <Input
             isClearable
             placeholder={searchPlaceholder}
             startContent={<Search />}
             value={filterValue}
-            onClear={onClear}
-            onValueChange={onSearchChange}
+            onClear={handleClearSearch}
+            onValueChange={handleSearchChange}
+            color="default"
+            variant="bordered"
             size="lg"
-            variant="faded"
             className="w-full"
           />
 
-          <ButtonGroup size="lg">
-            <Button
-              isIconOnly
-              variant={viewMode === "table" ? "solid" : "bordered"}
-              onPress={() => setViewMode("table")}
-              className={viewMode === "table" ? "border-1" : ""}
-              color="none"
-              aria-label="Table View"
-            >
-              <LayoutList size={20} />
-            </Button>
-            <Button
-              isIconOnly
-              variant={viewMode === "card" ? "solid" : "bordered"}
-              onPress={() => setViewMode("card")}
-              className={viewMode === "card" ? "border-1" : ""}
-              color="none"
-              aria-label="Card View"
-            >
-              <LayoutGrid size={20} />
-            </Button>
-          </ButtonGroup>
+          {/* View Toggle */}
+          <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
 
+          {/* Status Filter */}
           {statusOptions.length > 0 && (
-            <Dropdown>
-              <DropdownTrigger>
-                <Button
-                  color="none"
-                  endContent={<ChevronDown />}
-                  size="lg"
-                  className="w-full xl:w-52 border-1"
-                >
-                  Status
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Status Filter"
-                closeOnSelect={false}
-                selectedKeys={statusFilter}
-                selectionMode="multiple"
-                onSelectionChange={setStatusFilter}
-              >
-                {statusOptions.map((status) => (
-                  <DropdownItem key={status.uid} className="capitalize">
-                    {capitalize(status.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
+            <StatusFilterDropdown
+              statusOptions={statusOptions}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+            />
           )}
+
+          {/* Add New Button */}
           {onAddNew && (
             <Button
               startContent={<Plus />}
-              color="none"
               onPress={onAddNew}
+              color="default"
+              variant="bordered"
               size="lg"
-              className="w-full xl:w-52 border-1"
+              className="w-full xl:w-52"
             >
               Add New
             </Button>
           )}
         </div>
-        <div className="flex flex-col xl:flex-row items-center justify-between w-full h-full gap-2">
-          <div className="flex items-center justify-between w-full h-full p-2 gap-2">
+
+        {/* Info Row */}
+        <div className="flex flex-col xl:flex-row items-center justify-between w-full h-full p-2 gap-2 border-1">
+          <div className="flex items-center justify-between w-full h-full p-2 gap-2 border-1">
             Total {data.length} {itemName}
           </div>
-          <label className="flex items-center justify-between w-fit h-full p-2 gap-2 whitespace-nowrap">
-            Rows per page:
-            <select
-              className="flex items-center justify-between w-fit h-full p-2 gap-2"
-              onChange={onRowsPerPageChange}
-              defaultValue="5"
-            >
-              <option value="10">10</option>
-              <option value="15">15</option>
-              <option value="50">50</option>
-            </select>
-          </label>
+          <RowsPerPageSelector onChange={handleRowsPerPageChange} />
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-auto">
+      {/* ===== CONTENT ===== */}
+      <div className="flex-1 min-h-0 overflow-auto p-2 gap-2 border-1">
         {viewMode === "table" ? (
+          /* Table View */
           <Table
             aria-label="Data table with sorting and pagination"
-            classNames={{
-              wrapper: "min-h-full",
-            }}
+            classNames={{ wrapper: "min-h-full" }}
             sortDescriptor={sortDescriptor}
             onSortChange={setSortDescriptor}
             size="lg"
@@ -372,6 +551,7 @@ export default function DataTable({
             </TableBody>
           </Table>
         ) : (
+          /* Card View */
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
             {sortedItems.length > 0 ? (
               sortedItems.map((item) =>
@@ -386,8 +566,9 @@ export default function DataTable({
         )}
       </div>
 
-      <div className="flex-shrink-0 flex flex-row items-center justify-center w-full h-fit gap-2">
-        <div className="flex items-center justify-end w-full h-full p-2 gap-2">
+      {/* ===== PAGINATION ===== */}
+      <div className="flex-shrink-0 flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border-1">
+        <div className="flex items-center justify-end w-full h-full p-2 gap-2 border-1">
           <Pagination
             isCompact
             showControls
@@ -395,11 +576,9 @@ export default function DataTable({
             color="none"
             size="lg"
             page={page}
-            total={pages}
+            total={totalPages}
             onChange={setPage}
-            classNames={{
-              cursor: "border-1",
-            }}
+            classNames={{ cursor: "border-1" }}
           />
         </div>
       </div>
