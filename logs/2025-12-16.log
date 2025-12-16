@@ -197,3 +197,11 @@
 [2025-12-16 10:44:31] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
 [2025-12-16 10:44:34] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
 [2025-12-16 10:44:34] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-16 11:00:56] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 11:00:56] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:00:58] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:01:08] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:01:21] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:01:30] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:01:39] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:01:43] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}

@@ -17,7 +17,12 @@ enum accountStatus {
   Inactive
 }
 
-enum PermissionStatus {
+enum permissionStatus {
+  Active
+  Inactive
+}
+
+enum departmentStatus {
   Active
   Inactive
 }
@@ -52,13 +57,16 @@ model Employee {
   createdPermissions Permission[] @relation("PermissionCreatedBy")
   updatedPermissions Permission[] @relation("PermissionUpdatedBy")
 
+  createdDepartments Department[] @relation("DepartmentCreatedBy")
+  updatedDepartments Department[] @relation("DepartmentUpdatedBy")
+
   @@index([employeeCreatedBy])
   @@index([employeeUpdatedBy])
 }
 
 model Account {
-  accountId         String                @id @default(cuid())
-  accountEmployeeId String                @unique
+  accountId         String        @id @default(cuid())
+  accountEmployeeId String        @unique
   accountUsername   String
   accountPassword   String
   accountPinNumber  String?
@@ -102,7 +110,7 @@ model Assign {
 model Permission {
   permissionId        String           @id @default(cuid())
   permissionName      String           @unique
-  permissionStatus    PermissionStatus @default(Active)
+  permissionStatus    permissionStatus @default(Active)
   permissionCreatedBy String?
   permissionCreatedAt DateTime?
   permissionUpdatedBy String?
@@ -115,4 +123,20 @@ model Permission {
 
   @@index([permissionCreatedBy])
   @@index([permissionUpdatedBy])
+}
+
+model Department {
+  departmentId        String           @id @default(cuid())
+  departmentName      String
+  departmentStatus    departmentStatus @default(Active)
+  departmentCreatedBy String?
+  departmentCreatedAt DateTime?
+  departmentUpdatedBy String?
+  departmentUpdatedAt DateTime?
+
+  createdByEmployee Employee? @relation("DepartmentCreatedBy", fields: [departmentCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("DepartmentUpdatedBy", fields: [departmentUpdatedBy], references: [employeeId])
+
+  @@index([departmentCreatedBy])
+  @@index([departmentUpdatedBy])
 }
