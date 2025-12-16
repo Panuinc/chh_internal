@@ -18,7 +18,7 @@ export default function AccountUpdate() {
   const { account, loading: accountLoading } = useAccount(accountId);
 
   useEffect(() => {
-    if (!hasPermission("account.update")) {
+    if (!hasPermission("hr.account.edit")) {
       router.replace("/forbidden");
     }
   }, [hasPermission, router]);

@@ -13,7 +13,7 @@ export default function EmployeeCreate() {
   const { userId, userName } = useSessionUser();
 
   useEffect(() => {
-    if (!hasPermission("employee.create")) {
+    if (!hasPermission("hr.employee.create")) {
       router.replace("/forbidden");
     }
   }, [hasPermission, router]);

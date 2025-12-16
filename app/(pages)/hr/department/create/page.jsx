@@ -13,7 +13,7 @@ export default function DepartmentCreate() {
   const { userId, userName } = useSessionUser();
 
   useEffect(() => {
-    if (!hasPermission("department.create")) {
+    if (!hasPermission("hr.department.create")) {
       router.replace("/forbidden");
     }
   }, [hasPermission, router]);

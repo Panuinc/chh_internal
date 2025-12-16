@@ -11,12 +11,12 @@ export default function AccountPage() {
   const { hasPermission } = useMenu();
 
   const handleAddNew = () => {
-    if (!hasPermission("account.create")) return;
+    if (!hasPermission("hr.account.create")) return;
     router.push("/hr/account/create");
   };
 
   const handleEdit = (item) => {
-    if (!hasPermission("account.update")) return;
+    if (!hasPermission("hr.account.edit")) return;
     router.push(`/hr/account/${item.accountId}`);
   };
 
@@ -24,8 +24,8 @@ export default function AccountPage() {
     <UIAccount
       Accounts={accounts}
       loading={loading}
-      onAddNew={hasPermission("account.create") ? handleAddNew : null}
-      onEdit={hasPermission("account.update") ? handleEdit : null}
+      onAddNew={hasPermission("hr.account.create") ? handleAddNew : null}
+      onEdit={hasPermission("hr.account.edit") ? handleEdit : null}
     />
   );
 }

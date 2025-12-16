@@ -18,7 +18,7 @@ export default function EmployeeUpdate() {
   const { employee, loading: employeeLoading } = useEmployee(employeeId);
 
   useEffect(() => {
-    if (!hasPermission("employee.update")) {
+    if (!hasPermission("hr.employee.edit")) {
       router.replace("/forbidden");
     }
   }, [hasPermission, router]);

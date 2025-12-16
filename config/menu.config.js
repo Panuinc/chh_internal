@@ -60,6 +60,15 @@ export const menuConfig = {
         },
 
         {
+          id: "assign",
+          href: "/hr/assign",
+          text: "Assign",
+          icon: Key,
+          permission: "hr.assign.view",
+          requireSuperAdmin: true,
+        },
+
+        {
           id: "department",
           href: "/hr/department",
           text: "Department",
@@ -70,15 +79,6 @@ export const menuConfig = {
             create: "hr.department.create",
             edit: "hr.department.edit",
           },
-        },
-
-        {
-          id: "assignPermission",
-          href: "/hr/assignPermission",
-          text: "Assign Permission",
-          icon: Key,
-          permission: "hr.assignPermission.view",
-          requireSuperAdmin: true,
         },
       ],
     },

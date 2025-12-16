@@ -15,7 +15,7 @@ export default function AccountCreate() {
   const { employees } = useEmployees();
 
   useEffect(() => {
-    if (!hasPermission("account.create")) {
+    if (!hasPermission("hr.account.create")) {
       router.replace("/forbidden");
     }
   }, [hasPermission, router]);

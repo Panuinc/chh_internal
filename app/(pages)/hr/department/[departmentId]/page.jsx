@@ -22,7 +22,7 @@ export default function DepartmentUpdate() {
     useDepartment(departmentId);
 
   useEffect(() => {
-    if (!hasPermission("department.update")) {
+    if (!hasPermission("hr.department.edit")) {
       router.replace("/forbidden");
     }
   }, [hasPermission, router]);

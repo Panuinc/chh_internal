@@ -11,12 +11,12 @@ export default function DepartmentPage() {
   const { hasPermission } = useMenu();
 
   const handleAddNew = () => {
-    if (!hasPermission("department.create")) return;
+    if (!hasPermission("hr.department.create")) return;
     router.push("/hr/department/create");
   };
 
   const handleEdit = (item) => {
-    if (!hasPermission("department.update")) return;
+    if (!hasPermission("hr.department.edit")) return;
     router.push(`/hr/department/${item.departmentId}`);
   };
 
@@ -24,8 +24,8 @@ export default function DepartmentPage() {
     <UIDepartment
       Departments={departments}
       loading={loading}
-      onAddNew={hasPermission("department.create") ? handleAddNew : null}
-      onEdit={hasPermission("department.update") ? handleEdit : null}
+      onAddNew={hasPermission("hr.department.create") ? handleAddNew : null}
+      onEdit={hasPermission("hr.department.edit") ? handleEdit : null}
     />
   );
 }

@@ -11,12 +11,12 @@ export default function EmployeePage() {
   const { hasPermission } = useMenu();
 
   const handleAddNew = () => {
-    if (!hasPermission("employee.create")) return;
+    if (!hasPermission("hr.employee.create")) return;
     router.push("/hr/employee/create");
   };
 
   const handleEdit = (item) => {
-    if (!hasPermission("employee.update")) return;
+    if (!hasPermission("hr.employee.edit")) return;
     router.push(`/hr/employee/${item.employeeId}`);
   };
 
@@ -24,8 +24,8 @@ export default function EmployeePage() {
     <UIEmployee
       Employees={employees}
       loading={loading}
-      onAddNew={hasPermission("employee.create") ? handleAddNew : null}
-      onEdit={hasPermission("employee.update") ? handleEdit : null}
+      onAddNew={hasPermission("hr.employee.create") ? handleAddNew : null}
+      onEdit={hasPermission("hr.employee.edit") ? handleEdit : null}
     />
   );
 }
