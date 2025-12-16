@@ -38,22 +38,37 @@ export default auth((req) => {
       return NextResponse.next();
     }
 
-    for (const [route, config] of Object.entries(protectedRoutes)) {
-      if (pathname === route || pathname.startsWith(route + "/")) {
-        if (config.requireSuperAdmin) {
-          return NextResponse.redirect(new URL("/forbidden", nextUrl.origin));
-        }
+    const matchedRoute = findMatchingRoute(pathname, protectedRoutes);
 
-        if (!hasPermission(user.permissions, config.permission)) {
-          return NextResponse.redirect(new URL("/forbidden", nextUrl.origin));
-        }
-        break;
+    if (matchedRoute) {
+      const { config } = matchedRoute;
+
+      if (config.requireSuperAdmin) {
+        return NextResponse.redirect(new URL("/forbidden", nextUrl.origin));
+      }
+
+      if (!hasPermission(user.permissions, config.permission)) {
+        return NextResponse.redirect(new URL("/forbidden", nextUrl.origin));
       }
     }
   }
 
   return NextResponse.next();
 });
+
+function findMatchingRoute(pathname, routes) {
+  const sortedRoutes = Object.entries(routes).sort(
+    ([a], [b]) => b.length - a.length
+  );
+
+  for (const [route, config] of sortedRoutes) {
+    if (pathname === route || pathname.startsWith(route + "/")) {
+      return { route, config };
+    }
+  }
+
+  return null;
+}
 
 function hasPermission(userPermissions, requiredPermission) {
   if (!userPermissions || !requiredPermission) return false;
@@ -63,13 +78,7 @@ function hasPermission(userPermissions, requiredPermission) {
   const wildcardPermissions = userPermissions.filter((p) => p.endsWith(".*"));
   for (const wp of wildcardPermissions) {
     const prefix = wp.slice(0, -2);
-    if (requiredPermission.startsWith(prefix)) return true;
-  }
-
-  const parts = requiredPermission.split(".");
-  if (parts.length > 2) {
-    const modulePermission = `${parts[0]}.view`;
-    if (userPermissions.includes(modulePermission)) return true;
+    if (requiredPermission.startsWith(prefix + ".")) return true;
   }
 
   return false;

@@ -60,7 +60,7 @@ export function useMenu() {
   const { permissions, isSuperAdmin, isLoading, isAuthenticated } =
     usePermissions();
 
-  const hasPermission = useCallback(
+  const checkPermission = useCallback(
     (permission) => {
       if (!permission) return true;
       if (isSuperAdmin) return true;
@@ -81,13 +81,31 @@ export function useMenu() {
     [permissions, isSuperAdmin]
   );
 
+  const canAccessMenuItem = useCallback(
+    (item) => {
+      if (item.requireSuperAdmin && !isSuperAdmin) {
+        return false;
+      }
+      return checkPermission(item.permission);
+    },
+    [checkPermission, isSuperAdmin]
+  );
+
+  const hasPermission = useCallback(
+    (permission, requireSuperAdmin = false) => {
+      if (requireSuperAdmin && !isSuperAdmin) {
+        return false;
+      }
+      return checkPermission(permission);
+    },
+    [checkPermission, isSuperAdmin]
+  );
+
   const modules = useMemo(() => {
     if (!isAuthenticated) return [];
 
-    return menuConfig.modules.filter((module) =>
-      hasPermission(module.permission)
-    );
-  }, [hasPermission, isAuthenticated]);
+    return menuConfig.modules.filter((module) => canAccessMenuItem(module));
+  }, [canAccessMenuItem, isAuthenticated]);
 
   const getSubmenu = useCallback(
     (moduleId) => {
@@ -96,10 +114,10 @@ export function useMenu() {
 
       return {
         ...submenu,
-        items: submenu.items.filter((item) => hasPermission(item.permission)),
+        items: submenu.items.filter((item) => canAccessMenuItem(item)),
       };
     },
-    [hasPermission]
+    [canAccessMenuItem]
   );
 
   const getAllAccessibleMenus = useMemo(() => {
@@ -114,7 +132,7 @@ export function useMenu() {
       const submenu = menuConfig.submenus[module.id];
       if (submenu) {
         submenu.items
-          .filter((item) => hasPermission(item.permission))
+          .filter((item) => canAccessMenuItem(item))
           .forEach((item) => {
             accessible.push({
               type: "submenu",
@@ -126,7 +144,7 @@ export function useMenu() {
     });
 
     return accessible;
-  }, [modules, hasPermission]);
+  }, [modules, canAccessMenuItem]);
 
   return {
     permissions,
@@ -136,17 +154,27 @@ export function useMenu() {
     modules,
     getSubmenu,
     hasPermission,
+    canAccessMenuItem,
     getAllAccessibleMenus,
   };
 }
 
 export function useModuleMenu(moduleId) {
-  const { getSubmenu, hasPermission, isLoading, isAuthenticated } = useMenu();
+  const {
+    getSubmenu,
+    hasPermission,
+    canAccessMenuItem,
+    isSuperAdmin,
+    isLoading,
+    isAuthenticated,
+  } = useMenu();
   const menu = getSubmenu(moduleId);
 
   return {
     menu,
     hasPermission,
+    canAccessMenuItem,
+    isSuperAdmin,
     isEmpty: !menu || menu.items.length === 0,
     isLoading,
     isAuthenticated,

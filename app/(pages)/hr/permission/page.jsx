@@ -8,15 +8,13 @@ import { useMenu } from "@/hooks";
 export default function PermissionPage() {
   const router = useRouter();
   const { permissions, loading } = usePermissions();
-  const { hasPermission } = useMenu();
+  const { isSuperAdmin } = useMenu();
 
   const handleAddNew = () => {
-    if (!hasPermission("permission.create")) return;
     router.push("/hr/permission/create");
   };
 
   const handleEdit = (item) => {
-    if (!hasPermission("permission.update")) return;
     router.push(`/hr/permission/${item.permissionId}`);
   };
 
@@ -24,8 +22,8 @@ export default function PermissionPage() {
     <UIPermission
       Permissions={permissions}
       loading={loading}
-      onAddNew={hasPermission("permission.create") ? handleAddNew : null}
-      onEdit={hasPermission("permission.update") ? handleEdit : null}
+      onAddNew={isSuperAdmin ? handleAddNew : null}
+      onEdit={isSuperAdmin ? handleEdit : null}
     />
   );
 }
