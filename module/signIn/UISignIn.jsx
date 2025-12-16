@@ -73,10 +73,10 @@ export default function UISignIn({
           <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
             <Button
               type="submit"
-              color="success"
-              variant="shadow"
+              color="none"
+              variant="none"
               size="lg"
-              className="w-6/12 text-background"
+              className="w-6/12 border-1"
               isLoading={isLoading}
               spinner={<Spinner size="sm" color="current" />}
             >

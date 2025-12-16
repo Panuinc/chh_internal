@@ -40,10 +40,10 @@ function UserProfileCard({ user }) {
 
       <div className="flex flex-col items-end justify-end w-full h-full p-2 gap-2">
         <Button
-          color="success"
-          variant="shadow"
+          color="none"
+          variant="none"
           size="lg"
-          className="w-full text-background"
+          className="w-full border-1"
         >
           Change Password
         </Button>

@@ -31,10 +31,11 @@ export default function UIPermissionForm({
             type="text"
             label="Permission Name"
             color="none"
-            variant="faded"
+            variant="none"
             size="lg"
             labelPlacement="outside"
             placeholder="Enter Permission Name"
+            className="w-full border-1"
             isRequired
             value={formData.permissionName || ""}
             onChange={handleChange("permissionName")}
@@ -53,7 +54,7 @@ export default function UIPermissionForm({
               labelPlacement="outside"
               placeholder="Please Select"
               color="none"
-              variant="faded"
+              variant="none"
               size="lg"
               isRequired
               selectedKeys={
@@ -79,6 +80,7 @@ export default function UIPermissionForm({
           <Button
             type="submit"
             color="none"
+            variant="none"
             size="lg"
             className="w-full border-1"
           >
