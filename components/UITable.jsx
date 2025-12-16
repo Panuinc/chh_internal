@@ -350,7 +350,7 @@ export default function DataTable({
   );
 
   return (
-    <div className="flex flex-col w-full h-full p-2 gap-2 border-1 rounded-3xl overflow-hidden">
+    <div className="flex flex-col w-full h-full p-2 gap-2 border-1 rounded-xl overflow-hidden">
       <div className="flex-shrink-0 flex flex-col items-center justify-center w-full h-fit gap-2">
         <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
           <Input
