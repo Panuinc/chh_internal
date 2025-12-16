@@ -191,3 +191,9 @@
 [2025-12-16 10:41:19] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
 [2025-12-16 10:41:19] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
 [2025-12-16 10:41:42] [INFO] GetPermissionByIdUseCase start {"id":"แ"}
+[2025-12-16 10:44:27] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 10:44:27] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-16 10:44:31] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 10:44:31] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-16 10:44:34] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 10:44:34] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
