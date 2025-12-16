@@ -22,7 +22,7 @@ export const menuConfig = {
     hr: {
       title: "Human Resource",
       icon: User2,
-      description: "จัดการพนักงานและแผนก",
+      description: "Management About Human Resource",
       items: [
         {
           id: "employee",
@@ -34,17 +34,22 @@ export const menuConfig = {
             view: "hr.employee.view",
             create: "hr.employee.create",
             edit: "hr.employee.edit",
-            delete: "hr.employee.delete",
           },
         },
+
         {
           id: "account",
           href: "/hr/account",
           text: "Account",
           icon: UserLock,
           permission: "hr.account.view",
-          requireSuperAdmin: true,
+          actions: {
+            view: "hr.account.view",
+            create: "hr.account.create",
+            edit: "hr.account.edit",
+          },
         },
+
         {
           id: "permission",
           href: "/hr/permission",
@@ -53,6 +58,7 @@ export const menuConfig = {
           permission: "hr.permission.view",
           requireSuperAdmin: true,
         },
+
         {
           id: "department",
           href: "/hr/department",
@@ -63,9 +69,9 @@ export const menuConfig = {
             view: "hr.department.view",
             create: "hr.department.create",
             edit: "hr.department.edit",
-            delete: "hr.department.delete",
           },
         },
+
         {
           id: "assignPermission",
           href: "/hr/assignPermission",
