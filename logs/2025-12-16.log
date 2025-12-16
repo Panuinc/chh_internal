@@ -23,3 +23,17 @@
 [2025-12-16 11:42:52] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2025-12-16 11:42:53] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
 [2025-12-16 11:42:53] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 11:47:34] [INFO] GetDepartmentByIdUseCase start {"id":"cmj83jmjd0001crmk1dwydxcv"}
+[2025-12-16 11:47:34] [INFO] GetDepartmentByIdUseCase success {"id":"cmj83jmjd0001crmk1dwydxcv","name":"information technology"}
+[2025-12-16 11:47:35] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 11:47:35] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:47:35] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 11:47:37] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:47:37] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 11:52:11] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 11:52:11] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:52:11] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
+[2025-12-16 11:52:26] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:52:26] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
+[2025-12-16 11:52:40] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 11:52:40] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
