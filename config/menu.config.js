@@ -5,6 +5,7 @@ import {
   ScrollText,
   Key,
   UserLock,
+  ShieldBan,
 } from "lucide-react";
 
 export const menuConfig = {
@@ -15,6 +16,13 @@ export const menuConfig = {
       text: "Human Resource",
       icon: User2,
       permission: "hr.view",
+    },
+    {
+      id: "security",
+      href: "/security",
+      text: "security",
+      icon: ShieldBan,
+      permission: "security.view",
     },
   ],
 
@@ -78,6 +86,25 @@ export const menuConfig = {
             view: "hr.department.view",
             create: "hr.department.create",
             edit: "hr.department.edit",
+          },
+        },
+      ],
+    },
+    security: {
+      title: "security",
+      icon: ShieldBan,
+      description: "Management About security",
+      items: [
+        {
+          id: "visitor",
+          href: "/security/visitor",
+          text: "Visitor",
+          icon: Users,
+          permission: "security.visitor.view",
+          actions: {
+            view: "security.visitor.view",
+            create: "security.visitor.create",
+            edit: "security.visitor.edit",
           },
         },
       ],
