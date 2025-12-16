@@ -31,10 +31,10 @@ export default function UIPermission({
   onEdit,
 }) {
   const total = Permissions.length;
-  const enabled = Permissions.filter(
+  const active = Permissions.filter(
     (permission) => permission.permissionStatus === "Active"
   ).length;
-  const disabled = Permissions.filter(
+  const inactive = Permissions.filter(
     (permission) => permission.permissionStatus === "Inactive"
   ).length;
 
@@ -74,7 +74,7 @@ export default function UIPermission({
             Active Permissions
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {enabled}
+            {active}
           </div>
         </div>
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
@@ -82,7 +82,7 @@ export default function UIPermission({
             Inactive Permissions
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {disabled}
+            {inactive}
           </div>
         </div>
       </div>

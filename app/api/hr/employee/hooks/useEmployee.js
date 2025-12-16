@@ -23,8 +23,9 @@ function formatEmployee(employee, index = null) {
   return {
     ...employee,
     ...(index !== null && { employeeIndex: index + 1 }),
-    employeeCreatedBy: getFullName(employee.createdByEmployee),
-    employeeUpdatedBy: getFullName(employee.updatedByEmployee),
+    employeeFullName: `${employee.employeeFirstName} ${employee.employeeLastName}`,
+    employeeCreatedByName: getFullName(employee.createdByEmployee),
+    employeeUpdatedByName: getFullName(employee.updatedByEmployee),
   };
 }
 
@@ -153,7 +154,10 @@ export function useSubmitEmployee({
       const byField = isCreate ? "employeeCreatedBy" : "employeeUpdatedBy";
 
       const payload = {
-        ...formData,
+        employeeFirstName: formData.employeeFirstName,
+        employeeLastName: formData.employeeLastName,
+        employeeEmail: formData.employeeEmail,
+        ...(isCreate ? {} : { employeeStatus: formData.employeeStatus }),
         [byField]: currentEmployeeId,
       };
 
@@ -180,10 +184,7 @@ export function useSubmitEmployee({
             setErrors({});
           }
 
-          showToast(
-            TOAST.DANGER,
-            result.error || "Failed to submit Employee."
-          );
+          showToast(TOAST.DANGER, result.error || "Failed to submit Employee.");
         }
       } catch (err) {
         showToast(

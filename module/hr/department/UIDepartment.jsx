@@ -31,10 +31,10 @@ export default function UIDepartment({
   onEdit,
 }) {
   const total = Departments.length;
-  const enabled = Departments.filter(
+  const active = Departments.filter(
     (department) => department.departmentStatus === "Active"
   ).length;
-  const disabled = Departments.filter(
+  const inactive = Departments.filter(
     (department) => department.departmentStatus === "Inactive"
   ).length;
 
@@ -74,7 +74,7 @@ export default function UIDepartment({
             Active Departments
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {enabled}
+            {active}
           </div>
         </div>
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
@@ -82,7 +82,7 @@ export default function UIDepartment({
             Inactive Departments
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {disabled}
+            {inactive}
           </div>
         </div>
       </div>

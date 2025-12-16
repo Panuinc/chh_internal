@@ -26,6 +26,8 @@ export default function EmployeeCreate() {
   const formHandler = useFormHandler(
     {
       employeeFirstName: "",
+      employeeLastName: "",
+      employeeEmail: "",
     },
     submitEmployee
   );

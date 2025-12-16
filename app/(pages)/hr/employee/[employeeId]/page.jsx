@@ -5,10 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import UIEmployeeForm from "@/module/hr/employee/UIEmployeeForm";
 import { LoadingState } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
-import {
-  useEmployee,
-  useSubmitEmployee,
-} from "@/app/api/hr/employee/core";
+import { useEmployee, useSubmitEmployee } from "@/app/api/hr/employee/core";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function EmployeeUpdate() {
@@ -18,8 +15,7 @@ export default function EmployeeUpdate() {
   const { employeeId } = useParams();
   const { userId: sessionUserId, userName } = useSessionUser();
 
-  const { employee, loading: employeeLoading } =
-    useEmployee(employeeId);
+  const { employee, loading: employeeLoading } = useEmployee(employeeId);
 
   useEffect(() => {
     if (!hasPermission("employee.update")) {
@@ -36,6 +32,8 @@ export default function EmployeeUpdate() {
   const formHandler = useFormHandler(
     {
       employeeFirstName: "",
+      employeeLastName: "",
+      employeeEmail: "",
       employeeStatus: "",
     },
     submitEmployee
@@ -45,6 +43,8 @@ export default function EmployeeUpdate() {
     if (employee) {
       formHandler.setFormData({
         employeeFirstName: employee.employeeFirstName || "",
+        employeeLastName: employee.employeeLastName || "",
+        employeeEmail: employee.employeeEmail || "",
         employeeStatus: employee.employeeStatus || "",
       });
     }

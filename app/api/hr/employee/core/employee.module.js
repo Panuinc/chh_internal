@@ -1,12 +1,17 @@
-import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { getLocalNow } from "@/lib/getLocalNow";
+import { z } from "zod";
+import {
+  preprocessString,
+  preprocessEnum,
+  preprocessEmail,
+  formatData,
+} from "@/lib/zodSchema";
 import {
   NotFoundError,
   BadRequestError,
   validateOrThrow,
   normalizeString,
-  formatData,
   createBaseController,
   createLogger,
   handlePrismaUniqueError,
@@ -20,28 +25,21 @@ const EMPLOYEE_SELECT = {
   employeeId: true,
   employeeFirstName: true,
   employeeLastName: true,
+  employeeEmail: true,
 };
-
-const preprocessString = (message) =>
-  z.preprocess(
-    (val) => (typeof val === "string" ? val.trim() : val),
-    z.string({ required_error: message }).min(1, message)
-  );
-
-const preprocessEnum = (values, message) =>
-  z.preprocess(
-    (val) => (typeof val === "string" ? val.trim() : val),
-    z.enum(values, { required_error: message })
-  );
 
 export const createSchema = z.object({
   employeeFirstName: preprocessString("Please provide employeeFirstName"),
+  employeeLastName: preprocessString("Please provide employeeLastName"),
+  employeeEmail: preprocessEmail("Please provide employeeEmail"),
   employeeCreatedBy: preprocessString("Please provide the creator ID"),
 });
 
 export const updateSchema = z.object({
   employeeId: preprocessString("Please provide the employee ID"),
   employeeFirstName: preprocessString("Please provide employeeFirstName"),
+  employeeLastName: preprocessString("Please provide employeeLastName"),
+  employeeEmail: preprocessEmail("Please provide employeeEmail"),
   employeeStatus: preprocessEnum(
     ["Active", "Inactive"],
     "Please provide employeeStatus"
@@ -76,9 +74,9 @@ export const EmployeeRepository = {
     });
   },
 
-  async findByName(name) {
+  async findByEmail(email) {
     return prisma.employee.findUnique({
-      where: { employeeFirstName: name },
+      where: { employeeEmail: email },
     });
   },
 
@@ -114,11 +112,11 @@ export const EmployeeService = {
     return EmployeeRepository.findById(id);
   },
 
-  async ensureNameNotDuplicate(name, excludeId = null) {
-    const existing = await EmployeeRepository.findByName(name);
+  async ensureEmailNotDuplicate(email, excludeId = null) {
+    const existing = await EmployeeRepository.findByEmail(email);
     if (existing && existing.employeeId !== excludeId) {
       const { ConflictError } = await import("@/lib/shared/server");
-      throw new ConflictError("employeeFirstName", name);
+      throw new ConflictError("employeeEmail", email);
     }
   },
 
@@ -161,7 +159,7 @@ export async function GetByIdUseCase(id) {
       throw new NotFoundError(ENTITY_NAME);
     }
 
-    log.success({ id, name: item.employeeFirstName });
+    log.success({ id, email: item.employeeEmail });
     return item;
   } catch (error) {
     console.error("[GetEmployeeByIdUseCase] Error:", error);
@@ -171,25 +169,30 @@ export async function GetByIdUseCase(id) {
 
 export async function CreateUseCase(data) {
   const log = createLogger("CreateEmployeeUseCase");
-  log.start({ name: data?.employeeFirstName });
+  log.start({ email: data?.employeeEmail });
 
   try {
     const validated = validateOrThrow(createSchema, data);
-    const normalizedName = normalizeString(validated.employeeFirstName);
 
-    await EmployeeService.ensureNameNotDuplicate(normalizedName);
+    const normalizedFirstName = normalizeString(validated.employeeFirstName);
+    const normalizedLastName = normalizeString(validated.employeeLastName);
+    const normalizedEmail = validated.employeeEmail; // Already lowercase from schema
+
+    await EmployeeService.ensureEmailNotDuplicate(normalizedEmail);
 
     const item = await EmployeeService.create({
       ...validated,
-      employeeFirstName: normalizedName,
+      employeeFirstName: normalizedFirstName,
+      employeeLastName: normalizedLastName,
+      employeeEmail: normalizedEmail,
       employeeCreatedAt: getLocalNow(),
     });
 
-    log.success({ id: item.employeeId, name: item.employeeFirstName });
+    log.success({ id: item.employeeId, email: item.employeeEmail });
     return item;
   } catch (error) {
     console.error("[CreateEmployeeUseCase] Error:", error);
-    handlePrismaUniqueError(error, "employeeFirstName", data?.employeeFirstName);
+    handlePrismaUniqueError(error, "employeeEmail", data?.employeeEmail);
     throw error;
   }
 }
@@ -207,33 +210,36 @@ export async function UpdateUseCase(data) {
       throw new NotFoundError(ENTITY_NAME);
     }
 
-    const normalizedName = normalizeString(updateData.employeeFirstName);
-    const existingName = normalizeString(existing.employeeFirstName);
+    const normalizedFirstName = normalizeString(updateData.employeeFirstName);
+    const normalizedLastName = normalizeString(updateData.employeeLastName);
+    const normalizedEmail = updateData.employeeEmail; // Already lowercase from schema
 
-    if (normalizedName !== existingName) {
-      await EmployeeService.ensureNameNotDuplicate(
-        normalizedName,
+    if (normalizedEmail !== existing.employeeEmail.toLowerCase()) {
+      await EmployeeService.ensureEmailNotDuplicate(
+        normalizedEmail,
         employeeId
       );
     }
 
     const item = await EmployeeService.update(employeeId, {
       ...updateData,
-      employeeFirstName: normalizedName,
+      employeeFirstName: normalizedFirstName,
+      employeeLastName: normalizedLastName,
+      employeeEmail: normalizedEmail,
       employeeUpdatedAt: getLocalNow(),
     });
 
-    log.success({ id: employeeId, name: item.employeeFirstName });
+    log.success({ id: employeeId, email: item.employeeEmail });
     return item;
   } catch (error) {
     console.error("[UpdateEmployeeUseCase] Error:", error);
-    handlePrismaUniqueError(error, "employeeFirstName", data?.employeeFirstName);
+    handlePrismaUniqueError(error, "employeeEmail", data?.employeeEmail);
     throw error;
   }
 }
 
 export function formatEmployeeData(items) {
-  return formatData(items, ["employeeCreatedAt", "employeeUpdatedAt"], []);
+  return formatData(items, [], ["employeeCreatedAt", "employeeUpdatedAt"]);
 }
 
 const baseController = createBaseController({

@@ -5,7 +5,9 @@ import { LoadingState } from "@/components";
 
 const columns = [
   { name: "ID", uid: "employeeIndex" },
-  { name: "Employee First Name", uid: "employeeFirstName" },
+  { name: "First Name", uid: "employeeFirstName" },
+  { name: "Last Name", uid: "employeeLastName" },
+  { name: "Email", uid: "employeeEmail" },
   { name: "Status", uid: "employeeStatus" },
   { name: "Created By", uid: "employeeCreatedBy" },
   { name: "Created At", uid: "employeeCreatedAt" },
@@ -31,10 +33,10 @@ export default function UIEmployee({
   onEdit,
 }) {
   const total = Employees.length;
-  const enabled = Employees.filter(
+  const active = Employees.filter(
     (employee) => employee.employeeStatus === "Active"
   ).length;
-  const disabled = Employees.filter(
+  const inactive = Employees.filter(
     (employee) => employee.employeeStatus === "Inactive"
   ).length;
 
@@ -74,7 +76,7 @@ export default function UIEmployee({
             Active Employees
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {enabled}
+            {active}
           </div>
         </div>
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
@@ -82,7 +84,7 @@ export default function UIEmployee({
             Inactive Employees
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {disabled}
+            {inactive}
           </div>
         </div>
       </div>
@@ -98,9 +100,9 @@ export default function UIEmployee({
             data={normalized}
             statusOptions={statusOptions}
             statusColorMap={statusColorMap}
-            searchPlaceholder="Search by employee name..."
-            emptyContent="No employees found"
-            itemName="employees"
+            searchPlaceholder="Search by employee name or email..."
+            emptyContent="No Employees found"
+            itemName="Employees"
             onAddNew={onAddNew}
             onEdit={onEdit}
           />

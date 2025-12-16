@@ -1,12 +1,12 @@
-import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { getLocalNow } from "@/lib/getLocalNow";
+import { z } from "zod";
+import { preprocessString, preprocessEnum, formatData } from "@/lib/zodSchema";
 import {
   NotFoundError,
   BadRequestError,
   validateOrThrow,
   normalizeString,
-  formatData,
   createBaseController,
   createLogger,
   handlePrismaUniqueError,
@@ -21,18 +21,6 @@ const EMPLOYEE_SELECT = {
   employeeFirstName: true,
   employeeLastName: true,
 };
-
-const preprocessString = (message) =>
-  z.preprocess(
-    (val) => (typeof val === "string" ? val.trim() : val),
-    z.string({ required_error: message }).min(1, message)
-  );
-
-const preprocessEnum = (values, message) =>
-  z.preprocess(
-    (val) => (typeof val === "string" ? val.trim() : val),
-    z.enum(values, { required_error: message })
-  );
 
 export const createSchema = z.object({
   permissionName: preprocessString("Please provide permissionName"),
@@ -233,7 +221,7 @@ export async function UpdateUseCase(data) {
 }
 
 export function formatPermissionData(items) {
-  return formatData(items, ["permissionCreatedAt", "permissionUpdatedAt"], []);
+  return formatData(items, [], ["permissionCreatedAt", "permissionUpdatedAt"]);
 }
 
 const baseController = createBaseController({

@@ -29,9 +29,9 @@ export default function UIEmployeeForm({
           <Input
             name="employeeFirstName"
             type="text"
-            label="Employee First Name"
+            label="First Name"
             labelPlacement="outside"
-            placeholder="Enter Employee First Name"
+            placeholder="Enter First Name"
             color="default"
             variant="bordered"
             size="lg"
@@ -40,7 +40,50 @@ export default function UIEmployeeForm({
             value={formData.employeeFirstName || ""}
             onChange={handleChange("employeeFirstName")}
             isInvalid={!!errors.employeeFirstName}
-            errorMessage={errors.employeeFirstName?.[0] || errors.employeeFirstName}
+            errorMessage={
+              errors.employeeFirstName?.[0] || errors.employeeFirstName
+            }
+          />
+        </div>
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <Input
+            name="employeeLastName"
+            type="text"
+            label="Last Name"
+            labelPlacement="outside"
+            placeholder="Enter Last Name"
+            color="default"
+            variant="bordered"
+            size="lg"
+            radius="sm"
+            isRequired
+            value={formData.employeeLastName || ""}
+            onChange={handleChange("employeeLastName")}
+            isInvalid={!!errors.employeeLastName}
+            errorMessage={
+              errors.employeeLastName?.[0] || errors.employeeLastName
+            }
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <Input
+            name="employeeEmail"
+            type="email"
+            label="Email"
+            labelPlacement="outside"
+            placeholder="Enter Email Address"
+            color="default"
+            variant="bordered"
+            size="lg"
+            radius="sm"
+            isRequired
+            value={formData.employeeEmail || ""}
+            onChange={handleChange("employeeEmail")}
+            isInvalid={!!errors.employeeEmail}
+            errorMessage={errors.employeeEmail?.[0] || errors.employeeEmail}
           />
         </div>
       </div>
@@ -50,7 +93,7 @@ export default function UIEmployeeForm({
           <div className="flex items-center justify-center w-full xl:w-6/12 h-full p-2 gap-2">
             <Select
               name="employeeStatus"
-              label="Employee Status"
+              label="Status"
               labelPlacement="outside"
               placeholder="Please Select"
               color="default"
@@ -65,9 +108,7 @@ export default function UIEmployeeForm({
                 handleChange("employeeStatus")([...keys][0])
               }
               isInvalid={!!errors.employeeStatus}
-              errorMessage={
-                errors.employeeStatus?.[0] || errors.employeeStatus
-              }
+              errorMessage={errors.employeeStatus?.[0] || errors.employeeStatus}
             >
               <SelectItem key="Active">Active</SelectItem>
               <SelectItem key="Inactive">Inactive</SelectItem>
@@ -84,7 +125,7 @@ export default function UIEmployeeForm({
             variant="bordered"
             size="lg"
             radius="sm"
-            className="w-2/12 "
+            className="w-2/12"
           >
             Submit
           </Button>
