@@ -56,9 +56,9 @@ const ActionMenu = ({ item, onEdit, onAssign, size = "md" }) => (
 
 const StatusChip = ({ value, colorMap, size = "md" }) => (
   <Chip
-    className="capitalize"
+    className="capitalize text-background"
     color={colorMap[value] || "default"}
-    variant="dot"
+    variant="solid"
     size={size}
   >
     {value}
@@ -71,7 +71,11 @@ const ViewToggle = ({ viewMode, setViewMode }) => (
       isIconOnly
       variant={viewMode === "table" ? "solid" : "bordered"}
       onPress={() => setViewMode("table")}
-      className={viewMode === "table" ? "border-1" : ""}
+      className={
+        viewMode === "table"
+          ? "border-1"
+          : "bg-success text-background border-1 border-foreground"
+      }
       color="none"
       aria-label="Table View"
     >
@@ -81,7 +85,11 @@ const ViewToggle = ({ viewMode, setViewMode }) => (
       isIconOnly
       variant={viewMode === "card" ? "solid" : "bordered"}
       onPress={() => setViewMode("card")}
-      className={viewMode === "card" ? "border-1" : ""}
+      className={
+        viewMode === "card"
+          ? "border-1"
+          : "bg-success text-background border-1 border-foreground"
+      }
       color="none"
       aria-label="Card View"
     >
@@ -367,7 +375,6 @@ export default function DataTable({
             radius="sm"
             className="w-full"
           />
-          <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
           {statusOptions.length > 0 && (
             <StatusFilterDropdown
               statusOptions={statusOptions}
@@ -389,11 +396,12 @@ export default function DataTable({
             </Button>
           )}
         </div>
-        <div className="flex flex-col xl:flex-row items-center justify-between w-full h-full gap-2">
-          <div className="flex items-center justify-between w-full h-full p-2 gap-2">
+        <div className="flex flex-row items-center justify-between w-full h-full gap-2">
+          <div className="xl:flex items-center justify-between w-full h-full p-2 gap-2 hidden">
             Total {data.length} {itemName}
           </div>
           <RowsPerPageSelector onChange={handleRowsPerPageChange} />
+          <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
         </div>
       </div>
 
