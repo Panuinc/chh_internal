@@ -37,3 +37,82 @@
 [2025-12-16 11:52:26] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
 [2025-12-16 11:52:40] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
 [2025-12-16 11:52:40] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
+[2025-12-16 12:37:25] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 12:37:25] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 12:37:25] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
+[2025-12-16 13:04:51] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:04:51] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
+[2025-12-16 13:04:53] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:04:53] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
+[2025-12-16 13:05:19] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:05:19] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
+[2025-12-16 13:07:10] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:07:10] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-16 13:07:15] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:07:15] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:07:15] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 13:10:41] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:10:41] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:10:41] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 13:11:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:11:00] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:11:00] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 13:12:04] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:12:04] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 13:14:13] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:14:13] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 13:14:22] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:14:22] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 13:14:23] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:14:23] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 13:14:34] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:14:34] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 13:15:32] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:15:32] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
+[2025-12-16 13:22:16] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:22:16] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:22:16] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
+[2025-12-16 13:22:58] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:22:58] [INFO] GetEmployeeByIdUseCase start {"id":"cmj5t2tnc000104jmfmnm1j7j"}
+[2025-12-16 13:22:58] [INFO] GetEmployeeByIdUseCase success {"id":"cmj5t2tnc000104jmfmnm1j7j","email":"panuwat.j@chhindustry.com"}
+[2025-12-16 13:23:23] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:23:23] [INFO] GetAllEmployeeUseCase success {"total":1,"returned":1}
+[2025-12-16 13:23:37] [INFO] CreateEmployeeUseCase start {"email":"Demo01@gmail.com"}
+[2025-12-16 13:23:37] [INFO] CreateEmployeeUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2025-12-16 13:23:38] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:23:38] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-16 13:24:06] [INFO] GetEmployeeByIdUseCase start {"id":"cmj875hfb0003crmkvku84kgf"}
+[2025-12-16 13:24:06] [INFO] GetEmployeeByIdUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2025-12-16 13:24:06] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:24:08] [INFO] UpdateEmployeeUseCase start {"id":"cmj875hfb0003crmkvku84kgf"}
+[2025-12-16 13:24:08] [INFO] UpdateEmployeeUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2025-12-16 13:24:09] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:24:10] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:24:10] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-16 13:24:15] [INFO] GetEmployeeByIdUseCase start {"id":"cmj875hfb0003crmkvku84kgf"}
+[2025-12-16 13:24:15] [INFO] GetEmployeeByIdUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2025-12-16 13:24:16] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:24:18] [INFO] UpdateEmployeeUseCase start {"id":"cmj875hfb0003crmkvku84kgf"}
+[2025-12-16 13:24:18] [INFO] UpdateEmployeeUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2025-12-16 13:24:19] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:24:20] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:24:20] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-16 13:24:20] [INFO] GetEmployeeByIdUseCase start {"id":"cmj875hfb0003crmkvku84kgf"}
+[2025-12-16 13:24:20] [INFO] GetEmployeeByIdUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2025-12-16 13:24:21] [INFO] UpdateEmployeeUseCase start {"id":"cmj875hfb0003crmkvku84kgf"}
+[2025-12-16 13:24:21] [INFO] UpdateEmployeeUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2025-12-16 13:24:21] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:24:23] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:24:23] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-16 13:24:26] [INFO] GetEmployeeByIdUseCase start {"id":"cmj5t2tnc000104jmfmnm1j7j"}
+[2025-12-16 13:24:26] [INFO] GetEmployeeByIdUseCase success {"id":"cmj5t2tnc000104jmfmnm1j7j","email":"panuwat.j@chhindustry.com"}
+[2025-12-16 13:24:27] [INFO] UpdateEmployeeUseCase start {"id":"cmj5t2tnc000104jmfmnm1j7j"}
+[2025-12-16 13:24:27] [INFO] UpdateEmployeeUseCase success {"id":"cmj5t2tnc000104jmfmnm1j7j","email":"panuwat.j@chhindustry.com"}
+[2025-12-16 13:24:27] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:24:28] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:24:28] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-16 13:24:38] [INFO] GetEmployeeByIdUseCase start {"id":"cmj5t2tnc000104jmfmnm1j7j"}
+[2025-12-16 13:24:38] [INFO] GetEmployeeByIdUseCase success {"id":"cmj5t2tnc000104jmfmnm1j7j","email":"panuwat.j@chhindustry.com"}
+[2025-12-16 13:24:39] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 13:24:39] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 13:24:39] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
