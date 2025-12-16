@@ -128,8 +128,8 @@ export function groupPermissionsByCategory(permissions) {
 
   permissions.forEach((permission) => {
     const name = permission.permissionName || "";
-    const dotIndex = name.indexOf(".");
-    const category = dotIndex > 0 ? name.substring(0, dotIndex) : "other";
+    const parts = name.split(".");
+    const category = parts[0] || "other";
 
     if (!groups[category]) {
       groups[category] = [];
@@ -139,11 +139,61 @@ export function groupPermissionsByCategory(permissions) {
 
   const sortedCategories = Object.keys(groups).sort();
 
-  return sortedCategories.map((category) => ({
-    category,
-    categoryLabel: category.charAt(0).toUpperCase() + category.slice(1),
-    permissions: groups[category].sort((a, b) =>
-      a.permissionName.localeCompare(b.permissionName)
-    ),
-  }));
+  const actionPriority = {
+    "*": 0,
+    view: 1,
+    create: 2,
+    edit: 3,
+    update: 4,
+    delete: 5,
+  };
+
+  return sortedCategories.map((category) => {
+    const categoryPermissions = groups[category];
+
+    const subGroups = {};
+
+    categoryPermissions.forEach((permission) => {
+      const name = permission.permissionName || "";
+      const parts = name.split(".");
+
+      const subCategory = parts.length <= 2 ? "_module" : parts[1];
+
+      if (!subGroups[subCategory]) {
+        subGroups[subCategory] = [];
+      }
+      subGroups[subCategory].push(permission);
+    });
+
+    const sortedSubGroups = Object.keys(subGroups).sort((a, b) => {
+      if (a === "_module") return -1;
+      if (b === "_module") return 1;
+      return a.localeCompare(b);
+    });
+
+    const subGroupsArray = sortedSubGroups.map((subKey) => ({
+      subCategory: subKey,
+      subCategoryLabel:
+        subKey === "_module"
+          ? "Module Access"
+          : subKey.charAt(0).toUpperCase() + subKey.slice(1),
+      permissions: subGroups[subKey].sort((a, b) => {
+        const aAction = a.permissionName.split(".").pop();
+        const bAction = b.permissionName.split(".").pop();
+
+        const aPriority = actionPriority[aAction] ?? 999;
+        const bPriority = actionPriority[bAction] ?? 999;
+
+        if (aPriority !== bPriority) return aPriority - bPriority;
+        return a.permissionName.localeCompare(b.permissionName);
+      }),
+    }));
+
+    return {
+      category,
+      categoryLabel: category.charAt(0).toUpperCase() + category.slice(1),
+      subGroups: subGroupsArray,
+      permissions: categoryPermissions,
+    };
+  });
 }
