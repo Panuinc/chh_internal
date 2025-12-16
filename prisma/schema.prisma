@@ -127,7 +127,7 @@ model Permission {
 
 model Department {
   departmentId        String           @id @default(cuid())
-  departmentName      String
+  departmentName      String           @unique
   departmentStatus    departmentStatus @default(Active)
   departmentCreatedBy String?
   departmentCreatedAt DateTime?

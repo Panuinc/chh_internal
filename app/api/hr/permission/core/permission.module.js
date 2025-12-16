@@ -135,40 +135,50 @@ export async function GetAllUseCase(page = 1, limit = 1000000) {
   const log = createLogger("GetAllPermissionUseCase");
   log.start({ page, limit });
 
-  const skip = (page - 1) * limit;
-  const { items, total } = await PermissionService.getPaginated(skip, limit);
+  try {
+    const skip = (page - 1) * limit;
+    const { items, total } = await PermissionService.getPaginated(skip, limit);
 
-  log.success({ total, returned: items.length });
-  return { items, total };
+    log.success({ total, returned: items.length });
+    return { items, total };
+  } catch (error) {
+    console.error("[GetAllPermissionUseCase] Error:", error);
+    throw error;
+  }
 }
 
 export async function GetByIdUseCase(id) {
   const log = createLogger("GetPermissionByIdUseCase");
   log.start({ id });
 
-  if (!id || typeof id !== "string") {
-    throw new BadRequestError(`Invalid ${ENTITY_NAME} ID`);
-  }
+  try {
+    if (!id || typeof id !== "string") {
+      throw new BadRequestError(`Invalid ${ENTITY_NAME} ID`);
+    }
 
-  const item = await PermissionService.findById(id);
-  if (!item) {
-    throw new NotFoundError(ENTITY_NAME);
-  }
+    const item = await PermissionService.findById(id);
+    if (!item) {
+      throw new NotFoundError(ENTITY_NAME);
+    }
 
-  log.success({ id, name: item.permissionName });
-  return item;
+    log.success({ id, name: item.permissionName });
+    return item;
+  } catch (error) {
+    console.error("[GetPermissionByIdUseCase] Error:", error);
+    throw error;
+  }
 }
 
 export async function CreateUseCase(data) {
   const log = createLogger("CreatePermissionUseCase");
   log.start({ name: data?.permissionName });
 
-  const validated = validateOrThrow(createSchema, data);
-  const normalizedName = normalizeString(validated.permissionName);
-
-  await PermissionService.ensureNameNotDuplicate(normalizedName);
-
   try {
+    const validated = validateOrThrow(createSchema, data);
+    const normalizedName = normalizeString(validated.permissionName);
+
+    await PermissionService.ensureNameNotDuplicate(normalizedName);
+
     const item = await PermissionService.create({
       ...validated,
       permissionName: normalizedName,
@@ -178,7 +188,9 @@ export async function CreateUseCase(data) {
     log.success({ id: item.permissionId, name: item.permissionName });
     return item;
   } catch (error) {
-    handlePrismaUniqueError(error, "permissionName", normalizedName);
+    console.error("[CreatePermissionUseCase] Error:", error);
+    handlePrismaUniqueError(error, "permissionName", data?.permissionName);
+    throw error;
   }
 }
 
@@ -186,25 +198,25 @@ export async function UpdateUseCase(data) {
   const log = createLogger("UpdatePermissionUseCase");
   log.start({ id: data?.permissionId });
 
-  const validated = validateOrThrow(updateSchema, data);
-  const { permissionId, ...updateData } = validated;
-
-  const existing = await PermissionService.findById(permissionId);
-  if (!existing) {
-    throw new NotFoundError(ENTITY_NAME);
-  }
-
-  const normalizedName = normalizeString(updateData.permissionName);
-  const existingName = normalizeString(existing.permissionName);
-
-  if (normalizedName !== existingName) {
-    await PermissionService.ensureNameNotDuplicate(
-      normalizedName,
-      permissionId
-    );
-  }
-
   try {
+    const validated = validateOrThrow(updateSchema, data);
+    const { permissionId, ...updateData } = validated;
+
+    const existing = await PermissionService.findById(permissionId);
+    if (!existing) {
+      throw new NotFoundError(ENTITY_NAME);
+    }
+
+    const normalizedName = normalizeString(updateData.permissionName);
+    const existingName = normalizeString(existing.permissionName);
+
+    if (normalizedName !== existingName) {
+      await PermissionService.ensureNameNotDuplicate(
+        normalizedName,
+        permissionId
+      );
+    }
+
     const item = await PermissionService.update(permissionId, {
       ...updateData,
       permissionName: normalizedName,
@@ -214,7 +226,9 @@ export async function UpdateUseCase(data) {
     log.success({ id: permissionId, name: item.permissionName });
     return item;
   } catch (error) {
-    handlePrismaUniqueError(error, "permissionName", normalizedName);
+    console.error("[UpdatePermissionUseCase] Error:", error);
+    handlePrismaUniqueError(error, "permissionName", data?.permissionName);
+    throw error;
   }
 }
 

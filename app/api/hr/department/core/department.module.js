@@ -135,40 +135,50 @@ export async function GetAllUseCase(page = 1, limit = 1000000) {
   const log = createLogger("GetAllDepartmentUseCase");
   log.start({ page, limit });
 
-  const skip = (page - 1) * limit;
-  const { items, total } = await DepartmentService.getPaginated(skip, limit);
+  try {
+    const skip = (page - 1) * limit;
+    const { items, total } = await DepartmentService.getPaginated(skip, limit);
 
-  log.success({ total, returned: items.length });
-  return { items, total };
+    log.success({ total, returned: items.length });
+    return { items, total };
+  } catch (error) {
+    console.error("[GetAllDepartmentUseCase] Error:", error);
+    throw error;
+  }
 }
 
 export async function GetByIdUseCase(id) {
   const log = createLogger("GetDepartmentByIdUseCase");
   log.start({ id });
 
-  if (!id || typeof id !== "string") {
-    throw new BadRequestError(`Invalid ${ENTITY_NAME} ID`);
-  }
+  try {
+    if (!id || typeof id !== "string") {
+      throw new BadRequestError(`Invalid ${ENTITY_NAME} ID`);
+    }
 
-  const item = await DepartmentService.findById(id);
-  if (!item) {
-    throw new NotFoundError(ENTITY_NAME);
-  }
+    const item = await DepartmentService.findById(id);
+    if (!item) {
+      throw new NotFoundError(ENTITY_NAME);
+    }
 
-  log.success({ id, name: item.departmentName });
-  return item;
+    log.success({ id, name: item.departmentName });
+    return item;
+  } catch (error) {
+    console.error("[GetDepartmentByIdUseCase] Error:", error);
+    throw error;
+  }
 }
 
 export async function CreateUseCase(data) {
   const log = createLogger("CreateDepartmentUseCase");
   log.start({ name: data?.departmentName });
 
-  const validated = validateOrThrow(createSchema, data);
-  const normalizedName = normalizeString(validated.departmentName);
-
-  await DepartmentService.ensureNameNotDuplicate(normalizedName);
-
   try {
+    const validated = validateOrThrow(createSchema, data);
+    const normalizedName = normalizeString(validated.departmentName);
+
+    await DepartmentService.ensureNameNotDuplicate(normalizedName);
+
     const item = await DepartmentService.create({
       ...validated,
       departmentName: normalizedName,
@@ -178,7 +188,9 @@ export async function CreateUseCase(data) {
     log.success({ id: item.departmentId, name: item.departmentName });
     return item;
   } catch (error) {
-    handlePrismaUniqueError(error, "departmentName", normalizedName);
+    console.error("[CreateDepartmentUseCase] Error:", error);
+    handlePrismaUniqueError(error, "departmentName", data?.departmentName);
+    throw error;
   }
 }
 
@@ -186,25 +198,25 @@ export async function UpdateUseCase(data) {
   const log = createLogger("UpdateDepartmentUseCase");
   log.start({ id: data?.departmentId });
 
-  const validated = validateOrThrow(updateSchema, data);
-  const { departmentId, ...updateData } = validated;
-
-  const existing = await DepartmentService.findById(departmentId);
-  if (!existing) {
-    throw new NotFoundError(ENTITY_NAME);
-  }
-
-  const normalizedName = normalizeString(updateData.departmentName);
-  const existingName = normalizeString(existing.departmentName);
-
-  if (normalizedName !== existingName) {
-    await DepartmentService.ensureNameNotDuplicate(
-      normalizedName,
-      departmentId
-    );
-  }
-
   try {
+    const validated = validateOrThrow(updateSchema, data);
+    const { departmentId, ...updateData } = validated;
+
+    const existing = await DepartmentService.findById(departmentId);
+    if (!existing) {
+      throw new NotFoundError(ENTITY_NAME);
+    }
+
+    const normalizedName = normalizeString(updateData.departmentName);
+    const existingName = normalizeString(existing.departmentName);
+
+    if (normalizedName !== existingName) {
+      await DepartmentService.ensureNameNotDuplicate(
+        normalizedName,
+        departmentId
+      );
+    }
+
     const item = await DepartmentService.update(departmentId, {
       ...updateData,
       departmentName: normalizedName,
@@ -214,7 +226,9 @@ export async function UpdateUseCase(data) {
     log.success({ id: departmentId, name: item.departmentName });
     return item;
   } catch (error) {
-    handlePrismaUniqueError(error, "departmentName", normalizedName);
+    console.error("[UpdateDepartmentUseCase] Error:", error);
+    handlePrismaUniqueError(error, "departmentName", data?.departmentName);
+    throw error;
   }
 }
 
