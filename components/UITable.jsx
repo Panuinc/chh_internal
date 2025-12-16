@@ -32,7 +32,7 @@ import {
 const capitalize = (str) =>
   str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
 
-const ActionMenu = ({ item, onEdit, onAssign, size = "md" }) => (
+const ActionMenu = ({ item, onEdit, size = "md" }) => (
   <Dropdown>
     <DropdownTrigger>
       <Button isIconOnly variant="light" size={size}>
@@ -43,11 +43,6 @@ const ActionMenu = ({ item, onEdit, onAssign, size = "md" }) => (
       {onEdit && (
         <DropdownItem key="edit" onPress={() => onEdit(item)}>
           Edit
-        </DropdownItem>
-      )}
-      {onAssign && (
-        <DropdownItem key="assign" onPress={() => onAssign(item)}>
-          Assign Permissions
         </DropdownItem>
       )}
     </DropdownMenu>
@@ -234,7 +229,6 @@ export default function DataTable({
   cardDescriptionKey,
   onAddNew,
   onEdit,
-  onAssign,
   renderCustomCell,
   renderCard,
 }) {
@@ -284,21 +278,21 @@ export default function DataTable({
       if (columnKey === "actions") {
         return (
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <ActionMenu item={item} onEdit={onEdit} onAssign={onAssign} />
+            <ActionMenu item={item} onEdit={onEdit} />
           </div>
         );
       }
 
       return cellValue;
     },
-    [statusColorMap, renderCustomCell, onEdit, onAssign]
+    [statusColorMap, renderCustomCell, onEdit]
   );
 
   const defaultRenderCard = React.useCallback(
     (item) => {
       const titleKey = cardTitleKey || columns[0]?.uid || "id";
       const descKey = cardDescriptionKey || columns[1]?.uid;
-      const hasActions = onEdit || onAssign;
+      const hasActions = onEdit;
       const displayColumns = columns.filter(
         (col) =>
           col.uid !== "actions" && col.uid !== titleKey && col.uid !== descKey
@@ -313,14 +307,7 @@ export default function DataTable({
                 <p className="text-sm text-default-500">{item[descKey]}</p>
               )}
             </div>
-            {hasActions && (
-              <ActionMenu
-                item={item}
-                onEdit={onEdit}
-                onAssign={onAssign}
-                size="sm"
-              />
-            )}
+            {hasActions && <ActionMenu item={item} onEdit={onEdit} size="sm" />}
           </CardHeader>
           <CardBody className="pt-0">
             <div className="flex flex-wrap gap-2">
@@ -348,14 +335,7 @@ export default function DataTable({
         </Card>
       );
     },
-    [
-      columns,
-      cardTitleKey,
-      cardDescriptionKey,
-      statusColorMap,
-      onEdit,
-      onAssign,
-    ]
+    [columns, cardTitleKey, cardDescriptionKey, statusColorMap, onEdit]
   );
 
   return (

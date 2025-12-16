@@ -220,3 +220,12 @@
 [2025-12-16 14:25:11] [INFO] GetEmployeeByIdUseCase success {"id":"cmj5t2tnc000104jmfmnm1j7j","email":"panuwat.j@chhindustry.com"}
 [2025-12-16 14:25:11] [INFO] GetAssignsByEmployeeUseCase success {"total":1}
 [2025-12-16 14:25:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-16 14:25:59] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-16 14:25:59] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-16 14:26:00] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2025-12-16 14:26:00] [INFO] GetAllPermissionUseCase success {"total":9,"returned":9}
+[2025-12-16 14:26:00] [INFO] GetEmployeeByIdUseCase start {"id":"cmj875hfb0003crmkvku84kgf"}
+[2025-12-16 14:26:00] [INFO] GetAssignsByEmployeeUseCase start {"employeeId":"cmj875hfb0003crmkvku84kgf"}
+[2025-12-16 14:26:00] [INFO] GetAssignsByEmployeeUseCase success {"total":0}
+[2025-12-16 14:26:01] [INFO] GetEmployeeByIdUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2025-12-16 14:26:01] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
