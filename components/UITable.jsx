@@ -66,7 +66,7 @@ const StatusChip = ({ value, colorMap, size = "md" }) => (
 );
 
 const ViewToggle = ({ viewMode, setViewMode }) => (
-  <ButtonGroup size="lg">
+  <ButtonGroup size="lg" radius="sm">
     <Button
       isIconOnly
       variant={viewMode === "table" ? "solid" : "bordered"}
@@ -102,6 +102,7 @@ const StatusFilterDropdown = ({
         color="default"
         variant="bordered"
         size="lg"
+        radius="sm"
         className="w-full xl:w-52"
       >
         Status
@@ -363,6 +364,7 @@ export default function DataTable({
             color="default"
             variant="bordered"
             size="lg"
+            radius="sm"
             className="w-full"
           />
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
@@ -380,6 +382,7 @@ export default function DataTable({
               color="default"
               variant="bordered"
               size="lg"
+              radius="sm"
               className="w-full xl:w-52"
             >
               Add New
@@ -400,6 +403,7 @@ export default function DataTable({
             aria-label="Data table with pagination"
             classNames={{ wrapper: "min-h-full" }}
             size="lg"
+            radius="sm"
             shadow="none"
           >
             <TableHeader columns={columns}>
@@ -448,6 +452,7 @@ export default function DataTable({
             showShadow
             color="none"
             size="lg"
+            radius="sm"
             page={page}
             total={totalPages}
             onChange={setPage}

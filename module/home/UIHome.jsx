@@ -39,7 +39,13 @@ function UserProfileCard({ user }) {
       </div>
 
       <div className="flex flex-col items-end justify-end w-full h-full p-2 gap-2">
-        <Button color="default" variant="bordered" size="lg" className="w-full">
+        <Button
+          color="default"
+          variant="bordered"
+          size="lg"
+          radius="sm"
+          className="w-full"
+        >
           Change Password
         </Button>
       </div>

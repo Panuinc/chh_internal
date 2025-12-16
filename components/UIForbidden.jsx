@@ -21,7 +21,13 @@ export default function UIForbidden() {
         href="/home"
         className="flex items-center justify-center text-center w-4/12 h-fit p-2 gap-2"
       >
-        <Button color="default" variant="bordered" size="lg" className="w-full">
+        <Button
+          color="default"
+          variant="bordered"
+          size="lg"
+          radius="sm"
+          className="w-full"
+        >
           Home
         </Button>
       </Link>

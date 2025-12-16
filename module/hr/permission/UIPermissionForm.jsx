@@ -35,6 +35,7 @@ export default function UIPermissionForm({
             color="default"
             variant="bordered"
             size="lg"
+            radius="sm"
             isRequired
             value={formData.permissionName || ""}
             onChange={handleChange("permissionName")}
@@ -55,6 +56,7 @@ export default function UIPermissionForm({
               color="default"
               variant="bordered"
               size="lg"
+              radius="sm"
               isRequired
               selectedKeys={
                 formData.permissionStatus ? [formData.permissionStatus] : []
@@ -81,6 +83,7 @@ export default function UIPermissionForm({
             color="default"
             variant="bordered"
             size="lg"
+            radius="sm"
             className="w-2/12 "
           >
             Submit

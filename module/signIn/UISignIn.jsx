@@ -45,6 +45,7 @@ export default function UISignIn({
               color="default"
               variant="bordered"
               size="lg"
+              radius="sm"
               isRequired
               value={username}
               onChange={(e) => onUsernameChange(e.target.value)}
@@ -61,6 +62,7 @@ export default function UISignIn({
               color="default"
               variant="bordered"
               size="lg"
+              radius="sm"
               isRequired
               value={password}
               onChange={(e) => onPasswordChange(e.target.value)}
@@ -74,6 +76,7 @@ export default function UISignIn({
               color="default"
               variant="bordered"
               size="lg"
+              radius="sm"
               className="w-6/12"
               isLoading={isLoading}
               spinner={<Spinner size="sm" color="current" />}
