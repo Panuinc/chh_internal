@@ -27,6 +27,21 @@ enum departmentStatus {
   Inactive
 }
 
+enum VisitorStatus {
+  CheckIn
+  Confirmed
+  CheckOut
+}
+
+enum visitorContactReason {
+  Shipping
+  BillingChequeCollection
+  JobApplication
+  ProductPresentation
+  Meeting
+  Other
+}
+
 model Employee {
   employeeId        String         @id @default(cuid())
   employeeFirstName String
@@ -59,6 +74,10 @@ model Employee {
 
   createdDepartments Department[] @relation("DepartmentCreatedBy")
   updatedDepartments Department[] @relation("DepartmentUpdatedBy")
+  contactVisitors    Visitor[]    @relation("VisitorContactUserRelation")
+
+  createdVisitors Visitor[] @relation("VisitorCreatedBy")
+  updatedVisitors Visitor[] @relation("VisitorUpdatedBy")
 
   @@index([employeeCreatedBy])
   @@index([employeeUpdatedBy])
@@ -139,4 +158,30 @@ model Department {
 
   @@index([departmentCreatedBy])
   @@index([departmentUpdatedBy])
+}
+
+model Visitor {
+  visitorId              String               @id @default(cuid())
+  visitorFirstName       String
+  visitorLastName        String
+  visitorCompany         String
+  visitorCarRegistration String
+  visitorProvince        String
+  visitorContactUserId   String
+  visitorContactReason   visitorContactReason
+  visitorPhoto           String
+  visitorDocumentPhotos  String
+  visitorStatus          VisitorStatus        @default(CheckIn)
+  visitorCreatedBy       String
+  visitorCreatedAt       DateTime
+  visitorUpdatedBy       String?
+  visitorUpdatedAt       DateTime?
+
+  contactUser       Employee? @relation("VisitorContactUserRelation", fields: [visitorContactUserId], references: [employeeId])
+  createdByEmployee Employee? @relation("VisitorCreatedBy", fields: [visitorCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("VisitorUpdatedBy", fields: [visitorUpdatedBy], references: [employeeId])
+
+  @@index([visitorContactUserId])
+  @@index([visitorCreatedBy])
+  @@index([visitorUpdatedBy])
 }
