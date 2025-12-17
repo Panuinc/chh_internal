@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
-import { BellDot, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
-import { Button } from "@heroui/react";
 import Link from "next/link";
 import { LoadingState } from "@/components";
 
@@ -39,10 +38,6 @@ export default function PagesLayout({ children }) {
 
         <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:bg-default">
           {userInitial}
-        </div>
-
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:bg-default">
-          <BellDot />
         </div>
 
         <div
