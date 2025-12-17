@@ -13,7 +13,7 @@ export default function ModulePage({
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
       {showSidebar && (
-        <div className="flex flex-col items-center justify-center w-full xl:w-2/12 h-full gap-2">
+        <div className="flex flex-col items-center justify-center w-full xl:w-[20%] h-full gap-2">
           {sidebar || (
             <div >No sidebar content</div>
           )}
@@ -22,7 +22,7 @@ export default function ModulePage({
 
       <div
         className={`flex flex-col items-center justify-center w-full ${
-          showSidebar ? "xl:w-10/12" : "xl:w-10/12"
+          showSidebar ? "xl:w-[80%]" : "xl:w-[80%]"
         } h-full gap-2 overflow-hidden`}
       >
         {showHeader && (

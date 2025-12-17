@@ -6,7 +6,7 @@ import React from "react";
 
 export default function UIForbidden() {
   return (
-    <div className="flex flex-col items-center justify-center w-full xl:w-10/12 h-full p-2 gap-2 overflow-auto">
+    <div className="flex flex-col items-center justify-center w-full xl:w-[80%] h-full p-2 gap-2 overflow-auto">
       <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
         <Image src="/icon/icon-ghost.png" alt="logo" width={250} height={250} />
       </div>

@@ -1,5 +1,4 @@
 import { Ghost } from "lucide-react";
-import { Button } from "@heroui/react";
 import { SubMenu } from "@/components";
 import Image from "next/image";
 
@@ -37,18 +36,6 @@ function UserProfileCard({ user }) {
           value={user.permissions?.length || 0}
         />
       </div>
-
-      <div className="flex flex-col items-end justify-end w-full h-full p-2 gap-2">
-        <Button
-          color="default"
-          variant="bordered"
-          size="lg"
-          radius="sm"
-          className="w-full"
-        >
-          Change Password
-        </Button>
-      </div>
     </div>
   );
 }
@@ -69,11 +56,11 @@ function UserInfoRow({ label, value }) {
 export default function UIHome({ user, modules }) {
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
-      <div className="flex flex-col items-center justify-start w-full xl:w-2/12 h-fit xl:h-full gap-2">
+      <div className="flex flex-col items-center justify-start w-full xl:w-[20%] h-fit xl:h-full gap-2">
         {user && <UserProfileCard user={user} />}
       </div>
 
-      <div className="flex flex-col items-center justify-center w-full xl:w-10/12 h-full gap-2 overflow-hidden">
+      <div className="flex flex-col items-center justify-center w-full xl:w-[80%] h-full gap-2 overflow-hidden">
         <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-2 gap-2 border-1 rounded-xl hidden">
           <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-2xl font-black">
             EverGreen Dashboard
