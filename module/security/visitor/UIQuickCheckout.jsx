@@ -93,7 +93,7 @@ export default function UIQuickCheckout({
               <img
                 src={`/${visitor.visitorPhoto}`}
                 alt="Visitor"
-                className="w-24 h-24 rounded-full object-cover shadow-md"
+                className="w-24 h-24 rounded-full object-cover shadow-lg"
               />
             </div>
           )}

@@ -61,7 +61,7 @@ export default function UIHome({ user, modules }) {
       </div>
 
       <div className="flex flex-col items-center justify-center w-full xl:w-[80%] h-full gap-2 overflow-hidden">
-        <div className="xl:flex flex-col items-center justify-start w-full min-h-52 p-2 gap-2 border-1 rounded-xl hidden">
+        <div className="xl:flex flex-col items-center justify-start w-full h-fit p-2 gap-2 border-1 rounded-xl hidden">
           <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-2xl font-black">
             EverGreen Dashboard
           </div>
