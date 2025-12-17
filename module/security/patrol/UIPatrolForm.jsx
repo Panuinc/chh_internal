@@ -156,7 +156,14 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" variant="light" onPress={handleClose}>
+          <Button
+            color="default"
+            variant="bordered"
+            size="lg"
+            radius="sm"
+            className="w-6/12"
+            onPress={handleClose}
+          >
             ยกเลิก
           </Button>
         </ModalFooter>
@@ -333,14 +340,25 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" variant="light" onPress={handleClose}>
+          <Button
+            color="default"
+            variant="bordered"
+            size="lg"
+            radius="sm"
+            className="w-6/12"
+            onPress={handleClose}
+          >
             ยกเลิก
           </Button>
           <Button
-            color="primary"
+            color="default"
+            variant="bordered"
+            size="lg"
+            radius="sm"
+            className="w-6/12"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
-            startContent={<Camera className="w-5 h-5" />}
+            startContent={<Camera />}
           >
             ถ่ายรูป
           </Button>
@@ -354,7 +372,7 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
       <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
-        <QrCode className="w-5 h-5" />
+        <QrCode />
         {label}
       </div>
 
@@ -369,21 +387,23 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
           <div className="flex gap-2">
             <Button
               type="button"
-              color="primary"
-              variant="flat"
-              size="sm"
+              color="default"
+              variant="bordered"
+              size="lg"
               radius="sm"
+              className="w-6/12"
               onPress={onOpenScanner}
-              startContent={<RefreshCw className="w-4 h-4" />}
+              startContent={<RefreshCw />}
             >
               สแกนใหม่
             </Button>
             <Button
               type="button"
-              color="danger"
-              variant="flat"
-              size="sm"
+              color="default"
+              variant="bordered"
+              size="lg"
               radius="sm"
+              className="w-6/12"
               onPress={onClear}
             >
               ล้าง
@@ -398,12 +418,13 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
           <p className="text-sm text-default-500">ยังไม่ได้สแกน QR Code</p>
           <Button
             type="button"
-            color="primary"
-            variant="solid"
-            size="md"
+            color="default"
+            variant="bordered"
+            size="lg"
             radius="sm"
+            className="w-full"
             onPress={onOpenScanner}
-            startContent={<QrCode className="w-5 h-5" />}
+            startContent={<QrCode />}
           >
             สแกน QR Code
           </Button>
@@ -427,7 +448,7 @@ function PhotoCaptureCard({
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
       <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
-        <Camera className="w-5 h-5" />
+        <Camera />
         {label}
       </div>
 
@@ -443,21 +464,23 @@ function PhotoCaptureCard({
           <div className="flex gap-2">
             <Button
               type="button"
-              color="primary"
-              variant="flat"
-              size="sm"
+              color="default"
+              variant="bordered"
+              size="lg"
               radius="sm"
+              className="w-6/12"
               onPress={onOpenCamera}
-              startContent={<RefreshCw className="w-4 h-4" />}
+              startContent={<RefreshCw />}
             >
               ถ่ายใหม่
             </Button>
             <Button
               type="button"
-              color="danger"
-              variant="flat"
-              size="sm"
+              color="default"
+              variant="bordered"
+              size="lg"
               radius="sm"
+              className="w-6/12"
               onPress={onClear}
             >
               ลบ
@@ -472,12 +495,13 @@ function PhotoCaptureCard({
           <p className="text-sm text-default-500">ยังไม่มีรูปภาพ</p>
           <Button
             type="button"
-            color="primary"
-            variant="solid"
-            size="md"
+            color="default"
+            variant="bordered"
+            size="lg"
             radius="sm"
+            className="w-full"
             onPress={onOpenCamera}
-            startContent={<Camera className="w-5 h-5" />}
+            startContent={<Camera />}
           >
             เปิดกล้อง
           </Button>
@@ -537,7 +561,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2">
+        <div className="flex flex-co xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <QrCodeCard
               label="สแกน QR Code"
@@ -583,13 +607,13 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
           <div className="flex items-center justify-end w-full h-full p-2 gap-2">
             <Button
               type="submit"
-              color="primary"
-              variant="solid"
+              color="default"
+              variant="bordered"
               size="lg"
               radius="sm"
-              className="w-full xl:w-2/12"
+              className="w-2/12 "
             >
-              บันทึก
+              Submit
             </Button>
           </div>
         </div>
