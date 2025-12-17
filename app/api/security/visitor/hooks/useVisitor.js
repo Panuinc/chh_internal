@@ -57,12 +57,10 @@ export function useVisitors(apiUrl = API_URL) {
   const [visitors, setVisitors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    (async () => {
+  const fetchVisitors = useCallback(
+    async (signal) => {
       try {
-        const result = await fetchWithAbort(apiUrl, {}, controller.signal);
+        const result = await fetchWithAbort(apiUrl, {}, signal);
 
         const items = result.visitors || result.data || [];
 
@@ -75,16 +73,28 @@ export function useVisitors(apiUrl = API_URL) {
         if (err.name === "AbortError") return;
         showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);
       } finally {
-        if (!controller.signal.aborted) {
+        if (!signal?.aborted) {
           setLoading(false);
         }
       }
-    })();
+    },
+    [apiUrl]
+  );
 
+  const refetch = useCallback(() => {
+    setLoading(true);
+    const controller = new AbortController();
+    fetchVisitors(controller.signal);
     return () => controller.abort();
-  }, [apiUrl]);
+  }, [fetchVisitors]);
 
-  return { visitors, loading };
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchVisitors(controller.signal);
+    return () => controller.abort();
+  }, [fetchVisitors]);
+
+  return { visitors, loading, refetch, setVisitors };
 }
 
 export function useVisitor(visitorId) {
@@ -205,4 +215,46 @@ export function useSubmitVisitor({
     },
     [mode, visitorId, currentVisitorId, router]
   );
+}
+
+export function useCheckoutVisitor() {
+  const [loading, setLoading] = useState(false);
+
+  const checkout = useCallback(async (visitorId, updatedBy, onSuccess) => {
+    if (!visitorId || !updatedBy) {
+      showToast(TOAST.DANGER, "Missing required parameters");
+      return false;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/${visitorId}/checkout`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ updatedBy }),
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        showToast(TOAST.SUCCESS, result.message || "Checkout successful");
+        if (onSuccess) onSuccess(result.visitor);
+        return true;
+      } else {
+        showToast(TOAST.DANGER, result.error || "Failed to checkout visitor");
+        return false;
+      }
+    } catch (err) {
+      showToast(TOAST.DANGER, `Checkout failed: ${getErrorMessage(err)}`);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { checkout, loading };
 }

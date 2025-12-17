@@ -9,6 +9,10 @@ import {
   createLogger,
 } from "@/lib/shared/server";
 import { saveUploadedFile, deleteFile } from "@/lib/fileStore";
+import {
+  notifyVisitorCheckIn,
+  notifyVisitorStatusUpdate,
+} from "@/lib/lineNotify";
 
 const ENTITY_NAME = "Visitor";
 const ENTITY_KEY = "visitors";
@@ -223,8 +227,26 @@ export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
       ...validated,
       visitorPhoto: photoPath,
       visitorDocumentPhotos: documentPhotosPath,
+      visitorStatus: "CheckIn",
       visitorCreatedAt: getLocalNow(),
     });
+
+    try {
+      const contactUser = item.contactUser
+        ? {
+            userFirstName: item.contactUser.employeeFirstName,
+            userLastName: item.contactUser.employeeLastName,
+          }
+        : null;
+
+      await notifyVisitorCheckIn(item, contactUser);
+      log.success({ lineNotification: "sent" });
+    } catch (lineError) {
+      console.error(
+        "[CreateVisitorUseCase] LINE notification failed:",
+        lineError
+      );
+    }
 
     log.success({
       id: item.visitorId,
@@ -295,6 +317,35 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
       visitorUpdatedAt: getLocalNow(),
     });
 
+    if (
+      updateData.visitorStatus &&
+      updateData.visitorStatus !== existing.visitorStatus
+    ) {
+      try {
+        const contactUser = item.contactUser
+          ? {
+              userFirstName: item.contactUser.employeeFirstName,
+              userLastName: item.contactUser.employeeLastName,
+            }
+          : null;
+
+        await notifyVisitorStatusUpdate(
+          item,
+          contactUser,
+          updateData.visitorStatus
+        );
+        log.success({
+          lineNotification: "sent",
+          newStatus: updateData.visitorStatus,
+        });
+      } catch (lineError) {
+        console.error(
+          "[UpdateVisitorUseCase] LINE notification failed:",
+          lineError
+        );
+      }
+    }
+
     log.success({
       id: visitorId,
       name: `${item.visitorFirstName} ${item.visitorLastName}`,
@@ -302,6 +353,59 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
     return item;
   } catch (error) {
     console.error("[UpdateVisitorUseCase] Error:", error);
+    throw error;
+  }
+}
+
+export async function CheckoutUseCase(visitorId, updatedBy) {
+  const log = createLogger("CheckoutVisitorUseCase");
+  log.start({ visitorId });
+
+  try {
+    if (!visitorId || typeof visitorId !== "string") {
+      throw new BadRequestError(`Invalid ${ENTITY_NAME} ID`);
+    }
+
+    const existing = await VisitorService.findById(visitorId);
+    if (!existing) {
+      throw new NotFoundError(ENTITY_NAME);
+    }
+
+    if (existing.visitorStatus === "CheckOut") {
+      throw new BadRequestError("Visitor has already checked out");
+    }
+
+    const item = await VisitorService.update(visitorId, {
+      visitorStatus: "CheckOut",
+      visitorUpdatedBy: updatedBy,
+      visitorUpdatedAt: getLocalNow(),
+    });
+
+    try {
+      const contactUser = item.contactUser
+        ? {
+            userFirstName: item.contactUser.employeeFirstName,
+            userLastName: item.contactUser.employeeLastName,
+          }
+        : null;
+
+      await notifyVisitorStatusUpdate(item, contactUser, "CheckOut");
+      log.success({ lineNotification: "sent", status: "CheckOut" });
+    } catch (lineError) {
+      console.error(
+        "[CheckoutVisitorUseCase] LINE notification failed:",
+        lineError
+      );
+    }
+
+    log.success({
+      id: visitorId,
+      name: `${item.visitorFirstName} ${item.visitorLastName}`,
+      status: "CheckOut",
+    });
+    return item;
+  } catch (error) {
+    console.error("[CheckoutVisitorUseCase] Error:", error);
     throw error;
   }
 }
@@ -417,6 +521,35 @@ export async function updateVisitor(request, visitorId) {
     });
   } catch (error) {
     console.error("[updateVisitor] Error:", error);
+    const status = error.statusCode || 500;
+    return Response.json(
+      {
+        error: error.message || "Internal Server Error",
+        details: error.details || null,
+      },
+      { status }
+    );
+  }
+}
+
+export async function checkoutVisitor(request, visitorId) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const updatedBy = body.updatedBy;
+
+    if (!updatedBy) {
+      return Response.json({ error: "updatedBy is required" }, { status: 400 });
+    }
+
+    const item = await CheckoutUseCase(visitorId, updatedBy);
+    const formatted = formatVisitorData([item])[0];
+
+    return Response.json({
+      message: "Visitor checked out successfully",
+      [ENTITY_SINGULAR]: formatted,
+    });
+  } catch (error) {
+    console.error("[checkoutVisitor] Error:", error);
     const status = error.statusCode || 500;
     return Response.json(
       {
