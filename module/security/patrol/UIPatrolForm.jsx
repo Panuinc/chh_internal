@@ -561,8 +561,8 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
           </div>
         </div>
 
-        <div className="flex flex-co xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 rounded-xl">
             <QrCodeCard
               label="สแกน QR Code"
               qrCodeInfo={formData.patrolQrCodeInfo}
@@ -571,7 +571,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
               error={errors.patrolQrCodeInfo}
             />
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 rounded-xl">
             <PhotoCaptureCard
               label="ถ่ายรูป"
               capturedImage={capturedPicture}
