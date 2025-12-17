@@ -78,6 +78,9 @@ model Employee {
   createdVisitors Visitor[] @relation("VisitorCreatedBy")
   updatedVisitors Visitor[] @relation("VisitorUpdatedBy")
 
+  createdPatrols Patrol[] @relation("PatrolCreatedBy")
+  updatedPatrols Patrol[] @relation("PatrolUpdatedBy")
+
   @@index([employeeCreatedBy])
   @@index([employeeUpdatedBy])
 }
@@ -183,4 +186,21 @@ model Visitor {
   @@index([visitorContactUserId])
   @@index([visitorCreatedBy])
   @@index([visitorUpdatedBy])
+}
+
+model Patrol {
+  patrolId         String    @id @default(cuid())
+  patrolQrCodeInfo String
+  patrolPicture    String
+  patrolNote       String
+  patrolCreatedBy  String?
+  patrolCreatedAt  DateTime?
+  patrolUpdatedBy  String?
+  patrolUpdatedAt  DateTime?
+
+  createdByEmployee Employee? @relation("PatrolCreatedBy", fields: [patrolCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("PatrolUpdatedBy", fields: [patrolUpdatedBy], references: [employeeId])
+
+  @@index([patrolCreatedBy])
+  @@index([patrolUpdatedBy])
 }

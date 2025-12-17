@@ -107,6 +107,17 @@ export const menuConfig = {
             edit: "security.visitor.edit",
           },
         },
+        {
+          id: "patrol",
+          href: "/security/patrol",
+          text: "Patrol",
+          icon: Users,
+          permission: "security.patrol.view",
+          actions: {
+            view: "security.patrol.view",
+            create: "security.patrol.create",
+          },
+        },
       ],
     },
   },
