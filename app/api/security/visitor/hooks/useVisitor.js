@@ -23,8 +23,10 @@ function formatVisitor(visitor, index = null) {
   return {
     ...visitor,
     ...(index !== null && { visitorIndex: index + 1 }),
-    visitorCreatedBy: getFullName(visitor.createdByEmployee),
-    visitorUpdatedBy: getFullName(visitor.updatedByEmployee),
+    visitorFullName: `${visitor.visitorFirstName} ${visitor.visitorLastName}`,
+    visitorContactUserName: getFullName(visitor.contactUser),
+    visitorCreatedByName: getFullName(visitor.createdByEmployee),
+    visitorUpdatedByName: getFullName(visitor.updatedByEmployee),
   };
 }
 
@@ -152,10 +154,23 @@ export function useSubmitVisitor({
       const isCreate = mode === "create";
       const byField = isCreate ? "visitorCreatedBy" : "visitorUpdatedBy";
 
-      const payload = {
-        ...formData,
-        [byField]: currentVisitorId,
-      };
+      const submitFormData = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "visitorPhoto" && value instanceof File) {
+          submitFormData.append("visitorPhoto", value);
+        } else if (key === "visitorDocumentPhotos" && Array.isArray(value)) {
+          value.forEach((file) => {
+            if (file instanceof File) {
+              submitFormData.append("visitorDocumentPhotos", file);
+            }
+          });
+        } else if (value !== null && value !== undefined) {
+          submitFormData.append(key, String(value));
+        }
+      });
+
+      submitFormData.append(byField, currentVisitorId);
 
       const url = isCreate ? API_URL : `${API_URL}/${visitorId}`;
       const method = isCreate ? "POST" : "PUT";
@@ -163,9 +178,8 @@ export function useSubmitVisitor({
       try {
         const response = await fetch(url, {
           method,
-          headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify(payload),
+          body: submitFormData,
         });
 
         const result = await response.json().catch(() => ({}));
@@ -180,10 +194,7 @@ export function useSubmitVisitor({
             setErrors({});
           }
 
-          showToast(
-            TOAST.DANGER,
-            result.error || "Failed to submit Visitor."
-          );
+          showToast(TOAST.DANGER, result.error || "Failed to submit Visitor.");
         }
       } catch (err) {
         showToast(

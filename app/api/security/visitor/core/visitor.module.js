@@ -6,11 +6,9 @@ import {
   NotFoundError,
   BadRequestError,
   validateOrThrow,
-  normalizeString,
-  createBaseController,
   createLogger,
-  handlePrismaUniqueError,
 } from "@/lib/shared/server";
+import { saveUploadedFile, deleteFile } from "@/lib/fileStore";
 
 const ENTITY_NAME = "Visitor";
 const ENTITY_KEY = "visitors";
@@ -23,15 +21,51 @@ const EMPLOYEE_SELECT = {
 };
 
 export const createSchema = z.object({
-  visitorName: preprocessString("Please provide visitorName"),
+  visitorFirstName: preprocessString("Please provide visitorFirstName"),
+  visitorLastName: preprocessString("Please provide visitorLastName"),
+  visitorCompany: preprocessString("Please provide visitorCompany"),
+  visitorCarRegistration: preprocessString(
+    "Please provide visitorCarRegistration"
+  ),
+  visitorProvince: preprocessString("Please provide visitorProvince"),
+  visitorContactUserId: preprocessString("Please provide visitorContactUserId"),
+  visitorContactReason: preprocessEnum(
+    [
+      "Shipping",
+      "BillingChequeCollection",
+      "JobApplication",
+      "ProductPresentation",
+      "Meeting",
+      "Other",
+    ],
+    "Please provide visitorContactReason"
+  ),
   visitorCreatedBy: preprocessString("Please provide the creator ID"),
 });
 
 export const updateSchema = z.object({
   visitorId: preprocessString("Please provide the visitor ID"),
-  visitorName: preprocessString("Please provide visitorName"),
+  visitorFirstName: preprocessString("Please provide visitorFirstName"),
+  visitorLastName: preprocessString("Please provide visitorLastName"),
+  visitorCompany: preprocessString("Please provide visitorCompany"),
+  visitorCarRegistration: preprocessString(
+    "Please provide visitorCarRegistration"
+  ),
+  visitorProvince: preprocessString("Please provide visitorProvince"),
+  visitorContactUserId: preprocessString("Please provide visitorContactUserId"),
+  visitorContactReason: preprocessEnum(
+    [
+      "Shipping",
+      "BillingChequeCollection",
+      "JobApplication",
+      "ProductPresentation",
+      "Meeting",
+      "Other",
+    ],
+    "Please provide visitorContactReason"
+  ),
   visitorStatus: preprocessEnum(
-    ["Active", "Inactive"],
+    ["CheckIn", "CheckOut"],
     "Please provide visitorStatus"
   ),
   visitorUpdatedBy: preprocessString("Please provide the updater ID"),
@@ -42,8 +76,9 @@ export const VisitorRepository = {
     return prisma.visitor.findMany({
       skip,
       take,
-      orderBy: { visitorCreatedAt: "asc" },
+      orderBy: { visitorCreatedAt: "desc" },
       include: {
+        contactUser: { select: EMPLOYEE_SELECT },
         createdByEmployee: { select: EMPLOYEE_SELECT },
         updatedByEmployee: { select: EMPLOYEE_SELECT },
       },
@@ -58,22 +93,20 @@ export const VisitorRepository = {
     return prisma.visitor.findUnique({
       where: { visitorId: id },
       include: {
+        contactUser: { select: EMPLOYEE_SELECT },
         createdByEmployee: { select: EMPLOYEE_SELECT },
         updatedByEmployee: { select: EMPLOYEE_SELECT },
       },
     });
   },
 
-  async findByName(name) {
-    return prisma.visitor.findUnique({
-      where: { visitorName: name },
-    });
-  },
-
   async create(data) {
     return prisma.visitor.create({
       data,
-      include: { createdByEmployee: { select: EMPLOYEE_SELECT } },
+      include: {
+        contactUser: { select: EMPLOYEE_SELECT },
+        createdByEmployee: { select: EMPLOYEE_SELECT },
+      },
     });
   },
 
@@ -82,6 +115,7 @@ export const VisitorRepository = {
       where: { visitorId: id },
       data,
       include: {
+        contactUser: { select: EMPLOYEE_SELECT },
         createdByEmployee: { select: EMPLOYEE_SELECT },
         updatedByEmployee: { select: EMPLOYEE_SELECT },
       },
@@ -100,14 +134,6 @@ export const VisitorService = {
 
   async findById(id) {
     return VisitorRepository.findById(id);
-  },
-
-  async ensureNameNotDuplicate(name, excludeId = null) {
-    const existing = await VisitorRepository.findByName(name);
-    if (existing && existing.visitorId !== excludeId) {
-      const { ConflictError } = await import("@/lib/shared/server");
-      throw new ConflictError("visitorName", name);
-    }
   },
 
   async create(data) {
@@ -149,7 +175,10 @@ export async function GetByIdUseCase(id) {
       throw new NotFoundError(ENTITY_NAME);
     }
 
-    log.success({ id, name: item.visitorName });
+    log.success({
+      id,
+      name: `${item.visitorFirstName} ${item.visitorLastName}`,
+    });
     return item;
   } catch (error) {
     console.error("[GetVisitorByIdUseCase] Error:", error);
@@ -157,32 +186,58 @@ export async function GetByIdUseCase(id) {
   }
 }
 
-export async function CreateUseCase(data) {
+export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
   const log = createLogger("CreateVisitorUseCase");
-  log.start({ name: data?.visitorName });
+  log.start({ name: `${data?.visitorFirstName} ${data?.visitorLastName}` });
 
   try {
     const validated = validateOrThrow(createSchema, data);
-    const normalizedName = normalizeString(validated.visitorName);
 
-    await VisitorService.ensureNameNotDuplicate(normalizedName);
+    const timestamp = Date.now();
+    const baseName = `visitor_${timestamp}`;
+
+    let photoPath = "";
+    if (visitorPhoto) {
+      photoPath = await saveUploadedFile(
+        visitorPhoto,
+        "visitors/photos",
+        baseName
+      );
+    }
+
+    let documentPhotosPath = "";
+    if (visitorDocumentPhotos && visitorDocumentPhotos.length > 0) {
+      const paths = [];
+      for (let i = 0; i < visitorDocumentPhotos.length; i++) {
+        const docPath = await saveUploadedFile(
+          visitorDocumentPhotos[i],
+          "visitors/documents",
+          `${baseName}_doc${i}`
+        );
+        paths.push(docPath);
+      }
+      documentPhotosPath = JSON.stringify(paths);
+    }
 
     const item = await VisitorService.create({
       ...validated,
-      visitorName: normalizedName,
+      visitorPhoto: photoPath,
+      visitorDocumentPhotos: documentPhotosPath,
       visitorCreatedAt: getLocalNow(),
     });
 
-    log.success({ id: item.visitorId, name: item.visitorName });
+    log.success({
+      id: item.visitorId,
+      name: `${item.visitorFirstName} ${item.visitorLastName}`,
+    });
     return item;
   } catch (error) {
     console.error("[CreateVisitorUseCase] Error:", error);
-    handlePrismaUniqueError(error, "visitorName", data?.visitorName);
     throw error;
   }
 }
 
-export async function UpdateUseCase(data) {
+export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
   const log = createLogger("UpdateVisitorUseCase");
   log.start({ id: data?.visitorId });
 
@@ -195,27 +250,58 @@ export async function UpdateUseCase(data) {
       throw new NotFoundError(ENTITY_NAME);
     }
 
-    const normalizedName = normalizeString(updateData.visitorName);
-    const existingName = normalizeString(existing.visitorName);
-
-    if (normalizedName !== existingName) {
-      await VisitorService.ensureNameNotDuplicate(
-        normalizedName,
-        visitorId
+    let photoPath = existing.visitorPhoto;
+    if (visitorPhoto) {
+      if (existing.visitorPhoto) {
+        await deleteFile(existing.visitorPhoto);
+      }
+      const timestamp = Date.now();
+      const baseName = `visitor_${timestamp}`;
+      photoPath = await saveUploadedFile(
+        visitorPhoto,
+        "visitors/photos",
+        baseName
       );
+    }
+
+    let documentPhotosPath = existing.visitorDocumentPhotos;
+    if (visitorDocumentPhotos && visitorDocumentPhotos.length > 0) {
+      if (existing.visitorDocumentPhotos) {
+        try {
+          const oldPaths = JSON.parse(existing.visitorDocumentPhotos);
+          for (const oldPath of oldPaths) {
+            await deleteFile(oldPath);
+          }
+        } catch (_) {}
+      }
+      const timestamp = Date.now();
+      const baseName = `visitor_${timestamp}`;
+      const paths = [];
+      for (let i = 0; i < visitorDocumentPhotos.length; i++) {
+        const docPath = await saveUploadedFile(
+          visitorDocumentPhotos[i],
+          "visitors/documents",
+          `${baseName}_doc${i}`
+        );
+        paths.push(docPath);
+      }
+      documentPhotosPath = JSON.stringify(paths);
     }
 
     const item = await VisitorService.update(visitorId, {
       ...updateData,
-      visitorName: normalizedName,
+      visitorPhoto: photoPath,
+      visitorDocumentPhotos: documentPhotosPath,
       visitorUpdatedAt: getLocalNow(),
     });
 
-    log.success({ id: visitorId, name: item.visitorName });
+    log.success({
+      id: visitorId,
+      name: `${item.visitorFirstName} ${item.visitorLastName}`,
+    });
     return item;
   } catch (error) {
     console.error("[UpdateVisitorUseCase] Error:", error);
-    handlePrismaUniqueError(error, "visitorName", data?.visitorName);
     throw error;
   }
 }
@@ -224,17 +310,120 @@ export function formatVisitorData(items) {
   return formatData(items, [], ["visitorCreatedAt", "visitorUpdatedAt"]);
 }
 
-const baseController = createBaseController({
-  getAllUseCase: GetAllUseCase,
-  getByIdUseCase: GetByIdUseCase,
-  createUseCase: CreateUseCase,
-  updateUseCase: (data) => UpdateUseCase({ ...data, visitorId: data.id }),
-  formatData: formatVisitorData,
-  entityKey: ENTITY_KEY,
-  entitySingular: ENTITY_SINGULAR,
-});
+async function parseFormData(request) {
+  const formData = await request.formData();
+  const data = {};
+  let visitorPhoto = null;
+  const visitorDocumentPhotos = [];
 
-export const getAllVisitor = baseController.getAll;
-export const getVisitorById = baseController.getById;
-export const createVisitor = baseController.create;
-export const updateVisitor = baseController.update;
+  for (const [key, value] of formData.entries()) {
+    if (key === "visitorPhoto" && value instanceof File && value.size > 0) {
+      visitorPhoto = value;
+    } else if (
+      key === "visitorDocumentPhotos" &&
+      value instanceof File &&
+      value.size > 0
+    ) {
+      visitorDocumentPhotos.push(value);
+    } else if (typeof value === "string") {
+      data[key] = value;
+    }
+  }
+
+  return { data, visitorPhoto, visitorDocumentPhotos };
+}
+
+export async function getAllVisitor(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "1000000", 10);
+
+    const { items, total } = await GetAllUseCase(page, limit);
+    const formatted = formatVisitorData(items);
+
+    return Response.json({
+      [ENTITY_KEY]: formatted,
+      total,
+      page,
+      limit,
+    });
+  } catch (error) {
+    console.error("[getAllVisitor] Error:", error);
+    const status = error.statusCode || 500;
+    return Response.json(
+      { error: error.message || "Internal Server Error" },
+      { status }
+    );
+  }
+}
+
+export async function getVisitorById(request, visitorId) {
+  try {
+    const item = await GetByIdUseCase(visitorId);
+    const formatted = formatVisitorData([item])[0];
+
+    return Response.json({ [ENTITY_SINGULAR]: formatted });
+  } catch (error) {
+    console.error("[getVisitorById] Error:", error);
+    const status = error.statusCode || 500;
+    return Response.json(
+      { error: error.message || "Internal Server Error" },
+      { status }
+    );
+  }
+}
+
+export async function createVisitor(request) {
+  try {
+    const { data, visitorPhoto, visitorDocumentPhotos } = await parseFormData(
+      request
+    );
+    const item = await CreateUseCase(data, visitorPhoto, visitorDocumentPhotos);
+    const formatted = formatVisitorData([item])[0];
+
+    return Response.json(
+      { message: "Visitor created successfully", [ENTITY_SINGULAR]: formatted },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("[createVisitor] Error:", error);
+    const status = error.statusCode || 500;
+    return Response.json(
+      {
+        error: error.message || "Internal Server Error",
+        details: error.details || null,
+      },
+      { status }
+    );
+  }
+}
+
+export async function updateVisitor(request, visitorId) {
+  try {
+    const { data, visitorPhoto, visitorDocumentPhotos } = await parseFormData(
+      request
+    );
+    const item = await UpdateUseCase(
+      { ...data, visitorId },
+      visitorPhoto,
+      visitorDocumentPhotos
+    );
+    const formatted = formatVisitorData([item])[0];
+
+    return Response.json({
+      message: "Visitor updated successfully",
+      [ENTITY_SINGULAR]: formatted,
+    });
+  } catch (error) {
+    console.error("[updateVisitor] Error:", error);
+    const status = error.statusCode || 500;
+    return Response.json(
+      {
+        error: error.message || "Internal Server Error",
+        details: error.details || null,
+      },
+      { status }
+    );
+  }
+}

@@ -5,23 +5,38 @@ import { LoadingState } from "@/components";
 
 const columns = [
   { name: "ID", uid: "visitorIndex" },
-  { name: "Visitor Name", uid: "visitorName" },
+  { name: "First Name", uid: "visitorFirstName" },
+  { name: "Last Name", uid: "visitorLastName" },
+  { name: "Company", uid: "visitorCompany" },
+  { name: "Car Registration", uid: "visitorCarRegistration" },
+  { name: "Province", uid: "visitorProvince" },
+  { name: "Contact Person", uid: "visitorContactUserName" },
+  { name: "Contact Reason", uid: "visitorContactReason" },
   { name: "Status", uid: "visitorStatus" },
-  { name: "Created By", uid: "visitorCreatedBy" },
+  { name: "Created By", uid: "visitorCreatedByName" },
   { name: "Created At", uid: "visitorCreatedAt" },
-  { name: "Updated By", uid: "visitorUpdatedBy" },
+  { name: "Updated By", uid: "visitorUpdatedByName" },
   { name: "Updated At", uid: "visitorUpdatedAt" },
   { name: "Actions", uid: "actions" },
 ];
 
 const statusOptions = [
-  { name: "Active", uid: "Active" },
-  { name: "Inactive", uid: "Inactive" },
+  { name: "CheckIn", uid: "CheckIn" },
+  { name: "CheckOut", uid: "CheckOut" },
 ];
 
 const statusColorMap = {
-  Active: "success",
-  Inactive: "danger",
+  CheckIn: "success",
+  CheckOut: "danger",
+};
+
+const contactReasonMap = {
+  Shipping: "การจัดส่ง",
+  BillingChequeCollection: "รับเช็ค/วางบิล",
+  JobApplication: "สมัครงาน",
+  ProductPresentation: "นำเสนอสินค้า",
+  Meeting: "ประชุม",
+  Other: "อื่นๆ",
 };
 
 export default function UIVisitor({
@@ -31,11 +46,11 @@ export default function UIVisitor({
   onEdit,
 }) {
   const total = Visitors.length;
-  const active = Visitors.filter(
-    (visitor) => visitor.visitorStatus === "Active"
+  const checkIn = Visitors.filter(
+    (visitor) => visitor.visitorStatus === "CheckIn"
   ).length;
-  const inactive = Visitors.filter(
-    (visitor) => visitor.visitorStatus === "Inactive"
+  const checkOut = Visitors.filter(
+    (visitor) => visitor.visitorStatus === "CheckOut"
   ).length;
 
   const normalized = Array.isArray(Visitors)
@@ -43,12 +58,18 @@ export default function UIVisitor({
         ...visitor,
         id: visitor.visitorId,
         visitorIndex: i + 1,
-        visitorCreatedBy: visitor.createdByEmployee
+        visitorContactUserName: visitor.contactUser
+          ? `${visitor.contactUser.employeeFirstName} ${visitor.contactUser.employeeLastName}`
+          : visitor.visitorContactUserName || "-",
+        visitorContactReason:
+          contactReasonMap[visitor.visitorContactReason] ||
+          visitor.visitorContactReason,
+        visitorCreatedByName: visitor.createdByEmployee
           ? `${visitor.createdByEmployee.employeeFirstName} ${visitor.createdByEmployee.employeeLastName}`
-          : visitor.visitorCreatedBy || "-",
-        visitorUpdatedBy: visitor.updatedByEmployee
+          : visitor.visitorCreatedByName || "-",
+        visitorUpdatedByName: visitor.updatedByEmployee
           ? `${visitor.updatedByEmployee.employeeFirstName} ${visitor.updatedByEmployee.employeeLastName}`
-          : visitor.visitorUpdatedBy || "-",
+          : visitor.visitorUpdatedByName || "-",
         visitorCreatedAt: visitor.visitorCreatedAt
           ? new Date(visitor.visitorCreatedAt).toISOString().split("T")[0]
           : "-",
@@ -71,18 +92,18 @@ export default function UIVisitor({
         </div>
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Active Visitors
+            CheckIn Visitors
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {active}
+            {checkIn}
           </div>
         </div>
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Inactive Visitors
+            CheckOut Visitors
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {inactive}
+            {checkOut}
           </div>
         </div>
       </div>

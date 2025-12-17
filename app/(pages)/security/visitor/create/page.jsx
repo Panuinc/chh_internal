@@ -5,12 +5,15 @@ import { useRouter } from "next/navigation";
 import UIVisitorForm from "@/module/security/visitor/UIVisitorForm";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { useSubmitVisitor } from "@/app/api/security/visitor/core";
+import { useEmployees } from "@/app/api/hr/employee/core";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function VisitorCreate() {
   const router = useRouter();
   const { hasPermission } = useMenu();
   const { userId, userName } = useSessionUser();
+
+  const { employees } = useEmployees();
 
   useEffect(() => {
     if (!hasPermission("security.visitor.create")) {
@@ -25,7 +28,15 @@ export default function VisitorCreate() {
 
   const formHandler = useFormHandler(
     {
-      visitorName: "",
+      visitorFirstName: "",
+      visitorLastName: "",
+      visitorCompany: "",
+      visitorCarRegistration: "",
+      visitorProvince: "",
+      visitorContactUserId: "",
+      visitorContactReason: "",
+      visitorPhoto: null,
+      visitorDocumentPhotos: [],
     },
     submitVisitor
   );
@@ -35,6 +46,7 @@ export default function VisitorCreate() {
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}
+      employees={employees}
     />
   );
 }

@@ -9,6 +9,7 @@ import {
   useVisitor,
   useSubmitVisitor,
 } from "@/app/api/security/visitor/core";
+import { useEmployees } from "@/app/api/hr/employee/core";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function VisitorUpdate() {
@@ -20,6 +21,8 @@ export default function VisitorUpdate() {
 
   const { visitor, loading: visitorLoading } =
     useVisitor(visitorId);
+
+  const { employees } = useEmployees();
 
   useEffect(() => {
     if (!hasPermission("security.visitor.edit")) {
@@ -35,8 +38,16 @@ export default function VisitorUpdate() {
 
   const formHandler = useFormHandler(
     {
-      visitorName: "",
+      visitorFirstName: "",
+      visitorLastName: "",
+      visitorCompany: "",
+      visitorCarRegistration: "",
+      visitorProvince: "",
+      visitorContactUserId: "",
+      visitorContactReason: "",
       visitorStatus: "",
+      visitorPhoto: null,
+      visitorDocumentPhotos: [],
     },
     submitVisitor
   );
@@ -44,8 +55,16 @@ export default function VisitorUpdate() {
   useEffect(() => {
     if (visitor) {
       formHandler.setFormData({
-        visitorName: visitor.visitorName || "",
+        visitorFirstName: visitor.visitorFirstName || "",
+        visitorLastName: visitor.visitorLastName || "",
+        visitorCompany: visitor.visitorCompany || "",
+        visitorCarRegistration: visitor.visitorCarRegistration || "",
+        visitorProvince: visitor.visitorProvince || "",
+        visitorContactUserId: visitor.visitorContactUserId || "",
+        visitorContactReason: visitor.visitorContactReason || "",
         visitorStatus: visitor.visitorStatus || "",
+        visitorPhoto: null,
+        visitorDocumentPhotos: [],
       });
     }
   }, [visitor]);
@@ -58,6 +77,9 @@ export default function VisitorUpdate() {
       mode="update"
       operatedBy={userName}
       isUpdate
+      employees={employees}
+      existingPhoto={visitor?.visitorPhoto}
+      existingDocumentPhotos={visitor?.visitorDocumentPhotos}
     />
   );
 }
