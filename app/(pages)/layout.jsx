@@ -36,13 +36,13 @@ export default function PagesLayout({ children }) {
 
         <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 hidden"></div>
 
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl cursor-pointer hover:bg-default">
+        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 bg-success text-background shadow-lg border-1 rounded-xl cursor-pointer hover:bg-success/50">
           {userInitial}
         </div>
 
         <div
           onClick={!isSigningOut ? handleSignOut : undefined}
-          className={`flex items-center justify-center aspect-square h-full p-2 gap-2 border-1 rounded-xl
+          className={`flex items-center justify-center aspect-square h-full p-2 gap-2 bg-success text-background shadow-lg border-1 rounded-xl cursor-pointer hover:bg-success/50
     ${
       isSigningOut
         ? "opacity-50 cursor-not-allowed"
@@ -53,7 +53,7 @@ export default function PagesLayout({ children }) {
         </div>
       </header>
 
-      <main className="flex items-center justify-center w-full xl:w-11/12 h-full px-2 gap-2 overflow-hidden">
+      <main className="flex items-center justify-center w-full xl:w-[90%] h-full px-2 gap-2 overflow-hidden">
         {children}
       </main>
 
