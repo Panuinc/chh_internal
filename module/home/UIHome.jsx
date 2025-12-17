@@ -63,7 +63,22 @@ export default function UIHome({ user, modules }) {
       <div className="flex flex-col items-center justify-center w-full xl:w-[80%] h-full gap-2 overflow-hidden">
         <div className="xl:flex flex-col items-center justify-start w-full h-fit p-2 gap-2 border-1 rounded-xl hidden">
           <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-2xl font-black">
-            EverGreen Dashboard
+            Ever
+            <span className="text-success text-4xl">
+              G
+              <span className="relative inline-block">
+                r
+                <svg
+                  className="absolute -top-4 -right-1 w-7 h-7 text-success"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z" />
+                </svg>
+              </span>
+              een
+            </span>
+            Dashboard
           </div>
           <div className="flex items-center justify-start w-full h-fit p-2 gap-2 opacity-80">
             Your tools. Your workflow. Your operations.

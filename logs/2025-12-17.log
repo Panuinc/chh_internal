@@ -6,3 +6,16 @@
 [2025-12-17 13:51:38] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
 [2025-12-17 13:51:41] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
 [2025-12-17 13:51:41] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-17 14:07:26] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-17 14:07:26] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-17 14:16:31] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-17 14:16:31] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-17 14:17:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-17 14:17:36] [INFO] GetEmployeeByIdUseCase start {"id":"cmj5t2tnc000104jmfmnm1j7j"}
+[2025-12-17 14:17:36] [INFO] GetEmployeeByIdUseCase success {"id":"cmj5t2tnc000104jmfmnm1j7j","email":"panuwat.j@chhindustry.com"}
+[2025-12-17 14:17:42] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-17 14:17:42] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-17 14:18:01] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-17 14:18:01] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-17 14:18:04] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-17 14:18:04] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
