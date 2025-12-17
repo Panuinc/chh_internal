@@ -7,15 +7,15 @@
 }
 
 .border {
-  border: 1px dashed #15141A;
+  border: 1px dashed #000000;
 }
 
 .border-default {
-  border: 1px solid #15141A;
+  border: 1px solid #000000;
 }
 
 .border-default-200 {
-  border: 1px solid #15141A;
+  border: 1px solid #000000;
 }
 
 .bg-content1 {

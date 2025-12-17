@@ -9,34 +9,23 @@ import {
   TableCell,
   Input,
   Button,
-  ButtonGroup,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
   Chip,
   Pagination,
-  Card,
-  CardBody,
-  CardHeader,
 } from "@heroui/react";
-import {
-  ChevronDown,
-  Plus,
-  Search,
-  Settings2,
-  LayoutGrid,
-  LayoutList,
-} from "lucide-react";
+import { ChevronDown, Plus, Search, Settings2 } from "lucide-react";
 
 const capitalize = (str) =>
   str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
 
-const ActionMenu = ({ item, onEdit, size = "md" }) => (
+const ActionMenu = ({ item, onEdit }) => (
   <Dropdown>
     <DropdownTrigger>
-      <Button isIconOnly variant="light" size={size}>
-        <Settings2 size={size === "sm" ? 18 : 24} />
+      <Button isIconOnly variant="light" size="md">
+        <Settings2 size={24} />
       </Button>
     </DropdownTrigger>
     <DropdownMenu>
@@ -49,48 +38,15 @@ const ActionMenu = ({ item, onEdit, size = "md" }) => (
   </Dropdown>
 );
 
-const StatusChip = ({ value, colorMap, size = "md" }) => (
+const StatusChip = ({ value, colorMap }) => (
   <Chip
     className="capitalize text-background"
     color={colorMap[value] || "default"}
     variant="solid"
-    size={size}
+    size="md"
   >
     {value}
   </Chip>
-);
-
-const ViewToggle = ({ viewMode, setViewMode }) => (
-  <ButtonGroup size="lg" radius="sm">
-    <Button
-      isIconOnly
-      variant={viewMode === "table" ? "solid" : "bordered"}
-      onPress={() => setViewMode("table")}
-      className={
-        viewMode === "table"
-          ? "border-1"
-          : "bg-success text-background border-1 border-foreground"
-      }
-      color="none"
-      aria-label="Table View"
-    >
-      <LayoutList size={20} />
-    </Button>
-    <Button
-      isIconOnly
-      variant={viewMode === "card" ? "solid" : "bordered"}
-      onPress={() => setViewMode("card")}
-      className={
-        viewMode === "card"
-          ? "border-1"
-          : "bg-success text-background border-1 border-foreground"
-      }
-      color="none"
-      aria-label="Card View"
-    >
-      <LayoutGrid size={20} />
-    </Button>
-  </ButtonGroup>
 );
 
 const StatusFilterDropdown = ({
@@ -224,16 +180,10 @@ export default function DataTable({
   searchPlaceholder = "Search...",
   emptyContent = "No data found",
   itemName = "items",
-  defaultView = "table",
-  cardTitleKey,
-  cardDescriptionKey,
   onAddNew,
   onEdit,
   renderCustomCell,
-  renderCard,
 }) {
-  const [viewMode, setViewMode] = React.useState(defaultView);
-
   const {
     filterValue,
     setFilterValue,
@@ -288,56 +238,6 @@ export default function DataTable({
     [statusColorMap, renderCustomCell, onEdit]
   );
 
-  const defaultRenderCard = React.useCallback(
-    (item) => {
-      const titleKey = cardTitleKey || columns[0]?.uid || "id";
-      const descKey = cardDescriptionKey || columns[1]?.uid;
-      const hasActions = onEdit;
-      const displayColumns = columns.filter(
-        (col) =>
-          col.uid !== "actions" && col.uid !== titleKey && col.uid !== descKey
-      );
-
-      return (
-        <Card key={item.id} className="w-full border-1" shadow="none">
-          <CardHeader className="flex justify-between items-start">
-            <div className="flex flex-col gap-1">
-              <h4 className="text-lg font-semibold">{item[titleKey]}</h4>
-              {descKey && (
-                <p className="text-sm text-default-500">{item[descKey]}</p>
-              )}
-            </div>
-            {hasActions && <ActionMenu item={item} onEdit={onEdit} size="sm" />}
-          </CardHeader>
-          <CardBody className="pt-0">
-            <div className="flex flex-wrap gap-2">
-              {displayColumns.map((col) => {
-                const value = item[col.uid];
-                if (statusColorMap?.[value]) {
-                  return (
-                    <StatusChip
-                      key={col.uid}
-                      value={value}
-                      colorMap={statusColorMap}
-                      size="sm"
-                    />
-                  );
-                }
-                return (
-                  <div key={col.uid} className="text-sm">
-                    <span className="text-default-500">{col.name}: </span>
-                    <span>{value}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </CardBody>
-        </Card>
-      );
-    },
-    [columns, cardTitleKey, cardDescriptionKey, statusColorMap, onEdit]
-  );
-
   return (
     <div className="flex flex-col w-full h-full p-2 gap-2 border-1 rounded-xl overflow-hidden">
       <div className="flex-shrink-0 flex flex-col items-center justify-center w-full h-fit gap-2">
@@ -381,55 +281,40 @@ export default function DataTable({
             Total {data.length} {itemName}
           </div>
           <RowsPerPageSelector onChange={handleRowsPerPageChange} />
-          <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
         </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-auto gap-2">
-        {viewMode === "table" ? (
-          <Table
-            aria-label="Data table with pagination"
-            classNames={{ wrapper: "min-h-full" }}
-            size="lg"
-            radius="sm"
-            shadow="none"
-          >
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn
-                  key={column.uid}
-                  align={column.uid === "actions" ? "center" : "start"}
-                  className="p-4 gap-2 border-b-1 border-t-1"
-                >
-                  {column.name}
-                </TableColumn>
-              )}
-            </TableHeader>
-            <TableBody emptyContent={emptyContent} items={paginatedItems}>
-              {(item) => (
-                <TableRow key={item.id}>
-                  {(columnKey) => (
-                    <TableCell className="border-b-1">
-                      {renderCell(item, columnKey)}
-                    </TableCell>
-                  )}
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
-            {paginatedItems.length > 0 ? (
-              paginatedItems.map((item) =>
-                renderCard ? renderCard(item) : defaultRenderCard(item)
-              )
-            ) : (
-              <div className="col-span-full text-center py-10 text-default-500">
-                {emptyContent}
-              </div>
+        <Table
+          aria-label="Data table with pagination"
+          classNames={{ wrapper: "min-h-full" }}
+          size="lg"
+          radius="sm"
+          shadow="none"
+        >
+          <TableHeader columns={columns}>
+            {(column) => (
+              <TableColumn
+                key={column.uid}
+                align={column.uid === "actions" ? "center" : "start"}
+                className="p-4 gap-2 border-b-1 border-t-1"
+              >
+                {column.name}
+              </TableColumn>
             )}
-          </div>
-        )}
+          </TableHeader>
+          <TableBody emptyContent={emptyContent} items={paginatedItems}>
+            {(item) => (
+              <TableRow key={item.id}>
+                {(columnKey) => (
+                  <TableCell className="border-b-1">
+                    {renderCell(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       <div className="flex-shrink-0 flex flex-row items-center justify-center w-full h-fit gap-2">
