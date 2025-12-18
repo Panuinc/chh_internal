@@ -1,10 +1,19 @@
 "use client";
-import { Spinner } from "@heroui/react";
 
-export default function LoadingState({}) {
+import Image from "next/image";
+
+export default function LoadingState() {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
-      <Spinner color="primary" variant="wave" size="lg" />
+    <div className="flex items-center justify-center w-full h-full">
+      <div className="animate-pulse">
+        <Image
+          src="/logo/logo-01.png" // เปลี่ยนเป็น path logo ของคุณ
+          alt="loading"
+          width={150}
+          height={150}
+          priority
+        />
+      </div>
     </div>
   );
 }

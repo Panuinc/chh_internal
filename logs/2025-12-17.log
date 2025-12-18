@@ -46,3 +46,22 @@
 [2025-12-17 14:33:58] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
 [2025-12-17 14:34:04] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
 [2025-12-17 14:34:04] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-17 16:22:59] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-17 16:22:59] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-17 16:22:59] [INFO] GetAllAccountUseCase success {"total":2,"returned":2}
+[2025-12-17 16:23:12] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-17 16:23:12] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-17 16:23:18] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-17 16:23:18] [INFO] GetAllAccountUseCase success {"total":2,"returned":2}
+[2025-12-17 16:23:22] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-17 16:23:22] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-17 16:23:28] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-17 16:23:28] [INFO] GetAllAccountUseCase success {"total":2,"returned":2}
+[2025-12-17 16:26:43] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2025-12-17 16:26:43] [INFO] GetAllAccountUseCase success {"total":2,"returned":2}
+[2025-12-17 16:33:59] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-17 16:33:59] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-17 16:33:59] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-17 16:34:06] [INFO] GetEmployeeByIdUseCase start {"id":"cmj5t2tnc000104jmfmnm1j7j"}
+[2025-12-17 16:34:06] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-17 16:34:06] [INFO] GetEmployeeByIdUseCase success {"id":"cmj5t2tnc000104jmfmnm1j7j","email":"panuwat.j@chhindustry.com"}
