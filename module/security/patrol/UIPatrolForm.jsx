@@ -607,11 +607,11 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
           <div className="flex items-center justify-end w-full h-full p-2 gap-2">
             <Button
               type="submit"
-              color="default"
-              variant="bordered"
+              color="success"
+              variant="shadow"
               size="lg"
               radius="sm"
-              className="w-2/12 "
+              className="w-2/12 text-background"
             >
               Submit
             </Button>

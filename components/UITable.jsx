@@ -58,11 +58,11 @@ const StatusFilterDropdown = ({
     <DropdownTrigger>
       <Button
         endContent={<ChevronDown />}
-        color="default"
-        variant="bordered"
+        color="warning"
+        variant="shadow"
         size="lg"
         radius="sm"
-        className="w-full xl:w-52"
+        className="w-full xl:w-52 text-background"
       >
         Status
       </Button>
@@ -266,11 +266,11 @@ export default function DataTable({
             <Button
               startContent={<Plus />}
               onPress={onAddNew}
-              color="default"
-              variant="bordered"
+              color="success"
+              variant="shadow"
               size="lg"
               radius="sm"
-              className="w-full xl:w-52"
+              className="w-full xl:w-52 text-background"
             >
               Add New
             </Button>
