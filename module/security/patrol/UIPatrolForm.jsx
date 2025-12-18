@@ -157,11 +157,11 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
         </ModalBody>
         <ModalFooter>
           <Button
-            color="default"
-            variant="bordered"
+            color="danger"
+            variant="shadow"
             size="lg"
             radius="sm"
-            className="w-6/12"
+            className="w-2/12 text-background"
             onPress={handleClose}
           >
             ยกเลิก
@@ -341,21 +341,21 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
         </ModalBody>
         <ModalFooter>
           <Button
-            color="default"
-            variant="bordered"
+            color="danger"
+            variant="shadow"
             size="lg"
             radius="sm"
-            className="w-6/12"
+            className="w-2/12 text-background"
             onPress={handleClose}
           >
             ยกเลิก
           </Button>
           <Button
-            color="default"
-            variant="bordered"
+            color="success"
+            variant="shadow"
             size="lg"
             radius="sm"
-            className="w-6/12"
+            className="w-2/12 text-background"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
             startContent={<Camera />}
@@ -378,7 +378,7 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
 
       {qrCodeInfo ? (
         <div className="flex flex-col items-center gap-2 w-full">
-          <div className="w-full p-2 bg-success-50 border border-success-200 rounded-lg">
+          <div className="w-full p-2 bg-success-50 border-1 border-success-200 rounded-lg">
             <div className="text-sm text-success-600 font-medium mb-1">
               สแกนสำเร็จ:
             </div>
