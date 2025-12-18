@@ -10,3 +10,9 @@
 [2025-12-18 08:57:20] [INFO] GetAllVisitorUseCase success {"total":2,"returned":2}
 [2025-12-18 08:57:23] [INFO] GetAllPatrolUseCase start {"page":1,"limit":1000000}
 [2025-12-18 08:57:23] [INFO] GetAllPatrolUseCase success {"total":3,"returned":3}
+[2025-12-18 09:03:50] [INFO] GetAllPatrolUseCase start {"page":1,"limit":1000000}
+[2025-12-18 09:03:50] [INFO] GetAllPatrolUseCase success {"total":3,"returned":3}
+[2025-12-18 09:03:50] [INFO] GetAllPatrolUseCase start {"page":1,"limit":1000000}
+[2025-12-18 09:03:50] [INFO] GetAllPatrolUseCase success {"total":3,"returned":3}
+[2025-12-18 09:04:02] [INFO] GetAllPatrolUseCase start {"page":1,"limit":1000000}
+[2025-12-18 09:04:02] [INFO] GetAllPatrolUseCase success {"total":3,"returned":3}
