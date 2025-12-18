@@ -189,7 +189,7 @@ function VisitorDetails({ visitor, showCheckoutTime }) {
         icon="👤"
         label="ติดต่อ"
         value={getContactUserName(visitor)}
-        valueClassName="text-primary"
+        valueClassName="text-success"
       />
       <DetailRow
         icon="🕐"

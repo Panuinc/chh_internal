@@ -81,7 +81,7 @@ export default function UIAssignForm({
               <div className="flex items-center justify-between w-full h-fit pb-2 border-b-1">
                 <Checkbox
                   size="lg"
-                  color={allSelected || someSelected ? "primary" : "default"}
+                  color={allSelected || someSelected ? "success" : "default"}
                   isSelected={allSelected}
                   isIndeterminate={someSelected}
                   onValueChange={() =>

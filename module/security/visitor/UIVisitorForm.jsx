@@ -289,7 +289,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
             ยกเลิก
           </Button>
           <Button
-            color="primary"
+            color="success"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
             startContent={
@@ -554,7 +554,7 @@ function MultiCameraModal({
             เสร็จสิ้น
           </Button>
           <Button
-            color="primary"
+            color="success"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
             startContent={
@@ -635,7 +635,7 @@ function PhotoCaptureCard({
           <div className="flex gap-2">
             <Button
               type="button"
-              color="primary"
+              color="success"
               variant="flat"
               size="sm"
               radius="sm"
@@ -697,7 +697,7 @@ function PhotoCaptureCard({
           <p className="text-sm text-default-500">ยังไม่มีรูปภาพ</p>
           <Button
             type="button"
-            color="primary"
+            color="success"
             variant="solid"
             size="md"
             radius="sm"
@@ -814,7 +814,7 @@ function DocumentCaptureCard({
           <div className="flex gap-2">
             <Button
               type="button"
-              color="primary"
+              color="success"
               variant="flat"
               size="sm"
               radius="sm"
@@ -873,7 +873,7 @@ function DocumentCaptureCard({
           <p className="text-sm text-default-500">ยังไม่มีเอกสาร</p>
           <Button
             type="button"
-            color="primary"
+            color="success"
             variant="solid"
             size="md"
             radius="sm"
