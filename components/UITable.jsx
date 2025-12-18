@@ -58,11 +58,11 @@ const StatusFilterDropdown = ({
     <DropdownTrigger>
       <Button
         endContent={<ChevronDown />}
-        color="warning"
+        color="default"
         variant="shadow"
         size="lg"
         radius="sm"
-        className="w-full xl:w-52 text-background"
+        className="w-full xl:w-52 text-foreground"
       >
         Status
       </Button>
