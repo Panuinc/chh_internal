@@ -6,6 +6,8 @@ import {
   Key,
   UserLock,
   ShieldBan,
+  Box,
+  Package,
 } from "lucide-react";
 
 export const menuConfig = {
@@ -23,6 +25,13 @@ export const menuConfig = {
       text: "security",
       icon: ShieldBan,
       permission: "security.view",
+    },
+    {
+      id: "warehouse",
+      href: "/warehouse",
+      text: "warehouse",
+      icon: Box,
+      permission: "warehouse.view",
     },
   ],
 
@@ -116,6 +125,25 @@ export const menuConfig = {
           actions: {
             view: "security.patrol.view",
             create: "security.patrol.create",
+          },
+        },
+      ],
+    },
+    warehouse: {
+      title: "warehouse",
+      icon: Box,
+      description: "Management About warehouse",
+      items: [
+        {
+          id: "packing",
+          href: "/warehouse/packing",
+          text: "Packing",
+          icon: Package,
+          permission: "warehouse.packing.view",
+          actions: {
+            view: "warehouse.packing.view",
+            create: "warehouse.packing.create",
+            edit: "warehouse.packing.edit",
           },
         },
       ],
