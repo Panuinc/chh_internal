@@ -31,7 +31,7 @@ export default function PagesLayout({ children }) {
           href="/home"
           className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2"
         >
-          <Image src="/logo/logo-04.png" alt="logo" width={125} height={125} />
+          <Image src="/logo/Logo-04.png" alt="logo" width={125} height={125} />
         </Link>
 
         <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 hidden"></div>

@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/logo/logo-01.png" />
+        <link rel="icon" href="/logo/Logo-01.png" />
       </head>
       <body
         className={`

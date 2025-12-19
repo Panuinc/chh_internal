@@ -88,7 +88,7 @@ export default function UISignIn({
       </div>
 
       <div className="xl:flex items-center justify-center xl:w-[80%] h-full p-2 gap-2 hidden">
-        <Image src="/logo/logo-01.png" alt="logo" width={300} height={300} />
+        <Image src="/logo/Logo-01.png" alt="logo" width={300} height={300} />
       </div>
     </div>
   );

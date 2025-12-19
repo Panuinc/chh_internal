@@ -7,7 +7,7 @@ export default function LoadingState() {
     <div className="flex items-center justify-center w-full h-full">
       <div className="animate-pulse">
         <Image
-          src="/logo/logo-01.png" // เปลี่ยนเป็น path logo ของคุณ
+          src="/logo/Logo-01.png" // เปลี่ยนเป็น path logo ของคุณ
           alt="loading"
           width={150}
           height={150}
