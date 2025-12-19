@@ -596,7 +596,7 @@ function PhotoCaptureCard({
   error,
 }) {
   const displayImage =
-    capturedImage || (existingImage ? `/${existingImage}` : null);
+    capturedImage || (existingImage ? `/api/uploads/${existingImage}` : null);
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4 border-1 rounded-xl bg-default-50">
@@ -757,7 +757,7 @@ function DocumentCaptureCard({
   const displayImages =
     capturedImages.length > 0
       ? capturedImages.map((img) => img.preview)
-      : parsedExistingImages.map((path) => `/${path}`);
+      : parsedExistingImages.map((path) => `/api/uploads/${path}`);
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4 border-1 rounded-xl bg-default-50">

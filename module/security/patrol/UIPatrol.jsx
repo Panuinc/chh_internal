@@ -24,7 +24,7 @@ export default function UIPatrol({ Patrols = [], loading, onAddNew }) {
         patrolNote: patrol.patrolNote || "-",
         patrolPicturePreview: patrol.patrolPicture ? (
           <img
-            src={`/${patrol.patrolPicture}`}
+            src={`/api/uploads/${patrol.patrolPicture}`}
             alt="Patrol"
             className="w-14 h-14 object-cover rounded"
           />

@@ -91,7 +91,7 @@ export default function UIQuickCheckout({
           {visitor.visitorPhoto && (
             <div className="flex justify-center mb-4">
               <img
-                src={`/${visitor.visitorPhoto}`}
+                src={`/api/uploads/${visitor.visitorPhoto}`}
                 alt="Visitor"
                 className="w-24 h-24 rounded-full object-cover shadow-lg"
               />
