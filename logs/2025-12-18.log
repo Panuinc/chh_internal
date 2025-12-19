@@ -44,3 +44,11 @@
 [2025-12-18 09:07:54] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
 [2025-12-18 09:13:47] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
 [2025-12-18 09:13:47] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-18 09:16:34] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-18 09:16:34] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-18 09:16:36] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-18 09:16:36] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-18 09:16:39] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-18 09:16:39] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2025-12-18 09:16:40] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2025-12-18 09:16:40] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
