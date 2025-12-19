@@ -1,10 +1,10 @@
 "use client";
 
 import { useModuleMenu } from "@/hooks/useMenu";
-import UIHr from "@/module/hr/UIHr";
+import UIWarehouse from "@/module/warehouse/UIWarehouse";
 
-export default function Hr() {
-  const { menu, isEmpty } = useModuleMenu("hr");
+export default function Warehouse() {
+  const { menu, isEmpty } = useModuleMenu("warehouse");
 
-  return <UIHr menu={menu} isEmpty={isEmpty} />;
+  return <UIWarehouse menu={menu} isEmpty={isEmpty} />;
 }

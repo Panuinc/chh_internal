@@ -1,7 +1,7 @@
 import { ModulePage, SubMenu } from "@/components";
 import { AlertCircle } from "lucide-react";
 
-function HrSidebar() {
+function WarehouseSidebar() {
   const stats = {
     totalEmployees: 150,
     departments: 8,
@@ -36,7 +36,7 @@ function StatItem({ label, value }) {
   );
 }
 
-export default function UIHr({ menu, isEmpty }) {
+export default function UIWarehouse({ menu, isEmpty }) {
   if (!menu) {
     return (
       <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1">
@@ -55,7 +55,7 @@ export default function UIHr({ menu, isEmpty }) {
       icon={<Icon />}
       title={menu.title}
       description={menu.description}
-      sidebar={<HrSidebar />}
+      sidebar={<WarehouseSidebar />}
     >
       {isEmpty ? (
         <div className="col-span-full text-center justify-center w-full p-2 gap-2">
