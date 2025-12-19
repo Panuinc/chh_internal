@@ -24,8 +24,8 @@ const contactReasonOptions = [
 ];
 
 const statusOptions = [
-  { key: "CheckIn", label: "CheckIn" },
-  { key: "CheckOut", label: "CheckOut" },
+  { key: "CheckIn", label: "เข้า" },
+  { key: "CheckOut", label: "ออก" },
 ];
 
 const thaiProvinces = [
@@ -977,8 +977,8 @@ export default function UIVisitorForm({
         <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
           <div className="flex items-center justify-center h-full p-4 gap-2 border-b-1">
             {mode === "create"
-              ? `Create By : ${operatedBy}`
-              : `Update By : ${operatedBy}`}
+              ? `สร้างโดย : ${operatedBy}`
+              : `แก้ไขโดย : ${operatedBy}`}
           </div>
         </div>
 
@@ -987,9 +987,9 @@ export default function UIVisitorForm({
             <Input
               name="visitorFirstName"
               type="text"
-              label="First Name"
+              label="ชื่อ"
               labelPlacement="outside"
-              placeholder="Enter First Name"
+              placeholder="กรอกชื่อ"
               color="default"
               variant="bordered"
               size="lg"
@@ -1007,9 +1007,9 @@ export default function UIVisitorForm({
             <Input
               name="visitorLastName"
               type="text"
-              label="Last Name"
+              label="นามสกุล"
               labelPlacement="outside"
-              placeholder="Enter Last Name"
+              placeholder="กรอกนามสกุล"
               color="default"
               variant="bordered"
               size="lg"
@@ -1030,9 +1030,9 @@ export default function UIVisitorForm({
             <Input
               name="visitorCompany"
               type="text"
-              label="Company"
+              label="บริษัท"
               labelPlacement="outside"
-              placeholder="Enter Company Name"
+              placeholder="กรอกชื่อบริษัท"
               color="default"
               variant="bordered"
               size="lg"
@@ -1048,9 +1048,9 @@ export default function UIVisitorForm({
             <Input
               name="visitorCarRegistration"
               type="text"
-              label="Car Registration"
+              label="ทะเบียนรถ"
               labelPlacement="outside"
-              placeholder="Enter Car Registration"
+              placeholder="กรอกทะเบียนรถ"
               color="default"
               variant="bordered"
               size="lg"
@@ -1071,9 +1071,9 @@ export default function UIVisitorForm({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Select
               name="visitorProvince"
-              label="Province"
+              label="จังหวัด"
               labelPlacement="outside"
-              placeholder="Please Select"
+              placeholder="กรุณาเลือก"
               color="default"
               variant="bordered"
               size="lg"
@@ -1098,9 +1098,9 @@ export default function UIVisitorForm({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Select
               name="visitorContactUserId"
-              label="Contact Person"
+              label="ผู้ติดต่อ"
               labelPlacement="outside"
-              placeholder="Please Select"
+              placeholder="กรุณาเลือก"
               color="default"
               variant="bordered"
               size="lg"
@@ -1132,9 +1132,9 @@ export default function UIVisitorForm({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Select
               name="visitorContactReason"
-              label="Contact Reason"
+              label="เหตุผลการติดต่อ"
               labelPlacement="outside"
-              placeholder="Please Select"
+              placeholder="กรุณาเลือก"
               color="default"
               variant="bordered"
               size="lg"
@@ -1165,9 +1165,9 @@ export default function UIVisitorForm({
             <div className="flex items-center justify-center w-full xl:w-6/12 h-full p-2 gap-2">
               <Select
                 name="visitorStatus"
-                label="Visitor Status"
+                label="สถานะผู้เยี่ยมชม"
                 labelPlacement="outside"
-                placeholder="Please Select"
+                placeholder="กรุณาเลือก"
                 color="default"
                 variant="bordered"
                 size="lg"
@@ -1224,7 +1224,7 @@ export default function UIVisitorForm({
               radius="sm"
               className="w-2/12 text-background"
             >
-              Submit
+              บันทึก
             </Button>
           </div>
         </div>

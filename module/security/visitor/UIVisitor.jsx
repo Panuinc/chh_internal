@@ -4,25 +4,25 @@ import { DataTable } from "@/components";
 import { LoadingState } from "@/components";
 
 const columns = [
-  { name: "ID", uid: "visitorIndex" },
-  { name: "First Name", uid: "visitorFirstName" },
-  { name: "Last Name", uid: "visitorLastName" },
-  { name: "Company", uid: "visitorCompany" },
-  { name: "Car Registration", uid: "visitorCarRegistration" },
-  { name: "Province", uid: "visitorProvince" },
-  { name: "Contact Person", uid: "visitorContactUserName" },
-  { name: "Contact Reason", uid: "visitorContactReason" },
-  { name: "Status", uid: "visitorStatus" },
-  { name: "Created By", uid: "visitorCreatedByName" },
-  { name: "Created At", uid: "visitorCreatedAt" },
-  { name: "Updated By", uid: "visitorUpdatedByName" },
-  { name: "Updated At", uid: "visitorUpdatedAt" },
-  { name: "Actions", uid: "actions" },
+  { name: "ลำดับ", uid: "visitorIndex" },
+  { name: "ชื่อ", uid: "visitorFirstName" },
+  { name: "นามสกุล", uid: "visitorLastName" },
+  { name: "บริษัท", uid: "visitorCompany" },
+  { name: "ทะเบียนรถ", uid: "visitorCarRegistration" },
+  { name: "จังหวัด", uid: "visitorProvince" },
+  { name: "ผู้ติดต่อ", uid: "visitorContactUserName" },
+  { name: "เหตุผลการติดต่อ", uid: "visitorContactReason" },
+  { name: "สถานะ", uid: "visitorStatus" },
+  { name: "สร้างโดย", uid: "visitorCreatedByName" },
+  { name: "วันที่สร้าง", uid: "visitorCreatedAt" },
+  { name: "แก้ไขโดย", uid: "visitorUpdatedByName" },
+  { name: "วันที่แก้ไข", uid: "visitorUpdatedAt" },
+  { name: "จัดการ", uid: "actions" },
 ];
 
 const statusOptions = [
-  { name: "CheckIn", uid: "CheckIn" },
-  { name: "CheckOut", uid: "CheckOut" },
+  { name: "เข้า", uid: "CheckIn" },
+  { name: "ออก", uid: "CheckOut" },
 ];
 
 const statusColorMap = {
@@ -84,7 +84,7 @@ export default function UIVisitor({
       <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto hidden">
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Total Visitors
+            จำนวนผู้เยี่ยมชมทั้งหมด
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {total}
@@ -92,7 +92,7 @@ export default function UIVisitor({
         </div>
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            CheckIn Visitors
+            ผู้เยี่ยมชมที่เข้า
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {checkIn}
@@ -100,7 +100,7 @@ export default function UIVisitor({
         </div>
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            CheckOut Visitors
+            ผู้เยี่ยมชมที่ออก
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {checkOut}
@@ -119,9 +119,9 @@ export default function UIVisitor({
             data={normalized}
             statusOptions={statusOptions}
             statusColorMap={statusColorMap}
-            searchPlaceholder="Search by visitor name..."
-            emptyContent="No visitors found"
-            itemName="visitors"
+            searchPlaceholder="ค้นหาด้วยชื่อผู้เยี่ยมชม..."
+            emptyContent="ไม่พบข้อมูลผู้เยี่ยมชม"
+            itemName="ผู้เยี่ยมชม"
             onAddNew={onAddNew}
             onEdit={onEdit}
           />

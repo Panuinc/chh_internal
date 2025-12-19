@@ -557,7 +557,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
       >
         <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
           <div className="flex items-center justify-center h-full p-2 gap-2 border-b-1">
-            Create By : {operatedBy}
+            สร้างโดย : {operatedBy}
           </div>
         </div>
 
@@ -613,7 +613,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
               radius="sm"
               className="w-2/12 text-background"
             >
-              Submit
+              บันทึก
             </Button>
           </div>
         </div>
