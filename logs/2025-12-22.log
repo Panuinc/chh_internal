@@ -14,3 +14,6 @@
 [2025-12-22 08:29:53] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2025-12-22 08:34:29] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2025-12-22 08:34:32] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-22 11:55:28] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-22 11:55:28] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2025-12-22 11:55:28] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}

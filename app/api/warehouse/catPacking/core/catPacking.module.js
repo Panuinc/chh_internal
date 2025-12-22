@@ -1,0 +1,170 @@
+import {
+  bcClient,
+  ENDPOINTS,
+  query,
+  BCNotFoundError,
+  BCValidationError,
+  createLogger,
+  createBCController,
+  parseQueryParams,
+} from "@/lib/bc/server";
+
+const ENTITY_NAME = "Category Packing Item";
+const ENTITY_KEY = "catPackingItems";
+const ENTITY_SINGULAR = "catPackingItem";
+
+const INVENTORY_POSTING_GROUP_CODE = "PK";
+
+const QUERY_SCHEMA = {
+  displayName: { type: "string", required: false },
+  number: { type: "string", required: false },
+  description: { type: "string", required: false },
+  limit: {
+    type: "number",
+    required: false,
+    default: 100,
+    validate: (v) => v > 0 && v <= 1000,
+    message: "limit must be between 1 and 1000",
+  },
+};
+
+export const CatPackingRepository = {
+  async findMany(params) {
+    const q = query()
+      .filter("inventoryPostingGroupCode", "eq", INVENTORY_POSTING_GROUP_CODE)
+      .filterIf(params.number, "number", "startswith", params.number)
+      .filterIf(
+        params.displayName,
+        "displayName",
+        "contains",
+        params.displayName
+      )
+      .filterIf(
+        params.description,
+        "description",
+        "contains",
+        params.description
+      )
+      .top(params.limit)
+      .orderBy("number", "asc");
+
+    const url = q.buildPath(ENDPOINTS.ITEMS);
+    return bcClient.get(url);
+  },
+
+  async findById(id) {
+    return bcClient.get(`${ENDPOINTS.ITEMS}(${id})`);
+  },
+};
+
+export const CatPackingService = {
+  async getFiltered(params) {
+    const items = await CatPackingRepository.findMany(params);
+
+    const filteredItems = Array.isArray(items)
+      ? items.filter(
+          (item) =>
+            item.inventoryPostingGroupCode === INVENTORY_POSTING_GROUP_CODE
+        )
+      : [];
+
+    return {
+      items: filteredItems,
+      total: filteredItems.length,
+    };
+  },
+
+  async findById(id) {
+    const item = await CatPackingRepository.findById(id);
+
+    if (!item || !item.id) {
+      throw new BCNotFoundError(ENTITY_NAME, id);
+    }
+
+    if (item.inventoryPostingGroupCode !== INVENTORY_POSTING_GROUP_CODE) {
+      throw new BCNotFoundError(ENTITY_NAME, id);
+    }
+
+    return item;
+  },
+};
+
+export async function GetAllUseCase(searchParams) {
+  const log = createLogger("GetAllCatPackingItemsUseCase");
+  const params = parseQueryParams(searchParams, QUERY_SCHEMA);
+
+  log.start({
+    ...params,
+    inventoryPostingGroupCode: INVENTORY_POSTING_GROUP_CODE,
+  });
+
+  try {
+    const { items, total } = await CatPackingService.getFiltered(params);
+
+    log.success({ total, returned: items.length });
+
+    return {
+      items,
+      total,
+      filters: {
+        inventoryPostingGroupCode: INVENTORY_POSTING_GROUP_CODE,
+        displayName: params.displayName || null,
+        number: params.number || null,
+        description: params.description || null,
+      },
+    };
+  } catch (error) {
+    log.error({ message: error.message });
+    throw error;
+  }
+}
+
+export async function GetByIdUseCase(id) {
+  const log = createLogger("GetCatPackingItemByIdUseCase");
+  log.start({ id });
+
+  try {
+    if (!id) {
+      throw new BCValidationError("Item ID is required", "id");
+    }
+
+    const item = await CatPackingService.findById(id);
+
+    log.success({ id, number: item.number });
+    return item;
+  } catch (error) {
+    log.error({ message: error.message });
+    throw error;
+  }
+}
+
+export function formatCatPackingData(items) {
+  if (!Array.isArray(items)) return [];
+  return items.map((item) => ({
+    id: item.id,
+    number: item.number,
+    displayName: item.displayName,
+    displayName2: item.displayName2 || "",
+    type: item.type,
+    itemCategoryCode: item.itemCategoryCode,
+    inventoryPostingGroupCode: item.inventoryPostingGroupCode,
+    unitOfMeasureCode: item.unitOfMeasureCode,
+    unitPrice: item.unitPrice,
+    unitCost: item.unitCost,
+    inventory: item.inventory,
+    blocked: item.blocked,
+    gtin: item.gtin,
+    lastModifiedDateTime: item.lastModifiedDateTime,
+  }));
+}
+
+const baseController = createBCController({
+  getAllUseCase: GetAllUseCase,
+  getByIdUseCase: GetByIdUseCase,
+  formatData: formatCatPackingData,
+  entityKey: ENTITY_KEY,
+  entitySingular: ENTITY_SINGULAR,
+});
+
+export const getAllCatPackingItems = baseController.getAll;
+export const getCatPackingItemById = baseController.getById;

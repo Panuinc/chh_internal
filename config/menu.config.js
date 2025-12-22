@@ -135,15 +135,15 @@ export const menuConfig = {
       description: "Management About warehouse",
       items: [
         {
-          id: "packing",
-          href: "/warehouse/packing",
-          text: "Packing",
+          id: "catPacking",
+          href: "/warehouse/catPacking",
+          text: "Category Packing",
           icon: Package,
-          permission: "warehouse.packing.view",
+          permission: "warehouse.catPacking.view",
           actions: {
-            view: "warehouse.packing.view",
-            create: "warehouse.packing.create",
-            edit: "warehouse.packing.edit",
+            view: "warehouse.catPacking.view",
+            create: "warehouse.catPacking.create",
+            edit: "warehouse.catPacking.edit",
           },
         },
       ],
