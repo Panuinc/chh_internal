@@ -30,7 +30,6 @@ export default function UICatPacking({
   loading,
   onAddNew,
   onEdit,
-  onView,
 }) {
   const total = items.length;
   const active = items.filter((item) => !item.blocked).length;
@@ -42,10 +41,11 @@ export default function UICatPacking({
         id: item.id,
         index: i + 1,
         status: item.blocked ? "Blocked" : "Active",
-        unitPrice: item.unitPrice?.toLocaleString("th-TH", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }) || "0.00",
+        unitPrice:
+          item.unitPrice?.toLocaleString("th-TH", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }) || "0.00",
         inventory: item.inventory?.toLocaleString("th-TH") || "0",
       }))
     : [];
@@ -57,7 +57,7 @@ export default function UICatPacking({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Total Items (PK)
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-2xl font-bold">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {total}
           </div>
         </div>
@@ -65,7 +65,7 @@ export default function UICatPacking({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Active Items
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-2xl font-bold text-success">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {active}
           </div>
         </div>
@@ -73,7 +73,7 @@ export default function UICatPacking({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Blocked Items
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-2xl font-bold text-danger">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {blocked}
           </div>
         </div>
@@ -95,7 +95,6 @@ export default function UICatPacking({
             itemName="items"
             onAddNew={onAddNew}
             onEdit={onEdit}
-            onView={onView}
           />
         )}
       </div>

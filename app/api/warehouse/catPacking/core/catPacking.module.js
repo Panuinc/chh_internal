@@ -148,7 +148,7 @@ export function formatCatPackingData(items) {
     type: item.type,
     itemCategoryCode: item.itemCategoryCode,
     inventoryPostingGroupCode: item.inventoryPostingGroupCode,
-    unitOfMeasureCode: item.unitOfMeasureCode,
+    unitOfMeasureCode: item.baseUnitOfMeasureCode,
     unitPrice: item.unitPrice,
     unitCost: item.unitCost,
     inventory: item.inventory,
