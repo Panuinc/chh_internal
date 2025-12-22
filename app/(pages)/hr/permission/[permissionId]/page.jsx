@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import UIPermissionForm from "@/module/hr/permission/UIPermissionForm";
-import { LoadingState } from "@/components";
+import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import {
   usePermission,
@@ -50,7 +50,7 @@ export default function PermissionUpdate() {
     }
   }, [permission]);
 
-  if (permissionLoading) return <LoadingState />;
+  if (permissionLoading) return <Loading />;
 
   return (
     <UIPermissionForm

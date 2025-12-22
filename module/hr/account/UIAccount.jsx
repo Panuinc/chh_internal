@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { DataTable } from "@/components";
-import { LoadingState } from "@/components";
+import { Loading } from "@/components";
 
 const columns = [
   { name: "ID", uid: "accountIndex" },
@@ -94,7 +94,7 @@ export default function UIAccount({
       <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center w-full h-full gap-2">
-            <LoadingState />
+            <Loading />
           </div>
         ) : (
           <DataTable

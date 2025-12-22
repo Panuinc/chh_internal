@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import UIAccountForm from "@/module/hr/account/UIAccountForm";
-import { LoadingState } from "@/components";
+import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { useAccount, useSubmitAccount } from "@/app/api/hr/account/core";
 import { useFormHandler, useMenu } from "@/hooks";
@@ -50,7 +50,7 @@ export default function AccountUpdate() {
     }
   }, [account]);
 
-  if (accountLoading) return <LoadingState />;
+  if (accountLoading) return <Loading />;
 
   return (
     <UIAccountForm

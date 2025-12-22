@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import UIAssignForm from "@/module/hr/assign/UIAssignForm";
-import { LoadingState } from "@/components";
+import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { useEmployee } from "@/app/api/hr/employee/core";
 import { usePermissions } from "@/app/api/hr/permission/core";
@@ -100,7 +100,7 @@ export default function AssignUpdate() {
 
   const isLoading = employeeLoading || permissionsLoading || assignsLoading;
 
-  if (isLoading) return <LoadingState />;
+  if (isLoading) return <Loading />;
 
   return (
     <UIAssignForm

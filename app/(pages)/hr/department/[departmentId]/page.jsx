@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import UIDepartmentForm from "@/module/hr/department/UIDepartmentForm";
-import { LoadingState } from "@/components";
+import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import {
   useDepartment,
@@ -50,7 +50,7 @@ export default function DepartmentUpdate() {
     }
   }, [department]);
 
-  if (departmentLoading) return <LoadingState />;
+  if (departmentLoading) return <Loading />;
 
   return (
     <UIDepartmentForm

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import UIEmployeeForm from "@/module/hr/employee/UIEmployeeForm";
-import { LoadingState } from "@/components";
+import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { useEmployee, useSubmitEmployee } from "@/app/api/hr/employee/core";
 import { useFormHandler, useMenu } from "@/hooks";
@@ -50,7 +50,7 @@ export default function EmployeeUpdate() {
     }
   }, [employee]);
 
-  if (employeeLoading) return <LoadingState />;
+  if (employeeLoading) return <Loading />;
 
   return (
     <UIEmployeeForm
