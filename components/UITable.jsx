@@ -21,7 +21,7 @@ import { ChevronDown, Plus, Search, Settings2 } from "lucide-react";
 const capitalize = (str) =>
   str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
 
-const ActionMenu = ({ item, onEdit }) => (
+const ActionMenu = ({ item, onEdit, onView }) => (
   <Dropdown>
     <DropdownTrigger>
       <Button isIconOnly variant="light" size="md">
@@ -29,6 +29,11 @@ const ActionMenu = ({ item, onEdit }) => (
       </Button>
     </DropdownTrigger>
     <DropdownMenu>
+      {onView && (
+        <DropdownItem key="view" onPress={() => onView(item)}>
+          View
+        </DropdownItem>
+      )}
       {onEdit && (
         <DropdownItem key="edit" onPress={() => onEdit(item)}>
           Edit
@@ -182,6 +187,7 @@ export default function DataTable({
   itemName = "items",
   onAddNew,
   onEdit,
+  onView,
   renderCustomCell,
 }) {
   const {
@@ -228,14 +234,14 @@ export default function DataTable({
       if (columnKey === "actions") {
         return (
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <ActionMenu item={item} onEdit={onEdit} />
+            <ActionMenu item={item} onEdit={onEdit} onView={onView} />
           </div>
         );
       }
 
       return cellValue;
     },
-    [statusColorMap, renderCustomCell, onEdit]
+    [statusColorMap, renderCustomCell, onEdit, onView]
   );
 
   return (
