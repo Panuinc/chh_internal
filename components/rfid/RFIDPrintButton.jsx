@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useRFID } from "@/hooks/useRFID";
 import { useRFIDSafe as useRFIDSafeFromContext } from "@/hooks/RFIDContext";
+
+const LABEL_TYPES = [
+  { value: "thai-qr", label: "ภาษาไทย + QR Code", hasRFID: false },
+  { value: "thai", label: "ภาษาไทย + Barcode", hasRFID: false },
+  { value: "thai-rfid", label: "ภาษาไทย + RFID", hasRFID: true },
+];
 
 function useRFIDSafe(config = {}) {
   try {
@@ -257,17 +263,18 @@ export function RFIDPrintDialog({
   } = useRFIDSafe();
 
   const [quantity, setQuantity] = useState(1);
-  const [labelType, setLabelType] = useState("barcode");
-  const [enableRFID, setEnableRFID] = useState(false);
+  const [labelType, setLabelType] = useState("thai");
   const [showResult, setShowResult] = useState(false);
   const [localError, setLocalError] = useState(null);
+
+  const selectedTypeConfig = LABEL_TYPES.find((t) => t.value === labelType);
+  const enableRFID = selectedTypeConfig?.hasRFID || false;
 
   useEffect(() => {
     if (!isOpen) {
       setShowResult(false);
       setQuantity(1);
-      setLabelType("barcode");
-      setEnableRFID(false);
+      setLabelType("thai");
       setLocalError(null);
     }
   }, [isOpen]);
@@ -323,13 +330,6 @@ export function RFIDPrintDialog({
     setLocalError(null);
     onClose();
   };
-
-  const labelTypes = [
-    { value: "barcode", label: "Barcode" },
-    { value: "qr", label: "QR Code" },
-    { value: "thai", label: "ภาษาไทย + Barcode" },
-    { value: "thai-qr", label: "ภาษาไทย + QR Code" },
-  ];
 
   const displayError = localError || printerError;
 
@@ -404,7 +404,8 @@ export function RFIDPrintDialog({
               <div className="flex items-center gap-2">
                 <span>⚠️</span>
                 <span className="text-sm text-yellow-700">
-                  Printer ไม่ได้เชื่อมต่อ - จะลอง reconnect อัตโนมัติเมื่อกดพิมพ์
+                  Printer ไม่ได้เชื่อมต่อ - จะลอง reconnect
+                  อัตโนมัติเมื่อกดพิมพ์
                 </span>
               </div>
             </div>
@@ -441,7 +442,7 @@ export function RFIDPrintDialog({
                     onChange={(e) => setLabelType(e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
-                    {labelTypes.map((type) => (
+                    {LABEL_TYPES.map((type) => (
                       <option key={type.value} value={type.value}>
                         {type.label}
                       </option>
@@ -465,22 +466,17 @@ export function RFIDPrintDialog({
                 </div>
               </div>
 
-              <div className="mb-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={enableRFID}
-                    onChange={(e) => setEnableRFID(e.target.checked)}
-                    className="rounded text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm">เปิดใช้งาน RFID Tag</span>
-                </label>
-                {enableRFID && (
-                  <p className="text-xs text-gray-500 mt-1 ml-6">
-                    จะเขียน EPC ลงใน RFID Tag พร้อมกับพิมพ์ label
-                  </p>
-                )}
-              </div>
+              {/* แสดง RFID indicator เมื่อเลือก thai-rfid */}
+              {enableRFID && (
+                <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-blue-600">📡</span>
+                    <span className="text-sm text-blue-700">
+                      RFID Mode: จะเขียน EPC ลงใน RFID Tag พร้อมกับพิมพ์ label
+                    </span>
+                  </div>
+                </div>
+              )}
 
               <div className="flex justify-end gap-3">
                 <button
@@ -812,6 +808,27 @@ export function PrinterSettings({ onConfigChange, className = "" }) {
           </li>
         </ul>
       </div>
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+        <h5 className="text-sm font-medium text-gray-900 mb-2">
+          ประเภท Label ที่รองรับ
+        </h5>
+        <ul className="text-sm text-gray-700 space-y-1">
+          {LABEL_TYPES.map((type) => (
+            <li key={type.value} className="flex items-center gap-2">
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  type.hasRFID ? "bg-blue-500" : "bg-gray-400"
+                }`}
+              />
+              <span>{type.label}</span>
+              {type.hasRFID && (
+                <span className="text-xs text-blue-600">(RFID)</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
@@ -832,10 +849,13 @@ export function EPCPreview({ epc, className = "" }) {
   );
 }
 
+export { LABEL_TYPES };
+
 export default {
   PrinterStatusBadge,
   RFIDPrintButton,
   RFIDPrintDialog,
   PrinterSettings,
   EPCPreview,
+  LABEL_TYPES,
 };

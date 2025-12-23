@@ -31,7 +31,7 @@ function CatPackingContent() {
             displayName2: item.displayName2 || "",
           },
           {
-            type: options.type || "barcode",
+            type: options.type || "thai",
             enableRFID: options.enableRFID || false,
           }
         );

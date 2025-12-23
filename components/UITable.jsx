@@ -74,10 +74,9 @@ const StatusFilterDropdown = ({
     </DropdownTrigger>
     <DropdownMenu
       disallowEmptySelection
-      aria-label="Status Filter"
       closeOnSelect={false}
-      selectedKeys={statusFilter}
       selectionMode="multiple"
+      selectedKeys={statusFilter}
       onSelectionChange={setStatusFilter}
     >
       {statusOptions.map((status) => (
@@ -136,15 +135,12 @@ const useDataFiltering = (data, statusOptions) => {
     return filtered;
   }, [data, filterValue, statusFilter, statusOptions.length]);
 
-  const clearFilter = () => setFilterValue("");
-
   return {
     filterValue,
     setFilterValue,
     statusFilter,
     setStatusFilter,
     filteredItems,
-    clearFilter,
   };
 };
 
@@ -164,16 +160,12 @@ const usePagination = (filteredItems) => {
     setPage(1);
   };
 
-  const resetPage = () => setPage(1);
-
   return {
     page,
     setPage,
-    rowsPerPage,
     totalPages,
     paginatedItems,
     handleRowsPerPageChange,
-    resetPage,
   };
 };
 
@@ -189,6 +181,10 @@ export default function DataTable({
   onEdit,
   onView,
   renderCustomCell,
+
+  selectionMode,
+  selectedKeys,
+  onSelectionChange,
 }) {
   const {
     filterValue,
@@ -196,38 +192,21 @@ export default function DataTable({
     statusFilter,
     setStatusFilter,
     filteredItems,
-    clearFilter,
   } = useDataFiltering(data, statusOptions);
 
-  const {
-    page,
-    setPage,
-    totalPages,
-    paginatedItems,
-    handleRowsPerPageChange,
-    resetPage,
-  } = usePagination(filteredItems);
-
-  const handleSearchChange = (value) => {
-    setFilterValue(value);
-    resetPage();
-  };
-
-  const handleClearSearch = () => {
-    clearFilter();
-    resetPage();
-  };
+  const { page, setPage, totalPages, paginatedItems, handleRowsPerPageChange } =
+    usePagination(filteredItems);
 
   const renderCell = React.useCallback(
     (item, columnKey) => {
       const cellValue = item[columnKey];
 
       if (renderCustomCell) {
-        const customRender = renderCustomCell(item, columnKey);
-        if (customRender !== undefined) return customRender;
+        const custom = renderCustomCell(item, columnKey);
+        if (custom !== undefined) return custom;
       }
 
-      if (statusColorMap?.[cellValue]) {
+      if (statusColorMap[cellValue]) {
         return <StatusChip value={cellValue} colorMap={statusColorMap} />;
       }
 
@@ -253,8 +232,7 @@ export default function DataTable({
             placeholder={searchPlaceholder}
             startContent={<Search />}
             value={filterValue}
-            onClear={handleClearSearch}
-            onValueChange={handleSearchChange}
+            onValueChange={setFilterValue}
             color="default"
             variant="bordered"
             size="lg"
@@ -292,7 +270,9 @@ export default function DataTable({
 
       <div className="flex-1 min-h-0 overflow-auto gap-2">
         <Table
-          aria-label="Data table with pagination"
+          selectionMode={selectionMode}
+          selectedKeys={selectedKeys}
+          onSelectionChange={onSelectionChange}
           classNames={{ wrapper: "min-h-full" }}
           size="lg"
           radius="sm"
