@@ -1,7 +1,7 @@
 "use client";
-
 import React, { useMemo, useCallback, useState } from "react";
-import { DataTable, Loading } from "@/components";
+import { DataTable } from "@/components";
+import { Loading } from "@/components";
 import {
   Button,
   Dropdown,
@@ -86,155 +86,168 @@ export default function UICatPacking({
 }) {
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
 
-  const stats = useMemo(() => {
-    const total = items.length;
-    const active = items.filter((item) => !item.blocked).length;
-    const blocked = items.filter((item) => item.blocked).length;
-    return { total, active, blocked };
-  }, [items]);
+  const total = items.length;
+  const active = items.filter((i) => !i.blocked).length;
+  const blocked = items.filter((i) => i.blocked).length;
 
-  const normalized = useMemo(() => {
-    return Array.isArray(items)
-      ? items.map((item, i) => ({
-          ...item,
-          id: item.id,
-          index: i + 1,
-          status: item.blocked ? "Blocked" : "Active",
-          unitPrice:
-            item.unitPrice?.toLocaleString("th-TH", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }) || "0.00",
-          inventory: item.inventory?.toLocaleString("th-TH") || "0",
-        }))
-      : [];
-  }, [items]);
+  const normalized = useMemo(
+    () =>
+      Array.isArray(items)
+        ? items.map((item, i) => ({
+            ...item,
+            id: item.id,
+            index: i + 1,
+            status: item.blocked ? "Blocked" : "Active",
+            unitPrice:
+              item.unitPrice?.toLocaleString("th-TH", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }) || "0.00",
+            inventory: item.inventory?.toLocaleString("th-TH") || "0",
+          }))
+        : [],
+    [items]
+  );
 
   const getSelectedItems = useCallback(() => {
     if (selectedKeys === "all") return normalized;
-    return normalized.filter((item) => selectedKeys.has(item.id));
+    return normalized.filter((i) => selectedKeys.has(i.id));
   }, [selectedKeys, normalized]);
+
+  const handlePrintSelected = useCallback(() => {
+    const selected = getSelectedItems();
+    if (selected.length > 0) onPrintMultiple?.(selected);
+  }, [getSelectedItems, onPrintMultiple]);
 
   const renderCustomCell = useCallback(
     (item, columnKey) => {
-      if (columnKey === "actions") {
-        return (
-          <div className="flex items-center justify-center gap-1">
-            {onPrintSingle && (
-              <Dropdown>
-                <DropdownTrigger>
-                  <Button
-                    isIconOnly
-                    variant="light"
-                    size="sm"
-                    isDisabled={printing || !printerConnected}
-                    title={
-                      !printerConnected ? "Printer ไม่ได้เชื่อมต่อ" : "พิมพ์"
-                    }
-                  >
-                    <Printer
-                      size={18}
-                      className={
-                        printerConnected ? "text-gray-600" : "text-gray-300"
-                      }
-                    />
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Print options">
-                  {printOptions.map((option) => (
-                    <DropdownItem
-                      key={option.key}
-                      onPress={() => {
-                        onPrintSingle(item, {
-                          type: option.type,
-                          enableRFID: option.enableRFID,
-                        });
-                      }}
-                    >
-                      {option.label}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
-            )}
-          </div>
-        );
-      }
-      return undefined;
+      if (columnKey !== "actions") return undefined;
+      return (
+        <div className="flex items-center justify-center gap-1">
+          <Dropdown>
+            <DropdownTrigger>
+              <Button
+                isIconOnly
+                variant="light"
+                size="sm"
+                isDisabled={printing || !printerConnected}
+              >
+                <Printer
+                  size={18}
+                  className={
+                    printerConnected ? "text-gray-600" : "text-gray-300"
+                  }
+                />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Print options">
+              {printOptions.map((opt) => (
+                <DropdownItem
+                  key={opt.key}
+                  onPress={() =>
+                    onPrintSingle(item, {
+                      type: opt.type,
+                      enableRFID: opt.enableRFID,
+                    })
+                  }
+                >
+                  {opt.label}
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
+          </Dropdown>
+        </div>
+      );
     },
     [onPrintSingle, printerConnected, printing]
   );
 
-  const handlePrintSelected = () => {
-    const selected = getSelectedItems();
-    if (selected.length > 0) {
-      onPrintMultiple?.(selected);
-    }
-  };
-
   return (
-    <div className="flex flex-col xl:flex-row items-start justify-center w-full h-full gap-4 overflow-hidden p-4">
-      <div className="hidden xl:flex flex-col w-[280px] gap-4">
-        <div className="bg-white rounded-xl shadow-sm border p-4">
-          <h3 className="text-sm font-semibold mb-3">RFID Printer</h3>
-          <PrinterStatusBadge />
+    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2 overflow-hidden">
+      <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto hidden">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            RFID Printer
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            <PrinterStatusBadge />
+          </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border p-4 space-y-3">
-          <h3 className="text-sm font-semibold">สถิติ</h3>
-          <div className="flex justify-between">
-            <span className="text-gray-600">ทั้งหมด</span>
-            <span className="font-semibold">{stats.total}</span>
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Total Items
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Active</span>
-            <span className="font-semibold text-green-600">{stats.active}</span>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            {total}
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Blocked</span>
-            <span className="font-semibold text-red-600">{stats.blocked}</span>
+        </div>
+
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Active Items
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-green-600">
+            {active}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Blocked Items
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-red-600">
+            {blocked}
           </div>
         </div>
 
         {selectedKeys !== "all" && selectedKeys.size > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border p-4">
-            <h3 className="text-sm font-semibold mb-3">
-              เลือก {selectedKeys.size} รายการ
-            </h3>
-            <Button
-              color="primary"
-              size="sm"
-              className="w-full"
-              isDisabled={!printerConnected || printing}
-              onPress={handlePrintSelected}
-            >
-              <Printer size={16} className="mr-2" />
-              {printing ? "กำลังพิมพ์..." : "พิมพ์ที่เลือก"}
-            </Button>
-          </div>
-        )}
-      </div>
-
-      <div className="flex flex-col flex-1 h-full overflow-hidden">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold">Category Packing Items</h1>
-            <div className="xl:hidden">
-              <PrinterStatusBadge />
+          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+              Selected ({selectedKeys.size})
+            </div>
+            <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+              <Button
+                size="sm"
+                className="w-full"
+                isDisabled={!printerConnected || printing}
+                onPress={handlePrintSelected}
+              >
+                {printing ? "กำลังพิมพ์..." : "พิมพ์ที่เลือก"}
+              </Button>
             </div>
           </div>
+        )}
+
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+          <Button
+            variant="light"
+            size="sm"
+            onPress={onRefresh}
+            isDisabled={loading}
+            className="w-full"
+          >
+            <RefreshCw className={loading ? "animate-spin" : ""} />
+            <span className="ml-2">Refresh</span>
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
+        <div className="flex xl:hidden items-center justify-between w-full p-2">
+          <PrinterStatusBadge />
           <Button
             variant="light"
             size="sm"
             onPress={onRefresh}
             isDisabled={loading}
           >
-            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            <RefreshCw className={loading ? "animate-spin" : ""} />
           </Button>
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center h-64">
+          <div className="flex items-center justify-center w-full h-full gap-2">
             <Loading />
           </div>
         ) : (
@@ -246,10 +259,10 @@ export default function UICatPacking({
             searchPlaceholder="ค้นหา Item number หรือชื่อ..."
             emptyContent="ไม่พบรายการ"
             itemName="items"
-            renderCustomCell={renderCustomCell}
             selectionMode="multiple"
             selectedKeys={selectedKeys}
             onSelectionChange={setSelectedKeys}
+            renderCustomCell={renderCustomCell}
           />
         )}
       </div>
