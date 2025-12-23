@@ -8,7 +8,6 @@ export {
 export { default } from "./useMenu";
 export { useFormHandler } from "./useFormHandler";
 
-// RFID hooks
 export {
   useRFID,
   useRFIDPrint,
@@ -16,7 +15,6 @@ export {
   useRFIDPreview,
 } from "./useRFID";
 
-// RFID Context - สำหรับ share state across components
 export {
   RFIDProvider,
   useRFIDContext,

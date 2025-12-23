@@ -1,37 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useRFID } from "@/hooks/useRFID";
+import { useRFIDSafe as useRFIDSafeFromContext } from "@/hooks/RFIDContext";
 
-// Import context - ใช้ dynamic import เพื่อหลีกเลี่ยง circular dependency
-let RFIDContext = null;
-try {
-  const contextModule = require("@/hooks/RFIDContext");
-  RFIDContext = contextModule.useRFIDContext ? contextModule : null;
-} catch (e) {
-  // Context not available
-}
-
-/**
- * Hook helper - ใช้ context ถ้ามี, ไม่งั้นใช้ hook โดยตรง
- */
 function useRFIDSafe(config = {}) {
-  let contextValue = null;
   try {
-    if (RFIDContext?.useRFIDContext) {
-      contextValue = RFIDContext.useRFIDContext();
-    }
+    return useRFIDSafeFromContext(config);
   } catch (e) {
-    // Not in provider, will use direct hook
+    return useRFID({ autoConnect: true, pollInterval: 30000, ...config });
   }
-
-  const directHook = useRFID(
-    contextValue
-      ? { autoConnect: false }
-      : { autoConnect: true, pollInterval: 30000, ...config }
-  );
-
-  return contextValue || directHook;
 }
 
 export function PrinterStatusBadge({ className = "", showControls = false }) {
@@ -82,7 +60,6 @@ export function PrinterStatusBadge({ className = "", showControls = false }) {
           : "ไม่ได้เชื่อมต่อ"}
       </span>
 
-      {/* Refresh button */}
       <button
         type="button"
         onClick={refreshPrinter}
@@ -105,7 +82,6 @@ export function PrinterStatusBadge({ className = "", showControls = false }) {
         </svg>
       </button>
 
-      {/* More actions dropdown */}
       {showControls && (
         <div className="relative">
           <button
@@ -169,7 +145,6 @@ export function PrinterStatusBadge({ className = "", showControls = false }) {
         </div>
       )}
 
-      {/* Error indicator */}
       {printerError && (
         <span className="text-xs text-red-500" title={printerError}>
           ⚠️
@@ -196,7 +171,6 @@ export function RFIDPrintButton({
       return;
     }
 
-    // ถ้าไม่ connected ลอง reconnect ก่อน
     if (!isConnected) {
       try {
         await reconnect();
@@ -288,7 +262,6 @@ export function RFIDPrintDialog({
   const [showResult, setShowResult] = useState(false);
   const [localError, setLocalError] = useState(null);
 
-  // รีเซ็ตเมื่อเปิด/ปิด
   useEffect(() => {
     if (!isOpen) {
       setShowResult(false);
@@ -304,7 +277,6 @@ export function RFIDPrintDialog({
   const handlePrint = async () => {
     setLocalError(null);
 
-    // ถ้าไม่ connected ลอง reconnect ก่อน
     if (!isConnected) {
       try {
         await reconnect();
@@ -389,7 +361,6 @@ export function RFIDPrintDialog({
             </button>
           </div>
 
-          {/* Printer Status */}
           <div className="mb-4 p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">สถานะ Printer:</span>
@@ -397,7 +368,6 @@ export function RFIDPrintDialog({
             </div>
           </div>
 
-          {/* Error Message */}
           {displayError && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
               <div className="flex items-start gap-2">
@@ -429,7 +399,6 @@ export function RFIDPrintDialog({
             </div>
           )}
 
-          {/* Not Connected Warning */}
           {!isConnected && !displayError && (
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <div className="flex items-center gap-2">
@@ -755,7 +724,6 @@ export function PrinterSettings({ onConfigChange, className = "" }) {
         </button>
       </div>
 
-      {/* Quick Actions - Always visible */}
       <div className="border-t pt-4">
         <h4 className="text-sm font-medium text-gray-700 mb-3">
           Quick Actions

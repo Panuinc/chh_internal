@@ -101,7 +101,16 @@ export async function POST(request) {
             success: false,
             error: `Unknown action: ${action}`,
             code: "INVALID_ACTION",
-            validActions: ["test", "calibrate", "reset", "fullReset", "cancel", "feed", "pause", "resume"],
+            validActions: [
+              "test",
+              "calibrate",
+              "reset",
+              "fullReset",
+              "cancel",
+              "feed",
+              "pause",
+              "resume",
+            ],
           },
           { status: 400 }
         );

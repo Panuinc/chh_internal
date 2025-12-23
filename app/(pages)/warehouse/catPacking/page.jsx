@@ -2,34 +2,22 @@
 
 import React, { useCallback, useState } from "react";
 import { useCatPackingItems } from "@/app/api/warehouse/catPacking/core";
-import { useMenu, RFIDProvider, useRFIDContext } from "@/hooks";
+import { useMenu } from "@/hooks";
+import { RFIDProvider, useRFIDContext } from "@/hooks/RFIDContext";
 import UICatPacking from "@/module/warehouse/catPacking/UICatPacking";
 import { RFIDPrintDialog } from "@/components/rfid";
 
-/**
- * Content component ที่ใช้ RFID Context
- */
 function CatPackingContent() {
   const { items, loading, refetch } = useCatPackingItems({ limit: 500 });
   const { hasPermission } = useMenu();
 
-  // ใช้ context - share state กับ components อื่น
   const { print, printing, isConnected } = useRFIDContext();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
 
-  // Debug log
-  console.log("CatPackingContent render:", { isConnected, printing });
-
   const handlePrintSingle = useCallback(
     async (item, options = {}) => {
-      console.log("handlePrintSingle called:", {
-        item: item.number,
-        options,
-        isConnected,
-      });
-
       if (!isConnected) {
         alert("Printer ไม่ได้เชื่อมต่อ");
         return;
@@ -57,7 +45,6 @@ function CatPackingContent() {
   );
 
   const handlePrintMultiple = useCallback((items) => {
-    console.log("handlePrintMultiple called:", items.length, "items");
     setSelectedItems(items);
     setDialogOpen(true);
   }, []);
@@ -103,16 +90,12 @@ function CatPackingContent() {
   );
 }
 
-/**
- * Main Page Component
- * ครอบด้วย RFIDProvider เพื่อ share state
- */
 export default function CatPackingPage() {
   return (
     <RFIDProvider
       config={{
         autoConnect: true,
-        pollInterval: 15000, // Check every 15 seconds
+        pollInterval: 15000,
       }}
     >
       <CatPackingContent />

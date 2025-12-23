@@ -1,8 +1,3 @@
-/**
- * Cat Packing UI Component
- * แสดงรายการ Category Packing Items พร้อมฟังก์ชันพิมพ์
- */
-
 "use client";
 
 import React, { useMemo, useCallback, useState } from "react";
@@ -39,7 +34,6 @@ const statusColorMap = {
   Blocked: "danger",
 };
 
-// ตัวเลือกประเภท Label
 const printOptions = [
   {
     key: "barcode",
@@ -92,10 +86,6 @@ export default function UICatPacking({
 }) {
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
 
-  // Debug log
-  console.log("UICatPacking render:", { printerConnected, printing, itemCount: items.length });
-
-  // สถิติ
   const stats = useMemo(() => {
     const total = items.length;
     const active = items.filter((item) => !item.blocked).length;
@@ -103,7 +93,6 @@ export default function UICatPacking({
     return { total, active, blocked };
   }, [items]);
 
-  // แปลงข้อมูลสำหรับแสดงผล
   const normalized = useMemo(() => {
     return Array.isArray(items)
       ? items.map((item, i) => ({
@@ -121,13 +110,11 @@ export default function UICatPacking({
       : [];
   }, [items]);
 
-  // ดึงรายการที่เลือก
   const getSelectedItems = useCallback(() => {
     if (selectedKeys === "all") return normalized;
     return normalized.filter((item) => selectedKeys.has(item.id));
   }, [selectedKeys, normalized]);
 
-  // Render cell ที่กำหนดเอง
   const renderCustomCell = useCallback(
     (item, columnKey) => {
       if (columnKey === "actions") {
@@ -141,11 +128,15 @@ export default function UICatPacking({
                     variant="light"
                     size="sm"
                     isDisabled={printing || !printerConnected}
-                    title={!printerConnected ? "Printer ไม่ได้เชื่อมต่อ" : "พิมพ์"}
+                    title={
+                      !printerConnected ? "Printer ไม่ได้เชื่อมต่อ" : "พิมพ์"
+                    }
                   >
-                    <Printer 
-                      size={18} 
-                      className={printerConnected ? "text-gray-600" : "text-gray-300"}
+                    <Printer
+                      size={18}
+                      className={
+                        printerConnected ? "text-gray-600" : "text-gray-300"
+                      }
                     />
                   </Button>
                 </DropdownTrigger>
@@ -154,7 +145,6 @@ export default function UICatPacking({
                     <DropdownItem
                       key={option.key}
                       onPress={() => {
-                        console.log("Print option selected:", option.key, item.number);
                         onPrintSingle(item, {
                           type: option.type,
                           enableRFID: option.enableRFID,
@@ -175,10 +165,8 @@ export default function UICatPacking({
     [onPrintSingle, printerConnected, printing]
   );
 
-  // พิมพ์รายการที่เลือก
   const handlePrintSelected = () => {
     const selected = getSelectedItems();
-    console.log("Print selected:", selected.length, "items");
     if (selected.length > 0) {
       onPrintMultiple?.(selected);
     }
@@ -186,15 +174,12 @@ export default function UICatPacking({
 
   return (
     <div className="flex flex-col xl:flex-row items-start justify-center w-full h-full gap-4 overflow-hidden p-4">
-      {/* Sidebar */}
       <div className="hidden xl:flex flex-col w-[280px] gap-4">
-        {/* Printer Status */}
         <div className="bg-white rounded-xl shadow-sm border p-4">
           <h3 className="text-sm font-semibold mb-3">RFID Printer</h3>
           <PrinterStatusBadge />
         </div>
 
-        {/* Stats */}
         <div className="bg-white rounded-xl shadow-sm border p-4 space-y-3">
           <h3 className="text-sm font-semibold">สถิติ</h3>
           <div className="flex justify-between">
@@ -211,7 +196,6 @@ export default function UICatPacking({
           </div>
         </div>
 
-        {/* Selected Items */}
         {selectedKeys !== "all" && selectedKeys.size > 0 && (
           <div className="bg-white rounded-xl shadow-sm border p-4">
             <h3 className="text-sm font-semibold mb-3">
@@ -231,13 +215,10 @@ export default function UICatPacking({
         )}
       </div>
 
-      {/* Main Content */}
       <div className="flex flex-col flex-1 h-full overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold">Category Packing Items</h1>
-            {/* Mobile printer status */}
             <div className="xl:hidden">
               <PrinterStatusBadge />
             </div>
@@ -252,7 +233,6 @@ export default function UICatPacking({
           </Button>
         </div>
 
-        {/* Table */}
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <Loading />
