@@ -1,17 +1,8 @@
-/**
- * RFID Printer API Route
- * GET: ดูสถานะ printer
- * POST: ดำเนินการคำสั่ง (test, calibrate, reset, cancel)
- */
-
 import { PrinterService } from "@/lib/rfid";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-/**
- * GET - ดูสถานะ printer
- */
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -24,10 +15,8 @@ export async function GET(request) {
       ),
     };
 
-    // ทดสอบการเชื่อมต่อ
     const connection = await PrinterService.testConnection(config);
 
-    // อ่านสถานะถ้าเชื่อมต่อได้
     let status = null;
     if (connection.success) {
       status = await PrinterService.getStatus(config);
@@ -60,9 +49,6 @@ export async function GET(request) {
   }
 }
 
-/**
- * POST - ดำเนินการคำสั่ง
- */
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -70,7 +56,8 @@ export async function POST(request) {
 
     const printerConfig = {
       host: config.host || process.env.RFID_PRINTER_IP,
-      port: config.port || parseInt(process.env.RFID_PRINTER_PORT || "9100", 10),
+      port:
+        config.port || parseInt(process.env.RFID_PRINTER_PORT || "9100", 10),
     };
 
     let result;
@@ -88,8 +75,24 @@ export async function POST(request) {
         result = await PrinterService.reset(printerConfig);
         break;
 
+      case "fullReset":
+        result = await PrinterService.fullReset(printerConfig);
+        break;
+
       case "cancel":
         result = await PrinterService.cancelAll(printerConfig);
+        break;
+
+      case "feed":
+        result = await PrinterService.feedLabel(printerConfig);
+        break;
+
+      case "pause":
+        result = await PrinterService.pause(printerConfig);
+        break;
+
+      case "resume":
+        result = await PrinterService.resume(printerConfig);
         break;
 
       default:
@@ -98,7 +101,7 @@ export async function POST(request) {
             success: false,
             error: `Unknown action: ${action}`,
             code: "INVALID_ACTION",
-            validActions: ["test", "calibrate", "reset", "cancel"],
+            validActions: ["test", "calibrate", "reset", "fullReset", "cancel", "feed", "pause", "resume"],
           },
           { status: 400 }
         );

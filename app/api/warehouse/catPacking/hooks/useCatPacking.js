@@ -1,16 +1,9 @@
-/**
- * Cat Packing React Hooks
- */
-
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
 
 const API_URL = "/api/warehouse/catPacking";
 
-/**
- * Extract items from various response formats
- */
 function extractItems(result) {
   if (Array.isArray(result)) return result;
   if (result?.data?.catPackingItems) return result.data.catPackingItems;
@@ -19,9 +12,6 @@ function extractItems(result) {
   return [];
 }
 
-/**
- * Extract single item from response
- */
 function extractItem(result) {
   if (result?.data?.catPackingItem) return result.data.catPackingItem;
   if (result?.data && !Array.isArray(result.data)) return result.data;
@@ -29,9 +19,6 @@ function extractItem(result) {
   return result;
 }
 
-/**
- * Fetch with abort controller
- */
 async function fetchWithAbort(url, options, signal) {
   const response = await fetch(url, {
     ...options,
@@ -42,15 +29,14 @@ async function fetchWithAbort(url, options, signal) {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.error || `Request failed with status ${response.status}`);
+    throw new Error(
+      data.error || `Request failed with status ${response.status}`
+    );
   }
 
   return data;
 }
 
-/**
- * Hook สำหรับดึง Cat Packing Items หลายรายการ
- */
 export function useCatPackingItems(params = {}) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,9 +50,11 @@ export function useCatPackingItems(params = {}) {
         setLoading(true);
 
         const searchParams = new URLSearchParams();
-        if (params.displayName) searchParams.set("displayName", params.displayName);
+        if (params.displayName)
+          searchParams.set("displayName", params.displayName);
         if (params.number) searchParams.set("number", params.number);
-        if (params.description) searchParams.set("description", params.description);
+        if (params.description)
+          searchParams.set("description", params.description);
         if (params.limit) searchParams.set("limit", String(params.limit));
 
         const queryString = searchParams.toString();
@@ -107,9 +95,6 @@ export function useCatPackingItems(params = {}) {
   return { items, loading, error, meta, refetch };
 }
 
-/**
- * Hook สำหรับดึง Cat Packing Item เดียว
- */
 export function useCatPackingItem(itemId) {
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);

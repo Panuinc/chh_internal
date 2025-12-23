@@ -1,23 +1,13 @@
-/**
- * RFID Print API Route
- * POST: พิมพ์ label
- * GET: Preview label
- */
-
 import { PrintService, EPCService } from "@/lib/rfid";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-/**
- * POST - พิมพ์ label
- */
 export async function POST(request) {
   try {
     const body = await request.json();
     const { items, options = {} } = body;
 
-    // Validate items
     if (!items || !Array.isArray(items) || items.length === 0) {
       return Response.json(
         {
@@ -29,7 +19,6 @@ export async function POST(request) {
       );
     }
 
-    // Validate each item
     for (const item of items) {
       if (!item.number) {
         return Response.json(
@@ -43,7 +32,6 @@ export async function POST(request) {
       }
     }
 
-    // พิมพ์
     const result = await PrintService.printBatch(items, {
       type: options.type || "barcode",
       enableRFID: options.enableRFID === true,
@@ -84,9 +72,6 @@ export async function POST(request) {
   }
 }
 
-/**
- * GET - Preview label
- */
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);

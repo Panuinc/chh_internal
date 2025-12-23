@@ -1,6 +1,9 @@
 /**
  * RFID React Hooks
  * Custom hooks สำหรับใช้งาน RFID ใน React
+ * - เพิ่ม health check ก่อนพิมพ์
+ * - เพิ่ม retry mechanism
+ * - เพิ่ม auto-reconnect
  */
 
 "use client";
@@ -10,26 +13,77 @@ import { useState, useEffect, useCallback, useRef } from "react";
 const PRINT_API = "/api/warehouse/rfid/print";
 const PRINTER_API = "/api/warehouse/rfid/printer";
 
+// Config
+const CONFIG = {
+  PRINT_TIMEOUT: 30000, // 30 seconds timeout สำหรับการพิมพ์
+  RETRY_COUNT: 2, // จำนวนครั้งที่ retry
+  RETRY_DELAY: 1000, // delay ก่อน retry (ms)
+  HEALTH_CHECK_BEFORE_PRINT: true, // ตรวจสอบ connection ก่อนพิมพ์
+};
+
 /**
- * Helper function สำหรับ fetch API
+ * Helper function สำหรับ fetch API พร้อม timeout
  */
 async function fetchAPI(url, options = {}) {
-  const response = await fetch(url, {
-    ...options,
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
+  const timeout = options.timeout || 30000;
+  const controller = new AbortController();
+  
+  const timeoutId = setTimeout(() => {
+    controller.abort(new DOMException("Request timeout", "TimeoutError"));
+  }, timeout);
 
-  const data = await response.json().catch(() => ({}));
+  try {
+    // ใช้ signal จาก options ถ้ามี, ไม่งั้นใช้จาก controller
+    const signal = options.signal || controller.signal;
+    
+    const response = await fetch(url, {
+      ...options,
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+      signal,
+    });
 
-  if (!response.ok) {
-    throw new Error(data.error || `Request failed: ${response.status}`);
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.error || `Request failed: ${response.status}`);
+    }
+
+    return data;
+  } catch (err) {
+    // จัดการ AbortError
+    if (err.name === "AbortError" || err.name === "TimeoutError") {
+      throw new Error("Request timeout - กรุณาลองใหม่อีกครั้ง");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
   }
+}
 
-  return data;
+/**
+ * Helper function สำหรับ retry
+ */
+async function withRetry(fn, retries = CONFIG.RETRY_COUNT, delay = CONFIG.RETRY_DELAY) {
+  let lastError;
+  
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      console.warn(`Attempt ${i + 1} failed:`, err.message);
+      
+      if (i < retries) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError;
 }
 
 /**
@@ -43,18 +97,23 @@ export function useRFIDPrint(defaultOptions = {}) {
 
   // ยกเลิกการพิมพ์
   const cancel = useCallback(() => {
-    abortRef.current?.abort();
-    abortRef.current = null;
+    if (abortRef.current) {
+      abortRef.current.abort(new DOMException("Print cancelled by user", "AbortError"));
+      abortRef.current = null;
+    }
     setPrinting(false);
   }, []);
 
-  // พิมพ์ label เดียว
-  const print = useCallback(
-    async (item, options = {}) => {
-      return printBatch([item], options);
-    },
-    [defaultOptions]
-  );
+  // ตรวจสอบ connection ก่อนพิมพ์
+  const healthCheck = useCallback(async () => {
+    try {
+      const result = await fetchAPI(PRINTER_API, { timeout: 5000 });
+      return result.success && result.data?.connection?.success;
+    } catch (err) {
+      console.error("Health check failed:", err);
+      return false;
+    }
+  }, []);
 
   // พิมพ์หลาย label
   const printBatch = useCallback(
@@ -65,13 +124,32 @@ export function useRFIDPrint(defaultOptions = {}) {
       abortRef.current = new AbortController();
 
       try {
-        const result = await fetchAPI(PRINT_API, {
-          method: "POST",
-          body: JSON.stringify({
-            items,
-            options: { ...defaultOptions, ...options },
-          }),
-          signal: abortRef.current.signal,
+        // Health check ก่อนพิมพ์
+        if (CONFIG.HEALTH_CHECK_BEFORE_PRINT) {
+          console.log("Performing health check before print...");
+          const isHealthy = await healthCheck();
+          
+          if (!isHealthy) {
+            throw new Error("Printer ไม่พร้อม กรุณาตรวจสอบการเชื่อมต่อ");
+          }
+        }
+
+        // พิมพ์พร้อม retry
+        const result = await withRetry(async () => {
+          // ตรวจสอบว่าถูก abort หรือยัง
+          if (abortRef.current?.signal?.aborted) {
+            throw new DOMException("Print cancelled", "AbortError");
+          }
+          
+          return await fetchAPI(PRINT_API, {
+            method: "POST",
+            body: JSON.stringify({
+              items: Array.isArray(items) ? items : [items],
+              options: { ...defaultOptions, ...options },
+            }),
+            signal: abortRef.current?.signal,
+            timeout: CONFIG.PRINT_TIMEOUT,
+          });
         });
 
         if (!result.success) {
@@ -81,15 +159,35 @@ export function useRFIDPrint(defaultOptions = {}) {
         setLastResult(result);
         return result;
       } catch (err) {
-        if (err.name === "AbortError") return null;
-        setError(err.message);
+        // จัดการ AbortError
+        if (err.name === "AbortError" || err.message?.includes("cancelled")) {
+          console.log("Print cancelled");
+          return null;
+        }
+        
+        const errorMsg = err.message || "Unknown error";
+        setError(errorMsg);
+        
+        // ถ้า timeout หรือ connection error แนะนำให้ reset
+        if (errorMsg.includes("timeout") || errorMsg.includes("network") || errorMsg.includes("fetch")) {
+          setError(`${errorMsg} - ลอง Reset Printer หรือปิด/เปิดเครื่องใหม่`);
+        }
+        
         throw err;
       } finally {
         setPrinting(false);
         abortRef.current = null;
       }
     },
-    [defaultOptions, cancel]
+    [defaultOptions, cancel, healthCheck]
+  );
+
+  // พิมพ์ label เดียว (wrapper ของ printBatch)
+  const print = useCallback(
+    async (item, options = {}) => {
+      return printBatch([item], options);
+    },
+    [printBatch]
   );
 
   // Cleanup on unmount
@@ -102,6 +200,7 @@ export function useRFIDPrint(defaultOptions = {}) {
     printing,
     error,
     lastResult,
+    healthCheck,
     clearError: () => setError(null),
   };
 }
@@ -114,9 +213,14 @@ export function usePrinterStatus(config = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [lastCheckTime, setLastCheckTime] = useState(null);
+  const mountedRef = useRef(true);
+  const reconnectAttemptsRef = useRef(0);
 
   // รีเฟรชสถานะ
   const refresh = useCallback(async () => {
+    if (!mountedRef.current) return null;
+
     setLoading(true);
     setError(null);
 
@@ -126,20 +230,32 @@ export function usePrinterStatus(config = {}) {
       if (config.port) params.set("port", String(config.port));
 
       const url = `${PRINTER_API}${params.toString() ? `?${params}` : ""}`;
-      const result = await fetchAPI(url);
+      const result = await fetchAPI(url, { timeout: 10000 });
+
+      if (!mountedRef.current) return null;
 
       if (result.success) {
         setStatus(result.data);
-        setIsConnected(result.data?.connection?.success || false);
+        const connected = result.data?.connection?.success || false;
+        setIsConnected(connected);
+        setLastCheckTime(new Date());
+        
+        // Reset reconnect attempts on success
+        if (connected) {
+          reconnectAttemptsRef.current = 0;
+        }
       }
 
       return result;
     } catch (err) {
+      if (!mountedRef.current) return null;
       setError(err.message);
       setIsConnected(false);
       return null;
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [config.host, config.port]);
 
@@ -147,6 +263,8 @@ export function usePrinterStatus(config = {}) {
   const executeAction = useCallback(
     async (action) => {
       setLoading(true);
+      setError(null);
+      
       try {
         const result = await fetchAPI(PRINTER_API, {
           method: "POST",
@@ -154,13 +272,17 @@ export function usePrinterStatus(config = {}) {
             action,
             config: config.host ? config : undefined,
           }),
+          timeout: 15000,
         });
 
         if (!result.success) {
           throw new Error(result.error);
         }
 
+        // รอสักครู่แล้ว refresh
+        await new Promise(resolve => setTimeout(resolve, 1000));
         await refresh();
+        
         return result;
       } catch (err) {
         setError(err.message);
@@ -172,11 +294,62 @@ export function usePrinterStatus(config = {}) {
     [config, refresh]
   );
 
+  // Reconnect function
+  const reconnect = useCallback(async () => {
+    console.log("Attempting to reconnect...");
+    setError(null);
+    
+    // ลอง cancel jobs ก่อน
+    try {
+      await executeAction("cancel");
+    } catch (e) {
+      console.warn("Cancel failed:", e);
+    }
+    
+    // รอแล้ว refresh
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return refresh();
+  }, [executeAction, refresh]);
+
+  // Full reset (สำหรับกรณีที่ต้องการ reset เครื่อง)
+  const fullReset = useCallback(async () => {
+    console.log("Performing full reset...");
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // เรียก fullReset action โดยตรง (backend จะจัดการ cancel + reset + test)
+      const result = await fetchAPI(PRINTER_API, {
+        method: "POST",
+        body: JSON.stringify({ action: "fullReset" }),
+        timeout: 15000,
+      });
+      
+      console.log("Full reset result:", result);
+      
+      // รอสักครู่แล้ว refresh status
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      return await refresh();
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [refresh]);
+
   // Auto connect เมื่อ mount
   useEffect(() => {
+    mountedRef.current = true;
+
     if (config.autoConnect !== false) {
       refresh();
     }
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, [config.autoConnect, refresh]);
 
   // Polling
@@ -187,12 +360,31 @@ export function usePrinterStatus(config = {}) {
     return () => clearInterval(interval);
   }, [config.pollInterval, refresh]);
 
+  // Auto reconnect เมื่อ disconnect
+  useEffect(() => {
+    if (isConnected || !config.autoReconnect) return;
+    
+    const maxAttempts = 3;
+    if (reconnectAttemptsRef.current >= maxAttempts) return;
+    
+    const timeout = setTimeout(() => {
+      reconnectAttemptsRef.current++;
+      console.log(`Auto reconnect attempt ${reconnectAttemptsRef.current}/${maxAttempts}`);
+      refresh();
+    }, 5000);
+    
+    return () => clearTimeout(timeout);
+  }, [isConnected, config.autoReconnect, refresh]);
+
   return {
     status,
     loading,
     error,
     isConnected,
+    lastCheckTime,
     refresh,
+    reconnect,
+    fullReset,
     testConnection: () => executeAction("test"),
     calibrate: () => executeAction("calibrate"),
     resetPrinter: () => executeAction("reset"),
@@ -218,7 +410,7 @@ export function useRFIDPreview() {
       if (options.type) params.set("type", options.type);
       if (options.enableRFID) params.set("enableRFID", "true");
 
-      const result = await fetchAPI(`${PRINT_API}?${params}`);
+      const result = await fetchAPI(`${PRINT_API}?${params}`, { timeout: 10000 });
 
       if (!result.success) {
         throw new Error(result.error);
@@ -252,21 +444,53 @@ export function useRFID(config = {}) {
     ...config.printerConfig,
     autoConnect: config.autoConnect,
     pollInterval: config.pollInterval,
+    autoReconnect: config.autoReconnect ?? true,
   });
   const previewHook = useRFIDPreview();
 
+  // Print with auto health check
+  const safePrint = useCallback(async (item, options = {}) => {
+    if (!printerHook.isConnected) {
+      // ลอง refresh ก่อน
+      await printerHook.refresh();
+      
+      // ถ้ายังไม่ connected ให้ throw error
+      if (!printerHook.isConnected) {
+        throw new Error("Printer ไม่ได้เชื่อมต่อ กรุณาตรวจสอบการเชื่อมต่อ");
+      }
+    }
+    
+    return printHook.print(item, options);
+  }, [printHook, printerHook]);
+
+  const safePrintBatch = useCallback(async (items, options = {}) => {
+    if (!printerHook.isConnected) {
+      // ลอง refresh ก่อน
+      await printerHook.refresh();
+      
+      if (!printerHook.isConnected) {
+        throw new Error("Printer ไม่ได้เชื่อมต่อ กรุณาตรวจสอบการเชื่อมต่อ");
+      }
+    }
+    
+    return printHook.printBatch(items, options);
+  }, [printHook, printerHook]);
+
   return {
-    // Print
-    print: printHook.print,
-    printBatch: printHook.printBatch,
+    // Print (with safety check)
+    print: safePrint,
+    printBatch: safePrintBatch,
     cancelPrint: printHook.cancel,
     printing: printHook.printing,
     printError: printHook.error,
     lastResult: printHook.lastResult,
     clearPrintError: printHook.clearError,
+    healthCheck: printHook.healthCheck,
 
     // Printer
     refreshPrinter: printerHook.refresh,
+    reconnect: printerHook.reconnect,
+    fullReset: printerHook.fullReset,
     testConnection: printerHook.testConnection,
     calibrate: printerHook.calibrate,
     resetPrinter: printerHook.resetPrinter,
@@ -275,6 +499,7 @@ export function useRFID(config = {}) {
     printerLoading: printerHook.loading,
     printerError: printerHook.error,
     isConnected: printerHook.isConnected,
+    lastCheckTime: printerHook.lastCheckTime,
 
     // Preview
     getPreview: previewHook.getPreview,

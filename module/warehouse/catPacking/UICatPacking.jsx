@@ -92,6 +92,9 @@ export default function UICatPacking({
 }) {
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
 
+  // Debug log
+  console.log("UICatPacking render:", { printerConnected, printing, itemCount: items.length });
+
   // สถิติ
   const stats = useMemo(() => {
     const total = items.length;
@@ -130,28 +133,33 @@ export default function UICatPacking({
       if (columnKey === "actions") {
         return (
           <div className="flex items-center justify-center gap-1">
-            {onPrintSingle && printerConnected && (
+            {onPrintSingle && (
               <Dropdown>
                 <DropdownTrigger>
                   <Button
                     isIconOnly
                     variant="light"
                     size="sm"
-                    isDisabled={printing}
+                    isDisabled={printing || !printerConnected}
+                    title={!printerConnected ? "Printer ไม่ได้เชื่อมต่อ" : "พิมพ์"}
                   >
-                    <Printer size={18} />
+                    <Printer 
+                      size={18} 
+                      className={printerConnected ? "text-gray-600" : "text-gray-300"}
+                    />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Print options">
                   {printOptions.map((option) => (
                     <DropdownItem
                       key={option.key}
-                      onPress={() =>
+                      onPress={() => {
+                        console.log("Print option selected:", option.key, item.number);
                         onPrintSingle(item, {
                           type: option.type,
                           enableRFID: option.enableRFID,
-                        })
-                      }
+                        });
+                      }}
                     >
                       {option.label}
                     </DropdownItem>
@@ -170,6 +178,7 @@ export default function UICatPacking({
   // พิมพ์รายการที่เลือก
   const handlePrintSelected = () => {
     const selected = getSelectedItems();
+    console.log("Print selected:", selected.length, "items");
     if (selected.length > 0) {
       onPrintMultiple?.(selected);
     }
@@ -216,7 +225,7 @@ export default function UICatPacking({
               onPress={handlePrintSelected}
             >
               <Printer size={16} className="mr-2" />
-              พิมพ์ที่เลือก
+              {printing ? "กำลังพิมพ์..." : "พิมพ์ที่เลือก"}
             </Button>
           </div>
         )}
@@ -226,7 +235,13 @@ export default function UICatPacking({
       <div className="flex flex-col flex-1 h-full overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold">Category Packing Items</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold">Category Packing Items</h1>
+            {/* Mobile printer status */}
+            <div className="xl:hidden">
+              <PrinterStatusBadge />
+            </div>
+          </div>
           <Button
             variant="light"
             size="sm"

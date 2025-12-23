@@ -1,28 +1,35 @@
-/**
- * Cat Packing Page
- * หน้าจัดการ Category Packing Items พร้อมฟังก์ชันพิมพ์ RFID
- */
-
 "use client";
 
 import React, { useCallback, useState } from "react";
 import { useCatPackingItems } from "@/app/api/warehouse/catPacking/core";
-import { useRFID } from "@/hooks/useRFID";
-import { useMenu } from "@/hooks";
+import { useMenu, RFIDProvider, useRFIDContext } from "@/hooks";
 import UICatPacking from "@/module/warehouse/catPacking/UICatPacking";
 import { RFIDPrintDialog } from "@/components/rfid";
 
-export default function CatPackingPage() {
+/**
+ * Content component ที่ใช้ RFID Context
+ */
+function CatPackingContent() {
   const { items, loading, refetch } = useCatPackingItems({ limit: 500 });
   const { hasPermission } = useMenu();
-  const { print, printing, isConnected } = useRFID({ autoConnect: true });
+
+  // ใช้ context - share state กับ components อื่น
+  const { print, printing, isConnected } = useRFIDContext();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
 
-  // พิมพ์ label เดียว
+  // Debug log
+  console.log("CatPackingContent render:", { isConnected, printing });
+
   const handlePrintSingle = useCallback(
     async (item, options = {}) => {
+      console.log("handlePrintSingle called:", {
+        item: item.number,
+        options,
+        isConnected,
+      });
+
       if (!isConnected) {
         alert("Printer ไม่ได้เชื่อมต่อ");
         return;
@@ -42,19 +49,29 @@ export default function CatPackingPage() {
         );
         alert(`พิมพ์ ${item.number} สำเร็จ`);
       } catch (err) {
+        console.error("Print error:", err);
         alert(`พิมพ์ไม่สำเร็จ: ${err.message}`);
       }
     },
     [print, isConnected]
   );
 
-  // เปิด dialog พิมพ์หลายรายการ
   const handlePrintMultiple = useCallback((items) => {
+    console.log("handlePrintMultiple called:", items.length, "items");
     setSelectedItems(items);
     setDialogOpen(true);
   }, []);
 
-  // ตรวจสอบ permission
+  const handlePrintSuccess = useCallback((result) => {
+    console.log("Print success:", result);
+    setDialogOpen(false);
+  }, []);
+
+  const handlePrintError = useCallback((error) => {
+    console.error("Print error:", error);
+    alert(`พิมพ์ไม่สำเร็จ: ${error}`);
+  }, []);
+
   if (!hasPermission("warehouse.catPacking.view")) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -79,13 +96,26 @@ export default function CatPackingPage() {
         isOpen={dialogOpen}
         onClose={() => setDialogOpen(false)}
         items={selectedItems}
-        onSuccess={(result) => {
-          console.log("Print success:", result);
-        }}
-        onError={(error) => {
-          alert(`พิมพ์ไม่สำเร็จ: ${error}`);
-        }}
+        onSuccess={handlePrintSuccess}
+        onError={handlePrintError}
       />
     </>
+  );
+}
+
+/**
+ * Main Page Component
+ * ครอบด้วย RFIDProvider เพื่อ share state
+ */
+export default function CatPackingPage() {
+  return (
+    <RFIDProvider
+      config={{
+        autoConnect: true,
+        pollInterval: 15000, // Check every 15 seconds
+      }}
+    >
+      <CatPackingContent />
+    </RFIDProvider>
   );
 }

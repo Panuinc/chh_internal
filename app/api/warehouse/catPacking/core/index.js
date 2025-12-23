@@ -1,7 +1,3 @@
-/**
- * Cat Packing Core Export
- */
-
 export {
   getAllCatPackingItems,
   getCatPackingItemById,

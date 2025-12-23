@@ -1,8 +1,3 @@
-/**
- * Cat Packing Module
- * จัดการข้อมูล Category Packing Items จาก Business Central
- */
-
 import {
   bcClient,
   ENDPOINTS,
@@ -19,9 +14,6 @@ const ENTITY_KEY = "catPackingItems";
 const ENTITY_SINGULAR = "catPackingItem";
 const INVENTORY_POSTING_GROUP_CODE = "PK";
 
-/**
- * Query Schema สำหรับ validation
- */
 const QUERY_SCHEMA = {
   displayName: { type: "string", required: false },
   number: { type: "string", required: false },
@@ -35,16 +27,23 @@ const QUERY_SCHEMA = {
   },
 };
 
-/**
- * Repository - ติดต่อกับ API
- */
 const Repository = {
   async findMany(params) {
     const q = query()
       .filter("inventoryPostingGroupCode", "eq", INVENTORY_POSTING_GROUP_CODE)
       .filterIf(params.number, "number", "startswith", params.number)
-      .filterIf(params.displayName, "displayName", "contains", params.displayName)
-      .filterIf(params.description, "description", "contains", params.description)
+      .filterIf(
+        params.displayName,
+        "displayName",
+        "contains",
+        params.displayName
+      )
+      .filterIf(
+        params.description,
+        "description",
+        "contains",
+        params.description
+      )
       .top(params.limit)
       .orderBy("number", "asc");
 
@@ -56,14 +55,14 @@ const Repository = {
   },
 };
 
-/**
- * Service - Business Logic
- */
 const Service = {
   async getFiltered(params) {
     const items = await Repository.findMany(params);
     const filtered = Array.isArray(items)
-      ? items.filter((item) => item.inventoryPostingGroupCode === INVENTORY_POSTING_GROUP_CODE)
+      ? items.filter(
+          (item) =>
+            item.inventoryPostingGroupCode === INVENTORY_POSTING_GROUP_CODE
+        )
       : [];
 
     return { items: filtered, total: filtered.length };
@@ -72,7 +71,10 @@ const Service = {
   async findById(id) {
     const item = await Repository.findById(id);
 
-    if (!item?.id || item.inventoryPostingGroupCode !== INVENTORY_POSTING_GROUP_CODE) {
+    if (
+      !item?.id ||
+      item.inventoryPostingGroupCode !== INVENTORY_POSTING_GROUP_CODE
+    ) {
       throw new BCNotFoundError(ENTITY_NAME, id);
     }
 
@@ -80,9 +82,6 @@ const Service = {
   },
 };
 
-/**
- * Use Case: Get All Items
- */
 export async function GetAllUseCase(searchParams) {
   const log = createLogger("GetAllCatPackingItems");
   const params = parseQueryParams(searchParams, QUERY_SCHEMA);
@@ -112,9 +111,6 @@ export async function GetAllUseCase(searchParams) {
   }
 }
 
-/**
- * Use Case: Get By ID
- */
 export async function GetByIdUseCase(id) {
   const log = createLogger("GetCatPackingItemById");
   log.start({ id });
@@ -130,9 +126,6 @@ export async function GetByIdUseCase(id) {
   }
 }
 
-/**
- * Format data สำหรับ response
- */
 export function formatData(items) {
   if (!Array.isArray(items)) return [];
 
@@ -154,7 +147,6 @@ export function formatData(items) {
   }));
 }
 
-// สร้าง Controller
 const controller = createBCController({
   getAllUseCase: GetAllUseCase,
   getByIdUseCase: GetByIdUseCase,

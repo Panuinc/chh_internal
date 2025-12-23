@@ -1,7 +1,3 @@
-/**
- * Cat Packing API - Get By ID
- */
-
 import { getCatPackingItemById } from "../core/catPacking.module.js";
 
 export const dynamic = "force-dynamic";

@@ -1,7 +1,3 @@
-/**
- * RFID Components Export
- */
-
 export {
   PrinterStatusBadge,
   RFIDPrintButton,
