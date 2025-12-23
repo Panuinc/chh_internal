@@ -1,8 +1,7 @@
 /**
- * RFID Print API
- * 
- * POST /api/warehouse/rfid/print - พิมพ์ Label
- * GET /api/warehouse/rfid/print - Preview ZPL
+ * RFID Print API Route
+ * POST: พิมพ์ label
+ * GET: Preview label
  */
 
 import { PrintService, EPCService } from "@/lib/rfid";
@@ -11,33 +10,42 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 /**
- * POST - พิมพ์ Label
+ * POST - พิมพ์ label
  */
 export async function POST(request) {
   try {
     const body = await request.json();
     const { items, options = {} } = body;
 
-    // Validation
+    // Validate items
     if (!items || !Array.isArray(items) || items.length === 0) {
       return Response.json(
-        { success: false, error: "Items array is required", code: "VALIDATION_ERROR" },
+        {
+          success: false,
+          error: "Items array is required",
+          code: "VALIDATION_ERROR",
+        },
         { status: 400 }
       );
     }
 
+    // Validate each item
     for (const item of items) {
       if (!item.number) {
         return Response.json(
-          { success: false, error: "Each item must have a number", code: "VALIDATION_ERROR" },
+          {
+            success: false,
+            error: "Each item must have a number",
+            code: "VALIDATION_ERROR",
+          },
           { status: 400 }
         );
       }
     }
 
-    // Print
+    // พิมพ์
     const result = await PrintService.printBatch(items, {
-      type: options.type || 'barcode',
+      type: options.type || "barcode",
       enableRFID: options.enableRFID === true,
       delay: options.delay || 100,
       quantity: options.quantity || 1,
@@ -59,37 +67,50 @@ export async function POST(request) {
       },
       meta: {
         timestamp: new Date().toISOString(),
-        type: options.type || 'barcode',
+        type: options.type || "barcode",
         enableRFID: options.enableRFID === true,
       },
     });
   } catch (error) {
     console.error("[RFID Print API] Error:", error);
     return Response.json(
-      { success: false, error: error.message || "Internal server error", code: "INTERNAL_ERROR" },
+      {
+        success: false,
+        error: error.message || "Internal server error",
+        code: "INTERNAL_ERROR",
+      },
       { status: 500 }
     );
   }
 }
 
 /**
- * GET - Preview ZPL
+ * GET - Preview label
  */
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const number = searchParams.get("number");
     const displayName = searchParams.get("displayName") || number;
-    const type = searchParams.get("type") || "rfid";
+    const displayName2 = searchParams.get("displayName2") || "";
+    const type = searchParams.get("type") || "barcode";
+    const enableRFID = searchParams.get("enableRFID") === "true";
 
     if (!number) {
       return Response.json(
-        { success: false, error: "Item number is required", code: "VALIDATION_ERROR" },
+        {
+          success: false,
+          error: "Item number is required",
+          code: "VALIDATION_ERROR",
+        },
         { status: 400 }
       );
     }
 
-    const preview = await PrintService.preview({ number, displayName }, { type });
+    const preview = await PrintService.preview(
+      { number, displayName, displayName2 },
+      { type, enableRFID }
+    );
 
     return Response.json({
       success: true,
@@ -98,12 +119,18 @@ export async function GET(request) {
         epc: preview.epc,
         epcParsed: preview.epcParsed,
         item: preview.item,
+        type: preview.type,
+        enableRFID: preview.enableRFID,
       },
     });
   } catch (error) {
     console.error("[RFID Print API] Preview error:", error);
     return Response.json(
-      { success: false, error: error.message || "Internal server error", code: "INTERNAL_ERROR" },
+      {
+        success: false,
+        error: error.message || "Internal server error",
+        code: "INTERNAL_ERROR",
+      },
       { status: 500 }
     );
   }

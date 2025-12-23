@@ -1,6 +1,6 @@
 /**
- * Category Packing Page
- * หน้าแสดงรายการ Items สำหรับพิมพ์ RFID Label
+ * Cat Packing Page
+ * หน้าจัดการ Category Packing Items พร้อมฟังก์ชันพิมพ์ RFID
  */
 
 "use client";
@@ -10,7 +10,7 @@ import { useCatPackingItems } from "@/app/api/warehouse/catPacking/core";
 import { useRFID } from "@/hooks/useRFID";
 import { useMenu } from "@/hooks";
 import UICatPacking from "@/module/warehouse/catPacking/UICatPacking";
-import { RFIDPrintDialog } from "@/components/rfid/RFIDPrintButton";
+import { RFIDPrintDialog } from "@/components/rfid";
 
 export default function CatPackingPage() {
   const { items, loading, refetch } = useCatPackingItems({ limit: 500 });
@@ -20,7 +20,7 @@ export default function CatPackingPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
 
-  // พิมพ์ทีละชิ้น
+  // พิมพ์ label เดียว
   const handlePrintSingle = useCallback(
     async (item, options = {}) => {
       if (!isConnected) {
@@ -48,13 +48,20 @@ export default function CatPackingPage() {
     [print, isConnected]
   );
 
-  // เปิด dialog พิมพ์หลายชิ้น
+  // เปิด dialog พิมพ์หลายรายการ
   const handlePrintMultiple = useCallback((items) => {
     setSelectedItems(items);
     setDialogOpen(true);
   }, []);
 
-  if (!hasPermission("warehouse.catPacking.view")) return null;
+  // ตรวจสอบ permission
+  if (!hasPermission("warehouse.catPacking.view")) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-gray-500">ไม่มีสิทธิ์เข้าถึงหน้านี้</p>
+      </div>
+    );
+  }
 
   return (
     <>

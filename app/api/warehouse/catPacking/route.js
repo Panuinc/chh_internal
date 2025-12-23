@@ -1,4 +1,8 @@
-import { getAllCatPackingItems } from "./core/catPacking.module";
+/**
+ * Cat Packing API - List All
+ */
+
+import { getAllCatPackingItems } from "./core/catPacking.module.js";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

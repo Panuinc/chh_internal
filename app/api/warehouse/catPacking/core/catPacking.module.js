@@ -1,6 +1,6 @@
 /**
- * Category Packing Module
- * ดึงข้อมูล Item จาก Business Central (BC) ที่มี inventoryPostingGroupCode = 'PK'
+ * Cat Packing Module
+ * จัดการข้อมูล Category Packing Items จาก Business Central
  */
 
 import {
@@ -14,15 +14,14 @@ import {
   parseQueryParams,
 } from "@/lib/bc/server";
 
-// ============================================
-// Constants
-// ============================================
-
 const ENTITY_NAME = "Category Packing Item";
 const ENTITY_KEY = "catPackingItems";
 const ENTITY_SINGULAR = "catPackingItem";
 const INVENTORY_POSTING_GROUP_CODE = "PK";
 
+/**
+ * Query Schema สำหรับ validation
+ */
 const QUERY_SCHEMA = {
   displayName: { type: "string", required: false },
   number: { type: "string", required: false },
@@ -36,10 +35,9 @@ const QUERY_SCHEMA = {
   },
 };
 
-// ============================================
-// Repository
-// ============================================
-
+/**
+ * Repository - ติดต่อกับ API
+ */
 const Repository = {
   async findMany(params) {
     const q = query()
@@ -58,10 +56,9 @@ const Repository = {
   },
 };
 
-// ============================================
-// Service
-// ============================================
-
+/**
+ * Service - Business Logic
+ */
 const Service = {
   async getFiltered(params) {
     const items = await Repository.findMany(params);
@@ -83,15 +80,17 @@ const Service = {
   },
 };
 
-// ============================================
-// Use Cases
-// ============================================
-
+/**
+ * Use Case: Get All Items
+ */
 export async function GetAllUseCase(searchParams) {
   const log = createLogger("GetAllCatPackingItems");
   const params = parseQueryParams(searchParams, QUERY_SCHEMA);
 
-  log.start({ ...params, inventoryPostingGroupCode: INVENTORY_POSTING_GROUP_CODE });
+  log.start({
+    ...params,
+    inventoryPostingGroupCode: INVENTORY_POSTING_GROUP_CODE,
+  });
 
   try {
     const { items, total } = await Service.getFiltered(params);
@@ -113,6 +112,9 @@ export async function GetAllUseCase(searchParams) {
   }
 }
 
+/**
+ * Use Case: Get By ID
+ */
 export async function GetByIdUseCase(id) {
   const log = createLogger("GetCatPackingItemById");
   log.start({ id });
@@ -128,10 +130,9 @@ export async function GetByIdUseCase(id) {
   }
 }
 
-// ============================================
-// Data Formatter
-// ============================================
-
+/**
+ * Format data สำหรับ response
+ */
 export function formatData(items) {
   if (!Array.isArray(items)) return [];
 
@@ -153,10 +154,7 @@ export function formatData(items) {
   }));
 }
 
-// ============================================
-// Controller (API Handlers)
-// ============================================
-
+// สร้าง Controller
 const controller = createBCController({
   getAllUseCase: GetAllUseCase,
   getByIdUseCase: GetByIdUseCase,
@@ -168,8 +166,10 @@ const controller = createBCController({
 export const getAllCatPackingItems = controller.getAll;
 export const getCatPackingItemById = controller.getById;
 
-// ============================================
-// Client Hook Export
-// ============================================
-
-export { useCatPackingItems, useCatPackingItem } from "./useCatPacking";
+export default {
+  getAllCatPackingItems,
+  getCatPackingItemById,
+  GetAllUseCase,
+  GetByIdUseCase,
+  formatData,
+};

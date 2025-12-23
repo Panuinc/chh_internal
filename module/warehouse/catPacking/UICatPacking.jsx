@@ -1,15 +1,21 @@
 /**
- * UICatPacking Component
- * แสดงตาราง Category Packing Items พร้อมปุ่มพิมพ์
+ * Cat Packing UI Component
+ * แสดงรายการ Category Packing Items พร้อมฟังก์ชันพิมพ์
  */
 
 "use client";
 
 import React, { useMemo, useCallback, useState } from "react";
 import { DataTable, Loading } from "@/components";
-import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
-import { Printer, MoreVertical, RefreshCw } from "lucide-react";
-import { PrinterStatusBadge } from "@/components/rfid/RFIDPrintButton";
+import {
+  Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/react";
+import { Printer, RefreshCw } from "lucide-react";
+import { PrinterStatusBadge } from "@/components/rfid";
 
 const columns = [
   { name: "#", uid: "index", width: 60 },
@@ -33,6 +39,48 @@ const statusColorMap = {
   Blocked: "danger",
 };
 
+// ตัวเลือกประเภท Label
+const printOptions = [
+  {
+    key: "barcode",
+    label: "พิมพ์ Barcode",
+    type: "barcode",
+    enableRFID: false,
+  },
+  {
+    key: "barcode-rfid",
+    label: "พิมพ์ Barcode + RFID",
+    type: "barcode",
+    enableRFID: true,
+  },
+  { key: "qr", label: "พิมพ์ QR Code", type: "qr", enableRFID: false },
+  {
+    key: "qr-rfid",
+    label: "พิมพ์ QR Code + RFID",
+    type: "qr",
+    enableRFID: true,
+  },
+  { key: "thai", label: "พิมพ์ภาษาไทย", type: "thai", enableRFID: false },
+  {
+    key: "thai-rfid",
+    label: "พิมพ์ภาษาไทย + RFID",
+    type: "thai",
+    enableRFID: true,
+  },
+  {
+    key: "thai-qr",
+    label: "พิมพ์ภาษาไทย + QR",
+    type: "thai-qr",
+    enableRFID: false,
+  },
+  {
+    key: "thai-qr-rfid",
+    label: "พิมพ์ภาษาไทย + QR + RFID",
+    type: "thai-qr",
+    enableRFID: true,
+  },
+];
+
 export default function UICatPacking({
   items = [],
   loading,
@@ -44,7 +92,7 @@ export default function UICatPacking({
 }) {
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
 
-  // คำนวณ stats
+  // สถิติ
   const stats = useMemo(() => {
     const total = items.length;
     const active = items.filter((item) => !item.blocked).length;
@@ -52,7 +100,7 @@ export default function UICatPacking({
     return { total, active, blocked };
   }, [items]);
 
-  // Normalize data
+  // แปลงข้อมูลสำหรับแสดงผล
   const normalized = useMemo(() => {
     return Array.isArray(items)
       ? items.map((item, i) => ({
@@ -70,13 +118,13 @@ export default function UICatPacking({
       : [];
   }, [items]);
 
-  // Get selected items
+  // ดึงรายการที่เลือก
   const getSelectedItems = useCallback(() => {
     if (selectedKeys === "all") return normalized;
     return normalized.filter((item) => selectedKeys.has(item.id));
   }, [selectedKeys, normalized]);
 
-  // Render cell
+  // Render cell ที่กำหนดเอง
   const renderCustomCell = useCallback(
     (item, columnKey) => {
       if (columnKey === "actions") {
@@ -85,47 +133,29 @@ export default function UICatPacking({
             {onPrintSingle && printerConnected && (
               <Dropdown>
                 <DropdownTrigger>
-                  <Button isIconOnly variant="light" size="sm" isDisabled={printing}>
+                  <Button
+                    isIconOnly
+                    variant="light"
+                    size="sm"
+                    isDisabled={printing}
+                  >
                     <Printer size={18} />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Print options">
-                  <DropdownItem
-                    key="barcode"
-                    onPress={() => onPrintSingle(item, { type: "barcode" })}
-                  >
-                    พิมพ์ Barcode
-                  </DropdownItem>
-                  <DropdownItem
-                    key="barcode-rfid"
-                    onPress={() => onPrintSingle(item, { type: "barcode", enableRFID: true })}
-                  >
-                    พิมพ์ Barcode + RFID
-                  </DropdownItem>
-                  <DropdownItem
-                    key="qr"
-                    onPress={() => onPrintSingle(item, { type: "qr" })}
-                  >
-                    พิมพ์ QR Code
-                  </DropdownItem>
-                  <DropdownItem
-                    key="qr-rfid"
-                    onPress={() => onPrintSingle(item, { type: "qr", enableRFID: true })}
-                  >
-                    พิมพ์ QR Code + RFID
-                  </DropdownItem>
-                  <DropdownItem
-                    key="thai"
-                    onPress={() => onPrintSingle(item, { type: "thai" })}
-                  >
-                    พิมพ์ภาษาไทย
-                  </DropdownItem>
-                  <DropdownItem
-                    key="thai-rfid"
-                    onPress={() => onPrintSingle(item, { type: "thai", enableRFID: true })}
-                  >
-                    พิมพ์ภาษาไทย + RFID
-                  </DropdownItem>
+                  {printOptions.map((option) => (
+                    <DropdownItem
+                      key={option.key}
+                      onPress={() =>
+                        onPrintSingle(item, {
+                          type: option.type,
+                          enableRFID: option.enableRFID,
+                        })
+                      }
+                    >
+                      {option.label}
+                    </DropdownItem>
+                  ))}
                 </DropdownMenu>
               </Dropdown>
             )}
@@ -137,7 +167,7 @@ export default function UICatPacking({
     [onPrintSingle, printerConnected, printing]
   );
 
-  // Handle print selected
+  // พิมพ์รายการที่เลือก
   const handlePrintSelected = () => {
     const selected = getSelectedItems();
     if (selected.length > 0) {
@@ -172,7 +202,7 @@ export default function UICatPacking({
           </div>
         </div>
 
-        {/* Selected Actions */}
+        {/* Selected Items */}
         {selectedKeys !== "all" && selectedKeys.size > 0 && (
           <div className="bg-white rounded-xl shadow-sm border p-4">
             <h3 className="text-sm font-semibold mb-3">
