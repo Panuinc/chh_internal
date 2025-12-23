@@ -36,41 +36,21 @@ const statusColorMap = {
 
 const printOptions = [
   {
-    key: "barcode",
-    label: "พิมพ์ Barcode",
-    type: "barcode",
+    key: "thai-qr",
+    label: "1. ภาษาไทย + QR Code",
+    type: "thai-qr",
     enableRFID: false,
   },
   {
-    key: "barcode-rfid",
-    label: "พิมพ์ Barcode + RFID",
-    type: "barcode",
-    enableRFID: true,
+    key: "thai-barcode",
+    label: "2. ภาษาไทย + Barcode",
+    type: "thai",
+    enableRFID: false,
   },
-  { key: "qr", label: "พิมพ์ QR Code", type: "qr", enableRFID: false },
-  {
-    key: "qr-rfid",
-    label: "พิมพ์ QR Code + RFID",
-    type: "qr",
-    enableRFID: true,
-  },
-  { key: "thai", label: "พิมพ์ภาษาไทย", type: "thai", enableRFID: false },
   {
     key: "thai-rfid",
-    label: "พิมพ์ภาษาไทย + RFID",
-    type: "thai",
-    enableRFID: true,
-  },
-  {
-    key: "thai-qr",
-    label: "พิมพ์ภาษาไทย + QR",
-    type: "thai-qr",
-    enableRFID: false,
-  },
-  {
-    key: "thai-qr-rfid",
-    label: "พิมพ์ภาษาไทย + QR + RFID",
-    type: "thai-qr",
+    label: "3. ภาษาไทย + RFID",
+    type: "thai-rfid",
     enableRFID: true,
   },
 ];
