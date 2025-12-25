@@ -1,0 +1,5 @@
+[2025-12-25 15:04:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2025-12-25 15:04:12] [INFO] GetAllVisitorUseCase start {"page":1,"limit":1000000}
+[2025-12-25 15:04:12] [INFO] GetAllVisitorUseCase success {"total":0,"returned":0}
+[2025-12-25 15:04:15] [INFO] GetAllPatrolUseCase start {"page":1,"limit":1000000}
+[2025-12-25 15:04:15] [INFO] GetAllPatrolUseCase success {"total":0,"returned":0}
