@@ -9,6 +9,7 @@ import {
   Box,
   Package,
   Pickaxe,
+  DoorOpen,
 } from "lucide-react";
 
 export const menuConfig = {
@@ -158,14 +159,14 @@ export const menuConfig = {
     },
     production: {
       title: "production",
-      icon: Package,
+      icon: Pickaxe,
       description: "Management About production",
       items: [
         {
           id: "oneDoor",
           href: "/production/oneDoor",
           text: "One Door Optimize",
-          icon: Package,
+          icon: DoorOpen,
           permission: "production.oneDoor.view",
           actions: {
             view: "production.oneDoor.view",
