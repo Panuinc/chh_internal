@@ -8,6 +8,7 @@ import {
   ShieldBan,
   Box,
   Package,
+  Pickaxe,
 } from "lucide-react";
 
 export const menuConfig = {
@@ -32,6 +33,13 @@ export const menuConfig = {
       text: "warehouse",
       icon: Box,
       permission: "warehouse.view",
+    },
+    {
+      id: "production",
+      href: "/production",
+      text: "production",
+      icon: Pickaxe,
+      permission: "production.view",
     },
   ],
 
@@ -144,6 +152,25 @@ export const menuConfig = {
             view: "warehouse.catPacking.view",
             create: "warehouse.catPacking.create",
             edit: "warehouse.catPacking.edit",
+          },
+        },
+      ],
+    },
+    production: {
+      title: "production",
+      icon: Package,
+      description: "Management About production",
+      items: [
+        {
+          id: "oneDoor",
+          href: "/production/oneDoor",
+          text: "One Door Optimize",
+          icon: Package,
+          permission: "production.oneDoor.view",
+          actions: {
+            view: "production.oneDoor.view",
+            create: "production.oneDoor.create",
+            edit: "production.oneDoor.edit",
           },
         },
       ],
