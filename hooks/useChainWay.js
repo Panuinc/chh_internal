@@ -64,8 +64,6 @@ async function withRetry(fn, retries = 2, delay = 1000) {
       return await fn();
     } catch (err) {
       lastError = err;
-      console.warn(`Attempt ${i + 1} failed:`, err.message);
-
       if (i < retries) {
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
@@ -77,24 +75,20 @@ async function withRetry(fn, retries = 2, delay = 1000) {
 
 function loadFromStorage(key = STORAGE_KEYS.printerSettings) {
   if (typeof window === "undefined") return null;
-
   try {
     const stored = localStorage.getItem(key);
     return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error("[useSettings] Load error:", error);
+  } catch {
     return null;
   }
 }
 
 function saveToStorage(config, key = STORAGE_KEYS.printerSettings) {
   if (typeof window === "undefined") return false;
-
   try {
     localStorage.setItem(key, JSON.stringify(config));
     return true;
-  } catch (error) {
-    console.error("[useSettings] Save error:", error);
+  } catch {
     return false;
   }
 }
@@ -104,25 +98,130 @@ const getDefaultSettings = () => ({
   port: PRINTER_CONFIG.port,
   timeout: PRINTER_CONFIG.timeout,
   retries: PRINTER_CONFIG.retries,
-
   labelWidth: DEFAULT_LABEL_SIZE.width,
   labelHeight: DEFAULT_LABEL_SIZE.height,
   labelPreset: getDefaultLabelPreset().name,
-
   epcMode: EPC_CONFIG.mode,
   epcPrefix: EPC_CONFIG.prefix,
   companyPrefix: EPC_CONFIG.companyPrefix,
-
   defaultQuantity: 1,
   printDelay: 100,
   autoCalibrate: false,
-
   enableRFIDByDefault: false,
   validateEPC: true,
   retryOnError: true,
 });
 
-export function useRFIDPrint(defaultOptions = {}) {
+export function usePrinterSettings(options = {}) {
+  const { autoLoad = true, storageKey = STORAGE_KEYS.printerSettings } =
+    options;
+
+  const [settings, setSettings] = useState(getDefaultSettings);
+  const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!autoLoad) return;
+    const stored = loadFromStorage(storageKey);
+    if (stored) {
+      setSettings((prev) => ({ ...prev, ...stored }));
+    }
+    setLoaded(true);
+  }, [autoLoad, storageKey]);
+
+  const updateSetting = useCallback((key, value) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  const updateSettings = useCallback((updates) => {
+    setSettings((prev) => ({ ...prev, ...updates }));
+  }, []);
+
+  const save = useCallback(async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      const success = saveToStorage(settings, storageKey);
+      if (!success) throw new Error("Failed to save settings");
+      return true;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  }, [settings, storageKey]);
+
+  const reset = useCallback(() => {
+    const defaults = getDefaultSettings();
+    setSettings(defaults);
+    saveToStorage(defaults, storageKey);
+  }, [storageKey]);
+
+  return {
+    settings,
+    loaded,
+    saving,
+    error,
+    updateSetting,
+    updateSettings,
+    save,
+    reset,
+    getPrinterConfig: () => ({
+      host: settings.host,
+      port: settings.port,
+      timeout: settings.timeout,
+      retries: settings.retries,
+    }),
+    getLabelSize: () => ({
+      width: settings.labelWidth,
+      height: settings.labelHeight,
+    }),
+    getEPCConfig: () => ({
+      mode: settings.epcMode,
+      prefix: settings.epcPrefix,
+      companyPrefix: settings.companyPrefix,
+    }),
+  };
+}
+
+export function useLabelPresets() {
+  const [currentPreset, setCurrentPreset] = useState(
+    () => LABEL_PRESETS.find((p) => p.isDefault) || LABEL_PRESETS[0]
+  );
+  const [customSize, setCustomSize] = useState({ width: 100, height: 30 });
+
+  const selectPreset = useCallback((presetName) => {
+    const preset = LABEL_PRESETS.find((p) => p.name === presetName);
+    if (preset) {
+      setCurrentPreset(preset);
+      if (preset.width && preset.height) {
+        setCustomSize({ width: preset.width, height: preset.height });
+      }
+    }
+  }, []);
+
+  const setCustomDimensions = useCallback((width, height) => {
+    setCustomSize({ width, height });
+    setCurrentPreset(LABEL_PRESETS.find((p) => p.name === "Custom"));
+  }, []);
+
+  return {
+    presets: LABEL_PRESETS,
+    currentPreset,
+    customSize,
+    selectPreset,
+    setCustomDimensions,
+    getCurrentSize: () =>
+      currentPreset.name === "Custom"
+        ? customSize
+        : { width: currentPreset.width, height: currentPreset.height },
+    isCustom: currentPreset.name === "Custom",
+  };
+}
+
+function useRFIDPrint(defaultOptions = {}) {
   const [printing, setPrinting] = useState(false);
   const [error, setError] = useState(null);
   const [lastResult, setLastResult] = useState(null);
@@ -130,9 +229,7 @@ export function useRFIDPrint(defaultOptions = {}) {
 
   const cancel = useCallback(() => {
     if (abortRef.current) {
-      abortRef.current.abort(
-        new DOMException("Print cancelled by user", "AbortError")
-      );
+      abortRef.current.abort();
       abortRef.current = null;
     }
     setPrinting(false);
@@ -144,8 +241,7 @@ export function useRFIDPrint(defaultOptions = {}) {
         timeout: TIMEOUTS.healthCheck,
       });
       return result.success && result.data?.connection?.success;
-    } catch (err) {
-      console.error("Health check failed:", err);
+    } catch {
       return false;
     }
   }, []);
@@ -186,13 +282,8 @@ export function useRFIDPrint(defaultOptions = {}) {
         setLastResult(result);
         return result;
       } catch (err) {
-        if (err.name === "AbortError" || err.message?.includes("cancelled")) {
-          console.log("Print cancelled");
-          return null;
-        }
-
-        const errorMsg = err.message || "Unknown error";
-        setError(errorMsg);
+        if (err.name === "AbortError") return null;
+        setError(err.message);
         throw err;
       } finally {
         setPrinting(false);
@@ -202,17 +293,10 @@ export function useRFIDPrint(defaultOptions = {}) {
     [defaultOptions, cancel, healthCheck]
   );
 
-  const print = useCallback(
-    async (item, options = {}) => {
-      return printBatch([item], options);
-    },
-    [printBatch]
-  );
-
   useEffect(() => cancel, [cancel]);
 
   return {
-    print,
+    print: (item, options) => printBatch([item], options),
     printBatch,
     cancel,
     printing,
@@ -223,18 +307,15 @@ export function useRFIDPrint(defaultOptions = {}) {
   };
 }
 
-export function usePrinterStatus(config = {}) {
+function usePrinterStatus(config = {}) {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [lastCheckTime, setLastCheckTime] = useState(null);
   const mountedRef = useRef(true);
-  const reconnectAttemptsRef = useRef(0);
 
   const refresh = useCallback(async () => {
     if (!mountedRef.current) return null;
-
     setLoading(true);
     setError(null);
 
@@ -252,15 +333,8 @@ export function usePrinterStatus(config = {}) {
 
       if (result.success) {
         setStatus(result.data);
-        const connected = result.data?.connection?.success || false;
-        setIsConnected(connected);
-        setLastCheckTime(new Date());
-
-        if (connected) {
-          reconnectAttemptsRef.current = 0;
-        }
+        setIsConnected(result.data?.connection?.success || false);
       }
-
       return result;
     } catch (err) {
       if (!mountedRef.current) return null;
@@ -268,9 +342,7 @@ export function usePrinterStatus(config = {}) {
       setIsConnected(false);
       return null;
     } finally {
-      if (mountedRef.current) {
-        setLoading(false);
-      }
+      if (mountedRef.current) setLoading(false);
     }
   }, [config.host, config.port]);
 
@@ -289,13 +361,10 @@ export function usePrinterStatus(config = {}) {
           timeout: TIMEOUTS.action,
         });
 
-        if (!result.success) {
-          throw new Error(result.error);
-        }
+        if (!result.success) throw new Error(result.error);
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((r) => setTimeout(r, 1000));
         await refresh();
-
         return result;
       } catch (err) {
         setError(err.message);
@@ -308,32 +377,24 @@ export function usePrinterStatus(config = {}) {
   );
 
   const reconnect = useCallback(async () => {
-    console.log("Attempting to reconnect...");
     setError(null);
-
     try {
       await executeAction("cancel");
-    } catch (e) {
-      console.warn("Cancel failed:", e);
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    } catch {}
+    await new Promise((r) => setTimeout(r, 500));
     return refresh();
   }, [executeAction, refresh]);
 
   const fullReset = useCallback(async () => {
-    console.log("Performing full reset...");
     setLoading(true);
     setError(null);
-
     try {
-      const result = await fetchAPI(API_ENDPOINTS.printer, {
+      await fetchAPI(API_ENDPOINTS.printer, {
         method: "POST",
         body: JSON.stringify({ action: "fullReset" }),
         timeout: TIMEOUTS.action,
       });
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((r) => setTimeout(r, 1000));
       return await refresh();
     } catch (err) {
       setError(err.message);
@@ -345,11 +406,7 @@ export function usePrinterStatus(config = {}) {
 
   useEffect(() => {
     mountedRef.current = true;
-
-    if (config.autoConnect !== false) {
-      refresh();
-    }
-
+    if (config.autoConnect !== false) refresh();
     return () => {
       mountedRef.current = false;
     };
@@ -357,34 +414,15 @@ export function usePrinterStatus(config = {}) {
 
   useEffect(() => {
     if (!config.pollInterval) return;
-
     const interval = setInterval(refresh, config.pollInterval);
     return () => clearInterval(interval);
   }, [config.pollInterval, refresh]);
-
-  useEffect(() => {
-    if (isConnected || !config.autoReconnect) return;
-
-    const maxAttempts = 3;
-    if (reconnectAttemptsRef.current >= maxAttempts) return;
-
-    const timeout = setTimeout(() => {
-      reconnectAttemptsRef.current++;
-      console.log(
-        `Auto reconnect attempt ${reconnectAttemptsRef.current}/${maxAttempts}`
-      );
-      refresh();
-    }, 5000);
-
-    return () => clearTimeout(timeout);
-  }, [isConnected, config.autoReconnect, refresh]);
 
   return {
     status,
     loading,
     error,
     isConnected,
-    lastCheckTime,
     refresh,
     reconnect,
     fullReset,
@@ -395,68 +433,22 @@ export function usePrinterStatus(config = {}) {
   };
 }
 
-export function useRFIDPreview() {
-  const [preview, setPreview] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const getPreview = useCallback(async (item, options = {}) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const params = new URLSearchParams({ number: item.number });
-      if (item.displayName) params.set("displayName", item.displayName);
-      if (options.type) params.set("type", options.type);
-      if (options.enableRFID) params.set("enableRFID", "true");
-
-      const result = await fetchAPI(`${API_ENDPOINTS.print}?${params}`, {
-        timeout: TIMEOUTS.status,
-      });
-
-      if (!result.success) {
-        throw new Error(result.error);
-      }
-
-      setPreview(result.data);
-      return result.data;
-    } catch (err) {
-      setError(err.message);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return {
-    preview,
-    loading,
-    error,
-    getPreview,
-    clearPreview: () => setPreview(null),
-  };
-}
-
 export function useRFID(config = {}) {
   const printHook = useRFIDPrint(config.printOptions);
   const printerHook = usePrinterStatus({
     ...config.printerConfig,
     autoConnect: config.autoConnect,
     pollInterval: config.pollInterval,
-    autoReconnect: config.autoReconnect ?? true,
   });
-  const previewHook = useRFIDPreview();
 
   const safePrint = useCallback(
     async (item, options = {}) => {
       if (!printerHook.isConnected) {
         await printerHook.refresh();
-
         if (!printerHook.isConnected) {
-          throw new Error("Printer ไม่ได้เชื่อมต่อ กรุณาตรวจสอบการเชื่อมต่อ");
+          throw new Error("Printer ไม่ได้เชื่อมต่อ");
         }
       }
-
       return printHook.print(item, options);
     },
     [printHook, printerHook]
@@ -466,12 +458,10 @@ export function useRFID(config = {}) {
     async (items, options = {}) => {
       if (!printerHook.isConnected) {
         await printerHook.refresh();
-
         if (!printerHook.isConnected) {
-          throw new Error("Printer ไม่ได้เชื่อมต่อ กรุณาตรวจสอบการเชื่อมต่อ");
+          throw new Error("Printer ไม่ได้เชื่อมต่อ");
         }
       }
-
       return printHook.printBatch(items, options);
     },
     [printHook, printerHook]
@@ -498,160 +488,6 @@ export function useRFID(config = {}) {
     printerLoading: printerHook.loading,
     printerError: printerHook.error,
     isConnected: printerHook.isConnected,
-    lastCheckTime: printerHook.lastCheckTime,
-
-    getPreview: previewHook.getPreview,
-    previewData: previewHook.preview,
-    previewLoading: previewHook.loading,
-    clearPreview: previewHook.clearPreview,
-  };
-}
-
-export function usePrinterSettings(options = {}) {
-  const { autoLoad = true, storageKey = STORAGE_KEYS.printerSettings } =
-    options;
-
-  const [settings, setSettings] = useState(getDefaultSettings);
-  const [loaded, setLoaded] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!autoLoad) return;
-
-    const stored = loadFromStorage(storageKey);
-    if (stored) {
-      setSettings((prev) => ({ ...prev, ...stored }));
-    }
-    setLoaded(true);
-  }, [autoLoad, storageKey]);
-
-  const updateSetting = useCallback((key, value) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
-  }, []);
-
-  const updateSettings = useCallback((updates) => {
-    setSettings((prev) => ({ ...prev, ...updates }));
-  }, []);
-
-  const save = useCallback(async () => {
-    setSaving(true);
-    setError(null);
-
-    try {
-      const success = saveToStorage(settings, storageKey);
-      if (!success) {
-        throw new Error("Failed to save settings");
-      }
-      return true;
-    } catch (err) {
-      setError(err.message);
-      return false;
-    } finally {
-      setSaving(false);
-    }
-  }, [settings, storageKey]);
-
-  const reset = useCallback(() => {
-    const defaults = getDefaultSettings();
-    setSettings(defaults);
-    saveToStorage(defaults, storageKey);
-  }, [storageKey]);
-
-  const getPrinterConfig = useCallback(
-    () => ({
-      host: settings.host,
-      port: settings.port,
-      timeout: settings.timeout,
-      retries: settings.retries,
-    }),
-    [settings]
-  );
-
-  const getLabelSize = useCallback(
-    () => ({
-      width: settings.labelWidth,
-      height: settings.labelHeight,
-    }),
-    [settings]
-  );
-
-  const getEPCConfig = useCallback(
-    () => ({
-      mode: settings.epcMode,
-      prefix: settings.epcPrefix,
-      companyPrefix: settings.companyPrefix,
-    }),
-    [settings]
-  );
-
-  const getPrintOptions = useCallback(
-    () => ({
-      quantity: settings.defaultQuantity,
-      delay: settings.printDelay,
-      enableRFID: settings.enableRFIDByDefault,
-      labelSize: getLabelSize(),
-      epcMode: settings.epcMode,
-      epcPrefix: settings.epcPrefix,
-    }),
-    [settings, getLabelSize]
-  );
-
-  return {
-    settings,
-    loaded,
-    saving,
-    error,
-
-    updateSetting,
-    updateSettings,
-    save,
-    reset,
-
-    getPrinterConfig,
-    getLabelSize,
-    getEPCConfig,
-    getPrintOptions,
-  };
-}
-
-export function useLabelPresets() {
-  const [currentPreset, setCurrentPreset] = useState(
-    () => LABEL_PRESETS.find((p) => p.isDefault) || LABEL_PRESETS[0]
-  );
-
-  const [customSize, setCustomSize] = useState({ width: 100, height: 30 });
-
-  const selectPreset = useCallback((presetName) => {
-    const preset = LABEL_PRESETS.find((p) => p.name === presetName);
-    if (preset) {
-      setCurrentPreset(preset);
-      if (preset.width && preset.height) {
-        setCustomSize({ width: preset.width, height: preset.height });
-      }
-    }
-  }, []);
-
-  const setCustomDimensions = useCallback((width, height) => {
-    setCustomSize({ width, height });
-    setCurrentPreset(LABEL_PRESETS.find((p) => p.name === "Custom"));
-  }, []);
-
-  const getCurrentSize = useCallback(() => {
-    if (currentPreset.name === "Custom") {
-      return customSize;
-    }
-    return { width: currentPreset.width, height: currentPreset.height };
-  }, [currentPreset, customSize]);
-
-  return {
-    presets: LABEL_PRESETS,
-    currentPreset,
-    customSize,
-    selectPreset,
-    setCustomDimensions,
-    getCurrentSize,
-    isCustom: currentPreset.name === "Custom",
   };
 }
 
@@ -690,13 +526,11 @@ export function useRFIDContext() {
 
 export function useRFIDSafe(config = {}) {
   const context = useContext(RFIDContext);
-
   const directHook = useRFID(
     context
       ? { autoConnect: false }
       : { autoConnect: true, pollInterval: 15000, ...config }
   );
-
   return context || directHook;
 }
 

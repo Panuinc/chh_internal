@@ -46,10 +46,6 @@ import {
   Zap,
   Save,
   Undo,
-  Clock,
-  Repeat,
-  Timer,
-  ToggleLeft,
   CheckCircle,
   XCircle,
   Activity,
@@ -57,7 +53,6 @@ import {
   FileText,
   Ribbon,
   Hash,
-  Link,
 } from "lucide-react";
 import { useRFIDSafe, usePrinterSettings, useLabelPresets } from "@/hooks";
 import {
@@ -100,10 +95,7 @@ function SettingsInput({
       variant="bordered"
       size="md"
       radius="sm"
-      classNames={{
-        base: "w-full",
-        inputWrapper: "bg-background",
-      }}
+      classNames={{ base: "w-full", inputWrapper: "bg-background" }}
     />
   );
 }
@@ -128,10 +120,7 @@ function SettingsSelect({
       variant="bordered"
       size="md"
       radius="sm"
-      classNames={{
-        base: "w-full",
-        trigger: "bg-background",
-      }}
+      classNames={{ base: "w-full", trigger: "bg-background" }}
     >
       {options.map((opt) => (
         <SelectItem key={opt.value} value={opt.value}>
@@ -174,7 +163,7 @@ function SettingsSection({ title, children, icon }) {
   );
 }
 
-function StatusIndicator({ status, message }) {
+function StatusIndicator({ status }) {
   const statusConfig = {
     connected: { color: "success", text: "Connected", icon: Wifi },
     disconnected: { color: "danger", text: "Disconnected", icon: WifiOff },
@@ -203,7 +192,7 @@ function StatusIndicator({ status, message }) {
         />
       }
     >
-      {message || config.text}
+      {config.text}
     </Chip>
   );
 }
@@ -257,7 +246,6 @@ export function PrinterStatusBadge({ className = "", showControls = false }) {
         variant="light"
         onPress={refreshPrinter}
         isDisabled={printerLoading}
-        aria-label="Refresh"
       >
         <RefreshCw size={16} className={printerLoading ? "animate-spin" : ""} />
       </Button>
@@ -265,16 +253,11 @@ export function PrinterStatusBadge({ className = "", showControls = false }) {
       {showControls && (
         <Dropdown>
           <DropdownTrigger>
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              aria-label="More actions"
-            >
+            <Button isIconOnly size="sm" variant="light">
               <MoreVertical size={16} />
             </Button>
           </DropdownTrigger>
-          <DropdownMenu aria-label="Printer actions">
+          <DropdownMenu>
             <DropdownItem
               key="reconnect"
               startContent={<RefreshCw size={16} />}
@@ -405,9 +388,7 @@ export function RFIDPrintDialog({
     setLocalError(null);
 
     try {
-      if (!isConnected) {
-        await reconnect();
-      }
+      if (!isConnected) await reconnect();
 
       const result = await printBatch(items, {
         type: labelType,
@@ -618,48 +599,7 @@ export function RFIDPrintDialog({
   );
 }
 
-export function EPCPreview({ epc, parsed }) {
-  if (!epc) return null;
-
-  return (
-    <Card shadow="sm" radius="lg">
-      <CardHeader className="flex items-center gap-2">
-        <Radio size={18} />
-        <h4 className="text-sm font-medium">EPC Preview</h4>
-      </CardHeader>
-      <CardBody className="gap-2">
-        <div className="font-mono text-lg bg-default p-3 rounded-lg break-all">
-          {epc}
-        </div>
-        <div className="text-xs text-foreground/60 space-y-1">
-          <p className="flex items-center gap-1">
-            <Hash size={12} />
-            Length: 96-bit ({epc.length} hex characters)
-          </p>
-          {parsed && (
-            <>
-              <p className="flex items-center gap-1">
-                <Tag size={12} />
-                Type: {parsed.type}
-              </p>
-              <p className="flex items-center gap-1">
-                <Link size={12} />
-                URI: {parsed.uri}
-              </p>
-            </>
-          )}
-        </div>
-      </CardBody>
-    </Card>
-  );
-}
-
-export function PrinterSettings({
-  onSave,
-  showAdvanced = false,
-  compact = false,
-  className = "",
-}) {
+export function PrinterSettings({ onSave, compact = false, className = "" }) {
   const {
     isConnected,
     printerLoading,
@@ -675,7 +615,6 @@ export function PrinterSettings({
 
   const { settings, updateSetting, updateSettings, save, reset, saving } =
     usePrinterSettings();
-
   const { presets, selectPreset, isCustom } = useLabelPresets();
 
   const [actionLoading, setActionLoading] = useState(null);
@@ -702,10 +641,6 @@ export function PrinterSettings({
     setActionLoading(actionName);
     try {
       await actionFn();
-      return true;
-    } catch (error) {
-      console.error(`[PrinterSettings] ${actionName} failed:`, error);
-      return false;
     } finally {
       setActionLoading(null);
     }
@@ -718,8 +653,7 @@ export function PrinterSettings({
       await onSave?.(settings);
       setSaveStatus("saved");
       setTimeout(() => setSaveStatus(null), 2000);
-    } catch (error) {
-      console.error("[PrinterSettings] Save failed:", error);
+    } catch {
       setSaveStatus("error");
     }
   }, [save, onSave, settings]);
@@ -748,7 +682,6 @@ export function PrinterSettings({
         </Card>
       )}
 
-      {/* Connection Section */}
       <SettingsSection title="Connection" icon={<Plug size={18} />}>
         <div
           className={`grid gap-4 ${
@@ -800,7 +733,6 @@ export function PrinterSettings({
         </div>
       </SettingsSection>
 
-      {/* Label Configuration Section */}
       <SettingsSection title="Label Configuration" icon={<Tag size={18} />}>
         <SettingsSelect
           label="Label Size Preset"
@@ -844,7 +776,6 @@ export function PrinterSettings({
         />
       </SettingsSection>
 
-      {/* EPC Configuration Section */}
       <SettingsSection title="EPC Configuration" icon={<Radio size={18} />}>
         <SettingsSelect
           label="EPC Generation Mode"
@@ -887,7 +818,6 @@ export function PrinterSettings({
         />
       </SettingsSection>
 
-      {/* Printer Controls Section */}
       <SettingsSection
         title="Printer Controls"
         icon={<SlidersHorizontal size={18} />}
@@ -941,11 +871,9 @@ export function PrinterSettings({
         </div>
       </SettingsSection>
 
-      {/* Advanced Settings Accordion */}
       <Accordion variant="bordered" className="px-0">
         <AccordionItem
           key="advanced"
-          aria-label="Advanced Settings"
           title={
             <span className="flex items-center gap-2 text-sm font-semibold">
               <Settings size={16} />
@@ -1014,7 +942,6 @@ export function PrinterSettings({
         </AccordionItem>
       </Accordion>
 
-      {/* Printer Status Section */}
       {printerStatus && (
         <SettingsSection title="Printer Status" icon={<Activity size={18} />}>
           <div className="grid grid-cols-2 gap-4 text-sm">
@@ -1089,7 +1016,6 @@ export function PrinterSettings({
         </SettingsSection>
       )}
 
-      {/* Footer Actions */}
       <Divider />
       <div className="flex items-center justify-between">
         <Button
@@ -1139,10 +1065,6 @@ export function PrinterSettings({
       </div>
     </div>
   );
-}
-
-export function PrinterSettingsCompact(props) {
-  return <PrinterSettings {...props} compact showAdvanced={false} />;
 }
 
 export function PrinterQuickConnect({ onConnect, className = "" }) {
@@ -1228,13 +1150,3 @@ export function PrinterQuickConnect({ onConnect, className = "" }) {
 }
 
 export { PRINT_TYPES, PRINT_TYPE_OPTIONS };
-
-export default {
-  PrinterStatusBadge,
-  PrintButton,
-  RFIDPrintDialog,
-  EPCPreview,
-  PrinterSettings,
-  PrinterSettingsCompact,
-  PrinterQuickConnect,
-};
