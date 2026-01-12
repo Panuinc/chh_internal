@@ -39,7 +39,7 @@ export default function UISignIn({
           <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
             <Input
               type="text"
-              label="Username"
+              label="รหัสผู้ใช้งาน"
               labelPlacement="outside"
               placeholder="Enter your username"
               color="default"
@@ -56,7 +56,7 @@ export default function UISignIn({
           <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
             <Input
               type="password"
-              label="Password"
+              label="รหัสผ่าน"
               labelPlacement="outside"
               placeholder="Enter your password"
               color="default"
@@ -81,7 +81,7 @@ export default function UISignIn({
               isLoading={isLoading}
               spinner={<Spinner size="sm" color="current" />}
             >
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? "กำลัง เข้าสู่ระบบ ..." : "เข้าสู่ระบบ"}
             </Button>
           </div>
         </form>
