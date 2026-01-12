@@ -1,7 +1,28 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { API_ENDPOINTS, TIMEOUTS } from "@/lib/chainWay/config";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
+import {
+  API_ENDPOINTS,
+  TIMEOUTS,
+  STORAGE_KEYS,
+  PRINTER_CONFIG,
+  DEFAULT_LABEL_SIZE,
+  EPC_CONFIG,
+  LABEL_PRESETS,
+  getDefaultLabelPreset,
+} from "@/lib/chainWay/config";
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
 
 async function fetchAPI(url, options = {}) {
   const timeout = options.timeout || TIMEOUTS.print;
@@ -57,6 +78,57 @@ async function withRetry(fn, retries = 2, delay = 1000) {
 
   throw lastError;
 }
+
+function loadFromStorage(key = STORAGE_KEYS.printerSettings) {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : null;
+  } catch (error) {
+    console.error("[useSettings] Load error:", error);
+    return null;
+  }
+}
+
+function saveToStorage(config, key = STORAGE_KEYS.printerSettings) {
+  if (typeof window === "undefined") return false;
+
+  try {
+    localStorage.setItem(key, JSON.stringify(config));
+    return true;
+  } catch (error) {
+    console.error("[useSettings] Save error:", error);
+    return false;
+  }
+}
+
+const getDefaultSettings = () => ({
+  host: PRINTER_CONFIG.host,
+  port: PRINTER_CONFIG.port,
+  timeout: PRINTER_CONFIG.timeout,
+  retries: PRINTER_CONFIG.retries,
+
+  labelWidth: DEFAULT_LABEL_SIZE.width,
+  labelHeight: DEFAULT_LABEL_SIZE.height,
+  labelPreset: getDefaultLabelPreset().name,
+
+  epcMode: EPC_CONFIG.mode,
+  epcPrefix: EPC_CONFIG.prefix,
+  companyPrefix: EPC_CONFIG.companyPrefix,
+
+  defaultQuantity: 1,
+  printDelay: 100,
+  autoCalibrate: false,
+
+  enableRFIDByDefault: false,
+  validateEPC: true,
+  retryOnError: true,
+});
+
+// ============================================================================
+// useRFIDPrint Hook
+// ============================================================================
 
 export function useRFIDPrint(defaultOptions = {}) {
   const [printing, setPrinting] = useState(false);
@@ -158,6 +230,10 @@ export function useRFIDPrint(defaultOptions = {}) {
     clearError: () => setError(null),
   };
 }
+
+// ============================================================================
+// usePrinterStatus Hook
+// ============================================================================
 
 export function usePrinterStatus(config = {}) {
   const [status, setStatus] = useState(null);
@@ -331,6 +407,10 @@ export function usePrinterStatus(config = {}) {
   };
 }
 
+// ============================================================================
+// useRFIDPreview Hook
+// ============================================================================
+
 export function useRFIDPreview() {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -373,6 +453,10 @@ export function useRFIDPreview() {
   };
 }
 
+// ============================================================================
+// useRFID Hook (Combined)
+// ============================================================================
+
 export function useRFID(config = {}) {
   const printHook = useRFIDPrint(config.printOptions);
   const printerHook = usePrinterStatus({
@@ -414,6 +498,7 @@ export function useRFID(config = {}) {
   );
 
   return {
+    // Print functions
     print: safePrint,
     printBatch: safePrintBatch,
     cancelPrint: printHook.cancel,
@@ -423,6 +508,7 @@ export function useRFID(config = {}) {
     clearPrintError: printHook.clearError,
     healthCheck: printHook.healthCheck,
 
+    // Printer status & controls
     refreshPrinter: printerHook.refresh,
     reconnect: printerHook.reconnect,
     fullReset: printerHook.fullReset,
@@ -436,11 +522,221 @@ export function useRFID(config = {}) {
     isConnected: printerHook.isConnected,
     lastCheckTime: printerHook.lastCheckTime,
 
+    // Preview
     getPreview: previewHook.getPreview,
     previewData: previewHook.preview,
     previewLoading: previewHook.loading,
     clearPreview: previewHook.clearPreview,
   };
 }
+
+// ============================================================================
+// usePrinterSettings Hook
+// ============================================================================
+
+export function usePrinterSettings(options = {}) {
+  const { autoLoad = true, storageKey = STORAGE_KEYS.printerSettings } =
+    options;
+
+  const [settings, setSettings] = useState(getDefaultSettings);
+  const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!autoLoad) return;
+
+    const stored = loadFromStorage(storageKey);
+    if (stored) {
+      setSettings((prev) => ({ ...prev, ...stored }));
+    }
+    setLoaded(true);
+  }, [autoLoad, storageKey]);
+
+  const updateSetting = useCallback((key, value) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  const updateSettings = useCallback((updates) => {
+    setSettings((prev) => ({ ...prev, ...updates }));
+  }, []);
+
+  const save = useCallback(async () => {
+    setSaving(true);
+    setError(null);
+
+    try {
+      const success = saveToStorage(settings, storageKey);
+      if (!success) {
+        throw new Error("Failed to save settings");
+      }
+      return true;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  }, [settings, storageKey]);
+
+  const reset = useCallback(() => {
+    const defaults = getDefaultSettings();
+    setSettings(defaults);
+    saveToStorage(defaults, storageKey);
+  }, [storageKey]);
+
+  const getPrinterConfig = useCallback(
+    () => ({
+      host: settings.host,
+      port: settings.port,
+      timeout: settings.timeout,
+      retries: settings.retries,
+    }),
+    [settings]
+  );
+
+  const getLabelSize = useCallback(
+    () => ({
+      width: settings.labelWidth,
+      height: settings.labelHeight,
+    }),
+    [settings]
+  );
+
+  const getEPCConfig = useCallback(
+    () => ({
+      mode: settings.epcMode,
+      prefix: settings.epcPrefix,
+      companyPrefix: settings.companyPrefix,
+    }),
+    [settings]
+  );
+
+  const getPrintOptions = useCallback(
+    () => ({
+      quantity: settings.defaultQuantity,
+      delay: settings.printDelay,
+      enableRFID: settings.enableRFIDByDefault,
+      labelSize: getLabelSize(),
+      epcMode: settings.epcMode,
+      epcPrefix: settings.epcPrefix,
+    }),
+    [settings, getLabelSize]
+  );
+
+  return {
+    settings,
+    loaded,
+    saving,
+    error,
+
+    updateSetting,
+    updateSettings,
+    save,
+    reset,
+
+    getPrinterConfig,
+    getLabelSize,
+    getEPCConfig,
+    getPrintOptions,
+  };
+}
+
+// ============================================================================
+// useLabelPresets Hook
+// ============================================================================
+
+export function useLabelPresets() {
+  const [currentPreset, setCurrentPreset] = useState(
+    () => LABEL_PRESETS.find((p) => p.isDefault) || LABEL_PRESETS[0]
+  );
+
+  const [customSize, setCustomSize] = useState({ width: 100, height: 30 });
+
+  const selectPreset = useCallback((presetName) => {
+    const preset = LABEL_PRESETS.find((p) => p.name === presetName);
+    if (preset) {
+      setCurrentPreset(preset);
+      if (preset.width && preset.height) {
+        setCustomSize({ width: preset.width, height: preset.height });
+      }
+    }
+  }, []);
+
+  const setCustomDimensions = useCallback((width, height) => {
+    setCustomSize({ width, height });
+    setCurrentPreset(LABEL_PRESETS.find((p) => p.name === "Custom"));
+  }, []);
+
+  const getCurrentSize = useCallback(() => {
+    if (currentPreset.name === "Custom") {
+      return customSize;
+    }
+    return { width: currentPreset.width, height: currentPreset.height };
+  }, [currentPreset, customSize]);
+
+  return {
+    presets: LABEL_PRESETS,
+    currentPreset,
+    customSize,
+    selectPreset,
+    setCustomDimensions,
+    getCurrentSize,
+    isCustom: currentPreset.name === "Custom",
+  };
+}
+
+// ============================================================================
+// RFID Context & Provider
+// ============================================================================
+
+const RFIDContext = createContext(null);
+
+export function RFIDProvider({ children, config = {} }) {
+  const rfid = useRFID({
+    autoConnect: true,
+    pollInterval: 15000,
+    ...config,
+  });
+
+  const value = useMemo(
+    () => rfid,
+    [
+      rfid.printing,
+      rfid.isConnected,
+      rfid.printerLoading,
+      rfid.lastResult,
+      rfid.printError,
+      rfid.printerError,
+      rfid.printerStatus,
+    ]
+  );
+
+  return <RFIDContext.Provider value={value}>{children}</RFIDContext.Provider>;
+}
+
+export function useRFIDContext() {
+  const context = useContext(RFIDContext);
+  if (!context) {
+    throw new Error("useRFIDContext must be used within RFIDProvider");
+  }
+  return context;
+}
+
+export function useRFIDSafe(config = {}) {
+  const context = useContext(RFIDContext);
+
+  const directHook = useRFID(
+    context
+      ? { autoConnect: false }
+      : { autoConnect: true, pollInterval: 15000, ...config }
+  );
+
+  return context || directHook;
+}
+
+// ============================================================================
+// Default Export
+// ============================================================================
 
 export default useRFID;

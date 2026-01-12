@@ -16,8 +16,7 @@ import {
 } from "@heroui/react";
 import { Printer, RefreshCw, Settings } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
-import { useRFIDSafe } from "@/hooks/chainWayContext";
-import { usePrinterSettings } from "@/hooks/useSettings";
+import { useRFIDSafe, usePrinterSettings } from "@/hooks";
 import { PRINT_TYPE_OPTIONS, STATUS_COLORS } from "@/lib/chainWay/config";
 
 const columns = [

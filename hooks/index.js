@@ -3,18 +3,12 @@ export {
   useRFIDPrint,
   usePrinterStatus,
   useRFIDPreview,
-} from "./useChainWay";
-
-export {
+  usePrinterSettings,
+  useLabelPresets,
   RFIDProvider,
   useRFIDContext,
   useRFIDSafe,
-} from "./chainWayContext";
-
-export {
-  usePrinterSettings,
-  useLabelPresets,
-} from "./useSettings";
+} from "./useChainWay";
 
 export { useFormHandler } from "./useFormHandler";
 

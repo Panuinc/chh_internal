@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { useRFIDSafe } from "@/hooks/chainWayContext";
-import { usePrinterSettings, useLabelPresets } from "@/hooks/useSettings";
-import { LABEL_PRESETS, EPC_MODES, PRINTER_CONFIG } from "@/lib/chainWay/config";
+import { useRFIDSafe, usePrinterSettings, useLabelPresets } from "@/hooks";
+import {
+  LABEL_PRESETS,
+  EPC_MODES,
+  PRINTER_CONFIG,
+} from "@/lib/chainWay/config";
 
 function SettingsInput({
   label,

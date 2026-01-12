@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRFIDSafe } from "@/hooks/chainWayContext";
+import { useRFIDSafe } from "@/hooks";
 import { PRINT_TYPES, PRINT_TYPE_OPTIONS } from "@/lib/chainWay/config";
 
 export function PrinterStatusBadge({ className = "", showControls = false }) {
