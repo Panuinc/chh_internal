@@ -3,7 +3,8 @@ export {
   RFIDPrintButton,
   RFIDPrintDialog,
   EPCPreview,
-  LABEL_TYPES,
+  PRINT_TYPES,
+  PRINT_TYPE_OPTIONS,
 } from "./RFIDPrintButton.jsx";
 
 export {
@@ -12,4 +13,4 @@ export {
   PrinterQuickConnect,
 } from "./PrinterSettings.jsx";
 
-export { default } from "./RFIDPrintButton.jsx";
+export { default as RFIDPrintComponents } from "./RFIDPrintButton.jsx";

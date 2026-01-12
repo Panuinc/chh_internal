@@ -1,19 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-
-const PRINT_API = "/api/warehouse/rfid/print";
-const PRINTER_API = "/api/warehouse/rfid/printer";
-
-const CONFIG = {
-  PRINT_TIMEOUT: 30000,
-  RETRY_COUNT: 2,
-  RETRY_DELAY: 1000,
-  HEALTH_CHECK_BEFORE_PRINT: true,
-};
+import { API_ENDPOINTS, TIMEOUTS } from "@/lib/rfid/config";
 
 async function fetchAPI(url, options = {}) {
-  const timeout = options.timeout || 30000;
+  const timeout = options.timeout || TIMEOUTS.print;
   const controller = new AbortController();
 
   const timeoutId = setTimeout(() => {
@@ -21,8 +12,6 @@ async function fetchAPI(url, options = {}) {
   }, timeout);
 
   try {
-    const signal = options.signal || controller.signal;
-
     const response = await fetch(url, {
       ...options,
       credentials: "include",
@@ -30,7 +19,7 @@ async function fetchAPI(url, options = {}) {
         "Content-Type": "application/json",
         ...options.headers,
       },
-      signal,
+      signal: options.signal || controller.signal,
     });
 
     const data = await response.json().catch(() => ({}));
@@ -50,11 +39,7 @@ async function fetchAPI(url, options = {}) {
   }
 }
 
-async function withRetry(
-  fn,
-  retries = CONFIG.RETRY_COUNT,
-  delay = CONFIG.RETRY_DELAY
-) {
+async function withRetry(fn, retries = 2, delay = 1000) {
   let lastError;
 
   for (let i = 0; i <= retries; i++) {
@@ -91,7 +76,9 @@ export function useRFIDPrint(defaultOptions = {}) {
 
   const healthCheck = useCallback(async () => {
     try {
-      const result = await fetchAPI(PRINTER_API, { timeout: 5000 });
+      const result = await fetchAPI(API_ENDPOINTS.printer, {
+        timeout: TIMEOUTS.healthCheck,
+      });
       return result.success && result.data?.connection?.success;
     } catch (err) {
       console.error("Health check failed:", err);
@@ -107,13 +94,9 @@ export function useRFIDPrint(defaultOptions = {}) {
       abortRef.current = new AbortController();
 
       try {
-        if (CONFIG.HEALTH_CHECK_BEFORE_PRINT) {
-          console.log("Performing health check before print...");
-          const isHealthy = await healthCheck();
-
-          if (!isHealthy) {
-            throw new Error("Printer ไม่พร้อม กรุณาตรวจสอบการเชื่อมต่อ");
-          }
+        const isHealthy = await healthCheck();
+        if (!isHealthy) {
+          throw new Error("Printer ไม่พร้อม กรุณาตรวจสอบการเชื่อมต่อ");
         }
 
         const result = await withRetry(async () => {
@@ -121,14 +104,14 @@ export function useRFIDPrint(defaultOptions = {}) {
             throw new DOMException("Print cancelled", "AbortError");
           }
 
-          return await fetchAPI(PRINT_API, {
+          return await fetchAPI(API_ENDPOINTS.print, {
             method: "POST",
             body: JSON.stringify({
               items: Array.isArray(items) ? items : [items],
               options: { ...defaultOptions, ...options },
             }),
             signal: abortRef.current?.signal,
-            timeout: CONFIG.PRINT_TIMEOUT,
+            timeout: TIMEOUTS.print,
           });
         });
 
@@ -146,15 +129,6 @@ export function useRFIDPrint(defaultOptions = {}) {
 
         const errorMsg = err.message || "Unknown error";
         setError(errorMsg);
-
-        if (
-          errorMsg.includes("timeout") ||
-          errorMsg.includes("network") ||
-          errorMsg.includes("fetch")
-        ) {
-          setError(`${errorMsg} - ลอง Reset Printer หรือปิด/เปิดเครื่องใหม่`);
-        }
-
         throw err;
       } finally {
         setPrinting(false);
@@ -205,8 +179,10 @@ export function usePrinterStatus(config = {}) {
       if (config.host) params.set("host", config.host);
       if (config.port) params.set("port", String(config.port));
 
-      const url = `${PRINTER_API}${params.toString() ? `?${params}` : ""}`;
-      const result = await fetchAPI(url, { timeout: 10000 });
+      const url = `${API_ENDPOINTS.printer}${
+        params.toString() ? `?${params}` : ""
+      }`;
+      const result = await fetchAPI(url, { timeout: TIMEOUTS.status });
 
       if (!mountedRef.current) return null;
 
@@ -240,13 +216,13 @@ export function usePrinterStatus(config = {}) {
       setError(null);
 
       try {
-        const result = await fetchAPI(PRINTER_API, {
+        const result = await fetchAPI(API_ENDPOINTS.printer, {
           method: "POST",
           body: JSON.stringify({
             action,
             config: config.host ? config : undefined,
           }),
-          timeout: 15000,
+          timeout: TIMEOUTS.action,
         });
 
         if (!result.success) {
@@ -287,16 +263,13 @@ export function usePrinterStatus(config = {}) {
     setError(null);
 
     try {
-      const result = await fetchAPI(PRINTER_API, {
+      const result = await fetchAPI(API_ENDPOINTS.printer, {
         method: "POST",
         body: JSON.stringify({ action: "fullReset" }),
-        timeout: 15000,
+        timeout: TIMEOUTS.action,
       });
 
-      console.log("Full reset result:", result);
-
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
       return await refresh();
     } catch (err) {
       setError(err.message);
@@ -373,8 +346,8 @@ export function useRFIDPreview() {
       if (options.type) params.set("type", options.type);
       if (options.enableRFID) params.set("enableRFID", "true");
 
-      const result = await fetchAPI(`${PRINT_API}?${params}`, {
-        timeout: 10000,
+      const result = await fetchAPI(`${API_ENDPOINTS.print}?${params}`, {
+        timeout: TIMEOUTS.status,
       });
 
       if (!result.success) {
@@ -470,9 +443,4 @@ export function useRFID(config = {}) {
   };
 }
 
-export default {
-  useRFIDPrint,
-  usePrinterStatus,
-  useRFIDPreview,
-  useRFID,
-};
+export default useRFID;

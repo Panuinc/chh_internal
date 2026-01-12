@@ -52,6 +52,7 @@ function CatPackingContent() {
   const handlePrintSuccess = useCallback((result) => {
     console.log("Print success:", result);
     setDialogOpen(false);
+    setSelectedItems([]);
   }, []);
 
   const handlePrintError = useCallback((error) => {
@@ -62,7 +63,7 @@ function CatPackingContent() {
   if (!hasPermission("warehouse.catPacking.view")) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-gray-500">
+        <p className="text-danger">
           You do not have permission to access this page
         </p>
       </div>
@@ -83,7 +84,10 @@ function CatPackingContent() {
 
       <RFIDPrintDialog
         isOpen={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={() => {
+          setDialogOpen(false);
+          setSelectedItems([]);
+        }}
         items={selectedItems}
         onSuccess={handlePrintSuccess}
         onError={handlePrintError}

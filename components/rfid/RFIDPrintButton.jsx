@@ -1,22 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRFID } from "@/hooks/useRFID";
-import { useRFIDSafe as useRFIDSafeFromContext } from "@/hooks/RFIDContext";
-
-const LABEL_TYPES = [
-  { value: "thai-qr", label: "Thai + QR Code", hasRFID: false },
-  { value: "thai", label: "Thai + Barcode", hasRFID: false },
-  { value: "thai-rfid", label: "Thai + RFID", hasRFID: true },
-];
-
-function useRFIDSafe(config = {}) {
-  try {
-    return useRFIDSafeFromContext(config);
-  } catch {
-    return useRFID({ autoConnect: true, pollInterval: 30000, ...config });
-  }
-}
+import { useRFIDSafe } from "@/hooks/RFIDContext";
+import { PRINT_TYPES, PRINT_TYPE_OPTIONS } from "@/lib/rfid/config";
 
 export function PrinterStatusBadge({ className = "", showControls = false }) {
   const {
@@ -46,7 +32,9 @@ export function PrinterStatusBadge({ className = "", showControls = false }) {
     <div className={`inline-flex items-center gap-2 ${className}`}>
       <span
         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          isConnected ? "bg-success text-success" : "bg-default text-danger"
+          isConnected
+            ? "bg-success/20 text-success"
+            : "bg-danger/20 text-danger"
         }`}
       >
         <span
@@ -91,19 +79,22 @@ export function PrinterStatusBadge({ className = "", showControls = false }) {
               <div className="absolute right-0 mt-1 w-40 bg-background rounded-lg shadow-lg border z-20">
                 <button
                   onClick={() => handleAction("reconnect", reconnect)}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-default"
+                  disabled={actionLoading === "reconnect"}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-default disabled:opacity-50"
                 >
                   🔄 Reconnect
                 </button>
                 <button
                   onClick={() => handleAction("cancel", cancelAllJobs)}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-default"
+                  disabled={actionLoading === "cancel"}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-default disabled:opacity-50"
                 >
                   ⏹️ Cancel Jobs
                 </button>
                 <button
                   onClick={() => handleAction("reset", fullReset)}
-                  className="w-full px-3 py-2 text-left text-sm text-danger hover:bg-danger/10"
+                  disabled={actionLoading === "reset"}
+                  className="w-full px-3 py-2 text-left text-sm text-danger hover:bg-danger/10 disabled:opacity-50"
                 >
                   🔃 Full Reset
                 </button>
@@ -174,7 +165,13 @@ export function RFIDPrintButton({
   );
 }
 
-export function RFIDPrintDialog({ isOpen, onClose, items = [], onSuccess }) {
+export function RFIDPrintDialog({
+  isOpen,
+  onClose,
+  items = [],
+  onSuccess,
+  onError,
+}) {
   const {
     printBatch,
     printing,
@@ -191,7 +188,7 @@ export function RFIDPrintDialog({ isOpen, onClose, items = [], onSuccess }) {
   const [showResult, setShowResult] = useState(false);
   const [localError, setLocalError] = useState(null);
 
-  const selectedTypeConfig = LABEL_TYPES.find((t) => t.value === labelType);
+  const selectedTypeConfig = PRINT_TYPES[labelType];
   const enableRFID = selectedTypeConfig?.hasRFID || false;
 
   useEffect(() => {
@@ -207,24 +204,43 @@ export function RFIDPrintDialog({ isOpen, onClose, items = [], onSuccess }) {
 
   const handlePrint = async () => {
     setLocalError(null);
-    if (!isConnected) await reconnect();
-    const result = await printBatch(items, {
-      type: labelType,
-      enableRFID,
-      quantity,
-    });
-    setShowResult(true);
-    onSuccess?.(result);
+
+    try {
+      if (!isConnected) {
+        await reconnect();
+      }
+
+      const result = await printBatch(items, {
+        type: labelType,
+        enableRFID,
+        quantity,
+      });
+
+      setShowResult(true);
+      onSuccess?.(result);
+    } catch (err) {
+      setLocalError(err.message);
+      onError?.(err.message);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-background rounded-xl shadow-xl max-w-lg w-full p-6">
-        <h3 className="text-lg font-semibold mb-4">Print Label</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Print Label</h3>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-default rounded-lg"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
 
         {(localError || printerError) && (
           <div className="mb-4 p-3 bg-danger/10 text-danger rounded-lg">
-            ⚠️ {localError || printerError}
+            <p className="text-sm">⚠️ {localError || printerError}</p>
             <div className="flex gap-2 mt-2">
               <button
                 onClick={reconnect}
@@ -250,72 +266,122 @@ export function RFIDPrintDialog({ isOpen, onClose, items = [], onSuccess }) {
 
         {!showResult ? (
           <>
-            <div className="mb-4">
-              <label className="text-sm font-medium">
-                Items ({items.length})
-              </label>
+            <div className="mb-4 p-3 bg-default/50 rounded-lg">
+              <p className="text-sm font-medium">
+                Items to print: {items.length}
+              </p>
+              {items.length <= 5 && (
+                <ul className="mt-2 text-xs text-foreground/60">
+                  {items.map((item, idx) => (
+                    <li key={idx}>• {item.displayName || item.number}</li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-4">
-              <select
-                value={labelType}
-                onChange={(e) => setLabelType(e.target.value)}
-                className="border rounded-lg px-3 py-2"
-              >
-                {LABEL_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  Label Type
+                </label>
+                <select
+                  value={labelType}
+                  onChange={(e) => setLabelType(e.target.value)}
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                >
+                  {PRINT_TYPE_OPTIONS.map((t) => (
+                    <option key={t.key} value={t.key}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <input
-                type="number"
-                min={1}
-                value={quantity}
-                onChange={(e) =>
-                  setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-                }
-                className="border rounded-lg px-3 py-2"
-              />
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  Quantity (each)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={quantity}
+                  onChange={(e) =>
+                    setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                  }
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
             </div>
 
             {enableRFID && (
-              <div className="mb-4 p-3 bg-primary/10 text-primary rounded-lg">
-                📡 RFID Mode Enabled
+              <div className="mb-4 p-3 bg-primary/10 text-primary rounded-lg text-sm">
+                📡 RFID Mode Enabled - Tags will be encoded
               </div>
             )}
+
+            <div className="mb-4 text-center text-sm text-foreground/60">
+              Total labels: {items.length * quantity}
+            </div>
 
             <div className="flex justify-end gap-2">
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-default rounded-lg"
+                className="px-4 py-2 bg-default rounded-lg hover:bg-default/80"
               >
                 Cancel
               </button>
               <button
                 onClick={handlePrint}
-                disabled={printing}
-                className="px-4 py-2 bg-primary text-white rounded-lg"
+                disabled={printing || !items.length}
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {printing ? "Printing..." : "Print"}
+                {printing ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin">⏳</span>
+                    Printing...
+                  </span>
+                ) : (
+                  `Print ${items.length * quantity} Labels`
+                )}
               </button>
             </div>
           </>
         ) : (
+          /* Result Display */
           <div className="text-center">
             <div
-              className={`w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center ${
+              className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl ${
                 lastResult?.data?.summary?.failed === 0
-                  ? "bg-success"
-                  : "bg-warning"
+                  ? "bg-success/20"
+                  : "bg-warning/20"
               }`}
             >
-              ✓
+              {lastResult?.data?.summary?.failed === 0 ? "✓" : "⚠️"}
             </div>
+
+            <h4 className="text-lg font-semibold mb-2">
+              {lastResult?.data?.summary?.failed === 0
+                ? "Print Complete!"
+                : "Print Completed with Errors"}
+            </h4>
+
+            {lastResult?.data?.summary && (
+              <div className="mb-4 text-sm">
+                <p className="text-success">
+                  Success: {lastResult.data.summary.success}
+                </p>
+                {lastResult.data.summary.failed > 0 && (
+                  <p className="text-danger">
+                    Failed: {lastResult.data.summary.failed}
+                  </p>
+                )}
+              </div>
+            )}
+
             <button
               onClick={onClose}
-              className="w-full px-4 py-2 bg-primary text-white rounded-lg"
+              className="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
             >
               Close
             </button>
@@ -326,7 +392,7 @@ export function RFIDPrintDialog({ isOpen, onClose, items = [], onSuccess }) {
   );
 }
 
-export function EPCPreview({ epc }) {
+export function EPCPreview({ epc, parsed }) {
   if (!epc) return null;
 
   return (
@@ -335,11 +401,24 @@ export function EPCPreview({ epc }) {
       <div className="font-mono text-lg bg-default p-3 rounded break-all">
         {epc}
       </div>
-      <div className="text-xs text-foreground/60 mt-1">
-        96-bit EPC (24 hex characters)
+      <div className="mt-2 text-xs text-foreground/60 space-y-1">
+        <p>Length: 96-bit ({epc.length} hex characters)</p>
+        {parsed && (
+          <>
+            <p>Type: {parsed.type}</p>
+            <p>URI: {parsed.uri}</p>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-export { LABEL_TYPES };
+export { PRINT_TYPES, PRINT_TYPE_OPTIONS };
+
+export default {
+  PrinterStatusBadge,
+  RFIDPrintButton,
+  RFIDPrintDialog,
+  EPCPreview,
+};

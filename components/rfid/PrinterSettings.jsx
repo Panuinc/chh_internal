@@ -1,41 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { useRFID } from "@/hooks/useRFID";
-import { useRFIDSafe as useRFIDSafeFromContext } from "@/hooks/RFIDContext";
-
-const DEFAULT_CONFIG = {
-  host: process.env.NEXT_PUBLIC_RFID_PRINTER_IP || "192.168.1.20",
-  port: parseInt(process.env.NEXT_PUBLIC_RFID_PRINTER_PORT || "9100", 10),
-  timeout: 15000,
-  retries: 3,
-};
-
-const LABEL_PRESETS = [
-  { name: "Standard (100x30)", width: 100, height: 30 },
-  { name: "Small (50x25)", width: 50, height: 25 },
-  { name: "Medium (75x50)", width: 75, height: 50 },
-  { name: "Large (100x50)", width: 100, height: 50 },
-  { name: "Custom", width: null, height: null },
-];
-
-const EPC_MODES = [
-  {
-    value: "simple",
-    label: "Simple (Recommended)",
-    description: "Basic EPC with prefix and item number",
-  },
-  { value: "sgtin96", label: "SGTIN-96", description: "GS1 standard format" },
-  { value: "unique", label: "Unique", description: "Random unique identifier" },
-];
-
-function useRFIDSafe(config = {}) {
-  try {
-    return useRFIDSafeFromContext(config);
-  } catch {
-    return useRFID({ autoConnect: true, pollInterval: 30000, ...config });
-  }
-}
+import React, { useState, useCallback } from "react";
+import { useRFIDSafe } from "@/hooks/RFIDContext";
+import { usePrinterSettings, useLabelPresets } from "@/hooks/useSettings";
+import { LABEL_PRESETS, EPC_MODES, PRINTER_CONFIG } from "@/lib/rfid/config";
 
 function SettingsInput({
   label,
@@ -184,10 +152,10 @@ function ActionButton({
 
 function StatusIndicator({ status, message }) {
   const statusConfig = {
-    connected: { color: "bg-success", icon: "✓", text: "Connected" },
-    disconnected: { color: "bg-danger", icon: "✕", text: "Disconnected" },
-    checking: { color: "bg-warning", icon: "⏳", text: "Checking..." },
-    error: { color: "bg-danger", icon: "⚠", text: "Error" },
+    connected: { color: "bg-success", text: "Connected" },
+    disconnected: { color: "bg-danger", text: "Disconnected" },
+    checking: { color: "bg-warning", text: "Checking..." },
+    error: { color: "bg-danger", text: "Error" },
   };
 
   const config = statusConfig[status] || statusConfig.disconnected;
@@ -205,8 +173,6 @@ function StatusIndicator({ status, message }) {
 }
 
 export function PrinterSettings({
-  initialConfig = {},
-  onConfigChange,
   onSave,
   showAdvanced = false,
   compact = false,
@@ -225,60 +191,31 @@ export function PrinterSettings({
     cancelAllJobs,
   } = useRFIDSafe();
 
-  const [config, setConfig] = useState({
-    host: initialConfig.host || DEFAULT_CONFIG.host,
-    port: initialConfig.port || DEFAULT_CONFIG.port,
-    timeout: initialConfig.timeout || DEFAULT_CONFIG.timeout,
-    retries: initialConfig.retries || DEFAULT_CONFIG.retries,
+  const { settings, updateSetting, updateSettings, save, reset, saving } =
+    usePrinterSettings();
 
-    labelWidth: initialConfig.labelWidth || 100,
-    labelHeight: initialConfig.labelHeight || 30,
-    labelPreset: initialConfig.labelPreset || "Standard (100x30)",
-
-    epcMode: initialConfig.epcMode || "simple",
-    epcPrefix: initialConfig.epcPrefix || "PK",
-    companyPrefix: initialConfig.companyPrefix || "0885000",
-
-    defaultQuantity: initialConfig.defaultQuantity || 1,
-    printDelay: initialConfig.printDelay || 100,
-    autoCalibrate: initialConfig.autoCalibrate || false,
-
-    enableRFIDByDefault: initialConfig.enableRFIDByDefault || false,
-    validateEPC: initialConfig.validateEPC || true,
-    retryOnError: initialConfig.retryOnError || true,
-  });
+  const { presets, selectPreset, isCustom } = useLabelPresets();
 
   const [actionLoading, setActionLoading] = useState(null);
   const [showAdvancedSettings, setShowAdvancedSettings] =
     useState(showAdvanced);
   const [saveStatus, setSaveStatus] = useState(null);
 
-  const updateConfig = useCallback(
-    (key, value) => {
-      setConfig((prev) => {
-        const newConfig = { ...prev, [key]: value };
-        onConfigChange?.(newConfig);
-        return newConfig;
-      });
-    },
-    [onConfigChange]
-  );
-
   const handlePresetChange = useCallback(
     (presetName) => {
+      selectPreset(presetName);
       const preset = LABEL_PRESETS.find((p) => p.name === presetName);
       if (preset && preset.width !== null) {
-        setConfig((prev) => ({
-          ...prev,
+        updateSettings({
           labelPreset: presetName,
           labelWidth: preset.width,
           labelHeight: preset.height,
-        }));
+        });
       } else {
-        updateConfig("labelPreset", presetName);
+        updateSetting("labelPreset", presetName);
       }
     },
-    [updateConfig]
+    [selectPreset, updateSettings, updateSetting]
   );
 
   const handleAction = useCallback(async (actionName, actionFn) => {
@@ -297,35 +234,15 @@ export function PrinterSettings({
   const handleSave = useCallback(async () => {
     setSaveStatus("saving");
     try {
-      await onSave?.(config);
+      await save();
+      await onSave?.(settings);
       setSaveStatus("saved");
       setTimeout(() => setSaveStatus(null), 2000);
     } catch (error) {
       console.error("[PrinterSettings] Save failed:", error);
       setSaveStatus("error");
     }
-  }, [config, onSave]);
-
-  const handleReset = useCallback(() => {
-    setConfig({
-      host: DEFAULT_CONFIG.host,
-      port: DEFAULT_CONFIG.port,
-      timeout: DEFAULT_CONFIG.timeout,
-      retries: DEFAULT_CONFIG.retries,
-      labelWidth: 100,
-      labelHeight: 30,
-      labelPreset: "Standard (100x30)",
-      epcMode: "simple",
-      epcPrefix: "PK",
-      companyPrefix: "0885000",
-      defaultQuantity: 1,
-      printDelay: 100,
-      autoCalibrate: false,
-      enableRFIDByDefault: false,
-      validateEPC: true,
-      retryOnError: true,
-    });
-  }, []);
+  }, [save, onSave, settings]);
 
   const connectionStatus = printerLoading
     ? "checking"
@@ -354,16 +271,16 @@ export function PrinterSettings({
         >
           <SettingsInput
             label="Printer IP Address"
-            value={config.host}
-            onChange={(v) => updateConfig("host", v)}
-            placeholder="192.168.1.20"
+            value={settings.host}
+            onChange={(v) => updateSetting("host", v)}
+            placeholder={PRINTER_CONFIG.host}
             helpText="IP address of the RFID printer"
           />
           <SettingsInput
             label="Port"
             type="number"
-            value={config.port}
-            onChange={(v) => updateConfig("port", v)}
+            value={settings.port}
+            onChange={(v) => updateSetting("port", v)}
             min={1}
             max={65535}
             helpText="Default: 9100"
@@ -392,9 +309,9 @@ export function PrinterSettings({
       <SettingsSection title="Label Configuration" icon="🏷️">
         <SettingsSelect
           label="Label Size Preset"
-          value={config.labelPreset}
+          value={settings.labelPreset}
           onChange={handlePresetChange}
-          options={LABEL_PRESETS.map((p) => ({ value: p.name, label: p.name }))}
+          options={presets.map((p) => ({ value: p.name, label: p.name }))}
         />
 
         <div
@@ -405,28 +322,28 @@ export function PrinterSettings({
           <SettingsInput
             label="Width (mm)"
             type="number"
-            value={config.labelWidth}
-            onChange={(v) => updateConfig("labelWidth", v)}
+            value={settings.labelWidth}
+            onChange={(v) => updateSetting("labelWidth", v)}
             min={10}
             max={200}
-            disabled={config.labelPreset !== "Custom"}
+            disabled={!isCustom}
           />
           <SettingsInput
             label="Height (mm)"
             type="number"
-            value={config.labelHeight}
-            onChange={(v) => updateConfig("labelHeight", v)}
+            value={settings.labelHeight}
+            onChange={(v) => updateSetting("labelHeight", v)}
             min={10}
             max={200}
-            disabled={config.labelPreset !== "Custom"}
+            disabled={!isCustom}
           />
         </div>
 
         <SettingsInput
           label="Default Print Quantity"
           type="number"
-          value={config.defaultQuantity}
-          onChange={(v) => updateConfig("defaultQuantity", v)}
+          value={settings.defaultQuantity}
+          onChange={(v) => updateSetting("defaultQuantity", v)}
           min={1}
           max={100}
         />
@@ -435,11 +352,11 @@ export function PrinterSettings({
       <SettingsSection title="EPC Configuration" icon="📡">
         <SettingsSelect
           label="EPC Generation Mode"
-          value={config.epcMode}
-          onChange={(v) => updateConfig("epcMode", v)}
+          value={settings.epcMode}
+          onChange={(v) => updateSetting("epcMode", v)}
           options={EPC_MODES.map((m) => ({ value: m.value, label: m.label }))}
           helpText={
-            EPC_MODES.find((m) => m.value === config.epcMode)?.description
+            EPC_MODES.find((m) => m.value === settings.epcMode)?.description
           }
         />
 
@@ -450,16 +367,16 @@ export function PrinterSettings({
         >
           <SettingsInput
             label="EPC Prefix"
-            value={config.epcPrefix}
-            onChange={(v) => updateConfig("epcPrefix", v)}
+            value={settings.epcPrefix}
+            onChange={(v) => updateSetting("epcPrefix", v)}
             placeholder="PK"
             helpText="2-4 character prefix"
           />
-          {config.epcMode === "sgtin96" && (
+          {settings.epcMode === "sgtin96" && (
             <SettingsInput
               label="GS1 Company Prefix"
-              value={config.companyPrefix}
-              onChange={(v) => updateConfig("companyPrefix", v)}
+              value={settings.companyPrefix}
+              onChange={(v) => updateSetting("companyPrefix", v)}
               placeholder="0885000"
               helpText="7-digit company prefix"
             />
@@ -468,8 +385,8 @@ export function PrinterSettings({
 
         <SettingsToggle
           label="Enable RFID by Default"
-          checked={config.enableRFIDByDefault}
-          onChange={(v) => updateConfig("enableRFIDByDefault", v)}
+          checked={settings.enableRFIDByDefault}
+          onChange={(v) => updateSetting("enableRFIDByDefault", v)}
           helpText="Automatically enable RFID encoding for all prints"
         />
       </SettingsSection>
@@ -538,8 +455,8 @@ export function PrinterSettings({
               <SettingsInput
                 label="Connection Timeout (ms)"
                 type="number"
-                value={config.timeout}
-                onChange={(v) => updateConfig("timeout", v)}
+                value={settings.timeout}
+                onChange={(v) => updateSetting("timeout", v)}
                 min={1000}
                 max={60000}
                 step={1000}
@@ -547,16 +464,16 @@ export function PrinterSettings({
               <SettingsInput
                 label="Retry Attempts"
                 type="number"
-                value={config.retries}
-                onChange={(v) => updateConfig("retries", v)}
+                value={settings.retries}
+                onChange={(v) => updateSetting("retries", v)}
                 min={0}
                 max={10}
               />
               <SettingsInput
                 label="Print Delay (ms)"
                 type="number"
-                value={config.printDelay}
-                onChange={(v) => updateConfig("printDelay", v)}
+                value={settings.printDelay}
+                onChange={(v) => updateSetting("printDelay", v)}
                 min={0}
                 max={5000}
                 step={50}
@@ -567,20 +484,20 @@ export function PrinterSettings({
             <div className="space-y-3">
               <SettingsToggle
                 label="Auto Calibrate"
-                checked={config.autoCalibrate}
-                onChange={(v) => updateConfig("autoCalibrate", v)}
+                checked={settings.autoCalibrate}
+                onChange={(v) => updateSetting("autoCalibrate", v)}
                 helpText="Calibrate printer before first print"
               />
               <SettingsToggle
                 label="Validate EPC"
-                checked={config.validateEPC}
-                onChange={(v) => updateConfig("validateEPC", v)}
+                checked={settings.validateEPC}
+                onChange={(v) => updateSetting("validateEPC", v)}
                 helpText="Validate EPC format before writing"
               />
               <SettingsToggle
                 label="Retry on Error"
-                checked={config.retryOnError}
-                onChange={(v) => updateConfig("retryOnError", v)}
+                checked={settings.retryOnError}
+                onChange={(v) => updateSetting("retryOnError", v)}
                 helpText="Automatically retry failed prints"
               />
             </div>
@@ -640,7 +557,7 @@ export function PrinterSettings({
       )}
 
       <div className="flex items-center justify-between pt-4 border-t">
-        <ActionButton onClick={handleReset} variant="default" icon="↩️">
+        <ActionButton onClick={reset} variant="default" icon="↩️">
           Reset to Defaults
         </ActionButton>
 
@@ -679,8 +596,9 @@ export function PrinterQuickConnect({ onConnect, className = "" }) {
     testConnection,
     printerError,
   } = useRFIDSafe();
-  const [host, setHost] = useState(DEFAULT_CONFIG.host);
-  const [port, setPort] = useState(DEFAULT_CONFIG.port);
+
+  const [host, setHost] = useState(PRINTER_CONFIG.host);
+  const [port, setPort] = useState(PRINTER_CONFIG.port);
 
   const handleConnect = async () => {
     await testConnection({ host, port });
@@ -688,18 +606,16 @@ export function PrinterQuickConnect({ onConnect, className = "" }) {
     onConnect?.({ host, port, connected: isConnected });
   };
 
+  const connectionStatus = printerLoading
+    ? "checking"
+    : isConnected
+    ? "connected"
+    : "disconnected";
+
   return (
     <div className={`p-4 border rounded-xl ${className}`}>
       <div className="flex items-center gap-4 mb-4">
-        <StatusIndicator
-          status={
-            printerLoading
-              ? "checking"
-              : isConnected
-              ? "connected"
-              : "disconnected"
-          }
-        />
+        <StatusIndicator status={connectionStatus} />
       </div>
 
       {printerError && (

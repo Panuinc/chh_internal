@@ -1,7 +1,7 @@
 "use client";
+
 import React, { useMemo, useCallback, useState } from "react";
-import { DataTable } from "@/components";
-import { Loading } from "@/components";
+import { DataTable, Loading } from "@/components";
 import {
   Button,
   Dropdown,
@@ -16,6 +16,9 @@ import {
 } from "@heroui/react";
 import { Printer, RefreshCw, Settings } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/rfid";
+import { useRFIDSafe } from "@/hooks/RFIDContext";
+import { usePrinterSettings } from "@/hooks/useSettings";
+import { PRINT_TYPE_OPTIONS, STATUS_COLORS } from "@/lib/rfid/config";
 
 const columns = [
   { name: "#", uid: "index", width: 60 },
@@ -34,54 +37,6 @@ const statusOptions = [
   { name: "Blocked", uid: "Blocked" },
 ];
 
-const statusColorMap = {
-  Active: "success",
-  Blocked: "danger",
-};
-
-const printOptions = [
-  {
-    key: "thai-qr",
-    label: "1. ภาษาไทย + QR Code",
-    type: "thai-qr",
-    enableRFID: false,
-  },
-  {
-    key: "thai-barcode",
-    label: "2. ภาษาไทย + Barcode",
-    type: "thai",
-    enableRFID: false,
-  },
-  {
-    key: "thai-rfid",
-    label: "3. ภาษาไทย + RFID",
-    type: "thai-rfid",
-    enableRFID: true,
-  },
-];
-
-const SETTINGS_STORAGE_KEY = "rfid-printer-settings";
-
-function loadSettings() {
-  if (typeof window === "undefined") return {};
-  try {
-    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {};
-  } catch {
-    return {};
-  }
-}
-
-function saveSettings(config) {
-  if (typeof window === "undefined") return false;
-  try {
-    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(config));
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export default function UICatPacking({
   items = [],
   loading,
@@ -92,12 +47,14 @@ export default function UICatPacking({
   onRefresh,
 }) {
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-
   const {
     isOpen: isSettingsOpen,
     onOpen: openSettings,
     onClose: closeSettings,
   } = useDisclosure();
+
+  const { isConnected } = useRFIDSafe();
+  const { save: saveSettings, settings } = usePrinterSettings();
 
   const total = items.length;
   const active = items.filter((i) => !i.blocked).length;
@@ -132,15 +89,15 @@ export default function UICatPacking({
     if (selected.length > 0) onPrintMultiple?.(selected);
   }, [getSelectedItems, onPrintMultiple]);
 
-  const handleSaveSettings = useCallback(async (config) => {
-    const success = saveSettings(config);
-    if (!success) throw new Error("Failed to save settings");
-    return success;
-  }, []);
+  const handleSaveSettings = useCallback(async () => {
+    await saveSettings();
+    closeSettings();
+  }, [saveSettings, closeSettings]);
 
   const renderCustomCell = useCallback(
     (item, columnKey) => {
       if (columnKey !== "actions") return undefined;
+
       return (
         <div className="flex items-center justify-center gap-1">
           <Dropdown>
@@ -149,22 +106,22 @@ export default function UICatPacking({
                 isIconOnly
                 variant="light"
                 size="sm"
-                isDisabled={printing || !printerConnected}
+                isDisabled={printing || !isConnected}
               >
                 <Printer
                   size={18}
-                  className={printerConnected ? "text-success" : "text-danger"}
+                  className={isConnected ? "text-success" : "text-danger"}
                 />
               </Button>
             </DropdownTrigger>
             <DropdownMenu aria-label="Print options">
-              {printOptions.map((opt) => (
+              {PRINT_TYPE_OPTIONS.map((opt) => (
                 <DropdownItem
                   key={opt.key}
                   onPress={() =>
                     onPrintSingle(item, {
-                      type: opt.type,
-                      enableRFID: opt.enableRFID,
+                      type: opt.key,
+                      enableRFID: opt.hasRFID,
                     })
                   }
                 >
@@ -176,7 +133,7 @@ export default function UICatPacking({
         </div>
       );
     },
-    [onPrintSingle, printerConnected, printing]
+    [onPrintSingle, isConnected, printing]
   );
 
   return (
@@ -237,7 +194,7 @@ export default function UICatPacking({
                 size="sm"
                 color="primary"
                 className="w-full"
-                isDisabled={!printerConnected || printing}
+                isDisabled={!isConnected || printing}
                 onPress={handlePrintSelected}
               >
                 {printing ? "กำลังพิมพ์..." : "พิมพ์ที่เลือก"}
@@ -294,7 +251,7 @@ export default function UICatPacking({
             columns={columns}
             data={normalized}
             statusOptions={statusOptions}
-            statusColorMap={statusColorMap}
+            statusColorMap={STATUS_COLORS}
             searchPlaceholder="Search item number or name"
             emptyContent="No items found"
             itemName="items"
@@ -320,11 +277,7 @@ export default function UICatPacking({
             </p>
           </ModalHeader>
           <ModalBody className="pb-6">
-            <PrinterSettings
-              initialConfig={loadSettings()}
-              onSave={handleSaveSettings}
-              showAdvanced={false}
-            />
+            <PrinterSettings onSave={handleSaveSettings} showAdvanced={false} />
           </ModalBody>
         </ModalContent>
       </Modal>

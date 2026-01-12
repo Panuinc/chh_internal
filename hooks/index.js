@@ -1,14 +1,4 @@
 export {
-  useSessionUser,
-  usePermissions,
-  useMenu,
-  useModuleMenu,
-} from "./useMenu";
-
-export { default } from "./useMenu";
-export { useFormHandler } from "./useFormHandler";
-
-export {
   useRFID,
   useRFIDPrint,
   usePrinterStatus,
@@ -20,3 +10,17 @@ export {
   useRFIDContext,
   useRFIDSafe,
 } from "./RFIDContext";
+
+export {
+  usePrinterSettings,
+  useLabelPresets,
+} from "./useSettings";
+
+export { useFormHandler } from "./useFormHandler";
+
+export {
+  useMenu,
+  useSessionUser,
+  usePermissions,
+  useModuleMenu,
+} from "./useMenu";

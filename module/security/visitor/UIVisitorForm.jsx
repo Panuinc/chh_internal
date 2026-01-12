@@ -13,6 +13,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
+import { Camera, FileText, RefreshCw, Plus, X } from "lucide-react";
 
 const contactReasonOptions = [
   { key: "Shipping", label: "การจัดส่ง" },
@@ -126,9 +127,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
         },
         audio: false,
       });
-
       streamRef.current = mediaStream;
-
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         videoRef.current.onloadedmetadata = () => {
@@ -174,7 +173,6 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
       canvas.height = video.videoHeight || 720;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
       canvas.toBlob(
         (blob) => {
           if (blob) {
@@ -220,25 +218,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
-              />
-            </svg>
+            <Camera className="w-6 h-6" />
             {label}
           </div>
         </ModalHeader>
@@ -249,7 +229,6 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
                 {error}
               </div>
             )}
-
             <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden">
               <video
                 ref={videoRef}
@@ -259,13 +238,11 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
                 className="w-full h-full object-cover"
               />
               <canvas ref={canvasRef} className="hidden" />
-
               {!isStreaming && !error && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
                 </div>
               )}
-
               {isStreaming && (
                 <div className="absolute inset-0 pointer-events-none">
                   <div className="absolute top-4 left-4 w-16 h-16 border-l-4 border-t-4 border-white/50 rounded-tl-lg"></div>
@@ -292,27 +269,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
             color="success"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
-            startContent={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
-                />
-              </svg>
-            }
+            startContent={<Camera className="w-5 h-5" />}
           >
             ถ่ายรูป
           </Button>
@@ -347,9 +304,7 @@ function MultiCameraModal({
         },
         audio: false,
       });
-
       streamRef.current = mediaStream;
-
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         videoRef.current.onloadedmetadata = () => {
@@ -395,7 +350,6 @@ function MultiCameraModal({
       canvas.height = video.videoHeight || 720;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
       canvas.toBlob(
         (blob) => {
           if (blob) {
@@ -454,20 +408,7 @@ function MultiCameraModal({
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-              />
-            </svg>
+            <FileText className="w-6 h-6" />
             {label}
             {capturedImages.length > 0 && (
               <span className="text-sm text-default-500">
@@ -483,7 +424,6 @@ function MultiCameraModal({
                 {error}
               </div>
             )}
-
             <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden">
               <video
                 ref={videoRef}
@@ -493,13 +433,11 @@ function MultiCameraModal({
                 className="w-full h-full object-cover"
               />
               <canvas ref={canvasRef} className="hidden" />
-
               {!isStreaming && !error && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
                 </div>
               )}
-
               {isStreaming && (
                 <div className="absolute inset-0 pointer-events-none">
                   <div className="absolute top-4 left-4 w-16 h-16 border-l-4 border-t-4 border-white/50 rounded-tl-lg"></div>
@@ -509,7 +447,6 @@ function MultiCameraModal({
                 </div>
               )}
             </div>
-
             {capturedImages.length > 0 && (
               <div className="w-full">
                 <div className="text-sm text-default-600 mb-2">
@@ -533,7 +470,7 @@ function MultiCameraModal({
                         className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                         onPress={() => removeImage(index)}
                       >
-                        ✕
+                        <X className="w-3 h-3" />
                       </Button>
                     </div>
                   ))}
@@ -557,27 +494,7 @@ function MultiCameraModal({
             color="success"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
-            startContent={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
-                />
-              </svg>
-            }
+            startContent={<Camera className="w-5 h-5" />}
           >
             ถ่ายรูป
           </Button>
@@ -601,28 +518,9 @@ function PhotoCaptureCard({
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4 border-1 rounded-xl bg-default-50">
       <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
-          />
-        </svg>
+        <Camera className="w-5 h-5" />
         {label}
       </div>
-
       {displayImage ? (
         <div className="flex flex-col items-center gap-3">
           <div className="relative group">
@@ -640,22 +538,7 @@ function PhotoCaptureCard({
               size="sm"
               radius="sm"
               onPress={onOpenCamera}
-              startContent={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                  />
-                </svg>
-              }
+              startContent={<RefreshCw className="w-4 h-4" />}
             >
               ถ่ายใหม่
             </Button>
@@ -674,25 +557,7 @@ function PhotoCaptureCard({
       ) : (
         <div className="flex flex-col items-center gap-3 py-8">
           <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1}
-              stroke="currentColor"
-              className="w-10 h-10 text-default-400"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
-              />
-            </svg>
+            <Camera className="w-10 h-10 text-default-400" strokeWidth={1} />
           </div>
           <p className="text-sm text-default-500">ยังไม่มีรูปภาพ</p>
           <Button
@@ -702,33 +567,12 @@ function PhotoCaptureCard({
             size="md"
             radius="sm"
             onPress={onOpenCamera}
-            startContent={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
-                />
-              </svg>
-            }
+            startContent={<Camera className="w-5 h-5" />}
           >
             เปิดกล้อง
           </Button>
         </div>
       )}
-
       {error && (
         <div className="text-danger text-sm">{error?.[0] || error}</div>
       )}
@@ -762,20 +606,7 @@ function DocumentCaptureCard({
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4 border-1 rounded-xl bg-default-50">
       <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-          />
-        </svg>
+        <FileText className="w-5 h-5" />
         {label}
         {displayImages.length > 0 && (
           <span className="text-sm text-default-500">
@@ -783,7 +614,6 @@ function DocumentCaptureCard({
           </span>
         )}
       </div>
-
       {displayImages.length > 0 ? (
         <div className="flex flex-col items-center gap-3 w-full">
           <div className="flex flex-wrap justify-center gap-2 w-full">
@@ -805,7 +635,7 @@ function DocumentCaptureCard({
                     className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                     onPress={() => onRemove(index)}
                   >
-                    ✕
+                    <X className="w-3 h-3" />
                   </Button>
                 )}
               </div>
@@ -819,22 +649,7 @@ function DocumentCaptureCard({
               size="sm"
               radius="sm"
               onPress={onOpenCamera}
-              startContent={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 4.5v15m7.5-7.5h-15"
-                  />
-                </svg>
-              }
+              startContent={<Plus className="w-4 h-4" />}
             >
               เพิ่มรูป
             </Button>
@@ -855,20 +670,7 @@ function DocumentCaptureCard({
       ) : (
         <div className="flex flex-col items-center gap-3 py-8">
           <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1}
-              stroke="currentColor"
-              className="w-10 h-10 text-default-400"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-              />
-            </svg>
+            <FileText className="w-10 h-10 text-default-400" strokeWidth={1} />
           </div>
           <p className="text-sm text-default-500">ยังไม่มีเอกสาร</p>
           <Button
@@ -878,33 +680,12 @@ function DocumentCaptureCard({
             size="md"
             radius="sm"
             onPress={onOpenCamera}
-            startContent={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
-                />
-              </svg>
-            }
+            startContent={<Camera className="w-5 h-5" />}
           >
             เปิดกล้อง
           </Button>
         </div>
       )}
-
       {error && (
         <div className="text-danger text-sm">{error?.[0] || error}</div>
       )}
