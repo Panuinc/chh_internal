@@ -5,7 +5,7 @@ import { useRFID } from "@/hooks/useRFID";
 import { useRFIDSafe as useRFIDSafeFromContext } from "@/hooks/RFIDContext";
 
 const DEFAULT_CONFIG = {
-  host: process.env.NEXT_PUBLIC_RFID_PRINTER_IP || "192.168.0.20",
+  host: process.env.NEXT_PUBLIC_RFID_PRINTER_IP || "192.168.1.20",
   port: parseInt(process.env.NEXT_PUBLIC_RFID_PRINTER_PORT || "9100", 10),
   timeout: 15000,
   retries: 3,
@@ -356,7 +356,7 @@ export function PrinterSettings({
             label="Printer IP Address"
             value={config.host}
             onChange={(v) => updateConfig("host", v)}
-            placeholder="192.168.0.20"
+            placeholder="192.168.1.20"
             helpText="IP address of the RFID printer"
           />
           <SettingsInput
