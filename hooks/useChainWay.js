@@ -20,10 +20,6 @@ import {
   getDefaultLabelPreset,
 } from "@/lib/chainWay/config";
 
-// ============================================================================
-// Utility Functions
-// ============================================================================
-
 async function fetchAPI(url, options = {}) {
   const timeout = options.timeout || TIMEOUTS.print;
   const controller = new AbortController();
@@ -126,10 +122,6 @@ const getDefaultSettings = () => ({
   retryOnError: true,
 });
 
-// ============================================================================
-// useRFIDPrint Hook
-// ============================================================================
-
 export function useRFIDPrint(defaultOptions = {}) {
   const [printing, setPrinting] = useState(false);
   const [error, setError] = useState(null);
@@ -230,10 +222,6 @@ export function useRFIDPrint(defaultOptions = {}) {
     clearError: () => setError(null),
   };
 }
-
-// ============================================================================
-// usePrinterStatus Hook
-// ============================================================================
 
 export function usePrinterStatus(config = {}) {
   const [status, setStatus] = useState(null);
@@ -407,10 +395,6 @@ export function usePrinterStatus(config = {}) {
   };
 }
 
-// ============================================================================
-// useRFIDPreview Hook
-// ============================================================================
-
 export function useRFIDPreview() {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -453,10 +437,6 @@ export function useRFIDPreview() {
   };
 }
 
-// ============================================================================
-// useRFID Hook (Combined)
-// ============================================================================
-
 export function useRFID(config = {}) {
   const printHook = useRFIDPrint(config.printOptions);
   const printerHook = usePrinterStatus({
@@ -498,7 +478,6 @@ export function useRFID(config = {}) {
   );
 
   return {
-    // Print functions
     print: safePrint,
     printBatch: safePrintBatch,
     cancelPrint: printHook.cancel,
@@ -508,7 +487,6 @@ export function useRFID(config = {}) {
     clearPrintError: printHook.clearError,
     healthCheck: printHook.healthCheck,
 
-    // Printer status & controls
     refreshPrinter: printerHook.refresh,
     reconnect: printerHook.reconnect,
     fullReset: printerHook.fullReset,
@@ -522,17 +500,12 @@ export function useRFID(config = {}) {
     isConnected: printerHook.isConnected,
     lastCheckTime: printerHook.lastCheckTime,
 
-    // Preview
     getPreview: previewHook.getPreview,
     previewData: previewHook.preview,
     previewLoading: previewHook.loading,
     clearPreview: previewHook.clearPreview,
   };
 }
-
-// ============================================================================
-// usePrinterSettings Hook
-// ============================================================================
 
 export function usePrinterSettings(options = {}) {
   const { autoLoad = true, storageKey = STORAGE_KEYS.printerSettings } =
@@ -642,10 +615,6 @@ export function usePrinterSettings(options = {}) {
   };
 }
 
-// ============================================================================
-// useLabelPresets Hook
-// ============================================================================
-
 export function useLabelPresets() {
   const [currentPreset, setCurrentPreset] = useState(
     () => LABEL_PRESETS.find((p) => p.isDefault) || LABEL_PRESETS[0]
@@ -685,10 +654,6 @@ export function useLabelPresets() {
     isCustom: currentPreset.name === "Custom",
   };
 }
-
-// ============================================================================
-// RFID Context & Provider
-// ============================================================================
 
 const RFIDContext = createContext(null);
 
@@ -734,9 +699,5 @@ export function useRFIDSafe(config = {}) {
 
   return context || directHook;
 }
-
-// ============================================================================
-// Default Export
-// ============================================================================
 
 export default useRFID;
