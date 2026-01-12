@@ -7,7 +7,7 @@ import {
   DEFAULT_LABEL_SIZE,
   EPC_CONFIG,
   getDefaultLabelPreset,
-} from "@/lib/rfid/config";
+} from "@/lib/chainWay/config";
 
 const getDefaultSettings = () => ({
   host: PRINTER_CONFIG.host,
@@ -165,7 +165,7 @@ export function usePrinterSettings(options = {}) {
 }
 
 export function useLabelPresets() {
-  const { LABEL_PRESETS } = require("@/lib/rfid/config");
+  const { LABEL_PRESETS } = require("@/lib/chainWay/config");
 
   const [currentPreset, setCurrentPreset] = useState(
     () => LABEL_PRESETS.find((p) => p.isDefault) || LABEL_PRESETS[0]

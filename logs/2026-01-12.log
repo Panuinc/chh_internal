@@ -1,3 +1,18 @@
 [2026-01-12 08:52:25] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-01-12 08:52:25] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
 [2026-01-12 08:52:25] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2026-01-12 13:18:30] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-01-12 13:18:30] [INFO] GetAllVisitorUseCase start {"page":1,"limit":1000000}
+[2026-01-12 13:18:30] [INFO] GetAllVisitorUseCase success {"total":0,"returned":0}
+[2026-01-12 13:19:07] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-12 13:19:07] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-12 13:19:07] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2026-01-12 13:19:07] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2026-01-12 13:20:42] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-12 13:20:42] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2026-01-12 13:20:42] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-12 13:20:42] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2026-01-12 13:26:27] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-12 13:26:27] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2026-01-12 13:26:27] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-12 13:26:27] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}

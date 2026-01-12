@@ -1,4 +1,4 @@
-import { PrinterService } from "@/lib/rfid";
+import { PrinterService } from "@/lib/chainWay";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

@@ -3,9 +3,9 @@
 import React, { useCallback, useState } from "react";
 import { useCatPackingItems } from "@/app/api/warehouse/catPacking/core";
 import { useMenu } from "@/hooks";
-import { RFIDProvider, useRFIDContext } from "@/hooks/RFIDContext";
+import { RFIDProvider, useRFIDContext } from "@/hooks/chainWayContext";
 import UICatPacking from "@/module/warehouse/catPacking/UICatPacking";
-import { RFIDPrintDialog } from "@/components/rfid";
+import { RFIDPrintDialog } from "@/components/chainWay";
 
 function CatPackingContent() {
   const { items, loading, refetch } = useCatPackingItems({ limit: 500 });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { API_ENDPOINTS, TIMEOUTS } from "@/lib/rfid/config";
+import { API_ENDPOINTS, TIMEOUTS } from "@/lib/chainWay/config";
 
 async function fetchAPI(url, options = {}) {
   const timeout = options.timeout || TIMEOUTS.print;

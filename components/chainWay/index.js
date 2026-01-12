@@ -1,11 +1,11 @@
 export {
   PrinterStatusBadge,
-  RFIDPrintButton,
+  PrintButton,
   RFIDPrintDialog,
   EPCPreview,
   PRINT_TYPES,
   PRINT_TYPE_OPTIONS,
-} from "./RFIDPrintButton.jsx";
+} from "./PrintButton.jsx";
 
 export {
   PrinterSettings,
@@ -13,4 +13,4 @@ export {
   PrinterQuickConnect,
 } from "./PrinterSettings.jsx";
 
-export { default as RFIDPrintComponents } from "./RFIDPrintButton.jsx";
+export { default as RFIDPrintComponents } from "./PrintButton.jsx";

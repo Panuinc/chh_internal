@@ -3,13 +3,13 @@ export {
   useRFIDPrint,
   usePrinterStatus,
   useRFIDPreview,
-} from "./useRFID";
+} from "./useChainWay";
 
 export {
   RFIDProvider,
   useRFIDContext,
   useRFIDSafe,
-} from "./RFIDContext";
+} from "./chainWayContext";
 
 export {
   usePrinterSettings,

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRFIDSafe } from "@/hooks/RFIDContext";
-import { PRINT_TYPES, PRINT_TYPE_OPTIONS } from "@/lib/rfid/config";
+import { useRFIDSafe } from "@/hooks/chainWayContext";
+import { PRINT_TYPES, PRINT_TYPE_OPTIONS } from "@/lib/chainWay/config";
 
 export function PrinterStatusBadge({ className = "", showControls = false }) {
   const {
@@ -113,7 +113,7 @@ export function PrinterStatusBadge({ className = "", showControls = false }) {
   );
 }
 
-export function RFIDPrintButton({
+export function PrintButton({
   items = [],
   options = {},
   onSuccess,
@@ -418,7 +418,7 @@ export { PRINT_TYPES, PRINT_TYPE_OPTIONS };
 
 export default {
   PrinterStatusBadge,
-  RFIDPrintButton,
+  PrintButton,
   RFIDPrintDialog,
   EPCPreview,
 };
