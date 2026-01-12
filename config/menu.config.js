@@ -203,15 +203,15 @@ export const menuConfig = {
       description: "Management About sales",
       items: [
         {
-          id: "salesOrder",
-          href: "/sales/salesOrder",
+          id: "salesOrderOnline",
+          href: "/sales/salesOrderOnline",
           text: "Sales Order Online",
           icon: ListOrdered,
-          permission: "sales.salesOrder.view",
+          permission: "sales.salesOrderOnline.view",
           actions: {
-            view: "sales.salesOrder.view",
-            create: "sales.salesOrder.create",
-            edit: "sales.salesOrder.edit",
+            view: "sales.salesOrderOnline.view",
+            create: "sales.salesOrderOnline.create",
+            edit: "sales.salesOrderOnline.edit",
           },
         },
       ],
