@@ -164,6 +164,18 @@ export const menuConfig = {
             edit: "warehouse.catPacking.edit",
           },
         },
+         {
+          id: "catSupply",
+          href: "/warehouse/catSupply",
+          text: "Category Supply",
+          icon: Package,
+          permission: "warehouse.catSupply.view",
+          actions: {
+            view: "warehouse.catSupply.view",
+            create: "warehouse.catSupply.create",
+            edit: "warehouse.catSupply.edit",
+          },
+        },
       ],
     },
     production: {
