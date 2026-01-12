@@ -19,7 +19,7 @@ function CatPackingContent() {
   const handlePrintSingle = useCallback(
     async (item, options = {}) => {
       if (!isConnected) {
-        alert("Printer ไม่ได้เชื่อมต่อ");
+        alert("Printer is not connected");
         return;
       }
 
@@ -35,10 +35,10 @@ function CatPackingContent() {
             enableRFID: options.enableRFID || false,
           }
         );
-        alert(`พิมพ์ ${item.number} สำเร็จ`);
+        alert(`Printed ${item.number} successfully`);
       } catch (err) {
         console.error("Print error:", err);
-        alert(`พิมพ์ไม่สำเร็จ: ${err.message}`);
+        alert(`Print failed: ${err.message}`);
       }
     },
     [print, isConnected]
@@ -56,13 +56,15 @@ function CatPackingContent() {
 
   const handlePrintError = useCallback((error) => {
     console.error("Print error:", error);
-    alert(`พิมพ์ไม่สำเร็จ: ${error}`);
+    alert(`Print failed: ${error}`);
   }, []);
 
   if (!hasPermission("warehouse.catPacking.view")) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-gray-500">ไม่มีสิทธิ์เข้าถึงหน้านี้</p>
+        <p className="text-gray-500">
+          You do not have permission to access this page
+        </p>
       </div>
     );
   }

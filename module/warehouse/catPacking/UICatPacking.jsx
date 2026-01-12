@@ -114,9 +114,7 @@ export default function UICatPacking({
               >
                 <Printer
                   size={18}
-                  className={
-                    printerConnected ? "text-gray-600" : "text-gray-300"
-                  }
+                  className={printerConnected ? "text-success" : "text-danger"}
                 />
               </Button>
             </DropdownTrigger>
@@ -176,7 +174,7 @@ export default function UICatPacking({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Blocked Items
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-red-600">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-danger">
             {blocked}
           </div>
         </div>
@@ -236,8 +234,8 @@ export default function UICatPacking({
             data={normalized}
             statusOptions={statusOptions}
             statusColorMap={statusColorMap}
-            searchPlaceholder="ค้นหา Item number หรือชื่อ..."
-            emptyContent="ไม่พบรายการ"
+            searchPlaceholder="Search item number or name"
+            emptyContent="No items found"
             itemName="items"
             selectionMode="multiple"
             selectedKeys={selectedKeys}
