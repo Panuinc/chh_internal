@@ -8,9 +8,14 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  useDisclosure,
 } from "@heroui/react";
-import { Printer, RefreshCw } from "lucide-react";
-import { PrinterStatusBadge } from "@/components/rfid";
+import { Printer, RefreshCw, Settings } from "lucide-react";
+import { PrinterStatusBadge, PrinterSettings } from "@/components/rfid";
 
 const columns = [
   { name: "#", uid: "index", width: 60 },
@@ -55,6 +60,28 @@ const printOptions = [
   },
 ];
 
+const SETTINGS_STORAGE_KEY = "rfid-printer-settings";
+
+function loadSettings() {
+  if (typeof window === "undefined") return {};
+  try {
+    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveSettings(config) {
+  if (typeof window === "undefined") return false;
+  try {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(config));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function UICatPacking({
   items = [],
   loading,
@@ -65,6 +92,12 @@ export default function UICatPacking({
   onRefresh,
 }) {
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
+
+  const {
+    isOpen: isSettingsOpen,
+    onOpen: openSettings,
+    onClose: closeSettings,
+  } = useDisclosure();
 
   const total = items.length;
   const active = items.filter((i) => !i.blocked).length;
@@ -98,6 +131,12 @@ export default function UICatPacking({
     const selected = getSelectedItems();
     if (selected.length > 0) onPrintMultiple?.(selected);
   }, [getSelectedItems, onPrintMultiple]);
+
+  const handleSaveSettings = useCallback(async (config) => {
+    const success = saveSettings(config);
+    if (!success) throw new Error("Failed to save settings");
+    return success;
+  }, []);
 
   const renderCustomCell = useCallback(
     (item, columnKey) => {
@@ -144,11 +183,20 @@ export default function UICatPacking({
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2 overflow-hidden">
       <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto hidden">
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Printer
+          <div className="flex items-center justify-between w-full px-2">
+            <span className="font-medium">Printer</span>
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              onPress={openSettings}
+              title="Printer Settings"
+            >
+              <Settings size={16} />
+            </Button>
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <PrinterStatusBadge />
+            <PrinterStatusBadge showControls />
           </div>
         </div>
 
@@ -187,6 +235,7 @@ export default function UICatPacking({
             <div className="flex items-center justify-center w-full h-full p-2 gap-2">
               <Button
                 size="sm"
+                color="primary"
                 className="w-full"
                 isDisabled={!printerConnected || printing}
                 onPress={handlePrintSelected}
@@ -214,14 +263,26 @@ export default function UICatPacking({
       <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
         <div className="flex xl:hidden items-center justify-between w-full p-2">
           <PrinterStatusBadge />
-          <Button
-            variant="light"
-            size="sm"
-            onPress={onRefresh}
-            isDisabled={loading}
-          >
-            <RefreshCw className={loading ? "animate-spin" : ""} />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              onPress={openSettings}
+              title="Printer Settings"
+            >
+              <Settings />
+            </Button>
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              onPress={onRefresh}
+              isDisabled={loading}
+            >
+              <RefreshCw className={loading ? "animate-spin" : ""} />
+            </Button>
+          </div>
         </div>
 
         {loading ? (
@@ -244,6 +305,29 @@ export default function UICatPacking({
           />
         )}
       </div>
+
+      <Modal
+        isOpen={isSettingsOpen}
+        onClose={closeSettings}
+        size="2xl"
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
+            <h3 className="text-lg font-semibold">Printer Settings</h3>
+            <p className="text-sm text-foreground/60">
+              Configure printer connection and label settings
+            </p>
+          </ModalHeader>
+          <ModalBody className="pb-6">
+            <PrinterSettings
+              initialConfig={loadSettings()}
+              onSave={handleSaveSettings}
+              showAdvanced={false}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
