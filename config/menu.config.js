@@ -10,6 +10,8 @@ import {
   Package,
   Pickaxe,
   DoorOpen,
+  BadgeDollarSign,
+  ListOrdered,
 } from "lucide-react";
 
 export const menuConfig = {
@@ -41,6 +43,13 @@ export const menuConfig = {
       text: "production",
       icon: Pickaxe,
       permission: "production.view",
+    },
+    {
+      id: "sales",
+      href: "/sales",
+      text: "sales",
+      icon: BadgeDollarSign,
+      permission: "sales.view",
     },
   ],
 
@@ -172,6 +181,25 @@ export const menuConfig = {
             view: "production.oneDoor.view",
             create: "production.oneDoor.create",
             edit: "production.oneDoor.edit",
+          },
+        },
+      ],
+    },
+    sales: {
+      title: "sales",
+      icon: BadgeDollarSign,
+      description: "Management About sales",
+      items: [
+        {
+          id: "salesOrder",
+          href: "/sales/salesOrder",
+          text: "Sales Order Online",
+          icon: ListOrdered,
+          permission: "sales.salesOrder.view",
+          actions: {
+            view: "sales.salesOrder.view",
+            create: "sales.salesOrder.create",
+            edit: "sales.salesOrder.edit",
           },
         },
       ],
