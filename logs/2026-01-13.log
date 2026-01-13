@@ -1,0 +1,40 @@
+[2026-01-13 09:42:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-01-13 09:42:05] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-13 09:42:05] [INFO] GetAllEmployeeUseCase success {"total":2,"returned":2}
+[2026-01-13 09:42:57] [INFO] CreateEmployeeUseCase start {"email":"chanakan.s@chhindustry.com"}
+[2026-01-13 09:43:00] [INFO] CreateEmployeeUseCase success {"id":"cmkbzlkkx0001crd03xgjmfce","email":"chanakan.s@chhindustry.com"}
+[2026-01-13 09:43:00] [INFO] CreateEmployeeUseCase start {"email":"chanakan.s@chhindustry.com"}
+[2026-01-13 09:43:00] [ERROR] employeesController error {"method":"create","error":"employeeEmail 'chanakan.s@chhindustry.com' already exists","stack":"ConflictError: employeeEmail 'chanakan.s@chhindustry.com' already exists\n    at Object.ensureEmailNotDuplicate (E:\\chh_internal\\.next\\dev\\server\\chunks\\[root-of-the-server]__5bc8ba6e._.js:1099:19)\n    at async CreateUseCase (E:\\chh_internal\\.next\\dev\\server\\chunks\\[root-of-the-server]__5bc8ba6e._.js:1164:9)\n    at async create (E:\\chh_internal\\.next\\dev\\server\\chunks\\[root-of-the-server]__5bc8ba6e._.js:823:30)\n    at async AppRouteRouteModule.do (E:\\chh_internal\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:37789)\n    at async AppRouteRouteModule.handle (E:\\chh_internal\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:45045)\n    at async responseGenerator (E:\\chh_internal\\.next\\dev\\server\\chunks\\node_modules_next_d6dcf377._.js:14338:38)\n    at async AppRouteRouteModule.handleResponse (E:\\chh_internal\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:1:187851)\n    at async handleResponse (E:\\chh_internal\\.next\\dev\\server\\chunks\\node_modules_next_d6dcf377._.js:14400:32)\n    at async handler (E:\\chh_internal\\.next\\dev\\server\\chunks\\node_modules_next_d6dcf377._.js:14453:13)\n    at async DevServer.renderToResponseWithComponentsImpl (E:\\chh_internal\\node_modules\\next\\dist\\server\\base-server.js:1413:9)\n    at async DevServer.renderPageComponent (E:\\chh_internal\\node_modules\\next\\dist\\server\\base-server.js:1465:24)\n    at async DevServer.renderToResponseImpl (E:\\chh_internal\\node_modules\\next\\dist\\server\\base-server.js:1515:32)\n    at async DevServer.pipeImpl (E:\\chh_internal\\node_modules\\next\\dist\\server\\base-server.js:1021:25)\n    at async NextNodeServer.handleCatchallRenderRequest (E:\\chh_internal\\node_modules\\next\\dist\\server\\next-server.js:394:17)\n    at async DevServer.handleRequestImpl (E:\\chh_internal\\node_modules\\next\\dist\\server\\base-server.js:912:17)\n    at async E:\\chh_internal\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:382:20\n    at async Span.traceAsyncFn (E:\\chh_internal\\node_modules\\next\\dist\\trace\\trace.js:157:20)\n    at async DevServer.handleRequest (E:\\chh_internal\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:378:24)\n    at async invokeRender (E:\\chh_internal\\node_modules\\next\\dist\\server\\lib\\router-server.js:240:21)\n    at async handleRequest (E:\\chh_internal\\node_modules\\next\\dist\\server\\lib\\router-server.js:436:24)\n    at async requestHandlerImpl (E:\\chh_internal\\node_modules\\next\\dist\\server\\lib\\router-server.js:484:13)\n    at async Server.requestListener (E:\\chh_internal\\node_modules\\next\\dist\\server\\lib\\start-server.js:226:13)"}
+[2026-01-13 09:43:02] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-13 09:43:02] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-13 09:43:06] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-13 09:43:06] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-13 09:43:14] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2026-01-13 09:43:14] [INFO] GetAllAccountUseCase success {"total":2,"returned":2}
+[2026-01-13 09:43:17] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-13 09:43:17] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-13 09:43:33] [INFO] CreateAccountUseCase start {"employeeId":"cmkbzlkkx0001crd03xgjmfce"}
+[2026-01-13 09:43:34] [INFO] CreateAccountUseCase success {"id":"cmkbzmcjy0003crd02h7rn7ih","username":"Chana.S"}
+[2026-01-13 09:43:36] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2026-01-13 09:43:36] [INFO] GetAllAccountUseCase success {"total":3,"returned":3}
+[2026-01-13 09:43:54] [INFO] GetAccountByIdUseCase start {"id":"cmkbzmcjy0003crd02h7rn7ih"}
+[2026-01-13 09:43:54] [INFO] GetAccountByIdUseCase success {"id":"cmkbzmcjy0003crd02h7rn7ih","username":"Chana.S"}
+[2026-01-13 09:43:54] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-01-13 09:44:04] [INFO] UpdateAccountUseCase start {"id":"cmkbzmcjy0003crd02h7rn7ih"}
+[2026-01-13 09:44:04] [INFO] UpdateAccountUseCase success {"id":"cmkbzmcjy0003crd02h7rn7ih","username":"Chana.S"}
+[2026-01-13 09:44:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-01-13 09:44:08] [INFO] GetAllAccountUseCase start {"page":1,"limit":1000000}
+[2026-01-13 09:44:08] [INFO] GetAllAccountUseCase success {"total":3,"returned":3}
+[2026-01-13 09:44:31] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-13 09:44:31] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-13 09:44:38] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2026-01-13 09:44:38] [INFO] GetAllPermissionUseCase success {"total":12,"returned":12}
+[2026-01-13 09:44:41] [INFO] GetAssignsByEmployeeUseCase start {"employeeId":"cmkbzlkkx0001crd03xgjmfce"}
+[2026-01-13 09:44:41] [INFO] GetAssignsByEmployeeUseCase success {"total":0}
+[2026-01-13 09:44:42] [INFO] GetEmployeeByIdUseCase start {"id":"cmkbzlkkx0001crd03xgjmfce"}
+[2026-01-13 09:44:42] [INFO] GetEmployeeByIdUseCase success {"id":"cmkbzlkkx0001crd03xgjmfce","email":"chanakan.s@chhindustry.com"}
+[2026-01-13 09:44:42] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-01-13 09:44:46] [INFO] SyncPermissionsUseCase start {"employeeId":"cmkbzlkkx0001crd03xgjmfce"}
+[2026-01-13 09:44:46] [INFO] SyncPermissionsUseCase success {"added":1,"removed":0}
+[2026-01-13 09:44:48] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-13 09:44:48] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}

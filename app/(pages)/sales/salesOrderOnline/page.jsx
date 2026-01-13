@@ -15,6 +15,7 @@ function SalesOrderOnlineContent() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState([]);
+  const [isPrintingSlip, setIsPrintingSlip] = useState(false);
 
   const handlePrintSingle = useCallback(
     async (order, options = {}) => {
@@ -24,9 +25,44 @@ function SalesOrderOnlineContent() {
       }
 
       try {
-        const lineItems =
-          order.salesOrderLines?.filter((l) => l.lineType === "Item") || [];
+        // Handle packing slip print
+        if (options.type === "packingSlip") {
+          const itemLines = order.salesOrderLines?.filter(l => l.lineType === "Item") || [];
+          const totalPieces = itemLines.reduce((sum, l) => sum + (l.quantity || 0), 0);
+          
+          if (totalPieces === 0) {
+            alert("No items to print");
+            return;
+          }
 
+          setIsPrintingSlip(true);
+
+          try {
+            // Import and use the printPackingSlips function
+            const { printPackingSlips } = await import("@/lib/chainWay/packingSlipLabel");
+            
+            const result = await printPackingSlips(order, (current, total) => {
+              console.log(`Printing ${current}/${total}`);
+            });
+
+            if (result.success) {
+              alert(`พิมพ์ใบปะหน้า ${result.printed} ใบสำเร็จ (${order.number})`);
+            } else {
+              throw new Error(result.error || "Print failed");
+            }
+          } catch (err) {
+            console.error("Packing slip print error:", err);
+            alert(`Print failed: ${err.message}`);
+          } finally {
+            setIsPrintingSlip(false);
+          }
+          
+          return;
+        }
+
+        // Handle regular label print (existing logic)
+        const lineItems = order.salesOrderLines?.filter(l => l.lineType === "Item") || [];
+        
         for (const line of lineItems) {
           await print(
             {
@@ -42,9 +78,7 @@ function SalesOrderOnlineContent() {
             }
           );
         }
-        alert(
-          `Printed ${lineItems.length} items from ${order.number} successfully`
-        );
+        alert(`Printed ${lineItems.length} items from ${order.number} successfully`);
       } catch (err) {
         console.error("Print error:", err);
         alert(`Print failed: ${err.message}`);
@@ -87,7 +121,7 @@ function SalesOrderOnlineContent() {
         onPrintSingle={handlePrintSingle}
         onPrintMultiple={handlePrintMultiple}
         printerConnected={isConnected}
-        printing={printing}
+        printing={printing || isPrintingSlip}
         onRefresh={refetch}
       />
 
@@ -97,10 +131,10 @@ function SalesOrderOnlineContent() {
           setDialogOpen(false);
           setSelectedOrders([]);
         }}
-        items={selectedOrders.flatMap((order) =>
+        items={selectedOrders.flatMap(order => 
           (order.salesOrderLines || [])
-            .filter((l) => l.lineType === "Item")
-            .map((line) => ({
+            .filter(l => l.lineType === "Item")
+            .map(line => ({
               number: line.itemNumber,
               displayName: line.description,
               displayName2: line.description2 || "",

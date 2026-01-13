@@ -25,7 +25,7 @@ const ActionMenu = ({ item, onEdit, onView }) => (
   <Dropdown>
     <DropdownTrigger>
       <Button isIconOnly variant="light" size="md">
-        <Settings2 size={24} />
+        <Settings2 />
       </Button>
     </DropdownTrigger>
     <DropdownMenu>

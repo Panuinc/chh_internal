@@ -246,6 +246,36 @@ function useRFIDPrint(defaultOptions = {}) {
     }
   }, []);
 
+  /**
+   * Send raw TSPL command to printer
+   * @param {string} command - TSPL command string
+   * @returns {Promise<Object>} Result from printer API
+   */
+  const sendCommand = useCallback(async (command) => {
+    setPrinting(true);
+    setError(null);
+
+    try {
+      const result = await fetchAPI(API_ENDPOINTS.command || `${API_ENDPOINTS.printer}/command`, {
+        method: "POST",
+        body: JSON.stringify({ command }),
+        timeout: TIMEOUTS.print,
+      });
+
+      if (!result.success) {
+        throw new Error(result.error || "Send command failed");
+      }
+
+      setLastResult(result);
+      return result;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setPrinting(false);
+    }
+  }, []);
+
   const printBatch = useCallback(
     async (items, options = {}) => {
       cancel();
@@ -298,6 +328,7 @@ function useRFIDPrint(defaultOptions = {}) {
   return {
     print: (item, options) => printBatch([item], options),
     printBatch,
+    sendCommand,
     cancel,
     printing,
     error,
@@ -467,9 +498,23 @@ export function useRFID(config = {}) {
     [printHook, printerHook]
   );
 
+  const safeSendCommand = useCallback(
+    async (command) => {
+      if (!printerHook.isConnected) {
+        await printerHook.refresh();
+        if (!printerHook.isConnected) {
+          throw new Error("Printer ไม่ได้เชื่อมต่อ");
+        }
+      }
+      return printHook.sendCommand(command);
+    },
+    [printHook, printerHook]
+  );
+
   return {
     print: safePrint,
     printBatch: safePrintBatch,
+    sendCommand: safeSendCommand,
     cancelPrint: printHook.cancel,
     printing: printHook.printing,
     printError: printHook.error,

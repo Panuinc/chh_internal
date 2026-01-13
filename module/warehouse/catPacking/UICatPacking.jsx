@@ -108,7 +108,7 @@ export default function UICatPacking({
                 isDisabled={printing || !isConnected}
               >
                 <Printer
-                  size={18}
+                  
                   className={isConnected ? "text-success" : "text-danger"}
                 />
               </Button>
@@ -148,7 +148,7 @@ export default function UICatPacking({
               onPress={openSettings}
               title="Printer Settings"
             >
-              <Settings size={16} />
+              <Settings  />
             </Button>
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">

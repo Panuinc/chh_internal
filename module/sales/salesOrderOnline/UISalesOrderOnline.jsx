@@ -15,12 +15,6 @@ import {
   ModalFooter,
   useDisclosure,
   Chip,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
 } from "@heroui/react";
 import {
   Printer,
@@ -35,6 +29,14 @@ import {
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe, usePrinterSettings } from "@/hooks";
 import { PRINT_TYPE_OPTIONS, STATUS_COLORS } from "@/lib/chainWay/config";
+import { FileText } from "lucide-react";
+import PackingSlipPreviewModal from "./PackingSlipPreviewModal";
+
+// Print options including packing slip
+const PRINT_OPTIONS = [
+  { key: "packingSlip", label: "ใบปะหน้า (Packing Slip)", icon: FileText },
+  ...PRINT_TYPE_OPTIONS,
+];
 
 const columns = [
   { name: "#", uid: "index", width: 60 },
@@ -79,51 +81,64 @@ function formatDate(dateStr) {
   });
 }
 
+const orderLineColumns = [
+  { name: "#", uid: "index", width: 50 },
+  { name: "Item No.", uid: "itemNumber" },
+  { name: "Description", uid: "description" },
+  { name: "Unit", uid: "unitOfMeasureCode", width: 80 },
+  { name: "Qty", uid: "quantity", width: 80 },
+  { name: "Unit Price", uid: "unitPriceFormatted", width: 120 },
+  { name: "Amount", uid: "amountFormatted", width: 120 },
+  { name: "Ship Date", uid: "shipDateFormatted", width: 120 },
+];
+
 function OrderLinesTable({ lines }) {
   const itemLines = lines?.filter((l) => l.lineType === "Item") || [];
   const commentLines = lines?.filter((l) => l.lineType === "Comment") || [];
 
+  const normalizedLines = useMemo(
+    () =>
+      itemLines.map((line, i) => ({
+        ...line,
+        index: i + 1,
+        unitPriceFormatted: formatCurrency(line.unitPrice),
+        amountFormatted: formatCurrency(line.amountIncludingTax),
+        shipDateFormatted: formatDate(line.shipmentDate),
+      })),
+    [itemLines]
+  );
+
+  const renderLineCell = useCallback((item, columnKey) => {
+    if (columnKey === "itemNumber") {
+      return <span className="font-mono text-sm">{item.itemNumber}</span>;
+    }
+
+    if (columnKey === "description") {
+      return (
+        <div className="flex flex-col">
+          <span>{item.description}</span>
+          {item.description2 && (
+            <span className="text-xs text-foreground/60">
+              {item.description2}
+            </span>
+          )}
+        </div>
+      );
+    }
+
+    return undefined;
+  }, []);
+
   return (
     <div className="space-y-4">
-      <Table aria-label="Order lines" removeWrapper>
-        <TableHeader>
-          <TableColumn>Item No.</TableColumn>
-          <TableColumn>Description</TableColumn>
-          <TableColumn>Unit</TableColumn>
-          <TableColumn className="text-right">Qty</TableColumn>
-          <TableColumn className="text-right">Unit Price</TableColumn>
-          <TableColumn className="text-right">Amount</TableColumn>
-          <TableColumn>Ship Date</TableColumn>
-        </TableHeader>
-        <TableBody emptyContent="No items">
-          {itemLines.map((line) => (
-            <TableRow key={line.id}>
-              <TableCell className="font-mono text-sm">
-                {line.itemNumber}
-              </TableCell>
-              <TableCell>
-                <div className="flex flex-col">
-                  <span>{line.description}</span>
-                  {line.description2 && (
-                    <span className="text-xs text-foreground/60">
-                      {line.description2}
-                    </span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>{line.unitOfMeasureCode}</TableCell>
-              <TableCell className="text-right">{line.quantity}</TableCell>
-              <TableCell className="text-right">
-                {formatCurrency(line.unitPrice)}
-              </TableCell>
-              <TableCell className="text-right font-medium">
-                {formatCurrency(line.amountIncludingTax)}
-              </TableCell>
-              <TableCell>{formatDate(line.shipmentDate)}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <DataTable
+        columns={orderLineColumns}
+        data={normalizedLines}
+        searchPlaceholder="Search item..."
+        emptyContent="No items"
+        itemName="items"
+        renderCustomCell={renderLineCell}
+      />
 
       {commentLines.length > 0 && (
         <div className="border-t pt-3">
@@ -139,24 +154,24 @@ function OrderLinesTable({ lines }) {
   );
 }
 
-function OrderDetailModal({
-  isOpen,
-  onClose,
-  order,
-  onPrint,
-  isConnected,
-  printing,
-}) {
+function OrderDetailModal({ isOpen, onClose, order, onPrint, onOpenPreview, isConnected, printing }) {
   if (!order) return null;
 
   const lines = order.salesOrderLines || [];
   const lineCount = lines.filter((l) => l.lineType === "Item").length;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="4xl" scrollBehavior="inside">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="4xl"
+      scrollBehavior="inside"
+    >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <h3 className="text-lg font-semibold">Sales Order: {order.number}</h3>
+          <h3 className="text-lg font-semibold">
+            Sales Order: {order.number}
+          </h3>
           <div className="flex items-center gap-2">
             <Chip
               color={statusColorMap[order.status] || "default"}
@@ -174,9 +189,10 @@ function OrderDetailModal({
         </ModalHeader>
 
         <ModalBody className="gap-6">
+          {/* Order Info */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-start gap-2">
-              <User className="text-foreground/50 mt-1" size={16} />
+              <User className="text-foreground/50 mt-1"  />
               <div>
                 <p className="text-xs text-foreground/60">Customer</p>
                 <p className="font-medium">{order.customerName}</p>
@@ -187,10 +203,12 @@ function OrderDetailModal({
             </div>
 
             <div className="flex items-start gap-2">
-              <Calendar className="text-foreground/50 mt-1" size={16} />
+              <Calendar className="text-foreground/50 mt-1"  />
               <div>
                 <p className="text-xs text-foreground/60">Dates</p>
-                <p className="text-sm">Order: {formatDate(order.orderDate)}</p>
+                <p className="text-sm">
+                  Order: {formatDate(order.orderDate)}
+                </p>
                 <p className="text-sm">
                   Delivery: {formatDate(order.requestedDeliveryDate)}
                 </p>
@@ -198,7 +216,7 @@ function OrderDetailModal({
             </div>
 
             <div className="flex items-start gap-2">
-              <MapPin className="text-foreground/50 mt-1" size={16} />
+              <MapPin className="text-foreground/50 mt-1"  />
               <div>
                 <p className="text-xs text-foreground/60">Ship To</p>
                 <p className="text-sm">{order.shipToName}</p>
@@ -214,9 +232,10 @@ function OrderDetailModal({
             </div>
           </div>
 
+          {/* Order Lines */}
           <div className="border-t pt-4">
             <div className="flex items-center gap-2 mb-3">
-              <Package size={16} className="text-foreground/50" />
+              <Package  className="text-foreground/50" />
               <span className="font-medium">
                 Order Lines ({lineCount} items)
               </span>
@@ -224,6 +243,7 @@ function OrderDetailModal({
             <OrderLinesTable lines={lines} />
           </div>
 
+          {/* Totals */}
           <div className="flex justify-end border-t pt-4">
             <div className="text-right space-y-1">
               <p className="text-sm">
@@ -254,22 +274,27 @@ function OrderDetailModal({
             <DropdownTrigger>
               <Button
                 color="primary"
-                startContent={<Printer size={18} />}
+                startContent={<Printer  />}
                 isDisabled={printing || !isConnected || lineCount === 0}
               >
                 Print Labels
               </Button>
             </DropdownTrigger>
             <DropdownMenu aria-label="Print options">
-              {PRINT_TYPE_OPTIONS.map((opt) => (
+              {PRINT_OPTIONS.map((opt) => (
                 <DropdownItem
                   key={opt.key}
-                  onPress={() =>
-                    onPrint(order, {
-                      type: opt.key,
-                      enableRFID: opt.hasRFID,
-                    })
-                  }
+                  onPress={() => {
+                    if (opt.key === "packingSlip") {
+                      onClose();
+                      onOpenPreview(order);
+                    } else {
+                      onPrint(order, {
+                        type: opt.key,
+                        enableRFID: opt.hasRFID || false,
+                      });
+                    }
+                  }}
                 >
                   {opt.label}
                 </DropdownItem>
@@ -305,6 +330,14 @@ export default function UISalesOrderOnline({
     onOpen: openDetail,
     onClose: closeDetail,
   } = useDisclosure();
+
+  const {
+    isOpen: isPreviewOpen,
+    onOpen: openPreview,
+    onClose: closePreview,
+  } = useDisclosure();
+
+  const [previewOrder, setPreviewOrder] = useState(null);
 
   const { isConnected } = useRFIDSafe();
   const { save: saveSettings } = usePrinterSettings();
@@ -363,6 +396,27 @@ export default function UISalesOrderOnline({
     setSelectedOrder(null);
   }, [closeDetail]);
 
+  const handleOpenPreview = useCallback(
+    (order) => {
+      setPreviewOrder(order);
+      openPreview();
+    },
+    [openPreview]
+  );
+
+  const handleClosePreview = useCallback(() => {
+    closePreview();
+    setPreviewOrder(null);
+  }, [closePreview]);
+
+  const handlePrintPackingSlip = useCallback(
+    (order) => {
+      closePreview();
+      onPrintSingle(order, { type: "packingSlip", enableRFID: false });
+    },
+    [closePreview, onPrintSingle]
+  );
+
   const renderCustomCell = useCallback(
     (item, columnKey) => {
       if (columnKey === "actions") {
@@ -375,7 +429,7 @@ export default function UISalesOrderOnline({
               onPress={() => handleViewOrder(item._rawOrder)}
               title="View Details"
             >
-              <Eye size={18} />
+              <Eye  />
             </Button>
 
             <Dropdown>
@@ -387,21 +441,25 @@ export default function UISalesOrderOnline({
                   isDisabled={printing || !isConnected || item.lineCount === 0}
                 >
                   <Printer
-                    size={18}
+                    
                     className={isConnected ? "text-success" : "text-danger"}
                   />
                 </Button>
               </DropdownTrigger>
               <DropdownMenu aria-label="Print options">
-                {PRINT_TYPE_OPTIONS.map((opt) => (
+                {PRINT_OPTIONS.map((opt) => (
                   <DropdownItem
                     key={opt.key}
-                    onPress={() =>
-                      onPrintSingle(item._rawOrder, {
-                        type: opt.key,
-                        enableRFID: opt.hasRFID,
-                      })
-                    }
+                    onPress={() => {
+                      if (opt.key === "packingSlip") {
+                        handleOpenPreview(item._rawOrder);
+                      } else {
+                        onPrintSingle(item._rawOrder, {
+                          type: opt.key,
+                          enableRFID: opt.hasRFID || false,
+                        });
+                      }
+                    }}
                   >
                     {opt.label}
                   </DropdownItem>
@@ -437,11 +495,12 @@ export default function UISalesOrderOnline({
 
       return undefined;
     },
-    [onPrintSingle, handleViewOrder, isConnected, printing]
+    [onPrintSingle, handleViewOrder, handleOpenPreview, isConnected, printing]
   );
 
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2 overflow-hidden">
+      {/* Sidebar */}
       <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto hidden">
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <div className="flex items-center justify-between w-full px-2">
@@ -453,7 +512,7 @@ export default function UISalesOrderOnline({
               onPress={openSettings}
               title="Printer Settings"
             >
-              <Settings size={16} />
+              <Settings  />
             </Button>
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
@@ -522,7 +581,9 @@ export default function UISalesOrderOnline({
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
+        {/* Mobile header */}
         <div className="flex xl:hidden items-center justify-between w-full p-2">
           <PrinterStatusBadge />
           <div className="flex gap-2">
@@ -568,6 +629,7 @@ export default function UISalesOrderOnline({
         )}
       </div>
 
+      {/* Settings Modal */}
       <Modal
         isOpen={isSettingsOpen}
         onClose={closeSettings}
@@ -587,12 +649,23 @@ export default function UISalesOrderOnline({
         </ModalContent>
       </Modal>
 
+      {/* Order Detail Modal */}
       <OrderDetailModal
         isOpen={isDetailOpen}
         onClose={handleCloseDetail}
         order={selectedOrder}
         onPrint={onPrintSingle}
+        onOpenPreview={handleOpenPreview}
         isConnected={isConnected}
+        printing={printing}
+      />
+
+      {/* Packing Slip Preview Modal */}
+      <PackingSlipPreviewModal
+        isOpen={isPreviewOpen}
+        onClose={handleClosePreview}
+        order={previewOrder}
+        onPrint={handlePrintPackingSlip}
         printing={printing}
       />
     </div>

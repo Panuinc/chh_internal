@@ -35,7 +35,7 @@ const capitalize = (str) =>
 const ActionMenu = ({ item, onEdit, size = "md" }) => (
   <Dropdown>
     <DropdownTrigger>
-      <Button isIconOnly variant="light" size={size}>
+      <Button isIconOnly variant="light">
         <Settings2 size={size === "sm" ? 18 : 24} />
       </Button>
     </DropdownTrigger>
