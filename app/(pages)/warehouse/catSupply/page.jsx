@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from "react";
 import { useCatSupplyItems } from "@/app/api/warehouse/catSupply/core";
 import { useMenu } from "@/hooks";
-import { RFIDProvider, useRFIDContext } from "@/hooks";
+import { RFIDProvider, useRFIDContext } from "@/app/api/chainWay/core";
 import UICatSupply from "@/module/warehouse/catSupply/UICatSupply";
 import { RFIDPrintDialog } from "@/components/chainWay";
 

@@ -28,7 +28,7 @@ import {
   FileText,
 } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
-import { useRFIDSafe, usePrinterSettings } from "@/hooks";
+import { useRFIDSafe, usePrinterSettings } from "@/app/api/chainWay/core";
 import { PRINT_TYPE_OPTIONS } from "@/lib/chainWay";
 import PackingSlipPreviewModal from "./PackingSlipPreviewModal";
 

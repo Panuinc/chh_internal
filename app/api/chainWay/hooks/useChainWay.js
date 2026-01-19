@@ -20,6 +20,8 @@ import {
   getDefaultLabelPreset,
 } from "@/lib/chainWay/config";
 
+const API_URL = "/api/chainWay";
+
 async function fetchAPI(url, options = {}) {
   const timeout = options.timeout || TIMEOUTS.print;
   const controller = new AbortController();
@@ -91,6 +93,23 @@ function saveToStorage(config, key = STORAGE_KEYS.printerSettings) {
   } catch {
     return false;
   }
+}
+
+function getErrorMessage(error) {
+  if (typeof error === "string") return error;
+  return error?.message || "Unknown error";
+}
+
+async function postApi(action, payload = {}) {
+  return fetchAPI(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action, ...payload }),
+  });
+}
+
+async function getApi(action, params = {}) {
+  const searchParams = new URLSearchParams({ action, ...params });
+  return fetchAPI(`${API_URL}?${searchParams.toString()}`);
 }
 
 const getDefaultSettings = () => ({
@@ -188,7 +207,7 @@ export function usePrinterSettings(options = {}) {
 
 export function useLabelPresets() {
   const [currentPreset, setCurrentPreset] = useState(
-    () => LABEL_PRESETS.find((p) => p.isDefault) || LABEL_PRESETS[0]
+    () => LABEL_PRESETS.find((p) => p.isDefault) || LABEL_PRESETS[0],
   );
   const [customSize, setCustomSize] = useState({ width: 100, height: 30 });
 
@@ -221,7 +240,7 @@ export function useLabelPresets() {
   };
 }
 
-function useRFIDPrint(defaultOptions = {}) {
+export function useRFIDPrint(defaultOptions = {}) {
   const [printing, setPrinting] = useState(false);
   const [error, setError] = useState(null);
   const [lastResult, setLastResult] = useState(null);
@@ -237,30 +256,19 @@ function useRFIDPrint(defaultOptions = {}) {
 
   const healthCheck = useCallback(async () => {
     try {
-      const result = await fetchAPI(API_ENDPOINTS.printer, {
-        timeout: TIMEOUTS.healthCheck,
-      });
+      const result = await getApi("status");
       return result.success && result.data?.connection?.success;
     } catch {
       return false;
     }
   }, []);
 
-  /**
-   * Send raw TSPL command to printer
-   * @param {string} command - TSPL command string
-   * @returns {Promise<Object>} Result from printer API
-   */
   const sendCommand = useCallback(async (command) => {
     setPrinting(true);
     setError(null);
 
     try {
-      const result = await fetchAPI(API_ENDPOINTS.command || `${API_ENDPOINTS.printer}/command`, {
-        method: "POST",
-        body: JSON.stringify({ command }),
-        timeout: TIMEOUTS.print,
-      });
+      const result = await postApi("command", { command });
 
       if (!result.success) {
         throw new Error(result.error || "Send command failed");
@@ -294,14 +302,9 @@ function useRFIDPrint(defaultOptions = {}) {
             throw new DOMException("Print cancelled", "AbortError");
           }
 
-          return await fetchAPI(API_ENDPOINTS.print, {
-            method: "POST",
-            body: JSON.stringify({
-              items: Array.isArray(items) ? items : [items],
-              options: { ...defaultOptions, ...options },
-            }),
-            signal: abortRef.current?.signal,
-            timeout: TIMEOUTS.print,
+          return await postApi("print", {
+            items: Array.isArray(items) ? items : [items],
+            options: { ...defaultOptions, ...options },
           });
         });
 
@@ -320,7 +323,7 @@ function useRFIDPrint(defaultOptions = {}) {
         abortRef.current = null;
       }
     },
-    [defaultOptions, cancel, healthCheck]
+    [defaultOptions, cancel, healthCheck],
   );
 
   useEffect(() => cancel, [cancel]);
@@ -338,7 +341,7 @@ function useRFIDPrint(defaultOptions = {}) {
   };
 }
 
-function usePrinterStatus(config = {}) {
+export function usePrinterStatus(config = {}) {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -351,14 +354,10 @@ function usePrinterStatus(config = {}) {
     setError(null);
 
     try {
-      const params = new URLSearchParams();
-      if (config.host) params.set("host", config.host);
-      if (config.port) params.set("port", String(config.port));
-
-      const url = `${API_ENDPOINTS.printer}${
-        params.toString() ? `?${params}` : ""
-      }`;
-      const result = await fetchAPI(url, { timeout: TIMEOUTS.status });
+      const result = await getApi("status", {
+        host: config.host || "",
+        port: config.port ? String(config.port) : "",
+      });
 
       if (!mountedRef.current) return null;
 
@@ -383,13 +382,9 @@ function usePrinterStatus(config = {}) {
       setError(null);
 
       try {
-        const result = await fetchAPI(API_ENDPOINTS.printer, {
-          method: "POST",
-          body: JSON.stringify({
-            action,
-            config: config.host ? config : undefined,
-          }),
-          timeout: TIMEOUTS.action,
+        const result = await postApi("printer", {
+          printerAction: action,
+          config: config.host ? config : undefined,
         });
 
         if (!result.success) throw new Error(result.error);
@@ -404,7 +399,7 @@ function usePrinterStatus(config = {}) {
         setLoading(false);
       }
     },
-    [config, refresh]
+    [config, refresh],
   );
 
   const reconnect = useCallback(async () => {
@@ -420,11 +415,7 @@ function usePrinterStatus(config = {}) {
     setLoading(true);
     setError(null);
     try {
-      await fetchAPI(API_ENDPOINTS.printer, {
-        method: "POST",
-        body: JSON.stringify({ action: "fullReset" }),
-        timeout: TIMEOUTS.action,
-      });
+      await postApi("printer", { printerAction: "fullReset" });
       await new Promise((r) => setTimeout(r, 1000));
       return await refresh();
     } catch (err) {
@@ -464,6 +455,39 @@ function usePrinterStatus(config = {}) {
   };
 }
 
+export function useRFIDPreview() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [previewData, setPreviewData] = useState(null);
+
+  const preview = useCallback(async (params) => {
+    setLoading(true);
+    setError(null);
+    setPreviewData(null);
+
+    try {
+      const response = await getApi("preview", {
+        number: params.number,
+        displayName: params.displayName || params.number,
+        displayName2: params.displayName2 || "",
+        type: params.type || "barcode",
+        enableRFID: params.enableRFID ? "true" : "false",
+      });
+
+      setPreviewData(response.data);
+      return { success: true, data: response.data };
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { preview, loading, error, previewData };
+}
+
 export function useRFID(config = {}) {
   const printHook = useRFIDPrint(config.printOptions);
   const printerHook = usePrinterStatus({
@@ -482,7 +506,7 @@ export function useRFID(config = {}) {
       }
       return printHook.print(item, options);
     },
-    [printHook, printerHook]
+    [printHook, printerHook],
   );
 
   const safePrintBatch = useCallback(
@@ -495,7 +519,7 @@ export function useRFID(config = {}) {
       }
       return printHook.printBatch(items, options);
     },
-    [printHook, printerHook]
+    [printHook, printerHook],
   );
 
   const safeSendCommand = useCallback(
@@ -508,7 +532,7 @@ export function useRFID(config = {}) {
       }
       return printHook.sendCommand(command);
     },
-    [printHook, printerHook]
+    [printHook, printerHook],
   );
 
   return {
@@ -555,7 +579,7 @@ export function RFIDProvider({ children, config = {} }) {
       rfid.printError,
       rfid.printerError,
       rfid.printerStatus,
-    ]
+    ],
   );
 
   return <RFIDContext.Provider value={value}>{children}</RFIDContext.Provider>;
@@ -574,9 +598,237 @@ export function useRFIDSafe(config = {}) {
   const directHook = useRFID(
     context
       ? { autoConnect: false }
-      : { autoConnect: true, pollInterval: 15000, ...config }
+      : { autoConnect: true, pollInterval: 15000, ...config },
   );
   return context || directHook;
+}
+
+export function useChainWay() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const execute = useCallback(async (fn) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await fn();
+      return { success: true, data: result };
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { loading, error, execute };
+}
+
+export function useChainWayCommand() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [result, setResult] = useState(null);
+
+  const sendCommand = useCallback(async (command, options = {}) => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const response = await postApi("command", {
+        command,
+        host: options.host,
+        port: options.port,
+      });
+
+      setResult(response.data);
+      return { success: true, data: response.data };
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { sendCommand, loading, error, result };
+}
+
+export function useChainWayPrint() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [printResult, setPrintResult] = useState(null);
+  const [previewData, setPreviewData] = useState(null);
+
+  const printBatch = useCallback(async (items, options = {}) => {
+    setLoading(true);
+    setError(null);
+    setPrintResult(null);
+
+    try {
+      const response = await postApi("print", { items, options });
+      setPrintResult(response.data);
+      return { success: true, data: response.data };
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const preview = useCallback(async (params) => {
+    setLoading(true);
+    setError(null);
+    setPreviewData(null);
+
+    try {
+      const response = await getApi("preview", {
+        number: params.number,
+        displayName: params.displayName || params.number,
+        displayName2: params.displayName2 || "",
+        type: params.type || "barcode",
+        enableRFID: params.enableRFID ? "true" : "false",
+      });
+
+      setPreviewData(response.data);
+      return { success: true, data: response.data };
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { printBatch, preview, loading, error, printResult, previewData };
+}
+
+export function useChainWayPrinter() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState(null);
+  const [actionResult, setActionResult] = useState(null);
+
+  const getStatus = useCallback(async (config = {}) => {
+    setLoading(true);
+    setError(null);
+    setStatus(null);
+
+    try {
+      const response = await getApi("status", {
+        host: config.host || "",
+        port: config.port || "",
+      });
+
+      setStatus(response.data);
+      return { success: true, data: response.data };
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const executeAction = useCallback(async (printerAction, config = {}) => {
+    setLoading(true);
+    setError(null);
+    setActionResult(null);
+
+    try {
+      const response = await postApi("printer", { printerAction, config });
+      setActionResult(response.data);
+      return { success: true, data: response.data };
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const testConnection = useCallback(
+    (config) => executeAction("test", config),
+    [executeAction],
+  );
+  const calibrate = useCallback(
+    (config) => executeAction("calibrate", config),
+    [executeAction],
+  );
+  const reset = useCallback(
+    (config) => executeAction("reset", config),
+    [executeAction],
+  );
+  const fullReset = useCallback(
+    (config) => executeAction("fullReset", config),
+    [executeAction],
+  );
+  const cancelAll = useCallback(
+    (config) => executeAction("cancel", config),
+    [executeAction],
+  );
+  const feedLabel = useCallback(
+    (config) => executeAction("feed", config),
+    [executeAction],
+  );
+  const pause = useCallback(
+    (config) => executeAction("pause", config),
+    [executeAction],
+  );
+  const resume = useCallback(
+    (config) => executeAction("resume", config),
+    [executeAction],
+  );
+
+  return {
+    getStatus,
+    executeAction,
+    testConnection,
+    calibrate,
+    reset,
+    fullReset,
+    cancelAll,
+    feedLabel,
+    pause,
+    resume,
+    loading,
+    error,
+    status,
+    actionResult,
+  };
+}
+
+export function useChainWayPackingSlip() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [labels, setLabels] = useState([]);
+
+  const generatePackingSlips = useCallback(async (order) => {
+    setLoading(true);
+    setError(null);
+    setLabels([]);
+
+    try {
+      const response = await postApi("packingSlip", { order });
+      setLabels(response.labels || []);
+      return { success: true, labels: response.labels, count: response.count };
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { generatePackingSlips, loading, error, labels };
 }
 
 export default useRFID;

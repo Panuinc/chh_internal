@@ -54,7 +54,7 @@ import {
   Ribbon,
   Hash,
 } from "lucide-react";
-import { useRFIDSafe, usePrinterSettings, useLabelPresets } from "@/hooks";
+import { useRFIDSafe, usePrinterSettings, useLabelPresets } from "@/app/api/chainWay/core";
 import {
   PRINT_TYPES,
   PRINT_TYPE_OPTIONS,
