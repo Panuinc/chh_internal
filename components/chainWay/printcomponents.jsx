@@ -17,10 +17,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Divider,
   Accordion,
   AccordionItem,
@@ -28,7 +24,6 @@ import {
 import {
   Printer,
   RefreshCw,
-  MoreVertical,
   Wifi,
   WifiOff,
   AlertTriangle,
@@ -54,7 +49,11 @@ import {
   Ribbon,
   Hash,
 } from "lucide-react";
-import { useRFIDSafe, usePrinterSettings, useLabelPresets } from "@/app/api/chainWay/core";
+import {
+  useRFIDSafe,
+  usePrinterSettings,
+  useLabelPresets,
+} from "@/app/api/chainWay/core";
 import {
   PRINT_TYPES,
   PRINT_TYPE_OPTIONS,
@@ -85,7 +84,7 @@ function SettingsInput({
       value={String(value)}
       onChange={(e) =>
         onChange(
-          type === "number" ? parseFloat(e.target.value) || 0 : e.target.value
+          type === "number" ? parseFloat(e.target.value) || 0 : e.target.value,
         )
       }
       isDisabled={disabled}
@@ -181,13 +180,12 @@ function StatusIndicator({ status }) {
       size="sm"
       startContent={
         <IconComponent
-          
           className={
             status === "connected"
               ? "animate-pulse"
               : status === "checking"
-              ? "animate-spin"
-              : ""
+                ? "animate-spin"
+                : ""
           }
         />
       }
@@ -197,27 +195,9 @@ function StatusIndicator({ status }) {
   );
 }
 
-export function PrinterStatusBadge({ className = "", showControls = false }) {
-  const {
-    isConnected,
-    printerLoading,
-    refreshPrinter,
-    reconnect,
-    fullReset,
-    cancelAllJobs,
-    printerError,
-  } = useRFIDSafe();
-
-  const [actionLoading, setActionLoading] = useState(null);
-
-  const handleAction = async (action, fn) => {
-    setActionLoading(action);
-    try {
-      await fn();
-    } finally {
-      setActionLoading(null);
-    }
-  };
+export function PrinterStatusBadge({ className = "" }) {
+  const { isConnected, printerLoading, refreshPrinter, printerError } =
+    useRFIDSafe();
 
   return (
     <div className={`inline-flex items-center gap-2 ${className}`}>
@@ -226,18 +206,14 @@ export function PrinterStatusBadge({ className = "", showControls = false }) {
         variant="flat"
         size="sm"
         startContent={
-          isConnected ? (
-            <Wifi className="animate-pulse" />
-          ) : (
-            <WifiOff />
-          )
+          isConnected ? <Wifi className="animate-pulse" /> : <WifiOff />
         }
       >
         {printerLoading
           ? "Checking..."
           : isConnected
-          ? "Connected"
-          : "Disconnected"}
+            ? "Connected"
+            : "Disconnected"}
       </Chip>
 
       <Button
@@ -247,50 +223,12 @@ export function PrinterStatusBadge({ className = "", showControls = false }) {
         onPress={refreshPrinter}
         isDisabled={printerLoading}
       >
-        <RefreshCw  className={printerLoading ? "animate-spin" : ""} />
+        <RefreshCw className={printerLoading ? "animate-spin" : ""} />
       </Button>
-
-      {showControls && (
-        <Dropdown>
-          <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light">
-              <MoreVertical  />
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu>
-            <DropdownItem
-              key="reconnect"
-              startContent={<RefreshCw  />}
-              onPress={() => handleAction("reconnect", reconnect)}
-              isDisabled={actionLoading === "reconnect"}
-            >
-              Reconnect
-            </DropdownItem>
-            <DropdownItem
-              key="cancel"
-              startContent={<StopCircle  />}
-              onPress={() => handleAction("cancel", cancelAllJobs)}
-              isDisabled={actionLoading === "cancel"}
-            >
-              Cancel Jobs
-            </DropdownItem>
-            <DropdownItem
-              key="reset"
-              startContent={<RotateCcw  />}
-              color="danger"
-              className="text-danger"
-              onPress={() => handleAction("reset", fullReset)}
-              isDisabled={actionLoading === "reset"}
-            >
-              Full Reset
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-      )}
 
       {printerError && (
         <Chip color="danger" variant="flat" size="sm">
-          <AlertTriangle  />
+          <AlertTriangle />
         </Chip>
       )}
     </div>
@@ -341,7 +279,7 @@ export function PrintButton({
       isDisabled={disabled || printing || !items.length}
       isLoading={printing}
       spinner={<Spinner size="sm" color="current" />}
-      startContent={!printing && <Printer  />}
+      startContent={!printing && <Printer />}
       className={className}
     >
       {printing ? "Printing..." : children || `Print (${items.length})`}
@@ -408,7 +346,7 @@ export function RFIDPrintDialog({
     <Modal isOpen={isOpen} onClose={onClose} size="lg" radius="lg">
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <Printer  />
+          <Printer />
           Print Label
         </ModalHeader>
         <ModalBody>
@@ -416,7 +354,7 @@ export function RFIDPrintDialog({
             <Card className="bg-danger/10 border-danger/20" shadow="none">
               <CardBody className="gap-2">
                 <p className="text-sm text-danger flex items-center gap-2">
-                  <AlertTriangle  />
+                  <AlertTriangle />
                   {localError || printerError}
                 </p>
                 <div className="flex gap-2">
@@ -425,7 +363,7 @@ export function RFIDPrintDialog({
                     color="warning"
                     variant="flat"
                     onPress={reconnect}
-                    startContent={<RefreshCw  />}
+                    startContent={<RefreshCw />}
                   >
                     Reconnect
                   </Button>
@@ -434,7 +372,7 @@ export function RFIDPrintDialog({
                     color="danger"
                     variant="flat"
                     onPress={fullReset}
-                    startContent={<RotateCcw  />}
+                    startContent={<RotateCcw />}
                   >
                     Full Reset
                   </Button>
@@ -442,7 +380,7 @@ export function RFIDPrintDialog({
                     size="sm"
                     variant="flat"
                     onPress={cancelAllJobs}
-                    startContent={<StopCircle  />}
+                    startContent={<StopCircle />}
                   >
                     Cancel Jobs
                   </Button>
@@ -456,7 +394,7 @@ export function RFIDPrintDialog({
               <Card className="bg-default/50" shadow="none">
                 <CardBody>
                   <p className="text-sm font-medium flex items-center gap-2">
-                    <FileText  />
+                    <FileText />
                     Items to print: {items.length}
                   </p>
                   {items.length <= 5 && (
@@ -478,7 +416,7 @@ export function RFIDPrintDialog({
                   variant="bordered"
                   size="md"
                   radius="sm"
-                  startContent={<Tag  />}
+                  startContent={<Tag />}
                 >
                   {PRINT_TYPE_OPTIONS.map((t) => (
                     <SelectItem key={t.key} value={t.key}>
@@ -500,7 +438,7 @@ export function RFIDPrintDialog({
                   variant="bordered"
                   size="md"
                   radius="sm"
-                  startContent={<Hash  />}
+                  startContent={<Hash />}
                 />
               </div>
 
@@ -508,7 +446,7 @@ export function RFIDPrintDialog({
                 <Card className="bg-primary/10" shadow="none">
                   <CardBody>
                     <p className="text-sm text-primary flex items-center gap-2">
-                      <Radio  />
+                      <Radio />
                       RFID Mode Enabled - Tags will be encoded
                     </p>
                   </CardBody>
@@ -529,9 +467,9 @@ export function RFIDPrintDialog({
                 }`}
               >
                 {lastResult?.data?.summary?.failed === 0 ? (
-                  <CheckCircle  />
+                  <CheckCircle />
                 ) : (
-                  <AlertTriangle  />
+                  <AlertTriangle />
                 )}
               </div>
 
@@ -544,12 +482,12 @@ export function RFIDPrintDialog({
               {lastResult?.data?.summary && (
                 <div className="text-sm space-y-1">
                   <p className="text-success flex items-center gap-1 justify-center">
-                    <Check  />
+                    <Check />
                     Success: {lastResult.data.summary.success}
                   </p>
                   {lastResult.data.summary.failed > 0 && (
                     <p className="text-danger flex items-center gap-1 justify-center">
-                      <X  />
+                      <X />
                       Failed: {lastResult.data.summary.failed}
                     </p>
                   )}
@@ -561,11 +499,7 @@ export function RFIDPrintDialog({
         <ModalFooter>
           {!showResult ? (
             <>
-              <Button
-                variant="flat"
-                onPress={onClose}
-                startContent={<X  />}
-              >
+              <Button variant="flat" onPress={onClose} startContent={<X />}>
                 Cancel
               </Button>
               <Button
@@ -575,7 +509,7 @@ export function RFIDPrintDialog({
                 isDisabled={printing || !items.length}
                 isLoading={printing}
                 spinner={<Spinner size="sm" color="current" />}
-                startContent={!printing && <Printer  />}
+                startContent={!printing && <Printer />}
               >
                 {printing
                   ? "Printing..."
@@ -588,7 +522,7 @@ export function RFIDPrintDialog({
               variant="shadow"
               onPress={onClose}
               fullWidth
-              startContent={<Check  />}
+              startContent={<Check />}
             >
               Close
             </Button>
@@ -634,7 +568,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
         updateSetting("labelPreset", presetName);
       }
     },
-    [selectPreset, updateSettings, updateSetting]
+    [selectPreset, updateSettings, updateSetting],
   );
 
   const handleAction = useCallback(async (actionName, actionFn) => {
@@ -661,8 +595,8 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
   const connectionStatus = printerLoading
     ? "checking"
     : isConnected
-    ? "connected"
-    : "disconnected";
+      ? "connected"
+      : "disconnected";
 
   return (
     <div className={`flex flex-col gap-4 ${className}`}>
@@ -675,14 +609,14 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
         <Card className="bg-danger/10 border-danger/20" shadow="none">
           <CardBody>
             <p className="text-sm text-danger flex items-center gap-2">
-              <AlertTriangle  />
+              <AlertTriangle />
               {printerError}
             </p>
           </CardBody>
         </Card>
       )}
 
-      <SettingsSection title="Connection" icon={<Plug  />}>
+      <SettingsSection title="Connection" icon={<Plug />}>
         <div
           className={`grid gap-4 ${
             compact ? "grid-cols-2" : "grid-cols-1 md:grid-cols-2"
@@ -711,7 +645,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
             color="primary"
             variant="flat"
             size="sm"
-            startContent={actionLoading !== "test" && <Search  />}
+            startContent={actionLoading !== "test" && <Search />}
             onPress={() => handleAction("test", testConnection)}
             isLoading={actionLoading === "test"}
             spinner={<Spinner size="sm" color="current" />}
@@ -721,9 +655,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
           <Button
             variant="flat"
             size="sm"
-            startContent={
-              actionLoading !== "refresh" && <RefreshCw  />
-            }
+            startContent={actionLoading !== "refresh" && <RefreshCw />}
             onPress={() => handleAction("refresh", refreshPrinter)}
             isLoading={actionLoading === "refresh"}
             spinner={<Spinner size="sm" color="current" />}
@@ -733,7 +665,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
         </div>
       </SettingsSection>
 
-      <SettingsSection title="Label Configuration" icon={<Tag  />}>
+      <SettingsSection title="Label Configuration" icon={<Tag />}>
         <SettingsSelect
           label="Label Size Preset"
           value={settings.labelPreset}
@@ -776,7 +708,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
         />
       </SettingsSection>
 
-      <SettingsSection title="EPC Configuration" icon={<Radio  />}>
+      <SettingsSection title="EPC Configuration" icon={<Radio />}>
         <SettingsSelect
           label="EPC Generation Mode"
           value={settings.epcMode}
@@ -818,16 +750,13 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
         />
       </SettingsSection>
 
-      <SettingsSection
-        title="Printer Controls"
-        icon={<SlidersHorizontal  />}
-      >
+      <SettingsSection title="Printer Controls" icon={<SlidersHorizontal />}>
         <div className="flex flex-wrap gap-2">
           <Button
             color="primary"
             variant="flat"
             size="sm"
-            startContent={actionLoading !== "calibrate" && <Gauge  />}
+            startContent={actionLoading !== "calibrate" && <Gauge />}
             onPress={() => handleAction("calibrate", calibrate)}
             isLoading={actionLoading === "calibrate"}
             spinner={<Spinner size="sm" color="current" />}
@@ -838,9 +767,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
             color="warning"
             variant="flat"
             size="sm"
-            startContent={
-              actionLoading !== "cancel" && <StopCircle  />
-            }
+            startContent={actionLoading !== "cancel" && <StopCircle />}
             onPress={() => handleAction("cancel", cancelAllJobs)}
             isLoading={actionLoading === "cancel"}
             spinner={<Spinner size="sm" color="current" />}
@@ -850,7 +777,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
           <Button
             variant="flat"
             size="sm"
-            startContent={actionLoading !== "reset" && <RotateCcw  />}
+            startContent={actionLoading !== "reset" && <RotateCcw />}
             onPress={() => handleAction("reset", resetPrinter)}
             isLoading={actionLoading === "reset"}
             spinner={<Spinner size="sm" color="current" />}
@@ -861,7 +788,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
             color="danger"
             variant="flat"
             size="sm"
-            startContent={actionLoading !== "fullReset" && <Zap  />}
+            startContent={actionLoading !== "fullReset" && <Zap />}
             onPress={() => handleAction("fullReset", fullReset)}
             isLoading={actionLoading === "fullReset"}
             spinner={<Spinner size="sm" color="current" />}
@@ -876,7 +803,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
           key="advanced"
           title={
             <span className="flex items-center gap-2 text-sm font-semibold">
-              <Settings  />
+              <Settings />
               Advanced Settings
             </span>
           }
@@ -943,21 +870,17 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
       </Accordion>
 
       {printerStatus && (
-        <SettingsSection title="Printer Status" icon={<Activity  />}>
+        <SettingsSection title="Printer Status" icon={<Activity />}>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <Wifi  className="text-foreground/60" />
+              <Wifi className="text-foreground/60" />
               <span className="text-foreground/60">Online:</span>
               <Chip
                 size="sm"
                 color={printerStatus.online ? "success" : "danger"}
                 variant="flat"
                 startContent={
-                  printerStatus.online ? (
-                    <CheckCircle  />
-                  ) : (
-                    <XCircle  />
-                  )
+                  printerStatus.online ? <CheckCircle /> : <XCircle />
                 }
               >
                 {printerStatus.online ? "Yes" : "No"}
@@ -966,14 +889,14 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
             {printerStatus.parsed && (
               <>
                 <div className="flex items-center gap-2">
-                  <Pause  className="text-foreground/60" />
+                  <Pause className="text-foreground/60" />
                   <span className="text-foreground/60">Paused:</span>
                   <Chip size="sm" variant="flat">
                     {printerStatus.parsed.isPaused ? "Yes" : "No"}
                   </Chip>
                 </div>
                 <div className="flex items-center gap-2">
-                  <FileText  className="text-foreground/60" />
+                  <FileText className="text-foreground/60" />
                   <span className="text-foreground/60">Paper:</span>
                   <Chip
                     size="sm"
@@ -981,9 +904,9 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
                     variant="flat"
                     startContent={
                       printerStatus.parsed.paperOut ? (
-                        <XCircle  />
+                        <XCircle />
                       ) : (
-                        <CheckCircle  />
+                        <CheckCircle />
                       )
                     }
                   >
@@ -991,7 +914,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
                   </Chip>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Ribbon  className="text-foreground/60" />
+                  <Ribbon className="text-foreground/60" />
                   <span className="text-foreground/60">Ribbon:</span>
                   <Chip
                     size="sm"
@@ -1001,9 +924,9 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
                     variant="flat"
                     startContent={
                       printerStatus.parsed.ribbonOut ? (
-                        <XCircle  />
+                        <XCircle />
                       ) : (
-                        <CheckCircle  />
+                        <CheckCircle />
                       )
                     }
                   >
@@ -1021,7 +944,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
         <Button
           variant="flat"
           size="md"
-          startContent={<Undo  />}
+          startContent={<Undo />}
           onPress={reset}
         >
           Reset to Defaults
@@ -1033,18 +956,13 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
               color="success"
               size="sm"
               variant="flat"
-              startContent={<Check  />}
+              startContent={<Check />}
             >
               Saved
             </Chip>
           )}
           {saveStatus === "error" && (
-            <Chip
-              color="danger"
-              size="sm"
-              variant="flat"
-              startContent={<X  />}
-            >
+            <Chip color="danger" size="sm" variant="flat" startContent={<X />}>
               Save failed
             </Chip>
           )}
@@ -1053,7 +971,7 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
               color="primary"
               variant="shadow"
               size="md"
-              startContent={saveStatus !== "saving" && <Save  />}
+              startContent={saveStatus !== "saving" && <Save />}
               onPress={handleSave}
               isLoading={saveStatus === "saving"}
               spinner={<Spinner size="sm" color="current" />}
@@ -1088,8 +1006,8 @@ export function PrinterQuickConnect({ onConnect, className = "" }) {
   const connectionStatus = printerLoading
     ? "checking"
     : isConnected
-    ? "connected"
-    : "disconnected";
+      ? "connected"
+      : "disconnected";
 
   return (
     <Card className={className} shadow="sm" radius="lg">
@@ -1102,7 +1020,7 @@ export function PrinterQuickConnect({ onConnect, className = "" }) {
           <Card className="bg-danger/10" shadow="none">
             <CardBody>
               <p className="text-sm text-danger flex items-center gap-2">
-                <AlertTriangle  />
+                <AlertTriangle />
                 {printerError}
               </p>
             </CardBody>
@@ -1119,7 +1037,7 @@ export function PrinterQuickConnect({ onConnect, className = "" }) {
             size="md"
             radius="sm"
             className="flex-1"
-            startContent={<Wifi  className="text-foreground/50" />}
+            startContent={<Wifi className="text-foreground/50" />}
           />
           <Input
             type="number"
@@ -1130,7 +1048,7 @@ export function PrinterQuickConnect({ onConnect, className = "" }) {
             size="md"
             radius="sm"
             className="w-28"
-            startContent={<Hash  className="text-foreground/50" />}
+            startContent={<Hash className="text-foreground/50" />}
           />
           <Button
             color="primary"
@@ -1139,7 +1057,7 @@ export function PrinterQuickConnect({ onConnect, className = "" }) {
             onPress={handleConnect}
             isLoading={printerLoading}
             spinner={<Spinner size="sm" color="current" />}
-            startContent={!printerLoading && <Plug  />}
+            startContent={!printerLoading && <Plug />}
           >
             Connect
           </Button>
