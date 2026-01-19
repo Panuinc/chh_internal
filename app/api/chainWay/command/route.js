@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { RFIDPrinter, PRINTER_CONFIG, TIMEOUTS } from "@/lib/chainWay";
+import { RFIDPrinter, PRINTER_CONFIG, TIMEOUTS } from "@/lib/chainWay/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

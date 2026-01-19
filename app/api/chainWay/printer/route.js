@@ -1,4 +1,4 @@
-import { PrinterService, PRINTER_CONFIG } from "@/lib/chainWay";
+import { PrinterService, PRINTER_CONFIG } from "@/lib/chainWay/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

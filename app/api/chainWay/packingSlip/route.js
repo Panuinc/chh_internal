@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateAllPackingSlips } from "@/lib/chainWay";
+import { generateAllPackingSlips } from "@/lib/chainWay/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
