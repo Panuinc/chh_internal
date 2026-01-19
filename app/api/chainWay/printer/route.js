@@ -1,4 +1,4 @@
-import { PrinterService } from "@/lib/chainWay";
+import { PrinterService, PRINTER_CONFIG } from "@/lib/chainWay/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -8,10 +8,10 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
 
     const config = {
-      host: searchParams.get("host") || process.env.RFID_PRINTER_IP,
+      host: searchParams.get("host") || PRINTER_CONFIG.host,
       port: parseInt(
-        searchParams.get("port") || process.env.RFID_PRINTER_PORT || "9100",
-        10
+        searchParams.get("port") || PRINTER_CONFIG.port.toString(),
+        10,
       ),
     };
 
@@ -44,7 +44,7 @@ export async function GET(request) {
         error: error.message || "Failed to get status",
         code: "STATUS_ERROR",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -55,9 +55,8 @@ export async function POST(request) {
     const { action, config = {} } = body;
 
     const printerConfig = {
-      host: config.host || process.env.RFID_PRINTER_IP,
-      port:
-        config.port || parseInt(process.env.RFID_PRINTER_PORT || "9100", 10),
+      host: config.host || PRINTER_CONFIG.host,
+      port: config.port || PRINTER_CONFIG.port,
     };
 
     let result;
@@ -112,7 +111,7 @@ export async function POST(request) {
               "resume",
             ],
           },
-          { status: 400 }
+          { status: 400 },
         );
     }
 
@@ -134,7 +133,7 @@ export async function POST(request) {
         error: error.message || "Failed to execute action",
         code: "ACTION_ERROR",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

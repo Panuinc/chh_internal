@@ -1,4 +1,4 @@
-import { PrintService, EPCService } from "@/lib/chainWay";
+import { PrintService } from "@/lib/chainWay/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -15,7 +15,7 @@ export async function POST(request) {
           error: "Items array is required",
           code: "VALIDATION_ERROR",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -27,7 +27,7 @@ export async function POST(request) {
             error: "Each item must have a number",
             code: "VALIDATION_ERROR",
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -67,7 +67,7 @@ export async function POST(request) {
         error: error.message || "Internal server error",
         code: "INTERNAL_ERROR",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -88,13 +88,13 @@ export async function GET(request) {
           error: "Item number is required",
           code: "VALIDATION_ERROR",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const preview = await PrintService.preview(
       { number, displayName, displayName2 },
-      { type, enableRFID }
+      { type, enableRFID },
     );
 
     return Response.json({
@@ -116,7 +116,7 @@ export async function GET(request) {
         error: error.message || "Internal server error",
         code: "INTERNAL_ERROR",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

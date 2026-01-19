@@ -25,11 +25,11 @@ import {
   User,
   Calendar,
   MapPin,
+  FileText,
 } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe, usePrinterSettings } from "@/hooks";
-import { PRINT_TYPE_OPTIONS, STATUS_COLORS } from "@/lib/chainWay/config";
-import { FileText } from "lucide-react";
+import { PRINT_TYPE_OPTIONS } from "@/lib/chainWay";
 import PackingSlipPreviewModal from "./PackingSlipPreviewModal";
 
 const PRINT_OPTIONS = [
@@ -313,6 +313,7 @@ export default function UISalesOrderOnline({
 }) {
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [previewOrder, setPreviewOrder] = useState(null);
 
   const {
     isOpen: isSettingsOpen,
@@ -331,8 +332,6 @@ export default function UISalesOrderOnline({
     onOpen: openPreview,
     onClose: closePreview,
   } = useDisclosure();
-
-  const [previewOrder, setPreviewOrder] = useState(null);
 
   const { isConnected } = useRFIDSafe();
   const { save: saveSettings } = usePrinterSettings();
