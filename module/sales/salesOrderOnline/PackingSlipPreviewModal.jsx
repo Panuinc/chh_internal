@@ -13,7 +13,6 @@ import {
 } from "@heroui/react";
 import { Printer, Package } from "lucide-react";
 
-// Company info (same as packingSlip route)
 const COMPANY_INFO = {
   name: "บริษัท ชื้ออะฮวด อุตสาหกรรม จำกัด",
   address: "9/1 หมู่ 2 ถนนบางเลน-ลาดหลุมแก้ว",
@@ -21,19 +20,9 @@ const COMPANY_INFO = {
   phone: "02-921-9979",
 };
 
-/**
- * Label Preview Component
- * Layout based on 100mm x 150mm label
- * Matches ZPL output:
- * - Header (Logo + ผู้ส่ง + 1/X): 20mm (80px)
- * - Recipient (ผู้รับ): 20mm (80px)
- * - Table Header: 5mm (20px)
- * - Table Body: 75mm (300px)
- * - Footer: 25mm (100px)
- */
 function LabelPreview({ order, currentPiece, totalPieces }) {
   const itemLines = (order?.salesOrderLines || []).filter(
-    (l) => l.lineType === "Item"
+    (l) => l.lineType === "Item",
   );
 
   return (
@@ -45,15 +34,10 @@ function LabelPreview({ order, currentPiece, totalPieces }) {
         fontFamily: "sans-serif",
       }}
     >
-      {/* ============================================ */}
-      {/* HEADER SECTION - 20mm (80px) */}
-      {/* Logo + ผู้ส่ง + 1/X (top right) */}
-      {/* ============================================ */}
       <div
         className="flex border-b-2 border-black relative"
         style={{ height: "80px" }}
       >
-        {/* Logo */}
         <div
           className="flex items-center justify-center p-1"
           style={{ width: "72px" }}
@@ -72,12 +56,14 @@ function LabelPreview({ order, currentPiece, totalPieces }) {
           />
         </div>
 
-        {/* Sender Info - aligned columns */}
         <div className="flex-1 py-1 text-xs">
           <table className="w-full">
             <tbody>
               <tr>
-                <td className="font-semibold whitespace-nowrap pr-1 align-top" style={{ width: "45px" }}>
+                <td
+                  className="font-semibold whitespace-nowrap pr-1 align-top"
+                  style={{ width: "45px" }}
+                >
                   ผู้ส่ง:
                 </td>
                 <td className="align-top">{COMPANY_INFO.name}</td>
@@ -100,7 +86,6 @@ function LabelPreview({ order, currentPiece, totalPieces }) {
           </table>
         </div>
 
-        {/* Piece Count - Top Right Corner - EXTRA LARGE */}
         <div className="absolute top-1 right-2">
           <span className="text-3xl font-bold">
             {currentPiece}/{totalPieces}
@@ -108,9 +93,6 @@ function LabelPreview({ order, currentPiece, totalPieces }) {
         </div>
       </div>
 
-      {/* ============================================ */}
-      {/* RECIPIENT SECTION - 20mm (80px) */}
-      {/* ============================================ */}
       <div
         className="px-2 py-1 border-b-2 border-black"
         style={{ height: "80px" }}
@@ -152,9 +134,6 @@ function LabelPreview({ order, currentPiece, totalPieces }) {
         </table>
       </div>
 
-      {/* ============================================ */}
-      {/* TABLE HEADER - 5mm (20px) */}
-      {/* ============================================ */}
       <div
         className="flex items-center px-2 text-xs font-semibold border-b border-gray-400"
         style={{ height: "20px" }}
@@ -166,9 +145,6 @@ function LabelPreview({ order, currentPiece, totalPieces }) {
         </span>
       </div>
 
-      {/* ============================================ */}
-      {/* TABLE BODY - 75mm (300px) */}
-      {/* ============================================ */}
       <div className="overflow-auto" style={{ height: "300px" }}>
         <table className="w-full text-xs">
           <tbody>
@@ -201,11 +177,7 @@ function LabelPreview({ order, currentPiece, totalPieces }) {
         </table>
       </div>
 
-      {/* ============================================ */}
-      {/* FOOTER SECTION - 25mm (100px) */}
-      {/* ============================================ */}
       <div className="border-t-2 border-black flex" style={{ height: "100px" }}>
-        {/* Warning Note (left side) */}
         <div className="flex-1 p-2 text-xs text-red-600">
           <p className="font-bold">
             ❗ กรุณาถ่ายวิดีโอขณะแกะพัสดุ เพื่อใช้เป็นหลัก
@@ -213,7 +185,6 @@ function LabelPreview({ order, currentPiece, totalPieces }) {
           <p className="ml-4">ฐานการเคลมสินค้า ไม่มีหลักฐานงดเคลมทุกกรณี</p>
         </div>
 
-        {/* QR Code (bottom right corner) */}
         <div className="flex items-end justify-end p-2">
           <div
             className="border border-gray-300 flex items-center justify-center bg-gray-50"
@@ -240,7 +211,7 @@ export default function PackingSlipPreviewModal({
   if (!order) return null;
 
   const itemLines = (order.salesOrderLines || []).filter(
-    (l) => l.lineType === "Item"
+    (l) => l.lineType === "Item",
   );
   const totalPieces = itemLines.reduce((sum, l) => sum + (l.quantity || 0), 0);
 
@@ -272,8 +243,9 @@ export default function PackingSlipPreviewModal({
 
           <div className="space-y-2">
             <h4 className="font-medium flex items-center gap-2">
-              <Package  />
-              รายการสินค้าทั้งหมด ({itemLines.length} รายการ, {totalPieces} ชิ้น)
+              <Package />
+              รายการสินค้าทั้งหมด ({itemLines.length} รายการ, {totalPieces}{" "}
+              ชิ้น)
             </h4>
             <div className="max-h-40 overflow-auto">
               <table className="w-full text-sm">
@@ -310,7 +282,7 @@ export default function PackingSlipPreviewModal({
           </Button>
           <Button
             color="primary"
-            startContent={<Printer  />}
+            startContent={<Printer />}
             onPress={() => onPrint(order)}
             isLoading={printing}
             isDisabled={totalPieces === 0}

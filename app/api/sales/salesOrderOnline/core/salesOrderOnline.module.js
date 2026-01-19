@@ -30,53 +30,52 @@ const QUERY_SCHEMA = {
 
 const Repository = {
   async findMany(params) {
-    // Build query string manually to match working n8n query
     const queryParts = [];
-    
-    // $expand
+
     queryParts.push("$expand=salesOrderLines");
-    
-    // $filter
+
     const filters = ["salesperson eq 'ONLINE'"];
     if (params.number) filters.push(`startswith(number,'${params.number}')`);
-    if (params.customerNumber) filters.push(`customerNumber eq '${params.customerNumber}'`);
-    if (params.customerName) filters.push(`contains(customerName,'${params.customerName}')`);
+    if (params.customerNumber)
+      filters.push(`customerNumber eq '${params.customerNumber}'`);
+    if (params.customerName)
+      filters.push(`contains(customerName,'${params.customerName}')`);
     if (params.status) filters.push(`status eq '${params.status}'`);
-    if (params.orderDateFrom) filters.push(`orderDate ge ${params.orderDateFrom}`);
+    if (params.orderDateFrom)
+      filters.push(`orderDate ge ${params.orderDateFrom}`);
     if (params.orderDateTo) filters.push(`orderDate le ${params.orderDateTo}`);
-    
+
     if (filters.length > 0) {
       queryParts.push(`$filter=${filters.join(" and ")}`);
     }
-    
-    // $top
+
     queryParts.push(`$top=${params.limit || 100}`);
-    
-    // $orderby - no spaces around =
+
     queryParts.push("$orderby=number desc");
-    
+
     const queryString = queryParts.join("&");
-    // Add leading slash for buildUrl to work correctly
     const url = `/${SALES_ORDERS_ENDPOINT}?${queryString}`;
-    
+
     console.log("[SalesOrderOnline] Requesting:", url);
-    
+
     return bcClient.get(url);
   },
 
   async findById(id) {
-    return bcClient.get(`/${SALES_ORDERS_ENDPOINT}(${id})?$expand=salesOrderLines`);
+    return bcClient.get(
+      `/${SALES_ORDERS_ENDPOINT}(${id})?$expand=salesOrderLines`,
+    );
   },
 };
 
 const Service = {
   async getFiltered(params) {
     const result = await Repository.findMany(params);
-    const items = Array.isArray(result) ? result : (result?.value || []);
+    const items = Array.isArray(result) ? result : result?.value || [];
 
-    return { 
-      items, 
-      total: result?.["@odata.count"] || items.length 
+    return {
+      items,
+      total: result?.["@odata.count"] || items.length,
     };
   },
 
@@ -165,10 +164,12 @@ export function formatData(orders) {
     email: order.email || "",
     lastModifiedDateTime: order.lastModifiedDateTime,
     salesOrderLines: formatLines(order.salesOrderLines),
-    lineCount: order.salesOrderLines?.filter(l => l.lineType === "Item").length || 0,
-    totalQuantity: order.salesOrderLines
-      ?.filter(l => l.lineType === "Item")
-      .reduce((sum, l) => sum + (l.quantity || 0), 0) || 0,
+    lineCount:
+      order.salesOrderLines?.filter((l) => l.lineType === "Item").length || 0,
+    totalQuantity:
+      order.salesOrderLines
+        ?.filter((l) => l.lineType === "Item")
+        .reduce((sum, l) => sum + (l.quantity || 0), 0) || 0,
   }));
 }
 

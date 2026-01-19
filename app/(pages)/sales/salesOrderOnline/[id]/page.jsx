@@ -21,10 +21,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-// ============================================
-// Config & Helpers
-// ============================================
-
 const statusConfig = {
   Draft: { color: "default", label: "ร่าง" },
   Open: { color: "primary", label: "เปิด" },
@@ -59,16 +55,14 @@ function extractOrder(result) {
   return result;
 }
 
-// ============================================
-// UI Components
-// ============================================
-
 function LoadingState() {
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-b from-primary-50 to-background">
       <div className="text-center">
         <Spinner size="lg" color="primary" />
-        <p className="mt-4 text-foreground/60 animate-pulse">กำลังโหลดข้อมูล...</p>
+        <p className="mt-4 text-foreground/60 animate-pulse">
+          กำลังโหลดข้อมูล...
+        </p>
       </div>
     </div>
   );
@@ -84,7 +78,12 @@ function ErrorState({ error }) {
           </div>
           <h2 className="text-xl font-bold mb-2">เกิดข้อผิดพลาด</h2>
           <p className="text-sm text-foreground/60 mb-6">{error}</p>
-          <Button as={Link} href="/sales/salesOrderOnline" color="primary" variant="flat">
+          <Button
+            as={Link}
+            href="/sales/salesOrderOnline"
+            color="primary"
+            variant="flat"
+          >
             <ArrowLeft className="mr-1" />
             กลับหน้าหลัก
           </Button>
@@ -103,8 +102,15 @@ function NotFoundState() {
             <Package className="text-warning" />
           </div>
           <h2 className="text-xl font-bold mb-2">ไม่พบคำสั่งซื้อ</h2>
-          <p className="text-sm text-foreground/60 mb-6">ไม่พบข้อมูลที่ต้องการ</p>
-          <Button as={Link} href="/sales/salesOrderOnline" color="primary" variant="flat">
+          <p className="text-sm text-foreground/60 mb-6">
+            ไม่พบข้อมูลที่ต้องการ
+          </p>
+          <Button
+            as={Link}
+            href="/sales/salesOrderOnline"
+            color="primary"
+            variant="flat"
+          >
             <ArrowLeft className="mr-1" />
             กลับหน้าหลัก
           </Button>
@@ -132,15 +138,13 @@ function InfoRow({ label, value }) {
   if (!value || value === "-") return null;
   return (
     <div>
-      <p className="text-xs text-foreground/50 uppercase tracking-wide">{label}</p>
+      <p className="text-xs text-foreground/50 uppercase tracking-wide">
+        {label}
+      </p>
       <p className="font-medium">{value}</p>
     </div>
   );
 }
-
-// ============================================
-// Main Component
-// ============================================
 
 export default function SalesOrderDetailPage() {
   const params = useParams();
@@ -165,7 +169,9 @@ export default function SalesOrderDetailPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || result.message || "Failed to fetch order");
+        throw new Error(
+          result.error || result.message || "Failed to fetch order",
+        );
       }
 
       if (result.success === false) {
@@ -191,13 +197,19 @@ export default function SalesOrderDetailPage() {
   if (error) return <ErrorState error={error} />;
   if (!order) return <NotFoundState />;
 
-  const itemLines = (order.salesOrderLines || []).filter((l) => l.lineType === "Item");
-  const commentLines = (order.salesOrderLines || []).filter((l) => l.lineType === "Comment");
-  const status = statusConfig[order.status] || { color: "default", label: order.status };
+  const itemLines = (order.salesOrderLines || []).filter(
+    (l) => l.lineType === "Item",
+  );
+  const commentLines = (order.salesOrderLines || []).filter(
+    (l) => l.lineType === "Comment",
+  );
+  const status = statusConfig[order.status] || {
+    color: "default",
+    label: order.status,
+  };
 
   return (
     <div className="bg-gradient-to-b from-primary-50/50 to-background h-full overflow-auto">
-      {/* Header */}
       <div className="bg-white/80 backdrop-blur-md border-b sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <Button
@@ -220,9 +232,7 @@ export default function SalesOrderDetailPage() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="max-w-lg mx-auto px-4 py-4 space-y-4">
-        {/* Logo */}
         <div className="flex justify-center">
           <Image
             src="/logo/logo-09.png"
@@ -233,29 +243,38 @@ export default function SalesOrderDetailPage() {
           />
         </div>
 
-        {/* Order Info Card */}
         <Card className="shadow-md">
           <CardBody className="p-4">
             <SectionHeader icon={FileText} title="ข้อมูลคำสั่งซื้อ" />
             <div className="grid grid-cols-2 gap-4">
               <InfoRow label="เลขที่" value={order.number} />
-              <InfoRow label="วันที่สั่งซื้อ" value={formatDate(order.orderDate)} />
-              <InfoRow label="กำหนดส่ง" value={formatDate(order.requestedDeliveryDate)} />
+              <InfoRow
+                label="วันที่สั่งซื้อ"
+                value={formatDate(order.orderDate)}
+              />
+              <InfoRow
+                label="กำหนดส่ง"
+                value={formatDate(order.requestedDeliveryDate)}
+              />
               {order.externalDocumentNumber && (
-                <InfoRow label="เลขอ้างอิง" value={order.externalDocumentNumber} />
+                <InfoRow
+                  label="เลขอ้างอิง"
+                  value={order.externalDocumentNumber}
+                />
               )}
             </div>
           </CardBody>
         </Card>
 
-        {/* Customer Card */}
         <Card className="shadow-md">
           <CardBody className="p-4">
             <SectionHeader icon={User} title="ข้อมูลลูกค้า" />
             <div className="space-y-2">
               <div>
                 <p className="font-semibold text-lg">{order.customerName}</p>
-                <p className="text-sm text-foreground/60">{order.customerNumber}</p>
+                <p className="text-sm text-foreground/60">
+                  {order.customerNumber}
+                </p>
               </div>
               {order.phoneNumber && (
                 <a
@@ -270,17 +289,20 @@ export default function SalesOrderDetailPage() {
           </CardBody>
         </Card>
 
-        {/* Shipping Card */}
         <Card className="shadow-md">
           <CardBody className="p-4">
             <SectionHeader icon={MapPin} title="ที่อยู่จัดส่ง" />
             <div className="space-y-1">
               <p className="font-semibold">{order.shipToName}</p>
               {order.shipToAddressLine1 && (
-                <p className="text-sm text-foreground/70">{order.shipToAddressLine1}</p>
+                <p className="text-sm text-foreground/70">
+                  {order.shipToAddressLine1}
+                </p>
               )}
               {order.shipToAddressLine2 && (
-                <p className="text-sm text-foreground/70">{order.shipToAddressLine2}</p>
+                <p className="text-sm text-foreground/70">
+                  {order.shipToAddressLine2}
+                </p>
               )}
               {(order.shipToCity || order.shipToPostCode) && (
                 <p className="text-sm text-foreground/70">
@@ -291,7 +313,6 @@ export default function SalesOrderDetailPage() {
           </CardBody>
         </Card>
 
-        {/* Items Card */}
         <Card className="shadow-md">
           <CardBody className="p-4">
             <SectionHeader
@@ -305,7 +326,9 @@ export default function SalesOrderDetailPage() {
             />
 
             {itemLines.length === 0 ? (
-              <p className="text-center text-foreground/50 py-4">ไม่มีรายการสินค้า</p>
+              <p className="text-center text-foreground/50 py-4">
+                ไม่มีรายการสินค้า
+              </p>
             ) : (
               <div className="space-y-3">
                 {itemLines.map((line, index) => (
@@ -322,7 +345,9 @@ export default function SalesOrderDetailPage() {
                       </p>
                       <p className="font-medium text-sm">{line.description}</p>
                       {line.description2 && (
-                        <p className="text-xs text-foreground/60">{line.description2}</p>
+                        <p className="text-xs text-foreground/60">
+                          {line.description2}
+                        </p>
                       )}
                       <div className="flex gap-4 mt-1 text-xs text-foreground/60">
                         <span className="font-medium">
@@ -341,10 +366,11 @@ export default function SalesOrderDetailPage() {
               </div>
             )}
 
-            {/* Comments */}
             {commentLines.length > 0 && (
               <div className="mt-4 p-3 rounded-lg bg-warning-50">
-                <p className="text-xs font-semibold text-warning-800 mb-1">หมายเหตุ:</p>
+                <p className="text-xs font-semibold text-warning-800 mb-1">
+                  หมายเหตุ:
+                </p>
                 {commentLines.map((line, i) => (
                   <p key={i} className="text-sm text-warning-700">
                     {line.description} {line.description2}
@@ -353,7 +379,6 @@ export default function SalesOrderDetailPage() {
               </div>
             )}
 
-            {/* Totals */}
             <Divider className="my-4" />
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
@@ -361,7 +386,9 @@ export default function SalesOrderDetailPage() {
                 <span>{formatCurrency(order.totalAmountExcludingTax)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-foreground/60">ภาษีมูลค่าเพิ่ม (VAT)</span>
+                <span className="text-foreground/60">
+                  ภาษีมูลค่าเพิ่ม (VAT)
+                </span>
                 <span>{formatCurrency(order.totalTaxAmount)}</span>
               </div>
               <Divider />
@@ -369,14 +396,15 @@ export default function SalesOrderDetailPage() {
                 <span className="text-lg font-bold">ยอดรวมทั้งสิ้น</span>
                 <span className="text-2xl font-bold text-primary">
                   {formatCurrency(order.totalAmountIncludingTax)}
-                  <span className="text-sm ml-1 text-foreground/60">{order.currencyCode}</span>
+                  <span className="text-sm ml-1 text-foreground/60">
+                    {order.currencyCode}
+                  </span>
                 </span>
               </div>
             </div>
           </CardBody>
         </Card>
 
-        {/* Warning Card */}
         <Card className="bg-gradient-to-r from-warning-100 to-warning-50 border-l-4 border-warning shadow-md">
           <CardBody className="p-4">
             <p className="font-bold text-warning-800 flex items-center gap-2">
@@ -389,7 +417,6 @@ export default function SalesOrderDetailPage() {
           </CardBody>
         </Card>
 
-        {/* Footer */}
         <div className="text-center py-4 space-y-1">
           <p className="text-sm font-medium text-foreground/70">
             บริษัท ชื้ออะฮวด อุตสาหกรรม จำกัด

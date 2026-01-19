@@ -35,7 +35,10 @@ async function fetchWithAbort(url, options, signal) {
   }
 
   if (!response.ok) {
-    const errorMessage = data?.error || data?.message || `Request failed with status ${response.status}`;
+    const errorMessage =
+      data?.error ||
+      data?.message ||
+      `Request failed with status ${response.status}`;
     throw new Error(errorMessage);
   }
 
@@ -56,11 +59,15 @@ export function useSalesOrdersOnline(params = {}) {
 
         const searchParams = new URLSearchParams();
         if (params.number) searchParams.set("number", params.number);
-        if (params.customerNumber) searchParams.set("customerNumber", params.customerNumber);
-        if (params.customerName) searchParams.set("customerName", params.customerName);
+        if (params.customerNumber)
+          searchParams.set("customerNumber", params.customerNumber);
+        if (params.customerName)
+          searchParams.set("customerName", params.customerName);
         if (params.status) searchParams.set("status", params.status);
-        if (params.orderDateFrom) searchParams.set("orderDateFrom", params.orderDateFrom);
-        if (params.orderDateTo) searchParams.set("orderDateTo", params.orderDateTo);
+        if (params.orderDateFrom)
+          searchParams.set("orderDateFrom", params.orderDateFrom);
+        if (params.orderDateTo)
+          searchParams.set("orderDateTo", params.orderDateTo);
         if (params.limit) searchParams.set("limit", String(params.limit));
 
         const queryString = searchParams.toString();
@@ -68,11 +75,10 @@ export function useSalesOrdersOnline(params = {}) {
 
         const result = await fetchWithAbort(url, {}, signal);
 
-        // Handle both success wrapper and direct data response
         if (result.success === false) {
           throw new Error(result.error || "Failed to fetch sales orders");
         }
-        
+
         const data = extractOrders(result);
         setOrders(data);
         setMeta(result.meta || { total: data.length });
@@ -93,7 +99,7 @@ export function useSalesOrdersOnline(params = {}) {
       params.orderDateFrom,
       params.orderDateTo,
       params.limit,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -126,13 +132,16 @@ export function useSalesOrderOnline(orderId) {
         setError(null);
         setLoading(true);
 
-        const result = await fetchWithAbort(`${API_URL}/${orderId}`, {}, signal);
+        const result = await fetchWithAbort(
+          `${API_URL}/${orderId}`,
+          {},
+          signal,
+        );
 
-        // Handle both success wrapper and direct data response
         if (result.success === false) {
           throw new Error(result.error || "Failed to fetch sales order");
         }
-        
+
         const data = extractOrder(result);
         setOrder(data);
       } catch (err) {
@@ -144,7 +153,7 @@ export function useSalesOrderOnline(orderId) {
         setLoading(false);
       }
     },
-    [orderId]
+    [orderId],
   );
 
   useEffect(() => {

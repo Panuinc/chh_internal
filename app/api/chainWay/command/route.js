@@ -4,15 +4,23 @@ import net from "net";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-// Use same env variables as config.js
-const PRINTER_HOST = process.env.RFID_PRINTER_IP || process.env.NEXT_PUBLIC_RFID_PRINTER_IP || "169.254.112.200";
-const PRINTER_PORT = parseInt(process.env.RFID_PRINTER_PORT || process.env.NEXT_PUBLIC_RFID_PRINTER_PORT || "9100", 10);
-const TIMEOUT = 30000; // 30 seconds
+const PRINTER_HOST =
+  process.env.RFID_PRINTER_IP ||
+  process.env.NEXT_PUBLIC_RFID_PRINTER_IP ||
+  "169.254.112.200";
+const PRINTER_PORT = parseInt(
+  process.env.RFID_PRINTER_PORT ||
+    process.env.NEXT_PUBLIC_RFID_PRINTER_PORT ||
+    "9100",
+  10,
+);
+const TIMEOUT = 30000;
 
-/**
- * Send raw TSPL command to printer via TCP socket
- */
-async function sendToPrinter(command, host = PRINTER_HOST, port = PRINTER_PORT) {
+async function sendToPrinter(
+  command,
+  host = PRINTER_HOST,
+  port = PRINTER_PORT,
+) {
   return new Promise((resolve, reject) => {
     const socket = new net.Socket();
     let responded = false;
@@ -31,8 +39,7 @@ async function sendToPrinter(command, host = PRINTER_HOST, port = PRINTER_PORT) 
 
     socket.connect(port, host, () => {
       console.log(`[Printer Command] Connected to ${host}:${port}`);
-      
-      // Send the TSPL command
+
       socket.write(command + "\r\n", "utf8", (err) => {
         if (err) {
           clearTimeout(timeout);
@@ -42,8 +49,7 @@ async function sendToPrinter(command, host = PRINTER_HOST, port = PRINTER_PORT) 
         }
 
         console.log(`[Printer Command] Command sent successfully`);
-        
-        // Give printer time to process
+
         setTimeout(() => {
           clearTimeout(timeout);
           cleanup();
@@ -67,10 +73,6 @@ async function sendToPrinter(command, host = PRINTER_HOST, port = PRINTER_PORT) 
   });
 }
 
-/**
- * POST /api/chainWay/command
- * Send raw TSPL command to printer
- */
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -79,7 +81,7 @@ export async function POST(request) {
     if (!command) {
       return NextResponse.json(
         { success: false, error: "Command is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -88,7 +90,7 @@ export async function POST(request) {
     const result = await sendToPrinter(
       command,
       host || PRINTER_HOST,
-      port || PRINTER_PORT
+      port || PRINTER_PORT,
     );
 
     return NextResponse.json({
@@ -97,13 +99,13 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("[Printer Command] Error:", error);
-    
+
     return NextResponse.json(
       {
         success: false,
         error: error.message || "Failed to send command",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

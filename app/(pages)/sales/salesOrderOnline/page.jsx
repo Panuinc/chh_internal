@@ -25,11 +25,14 @@ function SalesOrderOnlineContent() {
       }
 
       try {
-        // Handle packing slip print
         if (options.type === "packingSlip") {
-          const itemLines = order.salesOrderLines?.filter(l => l.lineType === "Item") || [];
-          const totalPieces = itemLines.reduce((sum, l) => sum + (l.quantity || 0), 0);
-          
+          const itemLines =
+            order.salesOrderLines?.filter((l) => l.lineType === "Item") || [];
+          const totalPieces = itemLines.reduce(
+            (sum, l) => sum + (l.quantity || 0),
+            0,
+          );
+
           if (totalPieces === 0) {
             alert("No items to print");
             return;
@@ -38,15 +41,17 @@ function SalesOrderOnlineContent() {
           setIsPrintingSlip(true);
 
           try {
-            // Import and use the printPackingSlips function
-            const { printPackingSlips } = await import("@/lib/chainWay/packingSlipLabel");
-            
+            const { printPackingSlips } =
+              await import("@/lib/chainWay/packingSlipLabel");
+
             const result = await printPackingSlips(order, (current, total) => {
               console.log(`Printing ${current}/${total}`);
             });
 
             if (result.success) {
-              alert(`พิมพ์ใบปะหน้า ${result.printed} ใบสำเร็จ (${order.number})`);
+              alert(
+                `พิมพ์ใบปะหน้า ${result.printed} ใบสำเร็จ (${order.number})`,
+              );
             } else {
               throw new Error(result.error || "Print failed");
             }
@@ -56,13 +61,13 @@ function SalesOrderOnlineContent() {
           } finally {
             setIsPrintingSlip(false);
           }
-          
+
           return;
         }
 
-        // Handle regular label print (existing logic)
-        const lineItems = order.salesOrderLines?.filter(l => l.lineType === "Item") || [];
-        
+        const lineItems =
+          order.salesOrderLines?.filter((l) => l.lineType === "Item") || [];
+
         for (const line of lineItems) {
           await print(
             {
@@ -75,16 +80,18 @@ function SalesOrderOnlineContent() {
             {
               type: options.type || "thai",
               enableRFID: options.enableRFID || false,
-            }
+            },
           );
         }
-        alert(`Printed ${lineItems.length} items from ${order.number} successfully`);
+        alert(
+          `Printed ${lineItems.length} items from ${order.number} successfully`,
+        );
       } catch (err) {
         console.error("Print error:", err);
         alert(`Print failed: ${err.message}`);
       }
     },
-    [print, isConnected]
+    [print, isConnected],
   );
 
   const handlePrintMultiple = useCallback((orders) => {
@@ -131,16 +138,16 @@ function SalesOrderOnlineContent() {
           setDialogOpen(false);
           setSelectedOrders([]);
         }}
-        items={selectedOrders.flatMap(order => 
+        items={selectedOrders.flatMap((order) =>
           (order.salesOrderLines || [])
-            .filter(l => l.lineType === "Item")
-            .map(line => ({
+            .filter((l) => l.lineType === "Item")
+            .map((line) => ({
               number: line.itemNumber,
               displayName: line.description,
               displayName2: line.description2 || "",
               orderNumber: order.number,
               customerName: order.customerName,
-            }))
+            })),
         )}
         onSuccess={handlePrintSuccess}
         onError={handlePrintError}
