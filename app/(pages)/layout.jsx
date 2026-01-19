@@ -29,7 +29,7 @@ export default function PagesLayout({ children }) {
       <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 border-1">
         <Link
           href="/home"
-          className="flex items-center justify-start w-full xl:min-w-60 h-full p-2 gap-2"
+          className="flex items-center justify-start w-full xl:min-w-12 h-12 p-2 gap-2"
         >
           <Image src="/logo/logo-04.png" alt="logo" width={125} height={125} />
         </Link>
