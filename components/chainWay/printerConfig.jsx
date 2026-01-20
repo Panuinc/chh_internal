@@ -38,11 +38,7 @@ import {
   Cpu,
   Activity,
 } from "lucide-react";
-import {
-  useRFIDSafe,
-  usePrinterSettings,
-  useLabelPresets,
-} from "@/app/api/chainWay/core";
+import { useRFIDSafe, usePrinterSettings, useLabelPresets } from "@/hooks";
 import {
   PRINT_TYPES,
   PRINT_TYPE_OPTIONS,

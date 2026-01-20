@@ -30,7 +30,7 @@ import {
   FileText,
 } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
-import { useRFIDSafe, usePrinterSettings } from "@/app/api/chainWay/core";
+import { useRFIDSafe, usePrinterSettings } from "@/hooks";
 import { PRINT_TYPE_OPTIONS } from "@/lib/chainWay";
 
 const COMPANY_INFO = {

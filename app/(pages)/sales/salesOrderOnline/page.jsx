@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from "react";
 import { useSalesOrdersOnline } from "@/app/api/sales/salesOrderOnline/core";
 import { useMenu } from "@/hooks";
-import { RFIDProvider, useRFIDContext } from "@/app/api/chainWay/core";
+import { RFIDProvider, useRFIDContext } from "@/hooks";
 import UISalesOrderOnline from "@/module/sales/salesOrderOnline/UISalesOrderOnline";
 import { RFIDPrintDialog } from "@/components/chainWay";
 

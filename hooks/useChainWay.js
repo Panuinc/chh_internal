@@ -10,7 +10,6 @@ import React, {
   useRef,
 } from "react";
 import {
-  API_ENDPOINTS,
   TIMEOUTS,
   STORAGE_KEYS,
   PRINTER_CONFIG,
@@ -34,10 +33,7 @@ async function fetchAPI(url, options = {}) {
     const response = await fetch(url, {
       ...options,
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
+      headers: { "Content-Type": "application/json", ...options.headers },
       signal: options.signal || controller.signal,
     });
 
@@ -269,11 +265,8 @@ export function useRFIDPrint(defaultOptions = {}) {
 
     try {
       const result = await postApi("command", { command });
-
-      if (!result.success) {
+      if (!result.success)
         throw new Error(result.error || "Send command failed");
-      }
-
       setLastResult(result);
       return result;
     } catch (err) {
@@ -293,9 +286,8 @@ export function useRFIDPrint(defaultOptions = {}) {
 
       try {
         const isHealthy = await healthCheck();
-        if (!isHealthy) {
+        if (!isHealthy)
           throw new Error("Printer ไม่พร้อม กรุณาตรวจสอบการเชื่อมต่อ");
-        }
 
         const result = await withRetry(async () => {
           if (abortRef.current?.signal?.aborted) {
@@ -308,10 +300,7 @@ export function useRFIDPrint(defaultOptions = {}) {
           });
         });
 
-        if (!result.success) {
-          throw new Error(result.error || "Print failed");
-        }
-
+        if (!result.success) throw new Error(result.error || "Print failed");
         setLastResult(result);
         return result;
       } catch (err) {
@@ -362,8 +351,16 @@ export function usePrinterStatus(config = {}) {
       if (!mountedRef.current) return null;
 
       if (result.success) {
-        setStatus(result.data);
-        setIsConnected(result.data?.connection?.success || false);
+        const { connection, status: printerStatusData } = result.data || {};
+        const isOnline = connection?.success || false;
+
+        setStatus({
+          online: isOnline,
+          raw: printerStatusData?.raw,
+          parsed: printerStatusData?.parsed || null,
+          connection,
+        });
+        setIsConnected(isOnline);
       }
       return result;
     } catch (err) {
@@ -500,9 +497,8 @@ export function useRFID(config = {}) {
     async (item, options = {}) => {
       if (!printerHook.isConnected) {
         await printerHook.refresh();
-        if (!printerHook.isConnected) {
+        if (!printerHook.isConnected)
           throw new Error("Printer ไม่ได้เชื่อมต่อ");
-        }
       }
       return printHook.print(item, options);
     },
@@ -513,9 +509,8 @@ export function useRFID(config = {}) {
     async (items, options = {}) => {
       if (!printerHook.isConnected) {
         await printerHook.refresh();
-        if (!printerHook.isConnected) {
+        if (!printerHook.isConnected)
           throw new Error("Printer ไม่ได้เชื่อมต่อ");
-        }
       }
       return printHook.printBatch(items, options);
     },
@@ -526,9 +521,8 @@ export function useRFID(config = {}) {
     async (command) => {
       if (!printerHook.isConnected) {
         await printerHook.refresh();
-        if (!printerHook.isConnected) {
+        if (!printerHook.isConnected)
           throw new Error("Printer ไม่ได้เชื่อมต่อ");
-        }
       }
       return printHook.sendCommand(command);
     },
@@ -563,11 +557,7 @@ export function useRFID(config = {}) {
 const RFIDContext = createContext(null);
 
 export function RFIDProvider({ children, config = {} }) {
-  const rfid = useRFID({
-    autoConnect: true,
-    pollInterval: 15000,
-    ...config,
-  });
+  const rfid = useRFID({ autoConnect: true, pollInterval: 15000, ...config });
 
   const value = useMemo(
     () => rfid,
@@ -587,9 +577,8 @@ export function RFIDProvider({ children, config = {} }) {
 
 export function useRFIDContext() {
   const context = useContext(RFIDContext);
-  if (!context) {
+  if (!context)
     throw new Error("useRFIDContext must be used within RFIDProvider");
-  }
   return context;
 }
 
@@ -601,28 +590,6 @@ export function useRFIDSafe(config = {}) {
       : { autoConnect: true, pollInterval: 15000, ...config },
   );
   return context || directHook;
-}
-
-export function useChainWay() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const execute = useCallback(async (fn) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await fn();
-      return { success: true, data: result };
-    } catch (err) {
-      const message = getErrorMessage(err);
-      setError(message);
-      return { success: false, error: message };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return { loading, error, execute };
 }
 
 export function useChainWayCommand() {
@@ -641,7 +608,6 @@ export function useChainWayCommand() {
         host: options.host,
         port: options.port,
       });
-
       setResult(response.data);
       return { success: true, data: response.data };
     } catch (err) {
@@ -724,7 +690,6 @@ export function useChainWayPrinter() {
         host: config.host || "",
         port: config.port || "",
       });
-
       setStatus(response.data);
       return { success: true, data: response.data };
     } catch (err) {
@@ -754,50 +719,17 @@ export function useChainWayPrinter() {
     }
   }, []);
 
-  const testConnection = useCallback(
-    (config) => executeAction("test", config),
-    [executeAction],
-  );
-  const calibrate = useCallback(
-    (config) => executeAction("calibrate", config),
-    [executeAction],
-  );
-  const reset = useCallback(
-    (config) => executeAction("reset", config),
-    [executeAction],
-  );
-  const fullReset = useCallback(
-    (config) => executeAction("fullReset", config),
-    [executeAction],
-  );
-  const cancelAll = useCallback(
-    (config) => executeAction("cancel", config),
-    [executeAction],
-  );
-  const feedLabel = useCallback(
-    (config) => executeAction("feed", config),
-    [executeAction],
-  );
-  const pause = useCallback(
-    (config) => executeAction("pause", config),
-    [executeAction],
-  );
-  const resume = useCallback(
-    (config) => executeAction("resume", config),
-    [executeAction],
-  );
-
   return {
     getStatus,
     executeAction,
-    testConnection,
-    calibrate,
-    reset,
-    fullReset,
-    cancelAll,
-    feedLabel,
-    pause,
-    resume,
+    testConnection: (config) => executeAction("test", config),
+    calibrate: (config) => executeAction("calibrate", config),
+    reset: (config) => executeAction("reset", config),
+    fullReset: (config) => executeAction("fullReset", config),
+    cancelAll: (config) => executeAction("cancel", config),
+    feedLabel: (config) => executeAction("feed", config),
+    pause: (config) => executeAction("pause", config),
+    resume: (config) => executeAction("resume", config),
     loading,
     error,
     status,
