@@ -746,8 +746,8 @@ export default function UISalesOrderOnline({
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2 overflow-hidden">
       <div className="hidden xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto">
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
-          <div className="flex items-center justify-between w-full px-2">
-            <span className="font-medium">Printer</span>
+          <div className="flex items-center justify-between w-full h-full p-2 gap-2">
+            Printer
             <Button
               isIconOnly
               variant="light"
