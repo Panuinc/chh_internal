@@ -3,18 +3,20 @@
 import React, { useMemo, useCallback, useState } from "react";
 import { DataTable, Loading } from "@/components";
 import {
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
-  useDisclosure,
+  Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Divider,
+  Image,
   Chip,
+  useDisclosure,
 } from "@heroui/react";
 import {
   Printer,
@@ -30,7 +32,13 @@ import {
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe, usePrinterSettings } from "@/app/api/chainWay/core";
 import { PRINT_TYPE_OPTIONS } from "@/lib/chainWay";
-import PackingSlipPreviewModal from "./PackingSlipPreviewModal";
+
+const COMPANY_INFO = {
+  name: "บริษัท ชื้ออะฮวด อุตสาหกรรม จำกัด",
+  address: "9/1 หมู่ 2 ถนนบางเลน-ลาดหลุมแก้ว",
+  district: "ต.ขุนศรี อ.ไทรน้อย จ.นนทบุรี 11150",
+  phone: "02-921-9979",
+};
 
 const PRINT_OPTIONS = [
   { key: "packingSlip", label: "ใบปะหน้า (Packing Slip)", icon: FileText },
@@ -80,67 +88,329 @@ function formatDate(dateStr) {
   });
 }
 
-const orderLineColumns = [
-  { name: "#", uid: "index", width: 50 },
-  { name: "Item No.", uid: "itemNumber" },
-  { name: "Description", uid: "description" },
-  { name: "Unit", uid: "unitOfMeasureCode", width: 80 },
-  { name: "Qty", uid: "quantity", width: 80 },
-  { name: "Unit Price", uid: "unitPriceFormatted", width: 120 },
-  { name: "Amount", uid: "amountFormatted", width: 120 },
-  { name: "Ship Date", uid: "shipDateFormatted", width: 120 },
-];
+function LabelPreview({ order, currentPiece, totalPieces }) {
+  const itemLines = (order?.salesOrderLines || []).filter(
+    (l) => l.lineType === "Item",
+  );
+
+  return (
+    <div
+      className="flex flex-col bg-white border-2 border-black mx-auto overflow-hidden"
+      style={{ width: "400px", height: "600px", fontFamily: "sans-serif" }}
+    >
+      <div
+        className="flex border-b-2 border-black relative"
+        style={{ height: "80px" }}
+      >
+        <div
+          className="flex items-center justify-center p-2"
+          style={{ width: "72px" }}
+        >
+          <Image
+            src="/logo/logo-09.png"
+            alt="Logo"
+            width={64}
+            height={64}
+            className="object-contain"
+            fallback={
+              <div className="flex items-center justify-center w-16 h-16 border border-gray-400 text-sm font-bold">
+                LOGO
+              </div>
+            }
+          />
+        </div>
+        <div className="flex flex-col flex-1 py-1 text-xs">
+          <table className="w-full">
+            <tbody>
+              <tr>
+                <td
+                  className="font-semibold whitespace-nowrap pr-1 align-top"
+                  style={{ width: "45px" }}
+                >
+                  ผู้ส่ง:
+                </td>
+                <td className="align-top">{COMPANY_INFO.name}</td>
+              </tr>
+              <tr>
+                <td className="font-semibold whitespace-nowrap pr-1 align-top">
+                  ที่อยู่:
+                </td>
+                <td className="align-top">{COMPANY_INFO.address}</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>{COMPANY_INFO.district}</td>
+              </tr>
+              <tr>
+                <td className="font-semibold whitespace-nowrap pr-1">โทร:</td>
+                <td>{COMPANY_INFO.phone}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="absolute top-2 right-2">
+          <span className="text-3xl font-bold">
+            {currentPiece}/{totalPieces}
+          </span>
+        </div>
+      </div>
+
+      <div
+        className="flex flex-col px-2 py-1 border-b-2 border-black"
+        style={{ height: "80px" }}
+      >
+        <table className="w-full text-xs">
+          <tbody>
+            <tr>
+              <td
+                className="font-semibold whitespace-nowrap pr-1 align-top text-sm"
+                style={{ width: "45px" }}
+              >
+                ผู้รับ:
+              </td>
+              <td className="font-bold text-sm align-top">
+                {order?.shipToName || order?.customerName}
+              </td>
+            </tr>
+            <tr>
+              <td className="font-semibold whitespace-nowrap pr-1 align-top">
+                ที่อยู่:
+              </td>
+              <td className="align-top">
+                <div>{order?.shipToAddressLine1}</div>
+                {order?.shipToAddressLine2 && (
+                  <div>{order?.shipToAddressLine2}</div>
+                )}
+                {(order?.shipToCity || order?.shipToPostCode) && (
+                  <div>
+                    {order?.shipToCity} {order?.shipToPostCode}
+                  </div>
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td className="font-semibold whitespace-nowrap pr-1">โทร:</td>
+              <td>{order?.phoneNumber || "-"}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div
+        className="flex items-center px-2 text-xs font-semibold border-b border-gray-400"
+        style={{ height: "20px" }}
+      >
+        <span style={{ width: "40px" }}>Item</span>
+        <span className="flex-1">รายการสินค้า</span>
+        <span className="text-right" style={{ width: "50px" }}>
+          จำนวน
+        </span>
+      </div>
+
+      <div className="overflow-auto" style={{ height: "300px" }}>
+        <table className="w-full text-xs">
+          <tbody>
+            {itemLines.slice(0, 14).map((line, index) => (
+              <tr key={line.id || index} className="border-b border-gray-200">
+                <td className="py-1 px-2 align-top" style={{ width: "40px" }}>
+                  {index + 1}
+                </td>
+                <td className="py-1 align-top">
+                  <div className="whitespace-pre-wrap break-words">
+                    {line.description}
+                  </div>
+                </td>
+                <td
+                  className="py-1 px-2 text-right align-top"
+                  style={{ width: "50px" }}
+                >
+                  {line.quantity}
+                </td>
+              </tr>
+            ))}
+            {itemLines.length > 14 && (
+              <tr>
+                <td colSpan={3} className="py-1 px-2 text-gray-500">
+                  ... และอีก {itemLines.length - 14} รายการ
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex border-t-2 border-black" style={{ height: "100px" }}>
+        <div className="flex flex-col flex-1 p-2 text-xs text-red-600">
+          <p className="font-bold">
+            ❗ กรุณาถ่ายวิดีโอขณะแกะพัสดุ เพื่อใช้เป็นหลัก
+          </p>
+          <p className="ml-4">ฐานการเคลมสินค้า ไม่มีหลักฐานงดเคลมทุกกรณี</p>
+        </div>
+        <div className="flex items-end justify-end p-2">
+          <div
+            className="flex items-center justify-center border border-gray-300 bg-gray-50"
+            style={{ width: "70px", height: "70px" }}
+          >
+            <div className="flex flex-col items-center text-xs text-gray-400">
+              <div>QR</div>
+              <div>Code</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PackingSlipPreviewModal({
+  isOpen,
+  onClose,
+  order,
+  onPrint,
+  printing = false,
+}) {
+  if (!order) return null;
+
+  const itemLines = (order.salesOrderLines || []).filter(
+    (l) => l.lineType === "Item",
+  );
+  const totalPieces = itemLines.reduce((sum, l) => sum + (l.quantity || 0), 0);
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
+      <ModalContent>
+        <ModalHeader className="flex flex-col gap-2">
+          <h3 className="text-lg font-semibold">
+            ตัวอย่างใบปะหน้า - {order.number}
+          </h3>
+          <p className="text-sm text-foreground/60">
+            จะพิมพ์ทั้งหมด {totalPieces} ใบ (ตามจำนวนสินค้า)
+          </p>
+        </ModalHeader>
+        <ModalBody>
+          <div className="flex flex-col items-center gap-4 py-4 bg-gray-100 rounded-lg">
+            <p className="text-sm text-gray-600">
+              ตัวอย่างใบที่ 1 จาก {totalPieces} ใบ (ขนาด 100mm x 150mm)
+            </p>
+            <LabelPreview
+              order={order}
+              currentPiece={1}
+              totalPieces={totalPieces}
+            />
+          </div>
+          <Divider className="my-4" />
+          <div className="flex flex-col gap-2">
+            <h4 className="flex items-center gap-2 font-medium">
+              <Package />
+              รายการสินค้าทั้งหมด ({itemLines.length} รายการ, {totalPieces}{" "}
+              ชิ้น)
+            </h4>
+            <div className="max-h-40 overflow-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 sticky top-0">
+                  <tr>
+                    <th className="text-left p-2">#</th>
+                    <th className="text-left p-2">รหัสสินค้า</th>
+                    <th className="text-left p-2">รายการ</th>
+                    <th className="text-right p-2">จำนวน</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {itemLines.map((line, index) => (
+                    <tr key={line.id} className="border-b">
+                      <td className="p-2">{index + 1}</td>
+                      <td className="p-2 font-mono text-xs">
+                        {line.itemNumber}
+                      </td>
+                      <td className="p-2">{line.description}</td>
+                      <td className="p-2 text-right font-bold">
+                        {line.quantity}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="light" onPress={onClose}>
+            ยกเลิก
+          </Button>
+          <Button
+            color="primary"
+            startContent={<Printer />}
+            onPress={() => onPrint(order)}
+            isLoading={printing}
+            isDisabled={totalPieces === 0}
+          >
+            {printing ? "กำลังพิมพ์..." : `พิมพ์ ${totalPieces} ใบ`}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
 
 function OrderLinesTable({ lines }) {
   const itemLines = lines?.filter((l) => l.lineType === "Item") || [];
   const commentLines = lines?.filter((l) => l.lineType === "Comment") || [];
 
-  const normalizedLines = useMemo(
-    () =>
-      itemLines.map((line, i) => ({
-        ...line,
-        index: i + 1,
-        unitPriceFormatted: formatCurrency(line.unitPrice),
-        amountFormatted: formatCurrency(line.amountIncludingTax),
-        shipDateFormatted: formatDate(line.shipmentDate),
-      })),
-    [itemLines],
-  );
-
-  const renderLineCell = useCallback((item, columnKey) => {
-    if (columnKey === "itemNumber") {
-      return <span className="font-mono text-sm">{item.itemNumber}</span>;
-    }
-
-    if (columnKey === "description") {
-      return (
-        <div className="flex flex-col">
-          <span>{item.description}</span>
-          {item.description2 && (
-            <span className="text-xs text-foreground/60">
-              {item.description2}
-            </span>
-          )}
-        </div>
-      );
-    }
-
-    return undefined;
-  }, []);
-
   return (
-    <div className="space-y-4">
-      <DataTable
-        columns={orderLineColumns}
-        data={normalizedLines}
-        searchPlaceholder="Search item..."
-        emptyContent="No items"
-        itemName="items"
-        renderCustomCell={renderLineCell}
-      />
-
+    <div className="flex flex-col gap-4">
+      <div className="max-h-80 overflow-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 sticky top-0">
+            <tr>
+              <th className="text-left p-2 w-12">#</th>
+              <th className="text-left p-2">Item No.</th>
+              <th className="text-left p-2">Description</th>
+              <th className="text-left p-2 w-20">Unit</th>
+              <th className="text-right p-2 w-20">Qty</th>
+              <th className="text-right p-2 w-28">Unit Price</th>
+              <th className="text-right p-2 w-28">Amount</th>
+              <th className="text-left p-2 w-28">Ship Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {itemLines.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="p-4 text-center text-foreground/60">
+                  No items
+                </td>
+              </tr>
+            ) : (
+              itemLines.map((line, index) => (
+                <tr key={line.id || index} className="border-b">
+                  <td className="p-2">{index + 1}</td>
+                  <td className="p-2 font-mono text-xs">{line.itemNumber}</td>
+                  <td className="p-2">
+                    <div className="flex flex-col">
+                      <span>{line.description}</span>
+                      {line.description2 && (
+                        <span className="text-xs text-foreground/60">
+                          {line.description2}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="p-2">{line.unitOfMeasureCode}</td>
+                  <td className="p-2 text-right">{line.quantity}</td>
+                  <td className="p-2 text-right">
+                    {formatCurrency(line.unitPrice)}
+                  </td>
+                  <td className="p-2 text-right">
+                    {formatCurrency(line.amountIncludingTax)}
+                  </td>
+                  <td className="p-2">{formatDate(line.shipmentDate)}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
       {commentLines.length > 0 && (
-        <div className="border-t pt-3">
+        <div className="flex flex-col border-t pt-3">
           <p className="text-sm font-medium mb-2">หมายเหตุ:</p>
           {commentLines.map((line) => (
             <p key={line.id} className="text-sm text-foreground/70">
@@ -168,9 +438,9 @@ function OrderDetailModal({
   const lineCount = lines.filter((l) => l.lineType === "Item").length;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="4xl" scrollBehavior="inside">
+    <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
+        <ModalHeader className="flex flex-col gap-2">
           <h3 className="text-lg font-semibold">Sales Order: {order.number}</h3>
           <div className="flex items-center gap-2">
             <Chip
@@ -187,12 +457,11 @@ function OrderDetailModal({
             )}
           </div>
         </ModalHeader>
-
         <ModalBody className="gap-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-start gap-2">
               <User className="text-foreground/50 mt-1" />
-              <div>
+              <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Customer</p>
                 <p className="font-medium">{order.customerName}</p>
                 <p className="text-sm text-foreground/70">
@@ -200,10 +469,9 @@ function OrderDetailModal({
                 </p>
               </div>
             </div>
-
             <div className="flex items-start gap-2">
               <Calendar className="text-foreground/50 mt-1" />
-              <div>
+              <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Dates</p>
                 <p className="text-sm">Order: {formatDate(order.orderDate)}</p>
                 <p className="text-sm">
@@ -211,10 +479,9 @@ function OrderDetailModal({
                 </p>
               </div>
             </div>
-
             <div className="flex items-start gap-2">
               <MapPin className="text-foreground/50 mt-1" />
-              <div>
+              <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Ship To</p>
                 <p className="text-sm">{order.shipToName}</p>
                 <p className="text-sm text-foreground/70">
@@ -229,7 +496,7 @@ function OrderDetailModal({
             </div>
           </div>
 
-          <div className="border-t pt-4">
+          <div className="flex flex-col border-t pt-4">
             <div className="flex items-center gap-2 mb-3">
               <Package className="text-foreground/50" />
               <span className="font-medium">
@@ -240,7 +507,7 @@ function OrderDetailModal({
           </div>
 
           <div className="flex justify-end border-t pt-4">
-            <div className="text-right space-y-1">
+            <div className="flex flex-col items-end gap-2">
               <p className="text-sm">
                 Subtotal:{" "}
                 <span className="font-medium">
@@ -260,7 +527,6 @@ function OrderDetailModal({
             </div>
           </div>
         </ModalBody>
-
         <ModalFooter>
           <Button variant="light" onPress={onClose}>
             Close
@@ -306,12 +572,9 @@ export default function UISalesOrderOnline({
   orders = [],
   loading,
   onPrintSingle,
-  onPrintMultiple,
-  printerConnected = false,
   printing = false,
   onRefresh,
 }) {
-  const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [previewOrder, setPreviewOrder] = useState(null);
 
@@ -337,10 +600,6 @@ export default function UISalesOrderOnline({
   const { save: saveSettings } = usePrinterSettings();
 
   const total = orders.length;
-  const draft = orders.filter((o) => o.status === "Draft").length;
-  const open = orders.filter((o) => o.status === "Open").length;
-  const released = orders.filter((o) => o.status === "Released").length;
-
   const totalAmount = orders.reduce(
     (sum, o) => sum + (o.totalAmountIncludingTax || 0),
     0,
@@ -361,16 +620,6 @@ export default function UISalesOrderOnline({
         : [],
     [orders],
   );
-
-  const getSelectedOrders = useCallback(() => {
-    if (selectedKeys === "all") return orders;
-    return orders.filter((o) => selectedKeys.has(o.id));
-  }, [selectedKeys, orders]);
-
-  const handlePrintSelected = useCallback(() => {
-    const selected = getSelectedOrders();
-    if (selected.length > 0) onPrintMultiple?.(selected);
-  }, [getSelectedOrders, onPrintMultiple]);
 
   const handleSaveSettings = useCallback(async () => {
     await saveSettings();
@@ -415,7 +664,7 @@ export default function UISalesOrderOnline({
     (item, columnKey) => {
       if (columnKey === "actions") {
         return (
-          <div className="flex items-center justify-center gap-1">
+          <div className="flex items-center justify-center gap-2">
             <Button
               isIconOnly
               variant="light"
@@ -425,7 +674,6 @@ export default function UISalesOrderOnline({
             >
               <Eye />
             </Button>
-
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -462,7 +710,6 @@ export default function UISalesOrderOnline({
           </div>
         );
       }
-
       if (columnKey === "status") {
         return (
           <Chip
@@ -474,7 +721,6 @@ export default function UISalesOrderOnline({
           </Chip>
         );
       }
-
       if (columnKey === "customerName") {
         return (
           <div className="flex flex-col">
@@ -485,7 +731,6 @@ export default function UISalesOrderOnline({
           </div>
         );
       }
-
       return undefined;
     },
     [onPrintSingle, handleViewOrder, handleOpenPreview, isConnected, printing],
@@ -493,8 +738,8 @@ export default function UISalesOrderOnline({
 
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2 overflow-hidden">
-      <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto hidden">
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+      <div className="hidden xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
           <div className="flex items-center justify-between w-full px-2">
             <span className="font-medium">Printer</span>
             <Button
@@ -508,96 +753,54 @@ export default function UISalesOrderOnline({
             </Button>
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <PrinterStatusBadge showControls />
+            <PrinterStatusBadge />
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
-          <div className="text-sm text-foreground/60">Total Orders</div>
-          <div className="text-2xl font-bold">{total}</div>
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Total Orders
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            {total}
+          </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
-          <div className="text-sm text-foreground/60">Total Items</div>
-          <div className="text-2xl font-bold text-primary">{totalItems}</div>
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Total Items
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            {totalItems}
+          </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
-          <div className="text-sm text-foreground/60">Total Amount</div>
-          <div className="text-lg font-bold text-success">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Total Amount
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {formatCurrency(totalAmount)}
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 w-full">
-          <div className="flex flex-col items-center p-2 border-1 rounded-xl">
-            <div className="text-xs text-foreground/60">Draft</div>
-            <div className="font-bold">{draft}</div>
-          </div>
-          <div className="flex flex-col items-center p-2 border-1 rounded-xl">
-            <div className="text-xs text-foreground/60">Open</div>
-            <div className="font-bold text-primary">{open}</div>
-          </div>
-          <div className="flex flex-col items-center p-2 border-1 rounded-xl">
-            <div className="text-xs text-foreground/60">Released</div>
-            <div className="font-bold text-success">{released}</div>
-          </div>
-        </div>
-
-        {selectedKeys !== "all" && selectedKeys.size > 0 && (
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
-            <div className="text-sm">Selected ({selectedKeys.size})</div>
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border rounded-xl">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Button
-              size="sm"
-              color="primary"
-              className="w-full"
-              isDisabled={!isConnected || printing}
-              onPress={handlePrintSelected}
-            >
-              {printing ? "กำลังพิมพ์..." : "พิมพ์ที่เลือก"}
-            </Button>
-          </div>
-        )}
-
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
-          <Button
-            variant="light"
-            size="sm"
-            onPress={onRefresh}
-            isDisabled={loading}
-            className="w-full"
-          >
-            <RefreshCw className={loading ? "animate-spin" : ""} />
-            <span className="ml-2">Refresh</span>
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
-        <div className="flex xl:hidden items-center justify-between w-full p-2">
-          <PrinterStatusBadge />
-          <div className="flex gap-2">
-            <Button
-              isIconOnly
-              variant="light"
-              size="sm"
-              onPress={openSettings}
-              title="Printer Settings"
-            >
-              <Settings />
-            </Button>
-            <Button
-              isIconOnly
               variant="light"
               size="sm"
               onPress={onRefresh}
               isDisabled={loading}
+              className="w-full"
             >
               <RefreshCw className={loading ? "animate-spin" : ""} />
+              <span className="ml-2">Refresh Data</span>
             </Button>
           </div>
         </div>
+      </div>
 
+      <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center w-full h-full gap-2">
             <Loading />
@@ -611,9 +814,6 @@ export default function UISalesOrderOnline({
             searchPlaceholder="Search SO number or customer"
             emptyContent="No orders found"
             itemName="orders"
-            selectionMode="multiple"
-            selectedKeys={selectedKeys}
-            onSelectionChange={setSelectedKeys}
             renderCustomCell={renderCustomCell}
           />
         )}
@@ -622,7 +822,7 @@ export default function UISalesOrderOnline({
       <Modal
         isOpen={isSettingsOpen}
         onClose={closeSettings}
-        size="2xl"
+        size="5xl"
         scrollBehavior="inside"
       >
         <ModalContent>
