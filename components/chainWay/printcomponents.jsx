@@ -533,7 +533,14 @@ export function RFIDPrintDialog({
   );
 }
 
-export function PrinterSettings({ onSave, compact = false, className = "" }) {
+export function PrinterSettings({
+  onSave,
+  compact = false,
+  className = "",
+  showHeader = false,
+  title = "Printer Settings",
+  subtitle = "",
+}) {
   const {
     isConnected,
     printerLoading,
@@ -600,10 +607,18 @@ export function PrinterSettings({ onSave, compact = false, className = "" }) {
 
   return (
     <div className={`flex flex-col gap-4 ${className}`}>
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Printer Settings</h3>
-        <StatusIndicator status={connectionStatus} />
-      </div>
+      {showHeader ? (
+        <div className="flex flex-col items-center justify-center w-full gap-2 pb-2">
+          <h3 className="text-lg font-semibold">{title}</h3>
+          {subtitle && <p className="text-sm text-foreground/60">{subtitle}</p>}
+          <StatusIndicator status={connectionStatus} />
+        </div>
+      ) : (
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">{title}</h3>
+          <StatusIndicator status={connectionStatus} />
+        </div>
+      )}
 
       {printerError && (
         <Card className="bg-danger/10 border-danger/20" shadow="none">

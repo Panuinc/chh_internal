@@ -10,13 +10,12 @@ import {
   DropdownItem,
   Modal,
   ModalContent,
-  ModalHeader,
   ModalBody,
   useDisclosure,
 } from "@heroui/react";
 import { Printer, RefreshCw, Settings } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
-import { useRFIDSafe, usePrinterSettings } from "@/hooks";
+import { useRFIDSafe, usePrinterSettings } from "@/app/api/chainWay/core";
 import { PRINT_TYPE_OPTIONS, STATUS_COLORS } from "@/lib/chainWay/config";
 
 const columns = [
@@ -75,7 +74,7 @@ export default function UICatSupply({
             inventory: item.inventory?.toLocaleString("th-TH") || "0",
           }))
         : [],
-    [items]
+    [items],
   );
 
   const getSelectedItems = useCallback(() => {
@@ -108,7 +107,6 @@ export default function UICatSupply({
                 isDisabled={printing || !isConnected}
               >
                 <Printer
-                  
                   className={isConnected ? "text-success" : "text-danger"}
                 />
               </Button>
@@ -132,12 +130,12 @@ export default function UICatSupply({
         </div>
       );
     },
-    [onPrintSingle, isConnected, printing]
+    [onPrintSingle, isConnected, printing],
   );
 
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2 overflow-hidden">
-      <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto hidden">
+      <div className="hidden xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto">
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <div className="flex items-center justify-between w-full px-2">
             <span className="font-medium">Printer</span>
@@ -148,7 +146,7 @@ export default function UICatSupply({
               onPress={openSettings}
               title="Printer Settings"
             >
-              <Settings  />
+              <Settings />
             </Button>
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
@@ -269,14 +267,14 @@ export default function UICatSupply({
         scrollBehavior="inside"
       >
         <ModalContent>
-          <ModalHeader className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
-            <h3 className="text-lg font-semibold">Printer Settings</h3>
-            <p className="text-sm text-foreground/60">
-              Configure printer connection and label settings
-            </p>
-          </ModalHeader>
-          <ModalBody className="pb-6">
-            <PrinterSettings onSave={handleSaveSettings} showAdvanced={false} />
+          <ModalBody className="py-6">
+            <PrinterSettings
+              onSave={handleSaveSettings}
+              showAdvanced={false}
+              showHeader={true}
+              title="Printer Settings"
+              subtitle="Configure printer connection and label settings"
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
