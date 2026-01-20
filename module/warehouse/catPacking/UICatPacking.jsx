@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useMemo, useCallback, useState } from "react";
+/**
+ * UICatPacking - Option C
+ * ใช้ PrinterSettings (Modal) - กดปุ่ม Settings เปิด Modal ควบคุมเครื่องพิมพ์
+ * ไม่มี multi-select
+ */
+
+import React, { useMemo, useCallback } from "react";
 import { DataTable, Loading } from "@/components";
 import {
   Button,
@@ -8,9 +14,13 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Modal,
+  ModalContent,
+  ModalBody,
+  useDisclosure,
 } from "@heroui/react";
-import { Printer, RefreshCw } from "lucide-react";
-import { PrinterStatusBadge } from "@/components/chainWay";
+import { Printer, RefreshCw, Settings } from "lucide-react";
+import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
 import { PRINT_TYPE_OPTIONS, STATUS_COLORS } from "@/lib/chainWay/config";
 
@@ -35,11 +45,15 @@ export default function UICatPacking({
   items = [],
   loading,
   onPrintSingle,
-  onPrintMultiple,
   printing = false,
   onRefresh,
 }) {
-  const [selectedKeys, setSelectedKeys] = useState(new Set([]));
+  const {
+    isOpen: isSettingsOpen,
+    onOpen: openSettings,
+    onClose: closeSettings,
+  } = useDisclosure();
+
   const { isConnected } = useRFIDSafe();
 
   const total = items.length;
@@ -64,16 +78,6 @@ export default function UICatPacking({
         : [],
     [items],
   );
-
-  const getSelectedItems = useCallback(() => {
-    if (selectedKeys === "all") return normalized;
-    return normalized.filter((i) => selectedKeys.has(i.id));
-  }, [selectedKeys, normalized]);
-
-  const handlePrintSelected = useCallback(() => {
-    const selected = getSelectedItems();
-    if (selected.length > 0) onPrintMultiple?.(selected);
-  }, [getSelectedItems, onPrintMultiple]);
 
   const renderCustomCell = useCallback(
     (item, columnKey) => {
@@ -118,10 +122,21 @@ export default function UICatPacking({
 
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2 overflow-hidden">
+      {/* Sidebar */}
       <div className="hidden xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto">
+        {/* Printer Status + Settings Button */}
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <div className="flex items-center justify-between w-full px-2">
             <span className="font-medium">Printer</span>
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              onPress={openSettings}
+              title="Printer Settings"
+            >
+              <Settings />
+            </Button>
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <PrinterStatusBadge />
@@ -155,25 +170,6 @@ export default function UICatPacking({
           </div>
         </div>
 
-        {selectedKeys !== "all" && selectedKeys.size > 0 && (
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-              Selected ({selectedKeys.size})
-            </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-              <Button
-                size="sm"
-                color="primary"
-                className="w-full"
-                isDisabled={!isConnected || printing}
-                onPress={handlePrintSelected}
-              >
-                {printing ? "กำลังพิมพ์..." : "พิมพ์ที่เลือก"}
-              </Button>
-            </div>
-          </div>
-        )}
-
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <Button
             variant="light"
@@ -188,10 +184,21 @@ export default function UICatPacking({
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
+        {/* Mobile Header */}
         <div className="flex xl:hidden items-center justify-between w-full p-2">
           <PrinterStatusBadge />
           <div className="flex gap-2">
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              onPress={openSettings}
+              title="Printer Settings"
+            >
+              <Settings />
+            </Button>
             <Button
               isIconOnly
               variant="light"
@@ -217,13 +224,29 @@ export default function UICatPacking({
             searchPlaceholder="Search item number or name"
             emptyContent="No items found"
             itemName="items"
-            selectionMode="multiple"
-            selectedKeys={selectedKeys}
-            onSelectionChange={setSelectedKeys}
             renderCustomCell={renderCustomCell}
           />
         )}
       </div>
+
+      {/* Settings Modal */}
+      <Modal
+        isOpen={isSettingsOpen}
+        onClose={closeSettings}
+        size="2xl"
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          <ModalBody className="py-6">
+            <PrinterSettings
+              onClose={closeSettings}
+              showHeader={true}
+              title="ควบคุมเครื่องพิมพ์"
+              subtitle="ChainWay RFID Printer"
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

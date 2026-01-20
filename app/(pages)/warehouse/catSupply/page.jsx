@@ -5,7 +5,6 @@ import { useCatSupplyItems } from "@/app/api/warehouse/catSupply/core";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import UICatSupply from "@/module/warehouse/catSupply/UICatSupply";
-import { RFIDPrintDialog } from "@/components/chainWay";
 
 function CatSupplyContent() {
   const { items, loading, refetch } = useCatSupplyItems({ limit: 500 });
@@ -33,7 +32,7 @@ function CatSupplyContent() {
           {
             type: options.type || "thai",
             enableRFID: options.enableRFID || false,
-          }
+          },
         );
         alert(`Printed ${item.number} successfully`);
       } catch (err) {
@@ -41,7 +40,7 @@ function CatSupplyContent() {
         alert(`Print failed: ${err.message}`);
       }
     },
-    [print, isConnected]
+    [print, isConnected],
   );
 
   const handlePrintMultiple = useCallback((items) => {
@@ -71,28 +70,15 @@ function CatSupplyContent() {
   }
 
   return (
-    <>
-      <UICatSupply
-        items={items}
-        loading={loading}
-        onPrintSingle={handlePrintSingle}
-        onPrintMultiple={handlePrintMultiple}
-        printerConnected={isConnected}
-        printing={printing}
-        onRefresh={refetch}
-      />
-
-      <RFIDPrintDialog
-        isOpen={dialogOpen}
-        onClose={() => {
-          setDialogOpen(false);
-          setSelectedItems([]);
-        }}
-        items={selectedItems}
-        onSuccess={handlePrintSuccess}
-        onError={handlePrintError}
-      />
-    </>
+    <UICatSupply
+      items={items}
+      loading={loading}
+      onPrintSingle={handlePrintSingle}
+      onPrintMultiple={handlePrintMultiple}
+      printerConnected={isConnected}
+      printing={printing}
+      onRefresh={refetch}
+    />
   );
 }
 

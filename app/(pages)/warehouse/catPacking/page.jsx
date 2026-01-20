@@ -5,7 +5,6 @@ import { useCatPackingItems } from "@/app/api/warehouse/catPacking/core";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import UICatPacking from "@/module/warehouse/catPacking/UICatPacking";
-import { RFIDPrintDialog } from "@/components/chainWay";
 
 function CatPackingContent() {
   const { items, loading, refetch } = useCatPackingItems({ limit: 500 });
@@ -33,7 +32,7 @@ function CatPackingContent() {
           {
             type: options.type || "thai",
             enableRFID: options.enableRFID || false,
-          }
+          },
         );
         alert(`Printed ${item.number} successfully`);
       } catch (err) {
@@ -41,7 +40,7 @@ function CatPackingContent() {
         alert(`Print failed: ${err.message}`);
       }
     },
-    [print, isConnected]
+    [print, isConnected],
   );
 
   const handlePrintMultiple = useCallback((items) => {
@@ -71,28 +70,15 @@ function CatPackingContent() {
   }
 
   return (
-    <>
-      <UICatPacking
-        items={items}
-        loading={loading}
-        onPrintSingle={handlePrintSingle}
-        onPrintMultiple={handlePrintMultiple}
-        printerConnected={isConnected}
-        printing={printing}
-        onRefresh={refetch}
-      />
-
-      <RFIDPrintDialog
-        isOpen={dialogOpen}
-        onClose={() => {
-          setDialogOpen(false);
-          setSelectedItems([]);
-        }}
-        items={selectedItems}
-        onSuccess={handlePrintSuccess}
-        onError={handlePrintError}
-      />
-    </>
+    <UICatPacking
+      items={items}
+      loading={loading}
+      onPrintSingle={handlePrintSingle}
+      onPrintMultiple={handlePrintMultiple}
+      printerConnected={isConnected}
+      printing={printing}
+      onRefresh={refetch}
+    />
   );
 }
 

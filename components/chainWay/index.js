@@ -1,7 +1,7 @@
 export {
   PrinterStatusBadge,
-  PrintButton,
-  RFIDPrintDialog,
+  PrinterControls,
+  PrinterSettings,
   PRINT_TYPES,
   PRINT_TYPE_OPTIONS,
 } from "./printerConfig.jsx";

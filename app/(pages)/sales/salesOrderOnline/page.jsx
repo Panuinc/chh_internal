@@ -5,7 +5,6 @@ import { useSalesOrdersOnline } from "@/app/api/sales/salesOrderOnline/core";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import UISalesOrderOnline from "@/module/sales/salesOrderOnline/UISalesOrderOnline";
-import { RFIDPrintDialog } from "@/components/chainWay";
 
 function SalesOrderOnlineContent() {
   const { orders, loading, refetch } = useSalesOrdersOnline({ limit: 100 });
@@ -121,38 +120,15 @@ function SalesOrderOnlineContent() {
   }
 
   return (
-    <>
-      <UISalesOrderOnline
-        orders={orders}
-        loading={loading}
-        onPrintSingle={handlePrintSingle}
-        onPrintMultiple={handlePrintMultiple}
-        printerConnected={isConnected}
-        printing={printing || isPrintingSlip}
-        onRefresh={refetch}
-      />
-
-      <RFIDPrintDialog
-        isOpen={dialogOpen}
-        onClose={() => {
-          setDialogOpen(false);
-          setSelectedOrders([]);
-        }}
-        items={selectedOrders.flatMap((order) =>
-          (order.salesOrderLines || [])
-            .filter((l) => l.lineType === "Item")
-            .map((line) => ({
-              number: line.itemNumber,
-              displayName: line.description,
-              displayName2: line.description2 || "",
-              orderNumber: order.number,
-              customerName: order.customerName,
-            })),
-        )}
-        onSuccess={handlePrintSuccess}
-        onError={handlePrintError}
-      />
-    </>
+    <UISalesOrderOnline
+      orders={orders}
+      loading={loading}
+      onPrintSingle={handlePrintSingle}
+      onPrintMultiple={handlePrintMultiple}
+      printerConnected={isConnected}
+      printing={printing || isPrintingSlip}
+      onRefresh={refetch}
+    />
   );
 }
 
