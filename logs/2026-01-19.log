@@ -10,3 +10,6 @@
 [2026-01-19 11:30:16] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-01-19 11:30:16] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
 [2026-01-19 11:30:16] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-19 16:27:14] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-01-19 16:27:14] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-19 16:27:14] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}

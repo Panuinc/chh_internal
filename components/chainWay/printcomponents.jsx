@@ -7,32 +7,22 @@ import {
   Select,
   SelectItem,
   Switch,
-  Card,
-  CardHeader,
-  CardBody,
   Spinner,
-  Chip,
   Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Divider,
   Accordion,
   AccordionItem,
+  Progress,
 } from "@heroui/react";
 import {
   Printer,
   RefreshCw,
   Wifi,
-  WifiOff,
-  AlertTriangle,
-  Check,
+  AlertCircle,
   X,
-  Plug,
-  Tag,
-  Radio,
-  SlidersHorizontal,
   Settings,
   Search,
   Gauge,
@@ -42,12 +32,11 @@ import {
   Save,
   Undo,
   CheckCircle,
-  XCircle,
-  Activity,
-  Pause,
+  Circle,
   FileText,
-  Ribbon,
-  Hash,
+  Radio,
+  Cpu,
+  Activity,
 } from "lucide-react";
 import {
   useRFIDSafe,
@@ -62,7 +51,87 @@ import {
   PRINTER_CONFIG,
 } from "@/lib/chainWay/config";
 
-function SettingsInput({
+function ElevatedCard({ children, className = "", level = 1, hover = false }) {
+  const shadows = {
+    1: "shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)]",
+    2: "shadow-[0_2px_8px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.06)]",
+    3: "shadow-[0_4px_12px_rgba(0,0,0,0.08),0_16px_48px_rgba(0,0,0,0.08)]",
+  };
+
+  return (
+    <div
+      className={`
+        bg-white rounded-2xl border border-gray-100/80
+        ${shadows[level]}
+        ${hover ? "transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:-translate-y-0.5" : ""}
+        ${className}
+      `}
+    >
+      {children}
+    </div>
+  );
+}
+
+function StatusBadge({ connected, loading }) {
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-amber-50 border border-amber-100">
+        <RefreshCw size={14} className="text-amber-500 animate-spin" />
+        <span className="text-sm font-medium text-amber-600">
+          กำลังตรวจสอบ...
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`
+        flex items-center gap-2.5 px-4 py-2 rounded-full transition-all duration-300
+        ${
+          connected
+            ? "bg-emerald-50 border border-emerald-100"
+            : "bg-gray-50 border border-gray-200"
+        }
+      `}
+    >
+      <span className="relative flex h-2.5 w-2.5">
+        {connected && (
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+        )}
+        <span
+          className={`relative inline-flex h-2.5 w-2.5 rounded-full transition-colors ${
+            connected ? "bg-emerald-500" : "bg-gray-300"
+          }`}
+        />
+      </span>
+      <span
+        className={`text-sm font-medium ${connected ? "text-emerald-700" : "text-gray-500"}`}
+      >
+        {connected ? "เชื่อมต่อแล้ว" : "ไม่ได้เชื่อมต่อ"}
+      </span>
+    </div>
+  );
+}
+
+function Section({ icon: Icon, title, children, action }) {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/60 flex items-center justify-center shadow-sm">
+            <Icon size={18} className="text-gray-600" />
+          </div>
+          <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
+        </div>
+        {action}
+      </div>
+      <div className="space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function FormInput({
   label,
   type = "text",
   value,
@@ -72,126 +141,210 @@ function SettingsInput({
   min,
   max,
   step,
-  helpText,
+  hint,
+  icon: Icon,
 }) {
   return (
-    <Input
-      type={type}
-      label={label}
-      labelPlacement="outside"
-      placeholder={placeholder}
-      description={helpText}
-      value={String(value)}
-      onChange={(e) =>
-        onChange(
-          type === "number" ? parseFloat(e.target.value) || 0 : e.target.value,
-        )
-      }
-      isDisabled={disabled}
-      min={min}
-      max={max}
-      step={step}
-      variant="bordered"
-      size="md"
-      radius="sm"
-      classNames={{ base: "w-full", inputWrapper: "bg-background" }}
-    />
+    <div className="space-y-1.5">
+      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide">
+        {label}
+      </label>
+      <div className="relative">
+        {Icon && (
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <Icon size={16} />
+          </div>
+        )}
+        <Input
+          type={type}
+          placeholder={placeholder}
+          value={String(value)}
+          onChange={(e) =>
+            onChange(
+              type === "number"
+                ? parseFloat(e.target.value) || 0
+                : e.target.value,
+            )
+          }
+          isDisabled={disabled}
+          min={min}
+          max={max}
+          step={step}
+          variant="bordered"
+          size="md"
+          radius="lg"
+          classNames={{
+            inputWrapper: `
+              bg-gray-50/50 border-gray-200 
+              hover:bg-white hover:border-gray-300
+              focus-within:bg-white focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-50
+              transition-all duration-200 shadow-sm
+              ${Icon ? "pl-10" : ""}
+            `,
+            input:
+              "text-gray-800 text-sm font-medium placeholder:text-gray-400",
+          }}
+        />
+      </div>
+      {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
+    </div>
   );
 }
 
-function SettingsSelect({
+function FormSelect({
   label,
   value,
   onChange,
   options,
   disabled,
-  helpText,
+  hint,
+  icon: Icon,
 }) {
   return (
-    <Select
-      label={label}
-      labelPlacement="outside"
-      placeholder="เลือก..."
-      description={helpText}
-      selectedKeys={value ? [value] : []}
-      onChange={(e) => onChange(e.target.value)}
-      isDisabled={disabled}
-      variant="bordered"
-      size="md"
-      radius="sm"
-      classNames={{ base: "w-full", trigger: "bg-background" }}
-    >
-      {options.map((opt) => (
-        <SelectItem key={opt.value} value={opt.value}>
-          {opt.label}
-        </SelectItem>
-      ))}
-    </Select>
+    <div className="space-y-1.5">
+      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide">
+        {label}
+      </label>
+      <Select
+        placeholder="เลือก..."
+        selectedKeys={value ? [value] : []}
+        onChange={(e) => onChange(e.target.value)}
+        isDisabled={disabled}
+        variant="bordered"
+        size="md"
+        radius="lg"
+        startContent={Icon && <Icon size={16} className="text-gray-400" />}
+        classNames={{
+          trigger: `
+            bg-gray-50/50 border-gray-200 
+            hover:bg-white hover:border-gray-300
+            data-[open=true]:bg-white data-[open=true]:border-blue-400 data-[open=true]:ring-4 data-[open=true]:ring-blue-50
+            transition-all duration-200 shadow-sm
+          `,
+          value: "text-gray-800 text-sm font-medium",
+          popoverContent:
+            "bg-white border border-gray-200 shadow-xl shadow-gray-200/50 rounded-xl",
+        }}
+      >
+        {options.map((opt) => (
+          <SelectItem
+            key={opt.value}
+            value={opt.value}
+            classNames={{
+              base: "rounded-lg data-[hover=true]:bg-gray-50 data-[selected=true]:bg-blue-50 data-[selected=true]:text-blue-700",
+            }}
+          >
+            {opt.label}
+          </SelectItem>
+        ))}
+      </Select>
+      {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
+    </div>
   );
 }
 
-function SettingsToggle({ label, checked, onChange, disabled, helpText }) {
+function FormToggle({ label, checked, onChange, disabled, hint }) {
   return (
-    <div className="flex items-center justify-between w-full py-2">
-      <div className="flex flex-col gap-1">
-        <span className="text-sm font-medium">{label}</span>
-        {helpText && (
-          <span className="text-xs text-foreground/60">{helpText}</span>
-        )}
+    <div
+      className={`
+        flex items-center justify-between p-4 rounded-xl
+        bg-gradient-to-r from-gray-50/80 to-gray-50/40
+        border border-gray-100
+        transition-all duration-200
+        ${!disabled && "hover:bg-gray-50 hover:border-gray-200"}
+      `}
+    >
+      <div className="space-y-0.5">
+        <span className="text-sm font-medium text-gray-700">{label}</span>
+        {hint && <p className="text-xs text-gray-400">{hint}</p>}
       </div>
       <Switch
         isSelected={checked}
         onValueChange={onChange}
         isDisabled={disabled}
         size="md"
-        color="success"
+        classNames={{
+          wrapper: `
+            group-data-[selected=true]:bg-blue-500
+            bg-gray-200
+            shadow-inner
+          `,
+          thumb: "bg-white shadow-md",
+        }}
       />
     </div>
   );
 }
 
-function SettingsSection({ title, children, icon }) {
+function ActionBtn({
+  children,
+  icon: Icon,
+  variant = "secondary",
+  loading,
+  ...props
+}) {
+  const variants = {
+    primary:
+      "bg-gray-900 hover:bg-gray-800 text-white shadow-lg shadow-gray-900/20",
+    secondary:
+      "bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 shadow-sm hover:shadow",
+    danger:
+      "bg-white hover:bg-red-50 text-red-600 border border-red-200 shadow-sm",
+    ghost: "bg-transparent hover:bg-gray-100 text-gray-600",
+  };
+
   return (
-    <Card className="w-full" shadow="sm" radius="lg">
-      <CardHeader className="flex items-center gap-2 pb-0">
-        {icon && <span className="text-foreground/70">{icon}</span>}
-        <h4 className="text-sm font-semibold">{title}</h4>
-      </CardHeader>
-      <CardBody className="gap-4">{children}</CardBody>
-    </Card>
+    <Button
+      size="sm"
+      radius="lg"
+      isLoading={loading}
+      spinner={<Spinner size="sm" color="current" />}
+      startContent={!loading && Icon && <Icon size={15} />}
+      className={`${variants[variant]} font-medium text-sm h-9 px-4 transition-all duration-200`}
+      {...props}
+    >
+      {children}
+    </Button>
   );
 }
 
-function StatusIndicator({ status }) {
-  const statusConfig = {
-    connected: { color: "success", text: "Connected", icon: Wifi },
-    disconnected: { color: "danger", text: "Disconnected", icon: WifiOff },
-    checking: { color: "warning", text: "Checking...", icon: RefreshCw },
-    error: { color: "danger", text: "Error", icon: AlertTriangle },
+function AlertBox({ children, type = "error" }) {
+  const styles = {
+    error: {
+      bg: "bg-gradient-to-r from-red-50 to-red-50/50",
+      border: "border-red-100",
+      icon: "text-red-500",
+      text: "text-red-700",
+    },
+    warning: {
+      bg: "bg-gradient-to-r from-amber-50 to-amber-50/50",
+      border: "border-amber-100",
+      icon: "text-amber-500",
+      text: "text-amber-700",
+    },
+    success: {
+      bg: "bg-gradient-to-r from-emerald-50 to-emerald-50/50",
+      border: "border-emerald-100",
+      icon: "text-emerald-500",
+      text: "text-emerald-700",
+    },
   };
 
-  const config = statusConfig[status] || statusConfig.disconnected;
-  const IconComponent = config.icon;
+  const s = styles[type];
 
   return (
-    <Chip
-      color={config.color}
-      variant="flat"
-      size="sm"
-      startContent={
-        <IconComponent
-          className={
-            status === "connected"
-              ? "animate-pulse"
-              : status === "checking"
-                ? "animate-spin"
-                : ""
-          }
-        />
-      }
+    <div
+      className={`flex items-start gap-3 px-4 py-3 rounded-xl ${s.bg} border ${s.border}`}
     >
-      {config.text}
-    </Chip>
+      <AlertCircle size={18} className={`${s.icon} mt-0.5 flex-shrink-0`} />
+      <span className={`text-sm ${s.text}`}>{children}</span>
+    </div>
+  );
+}
+
+function Divider() {
+  return (
+    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
   );
 }
 
@@ -200,37 +353,15 @@ export function PrinterStatusBadge({ className = "" }) {
     useRFIDSafe();
 
   return (
-    <div className={`inline-flex items-center gap-2 ${className}`}>
-      <Chip
-        color={isConnected ? "success" : "danger"}
-        variant="flat"
-        size="sm"
-        startContent={
-          isConnected ? <Wifi className="animate-pulse" /> : <WifiOff />
-        }
+    <div className={`inline-flex items-center gap-3 ${className}`}>
+      <StatusBadge connected={isConnected} loading={printerLoading} />
+      <button
+        onClick={refreshPrinter}
+        disabled={printerLoading}
+        className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
       >
-        {printerLoading
-          ? "Checking..."
-          : isConnected
-            ? "Connected"
-            : "Disconnected"}
-      </Chip>
-
-      <Button
-        isIconOnly
-        size="sm"
-        variant="light"
-        onPress={refreshPrinter}
-        isDisabled={printerLoading}
-      >
-        <RefreshCw className={printerLoading ? "animate-spin" : ""} />
-      </Button>
-
-      {printerError && (
-        <Chip color="danger" variant="flat" size="sm">
-          <AlertTriangle />
-        </Chip>
-      )}
+        <RefreshCw size={16} className={printerLoading ? "animate-spin" : ""} />
+      </button>
     </div>
   );
 }
@@ -251,7 +382,6 @@ export function PrintButton({
       onError?.("No items to print");
       return;
     }
-
     if (!isConnected) {
       try {
         await reconnect();
@@ -260,7 +390,6 @@ export function PrintButton({
         return;
       }
     }
-
     try {
       const result = await printBatch(items, options);
       onSuccess?.(result);
@@ -271,18 +400,26 @@ export function PrintButton({
 
   return (
     <Button
-      color={isConnected ? "primary" : "warning"}
-      variant="shadow"
-      size="md"
-      radius="sm"
+      size="lg"
+      radius="xl"
       onPress={handleClick}
       isDisabled={disabled || printing || !items.length}
       isLoading={printing}
-      spinner={<Spinner size="sm" color="current" />}
-      startContent={!printing && <Printer />}
-      className={className}
+      spinner={<Spinner size="sm" color="white" />}
+      startContent={!printing && <Printer size={20} />}
+      className={`
+        bg-gradient-to-r from-gray-900 to-gray-800 
+        hover:from-gray-800 hover:to-gray-700
+        text-white font-semibold
+        shadow-xl shadow-gray-900/25
+        transition-all duration-300
+        hover:shadow-2xl hover:shadow-gray-900/30
+        hover:-translate-y-0.5
+        active:translate-y-0
+        ${className}
+      `}
     >
-      {printing ? "Printing..." : children || `Print (${items.length})`}
+      {printing ? "กำลังพิมพ์..." : children || `พิมพ์ ${items.length} รายการ`}
     </Button>
   );
 }
@@ -309,9 +446,11 @@ export function RFIDPrintDialog({
   const [labelType, setLabelType] = useState("thai");
   const [showResult, setShowResult] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [progress, setProgress] = useState(0);
 
   const selectedTypeConfig = PRINT_TYPES[labelType];
   const enableRFID = selectedTypeConfig?.hasRFID || false;
+  const totalLabels = items.length * quantity;
 
   useEffect(() => {
     if (!isOpen) {
@@ -319,21 +458,31 @@ export function RFIDPrintDialog({
       setLabelType("thai");
       setShowResult(false);
       setLocalError(null);
+      setProgress(0);
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (printing) {
+      const interval = setInterval(() => {
+        setProgress((prev) => Math.min(prev + Math.random() * 12, 90));
+      }, 150);
+      return () => clearInterval(interval);
+    } else if (showResult) {
+      setProgress(100);
+    }
+  }, [printing, showResult]);
+
   const handlePrint = async () => {
     setLocalError(null);
-
+    setProgress(0);
     try {
       if (!isConnected) await reconnect();
-
       const result = await printBatch(items, {
         type: labelType,
         enableRFID,
         quantity,
       });
-
       setShowResult(true);
       onSuccess?.(result);
     } catch (err) {
@@ -343,188 +492,238 @@ export function RFIDPrintDialog({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg" radius="lg">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="md"
+      radius="2xl"
+      backdrop="blur"
+      classNames={{
+        base: "bg-white",
+        header: "border-b border-gray-100 pt-6 pb-4",
+        body: "py-6",
+        footer: "border-t border-gray-100 pt-4 pb-6",
+        closeButton: "hover:bg-gray-100 text-gray-400 top-4 right-4",
+      }}
+    >
       <ModalContent>
-        <ModalHeader className="flex items-center gap-2">
-          <Printer />
-          Print Label
+        <ModalHeader className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200 flex items-center justify-center shadow-sm">
+            <Printer size={22} className="text-gray-700" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">พิมพ์ฉลาก</h3>
+            <p className="text-xs text-gray-400 font-normal mt-0.5">
+              RFID Label Printer
+            </p>
+          </div>
         </ModalHeader>
-        <ModalBody>
+
+        <ModalBody className="space-y-5">
           {(localError || printerError) && (
-            <Card className="bg-danger/10 border-danger/20" shadow="none">
-              <CardBody className="gap-2">
-                <p className="text-sm text-danger flex items-center gap-2">
-                  <AlertTriangle />
-                  {localError || printerError}
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    color="warning"
-                    variant="flat"
-                    onPress={reconnect}
-                    startContent={<RefreshCw />}
-                  >
-                    Reconnect
-                  </Button>
-                  <Button
-                    size="sm"
-                    color="danger"
-                    variant="flat"
-                    onPress={fullReset}
-                    startContent={<RotateCcw />}
-                  >
-                    Full Reset
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="flat"
-                    onPress={cancelAllJobs}
-                    startContent={<StopCircle />}
-                  >
-                    Cancel Jobs
-                  </Button>
-                </div>
-              </CardBody>
-            </Card>
+            <div className="space-y-3">
+              <AlertBox type="error">{localError || printerError}</AlertBox>
+              <div className="flex gap-2">
+                <ActionBtn icon={RefreshCw} onPress={reconnect}>
+                  เชื่อมต่อใหม่
+                </ActionBtn>
+                <ActionBtn icon={RotateCcw} onPress={fullReset}>
+                  รีเซ็ต
+                </ActionBtn>
+                <ActionBtn icon={StopCircle} onPress={cancelAllJobs}>
+                  ยกเลิก
+                </ActionBtn>
+              </div>
+            </div>
           )}
 
           {!showResult ? (
             <>
-              <Card className="bg-default/50" shadow="none">
-                <CardBody>
-                  <p className="text-sm font-medium flex items-center gap-2">
-                    <FileText />
-                    Items to print: {items.length}
-                  </p>
-                  {items.length <= 5 && (
-                    <ul className="mt-2 text-xs text-foreground/60">
-                      {items.map((item, idx) => (
-                        <li key={idx}>• {item.displayName || item.number}</li>
-                      ))}
-                    </ul>
-                  )}
-                </CardBody>
-              </Card>
+              {/* Items Card */}
+              <ElevatedCard className="p-4" level={1}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <FileText size={16} className="text-gray-400" />
+                    <span className="text-sm font-medium text-gray-600">
+                      รายการที่จะพิมพ์
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold text-gray-900">
+                    {items.length}
+                  </span>
+                </div>
+                {items.length <= 5 && (
+                  <div className="space-y-1.5 ml-6">
+                    {items.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 text-xs text-gray-500"
+                      >
+                        <Circle
+                          size={5}
+                          className="fill-gray-300 text-gray-300"
+                        />
+                        {item.displayName || item.number}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ElevatedCard>
 
+              {/* Options */}
               <div className="grid grid-cols-2 gap-4">
-                <Select
-                  label="Label Type"
-                  labelPlacement="outside"
-                  selectedKeys={[labelType]}
-                  onChange={(e) => setLabelType(e.target.value)}
-                  variant="bordered"
-                  size="md"
-                  radius="sm"
-                  startContent={<Tag />}
-                >
-                  {PRINT_TYPE_OPTIONS.map((t) => (
-                    <SelectItem key={t.key} value={t.key}>
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </Select>
-
-                <Input
+                <FormSelect
+                  label="ประเภทฉลาก"
+                  value={labelType}
+                  onChange={setLabelType}
+                  options={PRINT_TYPE_OPTIONS.map((t) => ({
+                    value: t.key,
+                    label: t.label,
+                  }))}
+                />
+                <FormInput
+                  label="จำนวน"
                   type="number"
-                  label="Quantity (each)"
-                  labelPlacement="outside"
+                  value={quantity}
+                  onChange={(v) => setQuantity(Math.max(1, v))}
                   min={1}
                   max={100}
-                  value={String(quantity)}
-                  onChange={(e) =>
-                    setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-                  }
-                  variant="bordered"
-                  size="md"
-                  radius="sm"
-                  startContent={<Hash />}
                 />
               </div>
 
+              {/* RFID Indicator */}
               {enableRFID && (
-                <Card className="bg-primary/10" shadow="none">
-                  <CardBody>
-                    <p className="text-sm text-primary flex items-center gap-2">
-                      <Radio />
-                      RFID Mode Enabled - Tags will be encoded
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
+                  <div className="relative">
+                    <div className="w-9 h-9 rounded-lg bg-blue-500 flex items-center justify-center">
+                      <Radio size={18} className="text-white" />
+                    </div>
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500" />
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-blue-700">
+                      RFID Encoding
                     </p>
-                  </CardBody>
-                </Card>
+                    <p className="text-xs text-blue-500">
+                      เขียนข้อมูลลงแท็กอัตโนมัติ
+                    </p>
+                  </div>
+                </div>
               )}
 
-              <p className="text-center text-sm text-foreground/60">
-                Total labels: {items.length * quantity}
-              </p>
+              {/* Total */}
+              <div className="text-center py-4">
+                <p className="text-xs text-gray-400 mb-1">จำนวนฉลากทั้งหมด</p>
+                <p className="text-4xl font-bold text-gray-900">
+                  {totalLabels}
+                </p>
+              </div>
+
+              {/* Progress */}
+              {printing && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500">กำลังพิมพ์...</span>
+                    <span className="font-medium text-gray-700">
+                      {Math.round(progress)}%
+                    </span>
+                  </div>
+                  <Progress
+                    value={progress}
+                    size="sm"
+                    radius="full"
+                    classNames={{
+                      base: "max-w-full",
+                      track: "bg-gray-100",
+                      indicator: "bg-gradient-to-r from-blue-500 to-indigo-500",
+                    }}
+                  />
+                </div>
+              )}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center py-4">
+            /* Success */
+            <div className="flex flex-col items-center py-8">
               <div
-                className={`w-16 h-16 mb-4 rounded-full flex items-center justify-center ${
-                  lastResult?.data?.summary?.failed === 0
-                    ? "bg-success/20 text-success"
-                    : "bg-warning/20 text-warning"
-                }`}
+                className={`
+                  w-20 h-20 rounded-2xl flex items-center justify-center mb-5
+                  ${
+                    lastResult?.data?.summary?.failed === 0
+                      ? "bg-gradient-to-br from-emerald-100 to-emerald-50 border-2 border-emerald-200"
+                      : "bg-gradient-to-br from-amber-100 to-amber-50 border-2 border-amber-200"
+                  }
+                  shadow-lg
+                `}
               >
                 {lastResult?.data?.summary?.failed === 0 ? (
-                  <CheckCircle />
+                  <CheckCircle size={36} className="text-emerald-600" />
                 ) : (
-                  <AlertTriangle />
+                  <AlertCircle size={36} className="text-amber-600" />
                 )}
               </div>
 
-              <h4 className="text-lg font-semibold mb-2">
+              <h4 className="text-xl font-bold text-gray-900 mb-1">
                 {lastResult?.data?.summary?.failed === 0
-                  ? "Print Complete!"
-                  : "Print Completed with Errors"}
+                  ? "พิมพ์สำเร็จ!"
+                  : "เสร็จสิ้น (มีข้อผิดพลาด)"}
               </h4>
 
               {lastResult?.data?.summary && (
-                <div className="text-sm space-y-1">
-                  <p className="text-success flex items-center gap-1 justify-center">
-                    <Check />
-                    Success: {lastResult.data.summary.success}
-                  </p>
-                  {lastResult.data.summary.failed > 0 && (
-                    <p className="text-danger flex items-center gap-1 justify-center">
-                      <X />
-                      Failed: {lastResult.data.summary.failed}
+                <div className="flex gap-8 mt-5">
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-emerald-600">
+                      {lastResult.data.summary.success}
                     </p>
+                    <p className="text-xs text-gray-500 mt-1">สำเร็จ</p>
+                  </div>
+                  {lastResult.data.summary.failed > 0 && (
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-red-600">
+                        {lastResult.data.summary.failed}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">ล้มเหลว</p>
+                    </div>
                   )}
                 </div>
               )}
             </div>
           )}
         </ModalBody>
-        <ModalFooter>
+
+        <ModalFooter className="gap-3">
           {!showResult ? (
             <>
-              <Button variant="flat" onPress={onClose} startContent={<X />}>
-                Cancel
+              <Button
+                variant="light"
+                radius="xl"
+                onPress={onClose}
+                className="text-gray-600 font-medium"
+              >
+                ยกเลิก
               </Button>
               <Button
-                color="primary"
-                variant="shadow"
+                radius="xl"
                 onPress={handlePrint}
                 isDisabled={printing || !items.length}
                 isLoading={printing}
-                spinner={<Spinner size="sm" color="current" />}
-                startContent={!printing && <Printer />}
+                spinner={<Spinner size="sm" color="white" />}
+                startContent={!printing && <Printer size={18} />}
+                className="bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold shadow-lg shadow-gray-900/20 px-6"
               >
-                {printing
-                  ? "Printing..."
-                  : `Print ${items.length * quantity} Labels`}
+                {printing ? "กำลังพิมพ์..." : `พิมพ์ ${totalLabels} ฉลาก`}
               </Button>
             </>
           ) : (
             <Button
-              color="primary"
-              variant="shadow"
+              radius="xl"
               onPress={onClose}
               fullWidth
-              startContent={<Check />}
+              className="bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold"
             >
-              Close
+              เสร็จสิ้น
             </Button>
           )}
         </ModalFooter>
@@ -537,9 +736,9 @@ export function PrinterSettings({
   onSave,
   compact = false,
   className = "",
-  showHeader = false,
-  title = "Printer Settings",
-  subtitle = "",
+  showHeader = true,
+  title = "ตั้งค่าเครื่องพิมพ์",
+  subtitle = "ChainWay RFID Printer",
 }) {
   const {
     isConnected,
@@ -554,7 +753,7 @@ export function PrinterSettings({
     cancelAllJobs,
   } = useRFIDSafe();
 
-  const { settings, updateSetting, updateSettings, save, reset, saving } =
+  const { settings, updateSetting, updateSettings, save, reset } =
     usePrinterSettings();
   const { presets, selectPreset, isCustom } = useLabelPresets();
 
@@ -593,409 +792,378 @@ export function PrinterSettings({
       await save();
       await onSave?.(settings);
       setSaveStatus("saved");
-      setTimeout(() => setSaveStatus(null), 2000);
+      setTimeout(() => setSaveStatus(null), 2500);
     } catch {
       setSaveStatus("error");
     }
   }, [save, onSave, settings]);
 
-  const connectionStatus = printerLoading
-    ? "checking"
-    : isConnected
-      ? "connected"
-      : "disconnected";
-
   return (
-    <div className={`flex flex-col gap-4 ${className}`}>
-      {showHeader ? (
-        <div className="flex flex-col items-center justify-center w-full gap-2 pb-2">
-          <h3 className="text-lg font-semibold">{title}</h3>
-          {subtitle && <p className="text-sm text-foreground/60">{subtitle}</p>}
-          <StatusIndicator status={connectionStatus} />
-        </div>
-      ) : (
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">{title}</h3>
-          <StatusIndicator status={connectionStatus} />
-        </div>
-      )}
-
-      {printerError && (
-        <Card className="bg-danger/10 border-danger/20" shadow="none">
-          <CardBody>
-            <p className="text-sm text-danger flex items-center gap-2">
-              <AlertTriangle />
-              {printerError}
-            </p>
-          </CardBody>
-        </Card>
-      )}
-
-      <SettingsSection title="Connection" icon={<Plug />}>
-        <div
-          className={`grid gap-4 ${
-            compact ? "grid-cols-2" : "grid-cols-1 md:grid-cols-2"
-          }`}
-        >
-          <SettingsInput
-            label="Printer IP Address"
-            value={settings.host}
-            onChange={(v) => updateSetting("host", v)}
-            placeholder={PRINTER_CONFIG.host}
-            helpText="IP address of the RFID printer"
-          />
-          <SettingsInput
-            label="Port"
-            type="number"
-            value={settings.port}
-            onChange={(v) => updateSetting("port", v)}
-            min={1}
-            max={65535}
-            helpText="Default: 9100"
-          />
-        </div>
-
-        <div className="flex flex-wrap gap-2 pt-2">
-          <Button
-            color="primary"
-            variant="flat"
-            size="sm"
-            startContent={actionLoading !== "test" && <Search />}
-            onPress={() => handleAction("test", testConnection)}
-            isLoading={actionLoading === "test"}
-            spinner={<Spinner size="sm" color="current" />}
-          >
-            Test Connection
-          </Button>
-          <Button
-            variant="flat"
-            size="sm"
-            startContent={actionLoading !== "refresh" && <RefreshCw />}
-            onPress={() => handleAction("refresh", refreshPrinter)}
-            isLoading={actionLoading === "refresh"}
-            spinner={<Spinner size="sm" color="current" />}
-          >
-            Refresh Status
-          </Button>
-        </div>
-      </SettingsSection>
-
-      <SettingsSection title="Label Configuration" icon={<Tag />}>
-        <SettingsSelect
-          label="Label Size Preset"
-          value={settings.labelPreset}
-          onChange={handlePresetChange}
-          options={presets.map((p) => ({ value: p.name, label: p.name }))}
-        />
-
-        <div
-          className={`grid gap-4 ${
-            compact ? "grid-cols-2" : "grid-cols-1 md:grid-cols-2"
-          }`}
-        >
-          <SettingsInput
-            label="Width (mm)"
-            type="number"
-            value={settings.labelWidth}
-            onChange={(v) => updateSetting("labelWidth", v)}
-            min={10}
-            max={200}
-            disabled={!isCustom}
-          />
-          <SettingsInput
-            label="Height (mm)"
-            type="number"
-            value={settings.labelHeight}
-            onChange={(v) => updateSetting("labelHeight", v)}
-            min={10}
-            max={200}
-            disabled={!isCustom}
-          />
-        </div>
-
-        <SettingsInput
-          label="Default Print Quantity"
-          type="number"
-          value={settings.defaultQuantity}
-          onChange={(v) => updateSetting("defaultQuantity", v)}
-          min={1}
-          max={100}
-        />
-      </SettingsSection>
-
-      <SettingsSection title="EPC Configuration" icon={<Radio />}>
-        <SettingsSelect
-          label="EPC Generation Mode"
-          value={settings.epcMode}
-          onChange={(v) => updateSetting("epcMode", v)}
-          options={EPC_MODES.map((m) => ({ value: m.value, label: m.label }))}
-          helpText={
-            EPC_MODES.find((m) => m.value === settings.epcMode)?.description
-          }
-        />
-
-        <div
-          className={`grid gap-4 ${
-            compact ? "grid-cols-2" : "grid-cols-1 md:grid-cols-2"
-          }`}
-        >
-          <SettingsInput
-            label="EPC Prefix"
-            value={settings.epcPrefix}
-            onChange={(v) => updateSetting("epcPrefix", v)}
-            placeholder="PK"
-            helpText="2-4 character prefix"
-          />
-          {settings.epcMode === "sgtin96" && (
-            <SettingsInput
-              label="GS1 Company Prefix"
-              value={settings.companyPrefix}
-              onChange={(v) => updateSetting("companyPrefix", v)}
-              placeholder="0885000"
-              helpText="7-digit company prefix"
-            />
-          )}
-        </div>
-
-        <SettingsToggle
-          label="Enable RFID by Default"
-          checked={settings.enableRFIDByDefault}
-          onChange={(v) => updateSetting("enableRFIDByDefault", v)}
-          helpText="Automatically enable RFID encoding for all prints"
-        />
-      </SettingsSection>
-
-      <SettingsSection title="Printer Controls" icon={<SlidersHorizontal />}>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            color="primary"
-            variant="flat"
-            size="sm"
-            startContent={actionLoading !== "calibrate" && <Gauge />}
-            onPress={() => handleAction("calibrate", calibrate)}
-            isLoading={actionLoading === "calibrate"}
-            spinner={<Spinner size="sm" color="current" />}
-          >
-            Calibrate
-          </Button>
-          <Button
-            color="warning"
-            variant="flat"
-            size="sm"
-            startContent={actionLoading !== "cancel" && <StopCircle />}
-            onPress={() => handleAction("cancel", cancelAllJobs)}
-            isLoading={actionLoading === "cancel"}
-            spinner={<Spinner size="sm" color="current" />}
-          >
-            Cancel Jobs
-          </Button>
-          <Button
-            variant="flat"
-            size="sm"
-            startContent={actionLoading !== "reset" && <RotateCcw />}
-            onPress={() => handleAction("reset", resetPrinter)}
-            isLoading={actionLoading === "reset"}
-            spinner={<Spinner size="sm" color="current" />}
-          >
-            Soft Reset
-          </Button>
-          <Button
-            color="danger"
-            variant="flat"
-            size="sm"
-            startContent={actionLoading !== "fullReset" && <Zap />}
-            onPress={() => handleAction("fullReset", fullReset)}
-            isLoading={actionLoading === "fullReset"}
-            spinner={<Spinner size="sm" color="current" />}
-          >
-            Full Reset
-          </Button>
-        </div>
-      </SettingsSection>
-
-      <Accordion variant="bordered" className="px-0">
-        <AccordionItem
-          key="advanced"
-          title={
-            <span className="flex items-center gap-2 text-sm font-semibold">
-              <Settings />
-              Advanced Settings
-            </span>
-          }
-        >
-          <div className="flex flex-col gap-4 pb-2">
-            <div
-              className={`grid gap-4 ${
-                compact ? "grid-cols-2" : "grid-cols-1 md:grid-cols-2"
-              }`}
-            >
-              <SettingsInput
-                label="Connection Timeout (ms)"
-                type="number"
-                value={settings.timeout}
-                onChange={(v) => updateSetting("timeout", v)}
-                min={1000}
-                max={60000}
-                step={1000}
-              />
-              <SettingsInput
-                label="Retry Attempts"
-                type="number"
-                value={settings.retries}
-                onChange={(v) => updateSetting("retries", v)}
-                min={0}
-                max={10}
-              />
-              <SettingsInput
-                label="Print Delay (ms)"
-                type="number"
-                value={settings.printDelay}
-                onChange={(v) => updateSetting("printDelay", v)}
-                min={0}
-                max={5000}
-                step={50}
-                helpText="Delay between batch prints"
-              />
+    <div className={`max-w-2xl mx-auto ${className}`}>
+      {/* Header */}
+      {showHeader && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-100 to-white border border-gray-200 flex items-center justify-center shadow-lg shadow-gray-200/50">
+              <Printer size={28} className="text-gray-700" />
             </div>
-
-            <Divider />
-
-            <div className="flex flex-col gap-2">
-              <SettingsToggle
-                label="Auto Calibrate"
-                checked={settings.autoCalibrate}
-                onChange={(v) => updateSetting("autoCalibrate", v)}
-                helpText="Calibrate printer before first print"
-              />
-              <SettingsToggle
-                label="Validate EPC"
-                checked={settings.validateEPC}
-                onChange={(v) => updateSetting("validateEPC", v)}
-                helpText="Validate EPC format before writing"
-              />
-              <SettingsToggle
-                label="Retry on Error"
-                checked={settings.retryOnError}
-                onChange={(v) => updateSetting("retryOnError", v)}
-                helpText="Automatically retry failed prints"
-              />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+              {subtitle && (
+                <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>
+              )}
             </div>
           </div>
-        </AccordionItem>
-      </Accordion>
+          <StatusBadge connected={isConnected} loading={printerLoading} />
+        </div>
+      )}
 
-      {printerStatus && (
-        <SettingsSection title="Printer Status" icon={<Activity />}>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Wifi className="text-foreground/60" />
-              <span className="text-foreground/60">Online:</span>
-              <Chip
-                size="sm"
-                color={printerStatus.online ? "success" : "danger"}
-                variant="flat"
-                startContent={
-                  printerStatus.online ? <CheckCircle /> : <XCircle />
-                }
-              >
-                {printerStatus.online ? "Yes" : "No"}
-              </Chip>
+      {/* Error */}
+      {printerError && (
+        <div className="mb-6">
+          <AlertBox type="error">{printerError}</AlertBox>
+        </div>
+      )}
+
+      <div className="space-y-8">
+        {/* Connection */}
+        <ElevatedCard className="p-6" level={2} hover>
+          <Section icon={Wifi} title="การเชื่อมต่อ">
+            <div
+              className={`grid gap-4 ${compact ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2"}`}
+            >
+              <FormInput
+                label="IP Address"
+                value={settings.host}
+                onChange={(v) => updateSetting("host", v)}
+                placeholder={PRINTER_CONFIG.host}
+                icon={Wifi}
+              />
+              <FormInput
+                label="Port"
+                type="number"
+                value={settings.port}
+                onChange={(v) => updateSetting("port", v)}
+                min={1}
+                max={65535}
+              />
             </div>
-            {printerStatus.parsed && (
-              <>
-                <div className="flex items-center gap-2">
-                  <Pause className="text-foreground/60" />
-                  <span className="text-foreground/60">Paused:</span>
-                  <Chip size="sm" variant="flat">
-                    {printerStatus.parsed.isPaused ? "Yes" : "No"}
-                  </Chip>
+            <div className="flex gap-2 pt-2">
+              <ActionBtn
+                variant="primary"
+                icon={Search}
+                loading={actionLoading === "test"}
+                onPress={() => handleAction("test", testConnection)}
+              >
+                ทดสอบการเชื่อมต่อ
+              </ActionBtn>
+              <ActionBtn
+                variant="ghost"
+                icon={RefreshCw}
+                loading={actionLoading === "refresh"}
+                onPress={() => handleAction("refresh", refreshPrinter)}
+              >
+                รีเฟรช
+              </ActionBtn>
+            </div>
+          </Section>
+        </ElevatedCard>
+
+        {/* Label Config */}
+        <ElevatedCard className="p-6" level={2} hover>
+          <Section icon={FileText} title="ตั้งค่าฉลาก">
+            <FormSelect
+              label="ขนาดสำเร็จรูป"
+              value={settings.labelPreset}
+              onChange={handlePresetChange}
+              options={presets.map((p) => ({ value: p.name, label: p.name }))}
+            />
+            <div
+              className={`grid gap-4 ${compact ? "grid-cols-3" : "grid-cols-1 sm:grid-cols-3"}`}
+            >
+              <FormInput
+                label="กว้าง (มม.)"
+                type="number"
+                value={settings.labelWidth}
+                onChange={(v) => updateSetting("labelWidth", v)}
+                min={10}
+                max={200}
+                disabled={!isCustom}
+              />
+              <FormInput
+                label="สูง (มม.)"
+                type="number"
+                value={settings.labelHeight}
+                onChange={(v) => updateSetting("labelHeight", v)}
+                min={10}
+                max={200}
+                disabled={!isCustom}
+              />
+              <FormInput
+                label="จำนวนเริ่มต้น"
+                type="number"
+                value={settings.defaultQuantity}
+                onChange={(v) => updateSetting("defaultQuantity", v)}
+                min={1}
+                max={100}
+              />
+            </div>
+          </Section>
+        </ElevatedCard>
+
+        {/* EPC */}
+        <ElevatedCard className="p-6" level={2} hover>
+          <Section icon={Cpu} title="EPC / RFID">
+            <FormSelect
+              label="โหมดสร้าง EPC"
+              value={settings.epcMode}
+              onChange={(v) => updateSetting("epcMode", v)}
+              options={EPC_MODES.map((m) => ({
+                value: m.value,
+                label: m.label,
+              }))}
+              hint={
+                EPC_MODES.find((m) => m.value === settings.epcMode)?.description
+              }
+              icon={Radio}
+            />
+            <div
+              className={`grid gap-4 ${compact ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2"}`}
+            >
+              <FormInput
+                label="EPC Prefix"
+                value={settings.epcPrefix}
+                onChange={(v) => updateSetting("epcPrefix", v)}
+                placeholder="PK"
+                hint="2-4 ตัวอักษร"
+              />
+              {settings.epcMode === "sgtin96" && (
+                <FormInput
+                  label="GS1 Company Prefix"
+                  value={settings.companyPrefix}
+                  onChange={(v) => updateSetting("companyPrefix", v)}
+                  placeholder="0885000"
+                  hint="7 หลัก"
+                />
+              )}
+            </div>
+            <FormToggle
+              label="เปิด RFID เป็นค่าเริ่มต้น"
+              checked={settings.enableRFIDByDefault}
+              onChange={(v) => updateSetting("enableRFIDByDefault", v)}
+              hint="เขียน RFID อัตโนมัติทุกครั้งที่พิมพ์"
+            />
+          </Section>
+        </ElevatedCard>
+
+        {/* Controls */}
+        <ElevatedCard className="p-6" level={2} hover>
+          <Section icon={Settings} title="ควบคุมเครื่องพิมพ์">
+            <div className="flex flex-wrap gap-2">
+              <ActionBtn
+                icon={Gauge}
+                loading={actionLoading === "calibrate"}
+                onPress={() => handleAction("calibrate", calibrate)}
+              >
+                ปรับเทียบ
+              </ActionBtn>
+              <ActionBtn
+                icon={StopCircle}
+                loading={actionLoading === "cancel"}
+                onPress={() => handleAction("cancel", cancelAllJobs)}
+              >
+                ยกเลิกงาน
+              </ActionBtn>
+              <ActionBtn
+                variant="ghost"
+                icon={RotateCcw}
+                loading={actionLoading === "reset"}
+                onPress={() => handleAction("reset", resetPrinter)}
+              >
+                Soft Reset
+              </ActionBtn>
+              <ActionBtn
+                variant="danger"
+                icon={Zap}
+                loading={actionLoading === "fullReset"}
+                onPress={() => handleAction("fullReset", fullReset)}
+              >
+                Full Reset
+              </ActionBtn>
+            </div>
+          </Section>
+        </ElevatedCard>
+
+        {/* Advanced */}
+        <ElevatedCard className="overflow-hidden" level={1}>
+          <Accordion
+            variant="light"
+            className="px-0"
+            itemClasses={{
+              base: "py-0 w-full",
+              title: "text-sm font-medium text-gray-700",
+              trigger: "px-6 py-4 hover:bg-gray-50 transition-colors",
+              content: "px-6 pb-6",
+              indicator: "text-gray-400",
+            }}
+          >
+            <AccordionItem
+              key="advanced"
+              title={
+                <span className="flex items-center gap-2.5">
+                  <Settings size={16} className="text-gray-500" />
+                  ตั้งค่าขั้นสูง
+                </span>
+              }
+            >
+              <div className="space-y-4 pt-2">
+                <div
+                  className={`grid gap-4 ${compact ? "grid-cols-3" : "grid-cols-1 sm:grid-cols-3"}`}
+                >
+                  <FormInput
+                    label="Timeout (ms)"
+                    type="number"
+                    value={settings.timeout}
+                    onChange={(v) => updateSetting("timeout", v)}
+                    min={1000}
+                    max={60000}
+                    step={1000}
+                  />
+                  <FormInput
+                    label="ลองใหม่ (ครั้ง)"
+                    type="number"
+                    value={settings.retries}
+                    onChange={(v) => updateSetting("retries", v)}
+                    min={0}
+                    max={10}
+                  />
+                  <FormInput
+                    label="หน่วงเวลา (ms)"
+                    type="number"
+                    value={settings.printDelay}
+                    onChange={(v) => updateSetting("printDelay", v)}
+                    min={0}
+                    max={5000}
+                    step={50}
+                  />
                 </div>
-                <div className="flex items-center gap-2">
-                  <FileText className="text-foreground/60" />
-                  <span className="text-foreground/60">Paper:</span>
-                  <Chip
-                    size="sm"
-                    color={printerStatus.parsed.paperOut ? "danger" : "success"}
-                    variant="flat"
-                    startContent={
-                      printerStatus.parsed.paperOut ? (
-                        <XCircle />
-                      ) : (
-                        <CheckCircle />
-                      )
-                    }
-                  >
-                    {printerStatus.parsed.paperOut ? "Out" : "OK"}
-                  </Chip>
+                <div className="space-y-2">
+                  <FormToggle
+                    label="ปรับเทียบอัตโนมัติ"
+                    checked={settings.autoCalibrate}
+                    onChange={(v) => updateSetting("autoCalibrate", v)}
+                  />
+                  <FormToggle
+                    label="ตรวจสอบ EPC"
+                    checked={settings.validateEPC}
+                    onChange={(v) => updateSetting("validateEPC", v)}
+                  />
+                  <FormToggle
+                    label="ลองใหม่เมื่อผิดพลาด"
+                    checked={settings.retryOnError}
+                    onChange={(v) => updateSetting("retryOnError", v)}
+                  />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Ribbon className="text-foreground/60" />
-                  <span className="text-foreground/60">Ribbon:</span>
-                  <Chip
-                    size="sm"
-                    color={
-                      printerStatus.parsed.ribbonOut ? "danger" : "success"
-                    }
-                    variant="flat"
-                    startContent={
-                      printerStatus.parsed.ribbonOut ? (
-                        <XCircle />
-                      ) : (
-                        <CheckCircle />
-                      )
-                    }
-                  >
-                    {printerStatus.parsed.ribbonOut ? "Out" : "OK"}
-                  </Chip>
-                </div>
-              </>
+              </div>
+            </AccordionItem>
+          </Accordion>
+        </ElevatedCard>
+
+        {/* Status */}
+        {printerStatus && (
+          <ElevatedCard className="p-6" level={1}>
+            <Section icon={Activity} title="สถานะเครื่องพิมพ์">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <StatusTile label="ออนไลน์" active={printerStatus.online} />
+                {printerStatus.parsed && (
+                  <>
+                    <StatusTile
+                      label="พร้อมทำงาน"
+                      active={!printerStatus.parsed.isPaused}
+                    />
+                    <StatusTile
+                      label="กระดาษ"
+                      active={!printerStatus.parsed.paperOut}
+                    />
+                    <StatusTile
+                      label="ริบบอน"
+                      active={!printerStatus.parsed.ribbonOut}
+                    />
+                  </>
+                )}
+              </div>
+            </Section>
+          </ElevatedCard>
+        )}
+
+        {/* Footer */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+          <ActionBtn variant="ghost" icon={Undo} onPress={reset}>
+            รีเซ็ตค่าเริ่มต้น
+          </ActionBtn>
+
+          <div className="flex items-center gap-4">
+            {saveStatus === "saved" && (
+              <span className="flex items-center gap-1.5 text-sm font-medium text-emerald-600">
+                <CheckCircle size={16} />
+                บันทึกแล้ว
+              </span>
+            )}
+            {saveStatus === "error" && (
+              <span className="flex items-center gap-1.5 text-sm font-medium text-red-600">
+                <X size={16} />
+                บันทึกล้มเหลว
+              </span>
+            )}
+            {onSave && (
+              <Button
+                radius="xl"
+                startContent={saveStatus !== "saving" && <Save size={16} />}
+                onPress={handleSave}
+                isLoading={saveStatus === "saving"}
+                spinner={<Spinner size="sm" color="white" />}
+                className="bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold shadow-lg shadow-gray-900/20 px-6"
+              >
+                บันทึกการตั้งค่า
+              </Button>
             )}
           </div>
-        </SettingsSection>
-      )}
-
-      <Divider />
-      <div className="flex items-center justify-between">
-        <Button
-          variant="flat"
-          size="md"
-          startContent={<Undo />}
-          onPress={reset}
-        >
-          Reset to Defaults
-        </Button>
-
-        <div className="flex items-center gap-2">
-          {saveStatus === "saved" && (
-            <Chip
-              color="success"
-              size="sm"
-              variant="flat"
-              startContent={<Check />}
-            >
-              Saved
-            </Chip>
-          )}
-          {saveStatus === "error" && (
-            <Chip color="danger" size="sm" variant="flat" startContent={<X />}>
-              Save failed
-            </Chip>
-          )}
-          {onSave && (
-            <Button
-              color="primary"
-              variant="shadow"
-              size="md"
-              startContent={saveStatus !== "saving" && <Save />}
-              onPress={handleSave}
-              isLoading={saveStatus === "saving"}
-              spinner={<Spinner size="sm" color="current" />}
-            >
-              Save Settings
-            </Button>
-          )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function StatusTile({ label, active }) {
+  return (
+    <div
+      className={`
+        p-3 rounded-xl border transition-all duration-300
+        ${
+          active
+            ? "bg-gradient-to-br from-emerald-50 to-white border-emerald-200"
+            : "bg-gradient-to-br from-red-50 to-white border-red-200"
+        }
+      `}
+    >
+      <div className="flex items-center gap-2 mb-1">
+        <span className="relative flex h-2 w-2">
+          {active && (
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+          )}
+          <span
+            className={`relative inline-flex h-2 w-2 rounded-full ${
+              active ? "bg-emerald-500" : "bg-red-400"
+            }`}
+          />
+        </span>
+        <span className="text-xs text-gray-500">{label}</span>
+      </div>
+      <p
+        className={`text-sm font-semibold ${active ? "text-emerald-700" : "text-red-600"}`}
+      >
+        {active ? "พร้อม" : "ไม่พร้อม"}
+      </p>
     </div>
   );
 }
@@ -1018,67 +1186,73 @@ export function PrinterQuickConnect({ onConnect, className = "" }) {
     onConnect?.({ host, port, connected: isConnected });
   };
 
-  const connectionStatus = printerLoading
-    ? "checking"
-    : isConnected
-      ? "connected"
-      : "disconnected";
-
   return (
-    <Card className={className} shadow="sm" radius="lg">
-      <CardBody className="gap-4">
-        <div className="flex items-center gap-4">
-          <StatusIndicator status={connectionStatus} />
+    <ElevatedCard className={`p-5 ${className}`} level={2} hover>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-white border border-gray-200 flex items-center justify-center shadow-sm">
+            <Wifi size={20} className="text-gray-600" />
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900">
+              เชื่อมต่อเครื่องพิมพ์
+            </h4>
+            <p className="text-xs text-gray-400">Quick Connect</p>
+          </div>
         </div>
+        <StatusBadge connected={isConnected} loading={printerLoading} />
+      </div>
 
-        {printerError && (
-          <Card className="bg-danger/10" shadow="none">
-            <CardBody>
-              <p className="text-sm text-danger flex items-center gap-2">
-                <AlertTriangle />
-                {printerError}
-              </p>
-            </CardBody>
-          </Card>
-        )}
-
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            value={host}
-            onChange={(e) => setHost(e.target.value)}
-            placeholder="IP Address"
-            variant="bordered"
-            size="md"
-            radius="sm"
-            className="flex-1"
-            startContent={<Wifi className="text-foreground/50" />}
-          />
-          <Input
-            type="number"
-            value={String(port)}
-            onChange={(e) => setPort(parseInt(e.target.value) || 9100)}
-            placeholder="Port"
-            variant="bordered"
-            size="md"
-            radius="sm"
-            className="w-28"
-            startContent={<Hash className="text-foreground/50" />}
-          />
-          <Button
-            color="primary"
-            variant="shadow"
-            size="md"
-            onPress={handleConnect}
-            isLoading={printerLoading}
-            spinner={<Spinner size="sm" color="current" />}
-            startContent={!printerLoading && <Plug />}
-          >
-            Connect
-          </Button>
+      {printerError && (
+        <div className="mb-4">
+          <AlertBox type="error">{printerError}</AlertBox>
         </div>
-      </CardBody>
-    </Card>
+      )}
+
+      <div className="flex gap-3">
+        <Input
+          type="text"
+          value={host}
+          onChange={(e) => setHost(e.target.value)}
+          placeholder="IP Address"
+          variant="bordered"
+          size="md"
+          radius="lg"
+          className="flex-1"
+          startContent={<Wifi size={16} className="text-gray-400" />}
+          classNames={{
+            inputWrapper:
+              "bg-gray-50/50 border-gray-200 hover:border-gray-300 shadow-sm",
+            input: "text-sm",
+          }}
+        />
+        <Input
+          type="number"
+          value={String(port)}
+          onChange={(e) => setPort(parseInt(e.target.value) || 9100)}
+          placeholder="Port"
+          variant="bordered"
+          size="md"
+          radius="lg"
+          className="w-24"
+          classNames={{
+            inputWrapper:
+              "bg-gray-50/50 border-gray-200 hover:border-gray-300 shadow-sm",
+            input: "text-sm",
+          }}
+        />
+        <Button
+          size="md"
+          radius="lg"
+          onPress={handleConnect}
+          isLoading={printerLoading}
+          spinner={<Spinner size="sm" color="white" />}
+          className="bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold shadow-lg shadow-gray-900/20 min-w-[100px]"
+        >
+          {printerLoading ? "" : "เชื่อมต่อ"}
+        </Button>
+      </div>
+    </ElevatedCard>
   );
 }
 
