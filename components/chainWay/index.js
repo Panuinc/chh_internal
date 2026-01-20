@@ -6,4 +6,4 @@ export {
   PrinterQuickConnect,
   PRINT_TYPES,
   PRINT_TYPE_OPTIONS,
-} from "./printcomponents.jsx";
+} from "./printerConfig.jsx";
