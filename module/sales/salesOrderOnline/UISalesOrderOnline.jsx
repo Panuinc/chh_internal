@@ -828,7 +828,7 @@ export default function UISalesOrderOnline({
       <Modal
         isOpen={isSettingsOpen}
         onClose={closeSettings}
-        size="5xl"
+        size="2xl"
         scrollBehavior="inside"
       >
         <ModalContent>
