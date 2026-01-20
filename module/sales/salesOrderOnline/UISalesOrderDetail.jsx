@@ -184,7 +184,7 @@ function CustomerInfoCard({ order }) {
             <p className="text-sm text-foreground/60">{order.customerNumber}</p>
           </div>
           {order.phoneNumber && (
-            
+            <a
               href={`tel:${order.phoneNumber}`}
               className="inline-flex items-center gap-2 text-primary hover:underline"
             >
@@ -228,10 +228,10 @@ function ShippingAddressCard({ order }) {
 
 function OrderLinesCard({ order }) {
   const itemLines = (order.salesOrderLines || []).filter(
-    (l) => l.lineType === "Item"
+    (l) => l.lineType === "Item",
   );
   const commentLines = (order.salesOrderLines || []).filter(
-    (l) => l.lineType === "Comment"
+    (l) => l.lineType === "Comment",
   );
 
   return (

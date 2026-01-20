@@ -9,10 +9,6 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Divider,
   Image,
   Chip,
@@ -31,7 +27,6 @@ import {
 } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
-import { PRINT_TYPE_OPTIONS } from "@/lib/chainWay";
 
 const COMPANY_INFO = {
   name: "บริษัท ชื้ออะฮวด อุตสาหกรรม จำกัด",
@@ -39,11 +34,6 @@ const COMPANY_INFO = {
   district: "ต.ขุนศรี อ.ไทรน้อย จ.นนทบุรี 11150",
   phone: "02-921-9979",
 };
-
-const PRINT_OPTIONS = [
-  { key: "packingSlip", label: "ใบปะหน้า (Packing Slip)", icon: FileText },
-  ...PRINT_TYPE_OPTIONS,
-];
 
 const columns = [
   { name: "#", uid: "index", width: 60 },
@@ -433,7 +423,6 @@ function OrderDetailModal({
   isOpen,
   onClose,
   order,
-  onPrint,
   onOpenPreview,
   isConnected,
   printing,
@@ -537,37 +526,17 @@ function OrderDetailModal({
           <Button variant="light" onPress={onClose}>
             Close
           </Button>
-          <Dropdown>
-            <DropdownTrigger>
-              <Button
-                color="primary"
-                startContent={<Printer />}
-                isDisabled={printing || !isConnected || lineCount === 0}
-              >
-                Print Labels
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Print options">
-              {PRINT_OPTIONS.map((opt) => (
-                <DropdownItem
-                  key={opt.key}
-                  onPress={() => {
-                    if (opt.key === "packingSlip") {
-                      onClose();
-                      onOpenPreview(order);
-                    } else {
-                      onPrint(order, {
-                        type: opt.key,
-                        enableRFID: opt.hasRFID || false,
-                      });
-                    }
-                  }}
-                >
-                  {opt.label}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
+          <Button
+            color="primary"
+            startContent={<Printer />}
+            isDisabled={printing || !isConnected || lineCount === 0}
+            onPress={() => {
+              onClose();
+              onOpenPreview(order);
+            }}
+          >
+            พิมพ์ใบปะหน้า
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
@@ -674,39 +643,18 @@ export default function UISalesOrderOnline({
             >
               <Eye />
             </Button>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  isDisabled={printing || !isConnected || item.lineCount === 0}
-                >
-                  <Printer
-                    className={isConnected ? "text-success" : "text-danger"}
-                  />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu aria-label="Print options">
-                {PRINT_OPTIONS.map((opt) => (
-                  <DropdownItem
-                    key={opt.key}
-                    onPress={() => {
-                      if (opt.key === "packingSlip") {
-                        handleOpenPreview(item._rawOrder);
-                      } else {
-                        onPrintSingle(item._rawOrder, {
-                          type: opt.key,
-                          enableRFID: opt.hasRFID || false,
-                        });
-                      }
-                    }}
-                  >
-                    {opt.label}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              isDisabled={printing || !isConnected || item.lineCount === 0}
+              onPress={() => handleOpenPreview(item._rawOrder)}
+              title="พิมพ์ใบปะหน้า"
+            >
+              <Printer
+                className={isConnected ? "text-success" : "text-danger"}
+              />
+            </Button>
           </div>
         );
       }
@@ -733,7 +681,7 @@ export default function UISalesOrderOnline({
       }
       return undefined;
     },
-    [onPrintSingle, handleViewOrder, handleOpenPreview, isConnected, printing],
+    [handleViewOrder, handleOpenPreview, isConnected, printing],
   );
 
   return (
@@ -823,7 +771,6 @@ export default function UISalesOrderOnline({
         isOpen={isDetailOpen}
         onClose={handleCloseDetail}
         order={selectedOrder}
-        onPrint={onPrintSingle}
         onOpenPreview={handleOpenPreview}
         isConnected={isConnected}
         printing={printing}
