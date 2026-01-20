@@ -419,7 +419,7 @@ export default function SalesOrderDetailPage() {
 
         <div className="text-center py-4 space-y-1">
           <p className="text-sm font-medium text-foreground/70">
-            บริษัท ชื้ออะฮวด อุตสาหกรรม จำกัด
+            บริษัท ชื้อฮะฮวด อุตสาหกรรม จำกัด
           </p>
           <p className="text-xs text-foreground/50">โทร: 02-921-9979</p>
         </div>

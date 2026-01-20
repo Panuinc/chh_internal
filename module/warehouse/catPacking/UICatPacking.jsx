@@ -8,14 +8,10 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Modal,
-  ModalContent,
-  ModalBody,
-  useDisclosure,
 } from "@heroui/react";
-import { Printer, RefreshCw, Settings } from "lucide-react";
-import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
-import { useRFIDSafe, usePrinterSettings } from "@/hooks";
+import { Printer, RefreshCw } from "lucide-react";
+import { PrinterStatusBadge } from "@/components/chainWay";
+import { useRFIDSafe } from "@/hooks";
 import { PRINT_TYPE_OPTIONS, STATUS_COLORS } from "@/lib/chainWay/config";
 
 const columns = [
@@ -40,19 +36,11 @@ export default function UICatPacking({
   loading,
   onPrintSingle,
   onPrintMultiple,
-  printerConnected = false,
   printing = false,
   onRefresh,
 }) {
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-  const {
-    isOpen: isSettingsOpen,
-    onOpen: openSettings,
-    onClose: closeSettings,
-  } = useDisclosure();
-
   const { isConnected } = useRFIDSafe();
-  const { save: saveSettings, settings } = usePrinterSettings();
 
   const total = items.length;
   const active = items.filter((i) => !i.blocked).length;
@@ -86,11 +74,6 @@ export default function UICatPacking({
     const selected = getSelectedItems();
     if (selected.length > 0) onPrintMultiple?.(selected);
   }, [getSelectedItems, onPrintMultiple]);
-
-  const handleSaveSettings = useCallback(async () => {
-    await saveSettings();
-    closeSettings();
-  }, [saveSettings, closeSettings]);
 
   const renderCustomCell = useCallback(
     (item, columnKey) => {
@@ -139,18 +122,9 @@ export default function UICatPacking({
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <div className="flex items-center justify-between w-full px-2">
             <span className="font-medium">Printer</span>
-            <Button
-              isIconOnly
-              variant="light"
-              size="sm"
-              onPress={openSettings}
-              title="Printer Settings"
-            >
-              <Settings />
-            </Button>
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <PrinterStatusBadge showControls />
+            <PrinterStatusBadge />
           </div>
         </div>
 
@@ -222,15 +196,6 @@ export default function UICatPacking({
               isIconOnly
               variant="light"
               size="sm"
-              onPress={openSettings}
-              title="Printer Settings"
-            >
-              <Settings />
-            </Button>
-            <Button
-              isIconOnly
-              variant="light"
-              size="sm"
               onPress={onRefresh}
               isDisabled={loading}
             >
@@ -259,25 +224,6 @@ export default function UICatPacking({
           />
         )}
       </div>
-
-      <Modal
-        isOpen={isSettingsOpen}
-        onClose={closeSettings}
-        size="2xl"
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          <ModalBody className="py-6">
-            <PrinterSettings
-              onSave={handleSaveSettings}
-              showAdvanced={false}
-              showHeader={true}
-              title="Printer Settings"
-              subtitle="Configure printer connection and label settings"
-            />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
     </div>
   );
 }

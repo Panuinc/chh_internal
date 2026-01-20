@@ -21,7 +21,6 @@ import {
 import {
   Printer,
   RefreshCw,
-  Settings,
   Eye,
   Package,
   User,
@@ -29,12 +28,12 @@ import {
   MapPin,
   FileText,
 } from "lucide-react";
-import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
-import { useRFIDSafe, usePrinterSettings } from "@/hooks";
+import { PrinterStatusBadge } from "@/components/chainWay";
+import { useRFIDSafe } from "@/hooks";
 import { PRINT_TYPE_OPTIONS } from "@/lib/chainWay";
 
 const COMPANY_INFO = {
-  name: "บริษัท ชื้ออะฮวด อุตสาหกรรม จำกัด",
+  name: "บริษัท ชื้อฮะฮวด อุตสาหกรรม จำกัด",
   address: "9/1 หมู่ 2 ถนนบางเลน-ลาดหลุมแก้ว",
   district: "ต.ขุนศรี อ.ไทรน้อย จ.นนทบุรี 11150",
   phone: "02-921-9979",
@@ -585,12 +584,6 @@ export default function UISalesOrderOnline({
   const [previewOrder, setPreviewOrder] = useState(null);
 
   const {
-    isOpen: isSettingsOpen,
-    onOpen: openSettings,
-    onClose: closeSettings,
-  } = useDisclosure();
-
-  const {
     isOpen: isDetailOpen,
     onOpen: openDetail,
     onClose: closeDetail,
@@ -603,7 +596,6 @@ export default function UISalesOrderOnline({
   } = useDisclosure();
 
   const { isConnected } = useRFIDSafe();
-  const { save: saveSettings } = usePrinterSettings();
 
   const total = orders.length;
   const totalAmount = orders.reduce(
@@ -626,11 +618,6 @@ export default function UISalesOrderOnline({
         : [],
     [orders],
   );
-
-  const handleSaveSettings = useCallback(async () => {
-    await saveSettings();
-    closeSettings();
-  }, [saveSettings, closeSettings]);
 
   const handleViewOrder = useCallback(
     (order) => {
@@ -748,15 +735,6 @@ export default function UISalesOrderOnline({
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <div className="flex items-center justify-between w-full h-full p-2 gap-2">
             Printer
-            <Button
-              isIconOnly
-              variant="light"
-              size="sm"
-              onPress={openSettings}
-              title="Printer Settings"
-            >
-              <Settings />
-            </Button>
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <PrinterStatusBadge />
@@ -824,25 +802,6 @@ export default function UISalesOrderOnline({
           />
         )}
       </div>
-
-      <Modal
-        isOpen={isSettingsOpen}
-        onClose={closeSettings}
-        size="2xl"
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          <ModalBody className="py-6">
-            <PrinterSettings
-              onSave={handleSaveSettings}
-              showAdvanced={false}
-              showHeader={true}
-              title="Printer Settings"
-              subtitle="Configure printer connection and label settings"
-            />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
 
       <OrderDetailModal
         isOpen={isDetailOpen}

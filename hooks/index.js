@@ -12,8 +12,6 @@ export {
   useRFIDPrint,
   usePrinterStatus,
   useRFIDPreview,
-  usePrinterSettings,
-  useLabelPresets,
   RFIDProvider,
   useRFIDContext,
   useRFIDSafe,

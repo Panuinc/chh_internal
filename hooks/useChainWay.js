@@ -9,15 +9,7 @@ import React, {
   useCallback,
   useRef,
 } from "react";
-import {
-  TIMEOUTS,
-  STORAGE_KEYS,
-  PRINTER_CONFIG,
-  DEFAULT_LABEL_SIZE,
-  EPC_CONFIG,
-  LABEL_PRESETS,
-  getDefaultLabelPreset,
-} from "@/lib/chainWay/config";
+import { TIMEOUTS, PRINTER_CONFIG } from "@/lib/chainWay/config";
 
 const API_URL = "/api/chainWay";
 
@@ -71,26 +63,6 @@ async function withRetry(fn, retries = 2, delay = 1000) {
   throw lastError;
 }
 
-function loadFromStorage(key = STORAGE_KEYS.printerSettings) {
-  if (typeof window === "undefined") return null;
-  try {
-    const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveToStorage(config, key = STORAGE_KEYS.printerSettings) {
-  if (typeof window === "undefined") return false;
-  try {
-    localStorage.setItem(key, JSON.stringify(config));
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 function getErrorMessage(error) {
   if (typeof error === "string") return error;
   return error?.message || "Unknown error";
@@ -106,134 +78,6 @@ async function postApi(action, payload = {}) {
 async function getApi(action, params = {}) {
   const searchParams = new URLSearchParams({ action, ...params });
   return fetchAPI(`${API_URL}?${searchParams.toString()}`);
-}
-
-const getDefaultSettings = () => ({
-  host: PRINTER_CONFIG.host,
-  port: PRINTER_CONFIG.port,
-  timeout: PRINTER_CONFIG.timeout,
-  retries: PRINTER_CONFIG.retries,
-  labelWidth: DEFAULT_LABEL_SIZE.width,
-  labelHeight: DEFAULT_LABEL_SIZE.height,
-  labelPreset: getDefaultLabelPreset().name,
-  epcMode: EPC_CONFIG.mode,
-  epcPrefix: EPC_CONFIG.prefix,
-  companyPrefix: EPC_CONFIG.companyPrefix,
-  defaultQuantity: 1,
-  printDelay: 100,
-  autoCalibrate: false,
-  enableRFIDByDefault: false,
-  validateEPC: true,
-  retryOnError: true,
-});
-
-export function usePrinterSettings(options = {}) {
-  const { autoLoad = true, storageKey = STORAGE_KEYS.printerSettings } =
-    options;
-
-  const [settings, setSettings] = useState(getDefaultSettings);
-  const [loaded, setLoaded] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!autoLoad) return;
-    const stored = loadFromStorage(storageKey);
-    if (stored) {
-      setSettings((prev) => ({ ...prev, ...stored }));
-    }
-    setLoaded(true);
-  }, [autoLoad, storageKey]);
-
-  const updateSetting = useCallback((key, value) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
-  }, []);
-
-  const updateSettings = useCallback((updates) => {
-    setSettings((prev) => ({ ...prev, ...updates }));
-  }, []);
-
-  const save = useCallback(async () => {
-    setSaving(true);
-    setError(null);
-    try {
-      const success = saveToStorage(settings, storageKey);
-      if (!success) throw new Error("Failed to save settings");
-      return true;
-    } catch (err) {
-      setError(err.message);
-      return false;
-    } finally {
-      setSaving(false);
-    }
-  }, [settings, storageKey]);
-
-  const reset = useCallback(() => {
-    const defaults = getDefaultSettings();
-    setSettings(defaults);
-    saveToStorage(defaults, storageKey);
-  }, [storageKey]);
-
-  return {
-    settings,
-    loaded,
-    saving,
-    error,
-    updateSetting,
-    updateSettings,
-    save,
-    reset,
-    getPrinterConfig: () => ({
-      host: settings.host,
-      port: settings.port,
-      timeout: settings.timeout,
-      retries: settings.retries,
-    }),
-    getLabelSize: () => ({
-      width: settings.labelWidth,
-      height: settings.labelHeight,
-    }),
-    getEPCConfig: () => ({
-      mode: settings.epcMode,
-      prefix: settings.epcPrefix,
-      companyPrefix: settings.companyPrefix,
-    }),
-  };
-}
-
-export function useLabelPresets() {
-  const [currentPreset, setCurrentPreset] = useState(
-    () => LABEL_PRESETS.find((p) => p.isDefault) || LABEL_PRESETS[0],
-  );
-  const [customSize, setCustomSize] = useState({ width: 100, height: 30 });
-
-  const selectPreset = useCallback((presetName) => {
-    const preset = LABEL_PRESETS.find((p) => p.name === presetName);
-    if (preset) {
-      setCurrentPreset(preset);
-      if (preset.width && preset.height) {
-        setCustomSize({ width: preset.width, height: preset.height });
-      }
-    }
-  }, []);
-
-  const setCustomDimensions = useCallback((width, height) => {
-    setCustomSize({ width, height });
-    setCurrentPreset(LABEL_PRESETS.find((p) => p.name === "Custom"));
-  }, []);
-
-  return {
-    presets: LABEL_PRESETS,
-    currentPreset,
-    customSize,
-    selectPreset,
-    setCustomDimensions,
-    getCurrentSize: () =>
-      currentPreset.name === "Custom"
-        ? customSize
-        : { width: currentPreset.width, height: currentPreset.height },
-    isCustom: currentPreset.name === "Custom",
-  };
 }
 
 export function useRFIDPrint(defaultOptions = {}) {
@@ -343,10 +187,7 @@ export function usePrinterStatus(config = {}) {
     setError(null);
 
     try {
-      const result = await getApi("status", {
-        host: config.host || "",
-        port: config.port ? String(config.port) : "",
-      });
+      const result = await getApi("status");
 
       if (!mountedRef.current) return null;
 
@@ -371,7 +212,7 @@ export function usePrinterStatus(config = {}) {
     } finally {
       if (mountedRef.current) setLoading(false);
     }
-  }, [config.host, config.port]);
+  }, []);
 
   const executeAction = useCallback(
     async (action) => {
@@ -381,7 +222,6 @@ export function usePrinterStatus(config = {}) {
       try {
         const result = await postApi("printer", {
           printerAction: action,
-          config: config.host ? config : undefined,
         });
 
         if (!result.success) throw new Error(result.error);
@@ -396,7 +236,7 @@ export function usePrinterStatus(config = {}) {
         setLoading(false);
       }
     },
-    [config, refresh],
+    [refresh],
   );
 
   const reconnect = useCallback(async () => {
@@ -488,7 +328,6 @@ export function useRFIDPreview() {
 export function useRFID(config = {}) {
   const printHook = useRFIDPrint(config.printOptions);
   const printerHook = usePrinterStatus({
-    ...config.printerConfig,
     autoConnect: config.autoConnect,
     pollInterval: config.pollInterval,
   });
@@ -680,16 +519,13 @@ export function useChainWayPrinter() {
   const [status, setStatus] = useState(null);
   const [actionResult, setActionResult] = useState(null);
 
-  const getStatus = useCallback(async (config = {}) => {
+  const getStatus = useCallback(async () => {
     setLoading(true);
     setError(null);
     setStatus(null);
 
     try {
-      const response = await getApi("status", {
-        host: config.host || "",
-        port: config.port || "",
-      });
+      const response = await getApi("status");
       setStatus(response.data);
       return { success: true, data: response.data };
     } catch (err) {
@@ -701,13 +537,13 @@ export function useChainWayPrinter() {
     }
   }, []);
 
-  const executeAction = useCallback(async (printerAction, config = {}) => {
+  const executeAction = useCallback(async (printerAction) => {
     setLoading(true);
     setError(null);
     setActionResult(null);
 
     try {
-      const response = await postApi("printer", { printerAction, config });
+      const response = await postApi("printer", { printerAction });
       setActionResult(response.data);
       return { success: true, data: response.data };
     } catch (err) {
@@ -722,14 +558,14 @@ export function useChainWayPrinter() {
   return {
     getStatus,
     executeAction,
-    testConnection: (config) => executeAction("test", config),
-    calibrate: (config) => executeAction("calibrate", config),
-    reset: (config) => executeAction("reset", config),
-    fullReset: (config) => executeAction("fullReset", config),
-    cancelAll: (config) => executeAction("cancel", config),
-    feedLabel: (config) => executeAction("feed", config),
-    pause: (config) => executeAction("pause", config),
-    resume: (config) => executeAction("resume", config),
+    testConnection: () => executeAction("test"),
+    calibrate: () => executeAction("calibrate"),
+    reset: () => executeAction("reset"),
+    fullReset: () => executeAction("fullReset"),
+    cancelAll: () => executeAction("cancel"),
+    feedLabel: () => executeAction("feed"),
+    pause: () => executeAction("pause"),
+    resume: () => executeAction("resume"),
     loading,
     error,
     status,
