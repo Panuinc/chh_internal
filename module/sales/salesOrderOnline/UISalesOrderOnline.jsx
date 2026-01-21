@@ -440,7 +440,7 @@ function OrderDetailModal({
           <div className="flex items-center gap-2">
             <Chip
               color={statusColorMap[order.status] || "default"}
-              size="sm"
+              size="md"
               variant="flat"
             >
               {order.status}
@@ -637,7 +637,7 @@ export default function UISalesOrderOnline({
             <Button
               isIconOnly
               variant="light"
-              size="sm"
+              size="md"
               onPress={() => handleViewOrder(item._rawOrder)}
               title="View Details"
             >
@@ -646,7 +646,7 @@ export default function UISalesOrderOnline({
             <Button
               isIconOnly
               variant="light"
-              size="sm"
+              size="md"
               isDisabled={printing || !isConnected || item.lineCount === 0}
               onPress={() => handleOpenPreview(item._rawOrder)}
               title="พิมพ์ใบปะหน้า"
@@ -662,7 +662,7 @@ export default function UISalesOrderOnline({
         return (
           <Chip
             color={statusColorMap[item.status] || "default"}
-            size="sm"
+            size="md"
             variant="flat"
           >
             {item.status}
@@ -693,7 +693,7 @@ export default function UISalesOrderOnline({
             <Button
               isIconOnly
               variant="light"
-              size="sm"
+              size="md"
               onPress={openSettings}
               title="Printer Settings"
             >
@@ -736,7 +736,7 @@ export default function UISalesOrderOnline({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Button
               variant="light"
-              size="sm"
+              size="md"
               onPress={onRefresh}
               isDisabled={loading}
               className="w-full"

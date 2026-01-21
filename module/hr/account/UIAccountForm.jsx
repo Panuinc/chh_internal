@@ -36,8 +36,8 @@ export default function UIAccountForm({
               placeholder="Select Employee"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               selectedKeys={
                 formData.accountEmployeeId ? [formData.accountEmployeeId] : []
@@ -71,8 +71,8 @@ export default function UIAccountForm({
               }`}
               isReadOnly
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
             />
           </div>
         </div>
@@ -88,8 +88,8 @@ export default function UIAccountForm({
             placeholder="Enter Username"
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             isRequired
             value={formData.accountUsername || ""}
             onChange={handleChange("accountUsername")}
@@ -109,8 +109,8 @@ export default function UIAccountForm({
             description={isUpdate ? "Leave blank to keep current password" : ""}
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             isRequired={!isUpdate}
             value={formData.accountPassword || ""}
             onChange={handleChange("accountPassword")}
@@ -135,8 +135,8 @@ export default function UIAccountForm({
             description={isUpdate ? "Leave blank to keep current PIN" : ""}
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             value={formData.accountPinNumber || ""}
             onChange={handleChange("accountPinNumber")}
             isInvalid={!!errors.accountPinNumber}
@@ -157,8 +157,8 @@ export default function UIAccountForm({
               placeholder="Please Select"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               selectedKeys={
                 formData.accountStatus ? [formData.accountStatus] : []
@@ -182,8 +182,8 @@ export default function UIAccountForm({
             type="submit"
             color="success"
             variant="shadow"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-2/12 text-background"
           >
             Submit

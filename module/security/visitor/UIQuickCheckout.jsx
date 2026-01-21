@@ -44,7 +44,7 @@ export default function UIQuickCheckout({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen p-2">
-        <Spinner size="lg" label="กำลังโหลด..." />
+        <Spinner size="md" label="กำลังโหลด..." />
       </div>
     );
   }
@@ -61,8 +61,8 @@ export default function UIQuickCheckout({
             <Button
               color="danger"
               variant="solid"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               className="w-full text-background"
               onPress={onGoBack}
             >
@@ -230,7 +230,7 @@ function ActionButtons({
       {!isAlreadyCheckedOut && !success ? (
         <Button
           color="warning"
-          size="lg"
+          size="md"
           className="w-full font-bold"
           isLoading={checkoutLoading}
           onPress={onCheckout}

@@ -21,19 +21,21 @@ import { ChevronDown, Plus, Search, Settings2 } from "lucide-react";
 const capitalize = (str) =>
   str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
 
-const ActionMenu = ({ item, onEdit, onView }) => (
+const ActionMenu = ({ item, onEdit }) => (
   <Dropdown>
     <DropdownTrigger>
-      <Button isIconOnly variant="light" size="md">
+      <Button
+        isIconOnly
+        color="secondary"
+        variant="shadow"
+        size="md"
+        radius="md"
+        className="text-background"
+      >
         <Settings2 />
       </Button>
     </DropdownTrigger>
     <DropdownMenu>
-      {onView && (
-        <DropdownItem key="view" onPress={() => onView(item)}>
-          View
-        </DropdownItem>
-      )}
       {onEdit && (
         <DropdownItem key="edit" onPress={() => onEdit(item)}>
           Edit
@@ -47,8 +49,9 @@ const StatusChip = ({ value, colorMap }) => (
   <Chip
     className="capitalize text-background"
     color={colorMap[value] || "default"}
-    variant="solid"
+    variant="shadow"
     size="md"
+    radius="md"
   >
     {value}
   </Chip>
@@ -63,13 +66,13 @@ const StatusFilterDropdown = ({
     <DropdownTrigger>
       <Button
         endContent={<ChevronDown />}
-        color="default"
+        color="secondary"
         variant="shadow"
-        size="lg"
-        radius="sm"
-        className="w-full xl:w-52 text-foreground"
+        size="md"
+        radius="md"
+        className="w-full xl:w-42 text-background"
       >
-        Status
+        สถานะ
       </Button>
     </DropdownTrigger>
     <DropdownMenu
@@ -114,8 +117,8 @@ const useDataFiltering = (data, statusOptions) => {
       const searchTerm = filterValue.toLowerCase();
       filtered = filtered.filter((item) =>
         Object.values(item).some((value) =>
-          String(value).toLowerCase().includes(searchTerm)
-        )
+          String(value).toLowerCase().includes(searchTerm),
+        ),
       );
     }
 
@@ -127,8 +130,8 @@ const useDataFiltering = (data, statusOptions) => {
     if (isStatusFiltered) {
       filtered = filtered.filter((item) =>
         Object.values(item).some((value) =>
-          Array.from(statusFilter).includes(String(value))
-        )
+          Array.from(statusFilter).includes(String(value)),
+        ),
       );
     }
 
@@ -179,9 +182,7 @@ export default function DataTable({
   itemName = "items",
   onAddNew,
   onEdit,
-  onView,
   renderCustomCell,
-
   selectionMode,
   selectedKeys,
   onSelectionChange,
@@ -213,18 +214,18 @@ export default function DataTable({
       if (columnKey === "actions") {
         return (
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <ActionMenu item={item} onEdit={onEdit} onView={onView} />
+            <ActionMenu item={item} onEdit={onEdit} />
           </div>
         );
       }
 
       return cellValue;
     },
-    [statusColorMap, renderCustomCell, onEdit, onView]
+    [statusColorMap, renderCustomCell, onEdit],
   );
 
   return (
-    <div className="flex flex-col w-full h-full p-2 gap-2 border-1 rounded-xl overflow-hidden">
+    <div className="flex flex-col w-full h-full p-2 gap-2 border-1 border-default overflow-hidden">
       <div className="flex-shrink-0 flex flex-col items-center justify-center w-full h-fit gap-2">
         <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
           <Input
@@ -235,8 +236,8 @@ export default function DataTable({
             onValueChange={setFilterValue}
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-full"
           />
           {statusOptions.length > 0 && (
@@ -250,13 +251,13 @@ export default function DataTable({
             <Button
               startContent={<Plus />}
               onPress={onAddNew}
-              color="success"
+              color="primary"
               variant="shadow"
-              size="lg"
-              radius="sm"
-              className="w-full xl:w-52 text-background"
+              size="md"
+              radius="md"
+              className="w-full xl:w-42 text-background"
             >
-              Add New
+              เพิ่ม
             </Button>
           )}
         </div>
@@ -267,15 +268,14 @@ export default function DataTable({
           <RowsPerPageSelector onChange={handleRowsPerPageChange} />
         </div>
       </div>
-
       <div className="flex-1 min-h-0 overflow-auto gap-2">
         <Table
           selectionMode={selectionMode}
           selectedKeys={selectedKeys}
           onSelectionChange={onSelectionChange}
           classNames={{ wrapper: "min-h-full" }}
-          size="lg"
-          radius="sm"
+          size="md"
+          radius="md"
           shadow="none"
         >
           <TableHeader columns={columns}>
@@ -283,7 +283,7 @@ export default function DataTable({
               <TableColumn
                 key={column.uid}
                 align={column.uid === "actions" ? "center" : "start"}
-                className="p-4 gap-2 border-b-1 border-t-1"
+                className="p-4 gap-2 border-b-2 border-t-2 border-default"
               >
                 {column.name}
               </TableColumn>
@@ -293,7 +293,7 @@ export default function DataTable({
             {(item) => (
               <TableRow key={item.id}>
                 {(columnKey) => (
-                  <TableCell className="border-b-1">
+                  <TableCell className="border-b-2 border-default">
                     {renderCell(item, columnKey)}
                   </TableCell>
                 )}
@@ -302,7 +302,6 @@ export default function DataTable({
           </TableBody>
         </Table>
       </div>
-
       <div className="flex-shrink-0 flex flex-row items-center justify-center w-full h-fit gap-2">
         <div className="flex items-center justify-end w-full h-full p-2 gap-2">
           <Pagination
@@ -310,12 +309,12 @@ export default function DataTable({
             showControls
             showShadow
             color="none"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             page={page}
             total={totalPages}
             onChange={setPage}
-            classNames={{ cursor: "border-1" }}
+            classNames={{ cursor: "border-1 border-default" }}
           />
         </div>
       </div>

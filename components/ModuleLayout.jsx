@@ -23,7 +23,7 @@ export default function ModuleLayout({ children }) {
         <Breadcrumbs
           color="default"
           variant="light"
-          size="lg"
+          size="md"
           className="flex items-center justify-start w-full h-full p-2 gap-2 border-1 border-default"
         >
           <BreadcrumbItem>

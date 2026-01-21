@@ -57,7 +57,7 @@ function LoadingState() {
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-b from-primary-50 to-background">
       <div className="text-center">
-        <Spinner size="lg" color="primary" />
+        <Spinner size="md" color="primary" />
         <p className="mt-4 text-foreground/60 animate-pulse">
           กำลังโหลดข้อมูล...
         </p>
@@ -241,7 +241,7 @@ function OrderLinesCard({ order }) {
           icon={Package}
           title="รายการสินค้า"
           action={
-            <Chip size="sm" variant="flat" color="primary">
+            <Chip size="md" variant="flat" color="primary">
               {itemLines.length} รายการ
             </Chip>
           }
@@ -380,8 +380,8 @@ export default function UISalesOrderDetail({
             href="/sales/salesOrderOnline"
             variant="light"
             isIconOnly
+            size="md"
             size="sm"
-            radius="full"
           >
             <ArrowLeft />
           </Button>
@@ -389,7 +389,7 @@ export default function UISalesOrderDetail({
             <h1 className="text-lg font-bold truncate">{order.number}</h1>
             <p className="text-xs text-foreground/50">รายละเอียดคำสั่งซื้อ</p>
           </div>
-          <Chip color={status.color} variant="flat" size="sm">
+          <Chip color={status.color} variant="flat" size="md">
             {status.label}
           </Chip>
         </div>

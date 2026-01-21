@@ -46,8 +46,8 @@ export default function UIAssignForm({
           <Button
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             onPress={onSelectAll}
           >
             Select All
@@ -55,8 +55,8 @@ export default function UIAssignForm({
           <Button
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             onPress={onDeselectAll}
           >
             Deselect All
@@ -80,7 +80,7 @@ export default function UIAssignForm({
             >
               <div className="flex items-center justify-between w-full h-fit pb-2 border-b-1">
                 <Checkbox
-                  size="lg"
+                  size="md"
                   color={allSelected || someSelected ? "success" : "default"}
                   isSelected={allSelected}
                   isIndeterminate={someSelected}
@@ -122,7 +122,7 @@ export default function UIAssignForm({
                     >
                       <div className="flex items-center justify-between w-full pb-2 border-b-1">
                         <Checkbox
-                          size="lg"
+                          size="md"
                           color={
                             subAllSelected || subSomeSelected
                               ? "warning"
@@ -160,7 +160,7 @@ export default function UIAssignForm({
                             className="flex items-center justify-start w-full h-fit p-2 gap-2"
                           >
                             <Checkbox
-                              size="lg"
+                              size="md"
                               color="success"
                               isSelected={selectedIds.has(
                                 permission.permissionId
@@ -193,8 +193,8 @@ export default function UIAssignForm({
           <Button
             color="success"
             variant="shadow"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-2/12 text-background"
             onPress={onSubmit}
             isLoading={saving}

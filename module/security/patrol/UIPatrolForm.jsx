@@ -159,8 +159,8 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
           <Button
             color="danger"
             variant="shadow"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-2/12 text-background"
             onPress={handleClose}
           >
@@ -343,8 +343,8 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
           <Button
             color="danger"
             variant="shadow"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-2/12 text-background"
             onPress={handleClose}
           >
@@ -353,8 +353,8 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
           <Button
             color="success"
             variant="shadow"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-2/12 text-background"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
@@ -389,8 +389,8 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
               type="button"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               className="w-6/12"
               onPress={onOpenScanner}
               startContent={<RefreshCw />}
@@ -401,8 +401,8 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
               type="button"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               className="w-6/12"
               onPress={onClear}
             >
@@ -420,8 +420,8 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
             type="button"
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-full"
             onPress={onOpenScanner}
             startContent={<QrCode />}
@@ -466,8 +466,8 @@ function PhotoCaptureCard({
               type="button"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               className="w-6/12"
               onPress={onOpenCamera}
               startContent={<RefreshCw />}
@@ -478,8 +478,8 @@ function PhotoCaptureCard({
               type="button"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               className="w-6/12"
               onPress={onClear}
             >
@@ -497,8 +497,8 @@ function PhotoCaptureCard({
             type="button"
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-full"
             onPress={onOpenCamera}
             startContent={<Camera />}
@@ -591,8 +591,8 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
               placeholder="กรอกบันทึกเพิ่มเติม (ถ้ามี)"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               minRows={3}
               maxRows={6}
               value={formData.patrolNote || ""}
@@ -609,8 +609,8 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
               type="submit"
               color="success"
               variant="shadow"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               className="w-2/12 text-background"
             >
               บันทึก

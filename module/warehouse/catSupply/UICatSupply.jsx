@@ -90,7 +90,7 @@ export default function UICatSupply({
               <Button
                 isIconOnly
                 variant="light"
-                size="sm"
+                size="md"
                 isDisabled={printing || !isConnected}
               >
                 <Printer
@@ -131,7 +131,7 @@ export default function UICatSupply({
             <Button
               isIconOnly
               variant="light"
-              size="sm"
+              size="md"
               onPress={openSettings}
               title="Printer Settings"
             >
@@ -173,7 +173,7 @@ export default function UICatSupply({
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
           <Button
             variant="light"
-            size="sm"
+            size="md"
             onPress={onRefresh}
             isDisabled={loading}
             className="w-full"
@@ -193,7 +193,7 @@ export default function UICatSupply({
             <Button
               isIconOnly
               variant="light"
-              size="sm"
+              size="md"
               onPress={openSettings}
               title="Printer Settings"
             >
@@ -202,7 +202,7 @@ export default function UICatSupply({
             <Button
               isIconOnly
               variant="light"
-              size="sm"
+              size="md"
               onPress={onRefresh}
               isDisabled={loading}
             >

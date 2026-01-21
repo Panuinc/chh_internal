@@ -106,10 +106,10 @@ function ActionBtn({
 
   return (
     <Button
+      size="md"
       size="sm"
-      radius="md"
       isLoading={loading}
-      spinner={<Spinner size="sm" color="current" />}
+      spinner={<Spinner size="md" color="current" />}
       startContent={!loading && Icon && <Icon size={15} />}
       className={`${variants[variant]} text-sm h-9 px-3`}
       {...props}
@@ -191,7 +191,7 @@ export function PrinterControls({ compact = false, className = "" }) {
           <Tooltip content="ทดสอบการเชื่อมต่อ">
             <Button
               isIconOnly
-              size="sm"
+              size="md"
               variant="light"
               isLoading={actionLoading === "test"}
               onPress={() => handleAction("test", testConnection)}
@@ -202,7 +202,7 @@ export function PrinterControls({ compact = false, className = "" }) {
           <Tooltip content="ปรับเทียบ">
             <Button
               isIconOnly
-              size="sm"
+              size="md"
               variant="light"
               isLoading={actionLoading === "calibrate"}
               onPress={() => handleAction("calibrate", calibrate)}
@@ -213,7 +213,7 @@ export function PrinterControls({ compact = false, className = "" }) {
           <Tooltip content="ยกเลิกงานพิมพ์">
             <Button
               isIconOnly
-              size="sm"
+              size="md"
               variant="light"
               isLoading={actionLoading === "cancel"}
               onPress={() => handleAction("cancel", cancelAllJobs)}
@@ -224,7 +224,7 @@ export function PrinterControls({ compact = false, className = "" }) {
           <Tooltip content="รีเซ็ต">
             <Button
               isIconOnly
-              size="sm"
+              size="md"
               variant="light"
               isLoading={actionLoading === "reset"}
               onPress={() => handleAction("reset", resetPrinter)}
@@ -466,7 +466,7 @@ export function PrinterSettings({
                 </h3>
               </div>
               <Button
-                size="sm"
+                size="md"
                 variant="light"
                 isLoading={printerLoading}
                 onPress={refreshPrinter}

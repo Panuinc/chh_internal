@@ -34,8 +34,8 @@ export default function UIEmployeeForm({
             placeholder="Enter First Name"
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             isRequired
             value={formData.employeeFirstName || ""}
             onChange={handleChange("employeeFirstName")}
@@ -54,8 +54,8 @@ export default function UIEmployeeForm({
             placeholder="Enter Last Name"
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             isRequired
             value={formData.employeeLastName || ""}
             onChange={handleChange("employeeLastName")}
@@ -77,8 +77,8 @@ export default function UIEmployeeForm({
             placeholder="Enter Email Address"
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             isRequired
             value={formData.employeeEmail || ""}
             onChange={handleChange("employeeEmail")}
@@ -98,8 +98,8 @@ export default function UIEmployeeForm({
               placeholder="Please Select"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               selectedKeys={
                 formData.employeeStatus ? [formData.employeeStatus] : []
@@ -123,8 +123,8 @@ export default function UIEmployeeForm({
             type="submit"
             color="success"
             variant="shadow"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-2/12 text-background"
           >
             Submit

@@ -24,8 +24,8 @@ export default function UIForbidden() {
         <Button
           color="default"
           variant="bordered"
-          size="lg"
-          radius="sm"
+          size="md"
+          radius="md"
           className="w-full"
         >
           Home

@@ -44,8 +44,8 @@ export default function UISignIn({
               placeholder="Enter your username"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               value={username}
               onChange={(e) => onUsernameChange(e.target.value)}
@@ -61,8 +61,8 @@ export default function UISignIn({
               placeholder="Enter your password"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               value={password}
               onChange={(e) => onPasswordChange(e.target.value)}
@@ -75,11 +75,11 @@ export default function UISignIn({
               type="submit"
               color="primary"
               variant="shadow"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               className="w-6/12 text-background"
               isLoading={isLoading}
-              spinner={<Spinner size="sm" color="current" />}
+              spinner={<Spinner size="md" color="current" />}
             >
               {isLoading ? "กำลัง เข้าสู่ระบบ ..." : "เข้าสู่ระบบ"}
             </Button>

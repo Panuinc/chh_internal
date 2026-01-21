@@ -34,8 +34,8 @@ export default function UIDepartmentForm({
             placeholder="Enter Department Name"
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             isRequired
             value={formData.departmentName || ""}
             onChange={handleChange("departmentName")}
@@ -55,8 +55,8 @@ export default function UIDepartmentForm({
               placeholder="Please Select"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               selectedKeys={
                 formData.departmentStatus ? [formData.departmentStatus] : []
@@ -82,8 +82,8 @@ export default function UIDepartmentForm({
             type="submit"
             color="success"
             variant="shadow"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-2/12 text-background"
           >
             Submit

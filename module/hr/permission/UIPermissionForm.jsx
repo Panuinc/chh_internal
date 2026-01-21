@@ -34,8 +34,8 @@ export default function UIPermissionForm({
             placeholder="Enter Permission Name"
             color="default"
             variant="bordered"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             isRequired
             value={formData.permissionName || ""}
             onChange={handleChange("permissionName")}
@@ -55,8 +55,8 @@ export default function UIPermissionForm({
               placeholder="Please Select"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               selectedKeys={
                 formData.permissionStatus ? [formData.permissionStatus] : []
@@ -82,8 +82,8 @@ export default function UIPermissionForm({
             type="submit"
             color="success"
             variant="shadow"
-            size="lg"
-            radius="sm"
+            size="md"
+            radius="md"
             className="w-2/12 text-background"
           >
             Submit

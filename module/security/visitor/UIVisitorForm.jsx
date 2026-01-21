@@ -464,8 +464,8 @@ function MultiCameraModal({
                         type="button"
                         color="danger"
                         variant="solid"
+                        size="md"
                         size="sm"
-                        radius="full"
                         isIconOnly
                         className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                         onPress={() => removeImage(index)}
@@ -535,8 +535,8 @@ function PhotoCaptureCard({
               type="button"
               color="success"
               variant="flat"
-              size="sm"
-              radius="sm"
+              size="md"
+              radius="md"
               onPress={onOpenCamera}
               startContent={<RefreshCw className="w-4 h-4" />}
             >
@@ -546,8 +546,8 @@ function PhotoCaptureCard({
               type="button"
               color="danger"
               variant="flat"
-              size="sm"
-              radius="sm"
+              size="md"
+              radius="md"
               onPress={onClear}
             >
               ลบ
@@ -565,7 +565,7 @@ function PhotoCaptureCard({
             color="success"
             variant="solid"
             size="md"
-            radius="sm"
+            radius="md"
             onPress={onOpenCamera}
             startContent={<Camera className="w-5 h-5" />}
           >
@@ -629,8 +629,8 @@ function DocumentCaptureCard({
                     type="button"
                     color="danger"
                     variant="solid"
+                    size="md"
                     size="sm"
-                    radius="full"
                     isIconOnly
                     className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                     onPress={() => onRemove(index)}
@@ -646,8 +646,8 @@ function DocumentCaptureCard({
               type="button"
               color="success"
               variant="flat"
-              size="sm"
-              radius="sm"
+              size="md"
+              radius="md"
               onPress={onOpenCamera}
               startContent={<Plus className="w-4 h-4" />}
             >
@@ -658,8 +658,8 @@ function DocumentCaptureCard({
                 type="button"
                 color="danger"
                 variant="flat"
-                size="sm"
-                radius="sm"
+                size="md"
+                radius="md"
                 onPress={onClear}
               >
                 ล้างทั้งหมด
@@ -678,7 +678,7 @@ function DocumentCaptureCard({
             color="success"
             variant="solid"
             size="md"
-            radius="sm"
+            radius="md"
             onPress={onOpenCamera}
             startContent={<Camera className="w-5 h-5" />}
           >
@@ -773,8 +773,8 @@ export default function UIVisitorForm({
               placeholder="กรอกชื่อ"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               value={formData.visitorFirstName || ""}
               onChange={handleChange("visitorFirstName")}
@@ -793,8 +793,8 @@ export default function UIVisitorForm({
               placeholder="กรอกนามสกุล"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               value={formData.visitorLastName || ""}
               onChange={handleChange("visitorLastName")}
@@ -816,8 +816,8 @@ export default function UIVisitorForm({
               placeholder="กรอกชื่อบริษัท"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               value={formData.visitorCompany || ""}
               onChange={handleChange("visitorCompany")}
@@ -834,8 +834,8 @@ export default function UIVisitorForm({
               placeholder="กรอกทะเบียนรถ"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               value={formData.visitorCarRegistration || ""}
               onChange={handleChange("visitorCarRegistration")}
@@ -857,8 +857,8 @@ export default function UIVisitorForm({
               placeholder="กรุณาเลือก"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               selectedKeys={
                 formData.visitorProvince ? [formData.visitorProvince] : []
@@ -884,8 +884,8 @@ export default function UIVisitorForm({
               placeholder="กรุณาเลือก"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               selectedKeys={
                 formData.visitorContactUserId
@@ -918,8 +918,8 @@ export default function UIVisitorForm({
               placeholder="กรุณาเลือก"
               color="default"
               variant="bordered"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               isRequired
               selectedKeys={
                 formData.visitorContactReason
@@ -951,8 +951,8 @@ export default function UIVisitorForm({
                 placeholder="กรุณาเลือก"
                 color="default"
                 variant="bordered"
-                size="lg"
-                radius="sm"
+                size="md"
+                radius="md"
                 isRequired
                 selectedKeys={
                   formData.visitorStatus ? [formData.visitorStatus] : []
@@ -1001,8 +1001,8 @@ export default function UIVisitorForm({
               type="submit"
               color="success"
               variant="shadow"
-              size="lg"
-              radius="sm"
+              size="md"
+              radius="md"
               className="w-2/12 text-background"
             >
               บันทึก
