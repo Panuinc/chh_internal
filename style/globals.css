@@ -7,15 +7,11 @@
 }
 
 .border {
-  border: 8px dashed #d1d2d4;
+  border: 8px dashed #F1F5F9;
 }
 
-/* .border-default {
-  border: 1px dashed #D1D2D4;
-} */
-
 .border-default-200 {
-  border: 2px solid #d1d2d4;
+  border: 2px solid #F1F5F9;
 }
 
 .bg-content1 {
