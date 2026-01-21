@@ -15,12 +15,12 @@ export default function UISignIn({
       <div className="flex flex-col items-center justify-center w-full xl:w-[30%] h-full p-2 gap-2 xl:border-1 xl:border-default">
         <div className="flex items-end justify-center w-full h-fit p-2 gap-2 text-2xl font-black">
           Ever
-          <span className="text-success text-5xl">
+          <span className="text-primary text-5xl">
             G
             <span className="relative inline-block">
               r
               <svg
-                className="absolute -top-4 -right-1 w-7 h-7 text-success"
+                className="absolute -top-4 -right-1 w-7 h-7 text-primary"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
@@ -73,7 +73,7 @@ export default function UISignIn({
           <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
             <Button
               type="submit"
-              color="success"
+              color="primary"
               variant="shadow"
               size="lg"
               radius="sm"
@@ -88,7 +88,7 @@ export default function UISignIn({
       </div>
 
       <div className="xl:flex items-center justify-center xl:w-[70%] h-full p-2 gap-2 hidden">
-        <Image src="/logo/logo-04.png" alt="logo" width={450} height={450} />
+        <Image src="/images/index.png" alt="logo" width={450} height={450} />
       </div>
     </div>
   );
