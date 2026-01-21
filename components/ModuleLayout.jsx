@@ -18,13 +18,13 @@ export default function ModuleLayout({ children }) {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full gap-2 overflow-hidden">
+    <div className="flex flex-col items-center justify-center w-full h-full overflow-hidden">
       <div className="flex items-center justify-start w-full h-fit gap-2">
         <Breadcrumbs
           color="default"
           variant="light"
           size="lg"
-          className="flex items-center justify-start w-full h-full p-2 gap-2 border-1 rounded-xl"
+          className="flex items-center justify-start w-full h-full p-2 gap-2 border-1 border-default"
         >
           <BreadcrumbItem>
             <Link

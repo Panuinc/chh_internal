@@ -1,0 +1,44 @@
+[2026-01-21 10:35:10] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-01-21 10:35:10] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:35:11] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-21 10:35:16] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:35:16] [INFO] GetAllPermissionUseCase success {"total":12,"returned":12}
+[2026-01-21 10:35:17] [INFO] GetAssignsByEmployeeUseCase start {"employeeId":"cmj875hfb0003crmkvku84kgf"}
+[2026-01-21 10:35:17] [INFO] GetEmployeeByIdUseCase start {"id":"cmj875hfb0003crmkvku84kgf"}
+[2026-01-21 10:35:17] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-01-21 10:35:17] [INFO] GetAssignsByEmployeeUseCase success {"total":4}
+[2026-01-21 10:35:17] [INFO] GetEmployeeByIdUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2026-01-21 10:35:21] [INFO] SyncPermissionsUseCase start {"employeeId":"cmj875hfb0003crmkvku84kgf"}
+[2026-01-21 10:35:21] [INFO] SyncPermissionsUseCase success {"added":0,"removed":4}
+[2026-01-21 10:35:23] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:35:23] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-21 10:36:44] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:36:44] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-21 10:36:46] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:36:46] [INFO] GetEmployeeByIdUseCase start {"id":"cmj875hfb0003crmkvku84kgf"}
+[2026-01-21 10:36:46] [INFO] GetAllPermissionUseCase success {"total":12,"returned":12}
+[2026-01-21 10:36:46] [INFO] GetAssignsByEmployeeUseCase start {"employeeId":"cmj875hfb0003crmkvku84kgf"}
+[2026-01-21 10:36:46] [INFO] GetEmployeeByIdUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2026-01-21 10:36:46] [INFO] GetAssignsByEmployeeUseCase success {"total":0}
+[2026-01-21 10:36:47] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-01-21 10:36:55] [INFO] SyncPermissionsUseCase start {"employeeId":"cmj875hfb0003crmkvku84kgf"}
+[2026-01-21 10:36:55] [INFO] SyncPermissionsUseCase success {"added":2,"removed":0}
+[2026-01-21 10:36:57] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:36:57] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-21 10:37:09] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:37:09] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-21 10:37:20] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:37:20] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-21 10:37:22] [INFO] GetAllPermissionUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:37:22] [INFO] GetAllPermissionUseCase success {"total":12,"returned":12}
+[2026-01-21 10:37:22] [INFO] GetEmployeeByIdUseCase start {"id":"cmj875hfb0003crmkvku84kgf"}
+[2026-01-21 10:37:22] [INFO] GetAssignsByEmployeeUseCase start {"employeeId":"cmj875hfb0003crmkvku84kgf"}
+[2026-01-21 10:37:22] [INFO] GetEmployeeByIdUseCase success {"id":"cmj875hfb0003crmkvku84kgf","email":"demo01@gmail.com"}
+[2026-01-21 10:37:22] [INFO] GetAssignsByEmployeeUseCase success {"total":2}
+[2026-01-21 10:37:23] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-01-21 10:37:37] [INFO] SyncPermissionsUseCase start {"employeeId":"cmj875hfb0003crmkvku84kgf"}
+[2026-01-21 10:37:37] [INFO] SyncPermissionsUseCase success {"added":0,"removed":1}
+[2026-01-21 10:37:39] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:37:39] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-21 10:39:59] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-21 10:39:59] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}

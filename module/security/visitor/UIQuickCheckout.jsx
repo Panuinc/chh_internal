@@ -79,7 +79,7 @@ export default function UIQuickCheckout({
 
   return (
     <div className="flex flex-col items-center justify-center w-full p-2 gap-2">
-      <Card className="w-full max-w-md shadow-lg">
+      <Card className="w-full max-w-md shadow-md">
         <CardHeader className="flex flex-col items-center pb-0 pt-6">
           <HeaderContent
             success={success}
@@ -93,7 +93,7 @@ export default function UIQuickCheckout({
               <img
                 src={`/api/uploads/${visitor.visitorPhoto}`}
                 alt="Visitor"
-                className="w-24 h-24 rounded-full object-cover shadow-lg"
+                className="w-24 h-24 rounded-full object-cover shadow-md"
               />
             </div>
           )}

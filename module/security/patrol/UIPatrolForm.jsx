@@ -458,7 +458,7 @@ function PhotoCaptureCard({
             <Image
               src={capturedImage}
               alt="Captured"
-              className="max-w-full max-h-48 object-contain rounded-lg shadow-lg"
+              className="max-w-full max-h-48 object-contain rounded-lg shadow-md"
             />
           </div>
           <div className="flex gap-2">

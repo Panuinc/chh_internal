@@ -527,7 +527,7 @@ function PhotoCaptureCard({
             <Image
               src={displayImage}
               alt="Captured"
-              className="max-w-full max-h-48 object-contain rounded-lg shadow-lg"
+              className="max-w-full max-h-48 object-contain rounded-lg shadow-md"
             />
           </div>
           <div className="flex gap-2">
@@ -622,7 +622,7 @@ function DocumentCaptureCard({
                 <Image
                   src={src}
                   alt={`Document ${index + 1}`}
-                  className="w-24 h-24 object-cover rounded-lg shadow-lg"
+                  className="w-24 h-24 object-cover rounded-lg shadow-md"
                 />
                 {capturedImages.length > 0 && (
                   <Button

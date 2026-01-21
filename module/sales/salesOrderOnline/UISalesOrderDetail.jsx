@@ -69,7 +69,7 @@ function LoadingState() {
 function ErrorState({ error, onRetry }) {
   return (
     <div className="min-h-[100dvh] flex items-center justify-center p-4 bg-gradient-to-b from-danger-50 to-background">
-      <Card className="max-w-sm w-full shadow-lg">
+      <Card className="max-w-sm w-full shadow-md">
         <CardBody className="text-center py-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-danger-100 flex items-center justify-center">
             <FileText className="text-danger" />
@@ -102,7 +102,7 @@ function ErrorState({ error, onRetry }) {
 function NotFoundState() {
   return (
     <div className="min-h-[100dvh] flex items-center justify-center p-4 bg-gradient-to-b from-warning-50 to-background">
-      <Card className="max-w-sm w-full shadow-lg">
+      <Card className="max-w-sm w-full shadow-md">
         <CardBody className="text-center py-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-warning-100 flex items-center justify-center">
             <Package className="text-warning" />

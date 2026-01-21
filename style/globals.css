@@ -7,15 +7,15 @@
 }
 
 .border {
-  border: 1px dashed #D1D2D4;
+  border: 8px dashed #d1d2d4;
 }
 
-.border-default {
-  border: 1px solid #D1D2D4;
-}
+/* .border-default {
+  border: 1px dashed #D1D2D4;
+} */
 
 .border-default-200 {
-  border: 1px solid #D1D2D4;
+  border: 2px solid #d1d2d4;
 }
 
 .bg-content1 {
@@ -25,7 +25,7 @@
 svg.lucide {
   width: 24px;
   height: 24px;
-  stroke-width: 1px;
+  stroke-width: 2px;
 }
 
 ::-webkit-scrollbar {

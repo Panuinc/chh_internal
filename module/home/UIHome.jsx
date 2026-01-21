@@ -4,7 +4,7 @@ import Image from "next/image";
 
 function UserProfileCard({ user }) {
   return (
-    <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1 rounded-xl hidden overflow-auto">
+    <div className="xl:flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1 border-default hidden overflow-auto">
       <div className="flex items-center justify-center w-full min-h-52 p-2 gap-2">
         <Image
           src={user.avatar}
@@ -55,21 +55,21 @@ function UserInfoRow({ label, value }) {
 
 export default function UIHome({ user, modules }) {
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
+    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full">
       <div className="flex flex-col items-center justify-start w-full xl:w-[20%] h-fit xl:h-full gap-2">
         {user && <UserProfileCard user={user} />}
       </div>
 
-      <div className="flex flex-col items-center justify-center w-full xl:w-[80%] h-full gap-2 overflow-hidden">
-        <div className="xl:flex flex-col items-center justify-start w-full h-fit p-2 gap-2 border-1 rounded-xl hidden">
+      <div className="flex flex-col items-center justify-center w-full xl:w-[80%] h-full overflow-hidden">
+        <div className="xl:flex flex-col items-center justify-start w-full h-fit p-2 gap-2 border-1 border-default hidden">
           <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-2xl font-black">
             Ever
-            <span className="text-success text-4xl">
+            <span className="text-primary text-4xl">
               G
               <span className="relative inline-block">
                 r
                 <svg
-                  className="absolute -top-4 -right-1 w-7 h-7 text-success"
+                  className="absolute -top-4 -right-1 w-7 h-7 text-primary"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -85,7 +85,7 @@ export default function UIHome({ user, modules }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 xl:grid-cols-4 place-items-center w-full h-full p-2 gap-2 border-1 rounded-xl overflow-auto">
+        <div className="grid grid-cols-2 xl:grid-cols-4 place-items-center w-full h-full p-2 gap-2 border-1 border-default overflow-auto">
           {modules.length > 0 ? (
             modules.map((module) => (
               <SubMenu
