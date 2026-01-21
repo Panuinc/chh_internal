@@ -22,11 +22,11 @@ export default function UIForbidden() {
         className="flex items-center justify-center text-center w-4/12 h-fit p-2 gap-2"
       >
         <Button
-          color="default"
-          variant="bordered"
+          color="primary"
+          variant="shadow"
           size="md"
           radius="md"
-          className="w-full"
+          className="w-full text-background"
         >
           Home
         </Button>

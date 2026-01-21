@@ -121,12 +121,10 @@ export default function UICatPacking({
   );
 
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2 overflow-hidden">
-      {/* Sidebar */}
-      <div className="hidden xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 overflow-auto">
-        {/* Printer Status + Settings Button */}
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
-          <div className="flex items-center justify-between w-full px-2">
+    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
+      <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <span className="font-medium">Printer</span>
             <Button
               isIconOnly
@@ -143,7 +141,7 @@ export default function UICatPacking({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Total Items
           </div>
@@ -152,7 +150,7 @@ export default function UICatPacking({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Active Items
           </div>
@@ -161,7 +159,7 @@ export default function UICatPacking({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Blocked Items
           </div>
@@ -170,7 +168,7 @@ export default function UICatPacking({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-1 rounded-xl">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
           <Button
             variant="light"
             size="md"
