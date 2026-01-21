@@ -26,11 +26,11 @@ const ActionMenu = ({ item, onEdit }) => (
     <DropdownTrigger>
       <Button
         isIconOnly
-        color="secondary"
+        color="default"
         variant="shadow"
         size="md"
         radius="md"
-        className="text-background"
+        className="text-foreground"
       >
         <Settings2 />
       </Button>
@@ -66,11 +66,11 @@ const StatusFilterDropdown = ({
     <DropdownTrigger>
       <Button
         endContent={<ChevronDown />}
-        color="secondary"
+        color="default"
         variant="shadow"
         size="md"
         radius="md"
-        className="w-full xl:w-42 text-background"
+        className="w-full xl:w-42 text-foreground"
       >
         Status
       </Button>
@@ -308,13 +308,13 @@ export default function DataTable({
             isCompact
             showControls
             showShadow
-            color="secondary"
+            color="default"
             size="md"
             radius="md"
             page={page}
             total={totalPages}
             onChange={setPage}
-            classNames={{ cursor: "text-background" }}
+            classNames={{ cursor: "text-foreground" }}
           />
         </div>
       </div>
