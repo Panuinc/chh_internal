@@ -15,13 +15,13 @@
 }
 
 .bg-content1 {
-  background-color: #ffffff;
+  background-color: #FFFFFF;
 }
 
 svg.lucide {
   width: 20px;
   height: 20px;
-  stroke-width: 2px;
+  stroke-width: 1px;
 }
 
 ::-webkit-scrollbar {
