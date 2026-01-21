@@ -47,11 +47,11 @@ const ActionMenu = ({ item, onEdit }) => (
 
 const StatusChip = ({ value, colorMap }) => (
   <Chip
-    className="capitalize text-background"
     color={colorMap[value] || "default"}
     variant="shadow"
     size="md"
     radius="md"
+    className="capitalize text-background"
   >
     {value}
   </Chip>

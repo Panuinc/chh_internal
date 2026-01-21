@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useCallback, useState } from "react";
+import React, { useState } from "react";
 import { DataTable, Loading } from "@/components";
 import {
   Modal,
@@ -22,7 +22,6 @@ import {
   User,
   Calendar,
   MapPin,
-  FileText,
   Settings,
 } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
@@ -57,7 +56,7 @@ const statusOptions = [
 
 const statusColorMap = {
   Draft: "default",
-  Open: "primary",
+  Open: "secondary",
   Released: "success",
   "Pending Approval": "warning",
 };
@@ -406,7 +405,7 @@ function OrderLinesTable({ lines }) {
         </table>
       </div>
       {commentLines.length > 0 && (
-        <div className="flex flex-col border-t pt-3">
+        <div className="flex flex-col pt-3">
           <p className="text-sm font-medium mb-2">หมายเหตุ:</p>
           {commentLines.map((line) => (
             <p key={line.id} className="text-sm text-foreground/70">
@@ -440,8 +439,10 @@ function OrderDetailModal({
           <div className="flex items-center gap-2">
             <Chip
               color={statusColorMap[order.status] || "default"}
+              variant="shadow"
               size="md"
-              variant="flat"
+              radius="md"
+              className="capitalize text-background"
             >
               {order.status}
             </Chip>
@@ -580,109 +581,93 @@ export default function UISalesOrderOnline({
   );
   const totalItems = orders.reduce((sum, o) => sum + (o.lineCount || 0), 0);
 
-  const normalized = useMemo(
-    () =>
-      Array.isArray(orders)
-        ? orders.map((order, i) => ({
-            ...order,
-            index: i + 1,
-            totalFormatted: formatCurrency(order.totalAmountIncludingTax),
-            orderDateFormatted: formatDate(order.orderDate),
-            deliveryDateFormatted: formatDate(order.requestedDeliveryDate),
-            _rawOrder: order,
-          }))
-        : [],
-    [orders],
-  );
+  const normalized = Array.isArray(orders)
+    ? orders.map((order, i) => ({
+        ...order,
+        index: i + 1,
+        totalFormatted: formatCurrency(order.totalAmountIncludingTax),
+        orderDateFormatted: formatDate(order.orderDate),
+        deliveryDateFormatted: formatDate(order.requestedDeliveryDate),
+        _rawOrder: order,
+      }))
+    : [];
 
-  const handleViewOrder = useCallback(
-    (order) => {
-      setSelectedOrder(order);
-      openDetail();
-    },
-    [openDetail],
-  );
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order);
+    openDetail();
+  };
 
-  const handleCloseDetail = useCallback(() => {
+  const handleCloseDetail = () => {
     closeDetail();
     setSelectedOrder(null);
-  }, [closeDetail]);
+  };
 
-  const handleOpenPreview = useCallback(
-    (order) => {
-      setPreviewOrder(order);
-      openPreview();
-    },
-    [openPreview],
-  );
+  const handleOpenPreview = (order) => {
+    setPreviewOrder(order);
+    openPreview();
+  };
 
-  const handleClosePreview = useCallback(() => {
+  const handleClosePreview = () => {
     closePreview();
     setPreviewOrder(null);
-  }, [closePreview]);
+  };
 
-  const handlePrintPackingSlip = useCallback(
-    (order) => {
-      closePreview();
-      onPrintSingle(order, { type: "packingSlip", enableRFID: false });
-    },
-    [closePreview, onPrintSingle],
-  );
+  const handlePrintPackingSlip = (order) => {
+    closePreview();
+    onPrintSingle(order, { type: "packingSlip", enableRFID: false });
+  };
 
-  const renderCustomCell = useCallback(
-    (item, columnKey) => {
-      if (columnKey === "actions") {
-        return (
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              isIconOnly
-              variant="light"
-              size="md"
-              onPress={() => handleViewOrder(item._rawOrder)}
-              title="View Details"
-            >
-              <Eye />
-            </Button>
-            <Button
-              isIconOnly
-              variant="light"
-              size="md"
-              isDisabled={printing || !isConnected || item.lineCount === 0}
-              onPress={() => handleOpenPreview(item._rawOrder)}
-              title="พิมพ์ใบปะหน้า"
-            >
-              <Printer
-                className={isConnected ? "text-success" : "text-danger"}
-              />
-            </Button>
-          </div>
-        );
-      }
-      if (columnKey === "status") {
-        return (
-          <Chip
-            color={statusColorMap[item.status] || "default"}
+  const renderCustomCell = (item, columnKey) => {
+    if (columnKey === "actions") {
+      return (
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            isIconOnly
+            variant="light"
             size="md"
-            variant="flat"
+            onPress={() => handleViewOrder(item._rawOrder)}
+            title="View Details"
           >
-            {item.status}
-          </Chip>
-        );
-      }
-      if (columnKey === "customerName") {
-        return (
-          <div className="flex flex-col">
-            <span className="truncate max-w-[200px]">{item.customerName}</span>
-            <span className="text-xs text-foreground/60">
-              {item.customerNumber}
-            </span>
-          </div>
-        );
-      }
-      return undefined;
-    },
-    [handleViewOrder, handleOpenPreview, isConnected, printing],
-  );
+            <Eye />
+          </Button>
+          <Button
+            isIconOnly
+            variant="light"
+            size="md"
+            isDisabled={printing || !isConnected || item.lineCount === 0}
+            onPress={() => handleOpenPreview(item._rawOrder)}
+            title="พิมพ์ใบปะหน้า"
+          >
+            <Printer className={isConnected ? "text-success" : "text-danger"} />
+          </Button>
+        </div>
+      );
+    }
+    if (columnKey === "status") {
+      return (
+        <Chip
+          color={statusColorMap[item.status] || "default"}
+          variant="shadow"
+          size="md"
+          radius="md"
+          className="capitalize text-background"
+        >
+          {item.status}
+        </Chip>
+      );
+    }
+    if (columnKey === "customerName") {
+      return (
+        <div className="flex flex-col">
+          <span className="truncate max-w-[200px]">{item.customerName}</span>
+          <span className="text-xs text-foreground/60">
+            {item.customerNumber}
+          </span>
+        </div>
+      );
+    }
+    return undefined;
+  };
 
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
@@ -784,7 +769,6 @@ export default function UISalesOrderOnline({
         printing={printing}
       />
 
-      {/* Settings Modal */}
       <Modal
         isOpen={isSettingsOpen}
         onClose={closeSettings}
