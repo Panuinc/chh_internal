@@ -39,7 +39,6 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
 
   const startScanner = useCallback(async () => {
     setError(null);
-
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const element = document.getElementById("qr-reader");
@@ -66,7 +65,7 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
           stopScanner();
           onClose();
         },
-        (errorMessage) => {}
+        () => {},
       );
 
       setIsScanning(true);
@@ -91,9 +90,9 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
 
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       startScanner();
     }
-
     return () => {
       if (!isOpen) {
         stopScanner();
@@ -115,53 +114,45 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
       backdrop="blur"
     >
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <QrCode className="w-6 h-6" />
-            {label}
-          </div>
+        <ModalHeader className="flex flex-row items-center justify-start w-full h-fit p-4 gap-2">
+          <QrCode />
+          {label}
         </ModalHeader>
-        <ModalBody>
-          <div className="flex flex-col items-center justify-center w-full gap-2">
-            {error && (
-              <div className="text-danger text-sm p-2 bg-danger-50 rounded-lg w-full text-center">
-                {error}
-              </div>
-            )}
-
-            <div className="relative w-full bg-black rounded-xl overflow-hidden">
-              <div
-                id="qr-reader"
-                className="w-full"
-                style={{ minHeight: "350px" }}
-              />
-
-              {!isScanning && !error && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-                    <span className="text-white text-sm">
-                      กำลังเปิดกล้อง...
-                    </span>
-                  </div>
-                </div>
-              )}
+        <ModalBody className="flex flex-col items-center justify-center w-full h-fit p-4 gap-2">
+          {error && (
+            <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-danger">
+              {error}
             </div>
+          )}
 
-            {isScanning && (
-              <div className="text-center text-default-600 text-sm">
-                วาง QR Code ให้อยู่ในกรอบสี่เหลี่ยม
+          <div className="relative flex flex-col items-center justify-center w-full h-fit p-2 gap-2 bg-black rounded-lg overflow-hidden">
+            <div
+              id="qr-reader"
+              className="w-full"
+              style={{ minHeight: "350px" }}
+            />
+
+            {!isScanning && !error && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-black/80">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                <span className="text-white">กำลังเปิดกล้อง...</span>
               </div>
             )}
           </div>
+
+          {isScanning && (
+            <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
+              วาง QR Code ให้อยู่ในกรอบสี่เหลี่ยม
+            </div>
+          )}
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="flex flex-row items-center justify-end w-full h-fit p-4 gap-2">
           <Button
             color="danger"
             variant="shadow"
             size="md"
             radius="md"
-            className="w-2/12 text-background"
+            className="w-full text-background"
             onPress={handleClose}
           >
             ยกเลิก
@@ -198,7 +189,6 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
 
   const startCamera = useCallback(async () => {
     setError(null);
-
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     try {
@@ -262,16 +252,16 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
           }
         },
         "image/jpeg",
-        0.9
+        0.9,
       );
     }
   }, [onCapture, stopCamera, onClose]);
 
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       startCamera();
     }
-
     return () => {
       if (!isOpen) {
         stopCamera();
@@ -293,72 +283,64 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
       backdrop="blur"
     >
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Camera className="w-6 h-6" />
-            {label}
-          </div>
+        <ModalHeader className="flex flex-row items-center justify-start w-full h-fit p-4 gap-2">
+          <Camera />
+          {label}
         </ModalHeader>
-        <ModalBody>
-          <div className="flex flex-col items-center justify-center w-full gap-2">
-            {error && (
-              <div className="text-danger text-sm p-2 bg-danger-50 rounded-lg w-full text-center">
-                {error}
+        <ModalBody className="flex flex-col items-center justify-center w-full h-fit p-4 gap-2">
+          {error && (
+            <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-danger">
+              {error}
+            </div>
+          )}
+
+          <div className="relative flex flex-col items-center justify-center w-full aspect-video bg-black rounded-lg overflow-hidden">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover"
+            />
+            <canvas ref={canvasRef} className="hidden" />
+
+            {!isStreaming && !error && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-black">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                <span className="text-white">กำลังเปิดกล้อง...</span>
               </div>
             )}
 
-            <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover"
-              />
-              <canvas ref={canvasRef} className="hidden" />
-
-              {!isStreaming && !error && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-                    <span className="text-white text-sm">
-                      กำลังเปิดกล้อง...
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {isStreaming && (
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-2 left-4 w-16 h-16 border-l-4 border-t-4 border-white/50 rounded-tl-lg"></div>
-                  <div className="absolute top-2 right-4 w-16 h-16 border-r-4 border-t-4 border-white/50 rounded-tr-lg"></div>
-                  <div className="absolute bottom-4 left-4 w-16 h-16 border-l-4 border-b-4 border-white/50 rounded-bl-lg"></div>
-                  <div className="absolute bottom-4 right-4 w-16 h-16 border-r-4 border-b-4 border-white/50 rounded-br-lg"></div>
-                </div>
-              )}
-            </div>
+            {isStreaming && (
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-4 left-4 w-12 h-12 border-l-2 border-t-2 border-white/50 rounded-tl-lg"></div>
+                <div className="absolute top-4 right-4 w-12 h-12 border-r-2 border-t-2 border-white/50 rounded-tr-lg"></div>
+                <div className="absolute bottom-4 left-4 w-12 h-12 border-l-2 border-b-2 border-white/50 rounded-bl-lg"></div>
+                <div className="absolute bottom-4 right-4 w-12 h-12 border-r-2 border-b-2 border-white/50 rounded-br-lg"></div>
+              </div>
+            )}
           </div>
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="flex flex-row items-center justify-end w-full h-fit p-4 gap-2">
           <Button
             color="danger"
             variant="shadow"
             size="md"
             radius="md"
-            className="w-2/12 text-background"
+            className="w-full text-background"
             onPress={handleClose}
           >
             ยกเลิก
           </Button>
           <Button
-            color="success"
+            color="primary"
             variant="shadow"
             size="md"
             radius="md"
-            className="w-2/12 text-background"
+            className="w-full text-background"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
-            startContent={<Camera />}
+            startContent={<Camera size={18} />}
           >
             ถ่ายรูป
           </Button>
@@ -370,40 +352,42 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
 
 function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
-      <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
-        <QrCode />
+    <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4">
+      <div className="flex items-center justify-center w-full h-fit gap-2 font-semibold">
+        <QrCode size={20} />
         {label}
       </div>
 
       {qrCodeInfo ? (
-        <div className="flex flex-col items-center gap-2 w-full">
-          <div className="w-full p-2 bg-success-50 border-1 border-success-200 rounded-lg">
-            <div className="text-sm text-success-600 font-medium mb-1">
-              สแกนสำเร็จ:
+        <div className="flex flex-col items-center justify-center w-full h-fit gap-4">
+          <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
+            <div className="flex items-center justify-center w-full h-fit text-success">
+              สแกนสำเร็จ
             </div>
-            <div className="text-default-700 break-all">{qrCodeInfo}</div>
+            <div className="flex items-center justify-center w-full h-fit p-2 bg-default rounded-lg break-all">
+              {qrCodeInfo}
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-row items-center justify-center w-full h-fit gap-2">
             <Button
               type="button"
-              color="default"
-              variant="bordered"
+              color="primary"
+              variant="shadow"
               size="md"
               radius="md"
-              className="w-6/12"
+              className="w-full text-background"
               onPress={onOpenScanner}
-              startContent={<RefreshCw />}
+              startContent={<RefreshCw size={16} />}
             >
               สแกนใหม่
             </Button>
             <Button
               type="button"
-              color="default"
-              variant="bordered"
+              color="danger"
+              variant="shadow"
               size="md"
               radius="md"
-              className="w-6/12"
+              className="w-full text-background"
               onPress={onClear}
             >
               ล้าง
@@ -411,20 +395,22 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-2 py-8">
-          <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
-            <QrCode className="w-10 h-10 text-default-400" strokeWidth={1} />
+        <div className="flex flex-col items-center justify-center w-full h-fit gap-4 py-4">
+          <div className="flex items-center justify-center w-20 h-20">
+            <QrCode />
           </div>
-          <p className="text-sm text-default-500">ยังไม่ได้สแกน QR Code</p>
+          <div className="flex items-center justify-center w-full h-fit">
+            ยังไม่ได้สแกน QR Code
+          </div>
           <Button
             type="button"
-            color="default"
-            variant="bordered"
+            color="primary"
+            variant="shadow"
             size="md"
             radius="md"
-            className="w-full"
+            className="w-6/12 text-background"
             onPress={onOpenScanner}
-            startContent={<QrCode />}
+            startContent={<QrCode size={18} />}
           >
             สแกน QR Code
           </Button>
@@ -432,7 +418,9 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
       )}
 
       {error && (
-        <div className="text-danger text-sm">{error?.[0] || error}</div>
+        <div className="flex items-center justify-center w-full h-fit text-danger">
+          {error?.[0] || error}
+        </div>
       )}
     </div>
   );
@@ -446,41 +434,41 @@ function PhotoCaptureCard({
   error,
 }) {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
-      <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
-        <Camera />
+    <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4">
+      <div className="flex items-center justify-center w-full h-fit gap-2 font-semibold">
+        <Camera size={20} />
         {label}
       </div>
 
       {capturedImage ? (
-        <div className="flex flex-col items-center gap-2">
-          <div className="relative group">
+        <div className="flex flex-col items-center justify-center w-full h-fit gap-4">
+          <div className="flex items-center justify-center w-full h-fit">
             <Image
               src={capturedImage}
               alt="Captured"
               className="max-w-full max-h-48 object-contain rounded-lg shadow-md"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-row items-center justify-center w-full h-fit gap-2">
             <Button
               type="button"
-              color="default"
-              variant="bordered"
+              color="primary"
+              variant="shadow"
               size="md"
               radius="md"
-              className="w-6/12"
+              className="w-full text-background"
               onPress={onOpenCamera}
-              startContent={<RefreshCw />}
+              startContent={<RefreshCw size={16} />}
             >
               ถ่ายใหม่
             </Button>
             <Button
               type="button"
-              color="default"
-              variant="bordered"
+              color="danger"
+              variant="shadow"
               size="md"
               radius="md"
-              className="w-6/12"
+              className="w-full text-background"
               onPress={onClear}
             >
               ลบ
@@ -488,20 +476,22 @@ function PhotoCaptureCard({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-2 py-8">
-          <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
-            <Camera className="w-10 h-10 text-default-400" strokeWidth={1} />
+        <div className="flex flex-col items-center justify-center w-full h-fit gap-4 py-4">
+          <div className="flex items-center justify-center w-20 h-20">
+            <Camera />
           </div>
-          <p className="text-sm text-default-500">ยังไม่มีรูปภาพ</p>
+          <div className="flex items-center justify-center w-full h-fit">
+            ยังไม่มีรูปภาพ
+          </div>
           <Button
             type="button"
-            color="default"
-            variant="bordered"
+            color="primary"
+            variant="shadow"
             size="md"
             radius="md"
-            className="w-full"
+            className="w-6/12 text-background"
             onPress={onOpenCamera}
-            startContent={<Camera />}
+            startContent={<Camera size={18} />}
           >
             เปิดกล้อง
           </Button>
@@ -509,7 +499,9 @@ function PhotoCaptureCard({
       )}
 
       {error && (
-        <div className="text-danger text-sm">{error?.[0] || error}</div>
+        <div className="flex items-center justify-center w-full h-fit text-danger">
+          {error?.[0] || error}
+        </div>
       )}
     </div>
   );
@@ -528,7 +520,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
     (qrData) => {
       setFormData((prev) => ({ ...prev, patrolQrCodeInfo: qrData }));
     },
-    [setFormData]
+    [setFormData],
   );
 
   const handleClearQr = useCallback(() => {
@@ -540,7 +532,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
       setCapturedPicture(preview);
       setFormData((prev) => ({ ...prev, patrolPicture: file }));
     },
-    [setFormData]
+    [setFormData],
   );
 
   const handleClearPicture = useCallback(() => {
@@ -553,16 +545,10 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="flex flex-col items-center justify-start w-full xl:w-12/12 h-full gap-2 border-1 rounded-xl overflow-auto"
+        className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto"
       >
-        <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center h-full p-2 gap-2 border-b-1">
-            สร้างโดย : {operatedBy}
-          </div>
-        </div>
-
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 rounded-xl">
+        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-b-2 xl:border-b-0 xl:border-r-2 border-default">
             <QrCodeCard
               label="สแกน QR Code"
               qrCodeInfo={formData.patrolQrCodeInfo}
@@ -571,7 +557,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
               error={errors.patrolQrCodeInfo}
             />
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 rounded-xl">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <PhotoCaptureCard
               label="ถ่ายรูป"
               capturedImage={capturedPicture}
@@ -607,7 +593,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
           <div className="flex items-center justify-end w-full h-full p-2 gap-2">
             <Button
               type="submit"
-              color="success"
+              color="primary"
               variant="shadow"
               size="md"
               radius="md"
@@ -615,6 +601,12 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
             >
               บันทึก
             </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
+          <div className="flex items-end justify-center h-full p-4 gap-2">
+            สร้างโดย : {operatedBy}
           </div>
         </div>
       </form>

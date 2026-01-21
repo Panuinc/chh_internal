@@ -185,7 +185,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
           }
         },
         "image/jpeg",
-        0.9
+        0.9,
       );
     }
   }, [onCapture, stopCamera, onClose]);
@@ -218,7 +218,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <Camera className="w-6 h-6" />
+            <Camera />
             {label}
           </div>
         </ModalHeader>
@@ -257,7 +257,10 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
         <ModalFooter>
           <Button
             color="danger"
-            variant="light"
+            variant="shadow"
+            size="md"
+            radius="md"
+            className="w-2/12 text-background"
             onPress={() => {
               stopCamera();
               onClose();
@@ -266,10 +269,14 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
             ยกเลิก
           </Button>
           <Button
-            color="success"
+            color="primary"
+            variant="shadow"
+            size="md"
+            radius="md"
+            className="w-2/12 text-background"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
-            startContent={<Camera className="w-5 h-5" />}
+            startContent={<Camera />}
           >
             ถ่ายรูป
           </Button>
@@ -365,7 +372,7 @@ function MultiCameraModal({
           }
         },
         "image/jpeg",
-        0.9
+        0.9,
       );
     }
   }, [capturedImages, setCapturedImages, onCapture]);
@@ -376,7 +383,7 @@ function MultiCameraModal({
       setCapturedImages(newImages);
       onCapture(newImages.map((img) => img.file));
     },
-    [capturedImages, setCapturedImages, onCapture]
+    [capturedImages, setCapturedImages, onCapture],
   );
 
   useEffect(() => {
@@ -408,7 +415,7 @@ function MultiCameraModal({
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <FileText className="w-6 h-6" />
+            <FileText />
             {label}
             {capturedImages.length > 0 && (
               <span className="text-sm text-default-500">
@@ -463,14 +470,14 @@ function MultiCameraModal({
                       <Button
                         type="button"
                         color="danger"
-                        variant="solid"
+                        variant="shadow"
                         size="md"
-                        size="sm"
+                        radius="md"
                         isIconOnly
-                        className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="w-2/12 text-background absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                         onPress={() => removeImage(index)}
                       >
-                        <X className="w-3 h-3" />
+                        <X />
                       </Button>
                     </div>
                   ))}
@@ -482,7 +489,10 @@ function MultiCameraModal({
         <ModalFooter>
           <Button
             color="danger"
-            variant="light"
+            variant="shadow"
+            size="md"
+            radius="md"
+            className="w-2/12 text-background"
             onPress={() => {
               stopCamera();
               onClose();
@@ -491,10 +501,14 @@ function MultiCameraModal({
             เสร็จสิ้น
           </Button>
           <Button
-            color="success"
+            color="primary"
+            variant="shadow"
+            size="md"
+            radius="md"
+            className="w-2/12 text-background"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
-            startContent={<Camera className="w-5 h-5" />}
+            startContent={<Camera />}
           >
             ถ่ายรูป
           </Button>
@@ -516,9 +530,9 @@ function PhotoCaptureCard({
     capturedImage || (existingImage ? `/api/uploads/${existingImage}` : null);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4 border-1 rounded-xl bg-default-50">
+    <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4 border-t-1 border-b-1 border-default">
       <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
-        <Camera className="w-5 h-5" />
+        <Camera />
         {label}
       </div>
       {displayImage ? (
@@ -533,21 +547,23 @@ function PhotoCaptureCard({
           <div className="flex gap-2">
             <Button
               type="button"
-              color="success"
-              variant="flat"
+              color="primary"
+              variant="shadow"
               size="md"
               radius="md"
+              className="w-full text-background"
               onPress={onOpenCamera}
-              startContent={<RefreshCw className="w-4 h-4" />}
+              startContent={<RefreshCw />}
             >
               ถ่ายใหม่
             </Button>
             <Button
               type="button"
               color="danger"
-              variant="flat"
+              variant="shadow"
               size="md"
               radius="md"
+              className="w-full text-background"
               onPress={onClear}
             >
               ลบ
@@ -557,17 +573,18 @@ function PhotoCaptureCard({
       ) : (
         <div className="flex flex-col items-center gap-3 py-8">
           <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
-            <Camera className="w-10 h-10 text-default-400" strokeWidth={1} />
+            <Camera className="text-default-400" />
           </div>
           <p className="text-sm text-default-500">ยังไม่มีรูปภาพ</p>
           <Button
             type="button"
-            color="success"
-            variant="solid"
+            color="primary"
+            variant="shadow"
             size="md"
             radius="md"
+            className="w-full text-background"
             onPress={onOpenCamera}
-            startContent={<Camera className="w-5 h-5" />}
+            startContent={<Camera />}
           >
             เปิดกล้อง
           </Button>
@@ -604,9 +621,9 @@ function DocumentCaptureCard({
       : parsedExistingImages.map((path) => `/api/uploads/${path}`);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4 border-1 rounded-xl bg-default-50">
+    <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4 border-t-1 border-b-1 border-default">
       <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
-        <FileText className="w-5 h-5" />
+        <FileText />
         {label}
         {displayImages.length > 0 && (
           <span className="text-sm text-default-500">
@@ -628,14 +645,14 @@ function DocumentCaptureCard({
                   <Button
                     type="button"
                     color="danger"
-                    variant="solid"
+                    variant="shadow"
                     size="md"
-                    size="sm"
+                    radius="md"
                     isIconOnly
-                    className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="w-2/12 text-background absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                     onPress={() => onRemove(index)}
                   >
-                    <X className="w-3 h-3" />
+                    <X />
                   </Button>
                 )}
               </div>
@@ -644,12 +661,13 @@ function DocumentCaptureCard({
           <div className="flex gap-2">
             <Button
               type="button"
-              color="success"
-              variant="flat"
+              color="primary"
+              variant="shadow"
               size="md"
               radius="md"
+              className="w-full text-background"
               onPress={onOpenCamera}
-              startContent={<Plus className="w-4 h-4" />}
+              startContent={<Plus />}
             >
               เพิ่มรูป
             </Button>
@@ -657,9 +675,10 @@ function DocumentCaptureCard({
               <Button
                 type="button"
                 color="danger"
-                variant="flat"
+                variant="shadow"
                 size="md"
                 radius="md"
+                className="w-full text-background"
                 onPress={onClear}
               >
                 ล้างทั้งหมด
@@ -670,17 +689,18 @@ function DocumentCaptureCard({
       ) : (
         <div className="flex flex-col items-center gap-3 py-8">
           <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
-            <FileText className="w-10 h-10 text-default-400" strokeWidth={1} />
+            <FileText className="text-default-400" />
           </div>
           <p className="text-sm text-default-500">ยังไม่มีเอกสาร</p>
           <Button
             type="button"
-            color="success"
-            variant="solid"
+            color="primary"
+            variant="shadow"
             size="md"
             radius="md"
+            className="w-full text-background"
             onPress={onOpenCamera}
-            startContent={<Camera className="w-5 h-5" />}
+            startContent={<Camera />}
           >
             เปิดกล้อง
           </Button>
@@ -716,7 +736,7 @@ export default function UIVisitorForm({
       setCapturedPhoto(preview);
       setFormData((prev) => ({ ...prev, visitorPhoto: file }));
     },
-    [setFormData]
+    [setFormData],
   );
 
   const handleClearPhoto = useCallback(() => {
@@ -728,7 +748,7 @@ export default function UIVisitorForm({
     (files) => {
       setFormData((prev) => ({ ...prev, visitorDocumentPhotos: files }));
     },
-    [setFormData]
+    [setFormData],
   );
 
   const handleClearDocuments = useCallback(() => {
@@ -745,7 +765,7 @@ export default function UIVisitorForm({
         visitorDocumentPhotos: newImages.map((img) => img.file),
       }));
     },
-    [capturedDocuments, setFormData]
+    [capturedDocuments, setFormData],
   );
 
   return (
@@ -753,16 +773,8 @@ export default function UIVisitorForm({
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="flex flex-col items-center justify-start w-full xl:w-12/12 h-full gap-2 border-1 rounded-xl overflow-auto"
+        className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto"
       >
-        <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center h-full p-4 gap-2 border-b-1">
-            {mode === "create"
-              ? `สร้างโดย : ${operatedBy}`
-              : `แก้ไขโดย : ${operatedBy}`}
-          </div>
-        </div>
-
         <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Input
@@ -939,10 +951,8 @@ export default function UIVisitorForm({
               ))}
             </Select>
           </div>
-        </div>
 
-        {isUpdate && (
-          <div className="flex flex-col xl:flex-row items-center justify-end w-full h-fit p-2 gap-2">
+          {isUpdate && (
             <div className="flex items-center justify-center w-full xl:w-6/12 h-full p-2 gap-2">
               <Select
                 name="visitorStatus"
@@ -968,10 +978,10 @@ export default function UIVisitorForm({
                 ))}
               </Select>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="flex flex-col xl:flex-row items-start justify-center w-full h-fit p-2 gap-4">
+        <div className="flex flex-col xl:flex-row items-start justify-center w-full h-fit">
           <div className="w-full xl:w-6/12">
             <PhotoCaptureCard
               label="รูปถ่ายผู้เข้าเยี่ยม"
@@ -999,7 +1009,7 @@ export default function UIVisitorForm({
           <div className="flex items-center justify-end w-full h-full p-2 gap-2">
             <Button
               type="submit"
-              color="success"
+              color="primary"
               variant="shadow"
               size="md"
               radius="md"
@@ -1007,6 +1017,14 @@ export default function UIVisitorForm({
             >
               บันทึก
             </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
+          <div className="flex items-end justify-center h-full p-4 gap-2">
+            {mode === "create"
+              ? `Create By : ${operatedBy}`
+              : `Update By : ${operatedBy}`}
           </div>
         </div>
       </form>
