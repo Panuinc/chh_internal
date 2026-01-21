@@ -72,7 +72,7 @@ const StatusFilterDropdown = ({
         radius="md"
         className="w-full xl:w-42 text-background"
       >
-        สถานะ
+        Status
       </Button>
     </DropdownTrigger>
     <DropdownMenu
@@ -249,7 +249,7 @@ export default function DataTable({
           )}
           {onAddNew && (
             <Button
-              startContent={<Plus />}
+              endContent={<Plus />}
               onPress={onAddNew}
               color="primary"
               variant="shadow"
@@ -257,7 +257,7 @@ export default function DataTable({
               radius="md"
               className="w-full xl:w-42 text-background"
             >
-              เพิ่ม
+              Create
             </Button>
           )}
         </div>

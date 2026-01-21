@@ -14,16 +14,8 @@ export default function UIEmployeeForm({
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="flex flex-col items-center justify-start w-full xl:w-12/12 h-full gap-2 border-1 rounded-xl overflow-auto"
+      className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto"
     >
-      <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
-        <div className="flex items-center justify-center h-full p-4 gap-2 border-b-1">
-          {mode === "create"
-            ? `Create By : ${operatedBy}`
-            : `Update By : ${operatedBy}`}
-        </div>
-      </div>
-
       <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
         <div className="flex items-center justify-center w-full h-full p-2 gap-2">
           <Input
@@ -86,42 +78,38 @@ export default function UIEmployeeForm({
             errorMessage={errors.employeeEmail?.[0] || errors.employeeEmail}
           />
         </div>
-      </div>
-
-      {isUpdate && (
-        <div className="flex flex-col xl:flex-row items-center justify-end w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full xl:w-6/12 h-full p-2 gap-2">
-            <Select
-              name="employeeStatus"
-              label="Status"
-              labelPlacement="outside"
-              placeholder="Please Select"
-              color="default"
-              variant="bordered"
-              size="md"
-              radius="md"
-              isRequired
-              selectedKeys={
-                formData.employeeStatus ? [formData.employeeStatus] : []
-              }
-              onSelectionChange={(keys) =>
-                handleChange("employeeStatus")([...keys][0])
-              }
-              isInvalid={!!errors.employeeStatus}
-              errorMessage={errors.employeeStatus?.[0] || errors.employeeStatus}
-            >
-              <SelectItem key="Active">Active</SelectItem>
-              <SelectItem key="Inactive">Inactive</SelectItem>
-            </Select>
-          </div>
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <Select
+            name="employeeStatus"
+            label="Status"
+            labelPlacement="outside"
+            placeholder="Please Select"
+            color="default"
+            variant="bordered"
+            size="md"
+            radius="md"
+            isRequired
+            isDisabled={!isUpdate}
+            selectedKeys={
+              formData.employeeStatus ? [formData.employeeStatus] : []
+            }
+            onSelectionChange={(keys) =>
+              handleChange("employeeStatus")([...keys][0])
+            }
+            isInvalid={!!errors.employeeStatus}
+            errorMessage={errors.employeeStatus?.[0] || errors.employeeStatus}
+          >
+            <SelectItem key="Active">Active</SelectItem>
+            <SelectItem key="Inactive">Inactive</SelectItem>
+          </Select>
         </div>
-      )}
+      </div>
 
       <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
         <div className="flex items-center justify-end w-full h-full p-2 gap-2">
           <Button
             type="submit"
-            color="success"
+            color="primary"
             variant="shadow"
             size="md"
             radius="md"
@@ -129,6 +117,14 @@ export default function UIEmployeeForm({
           >
             Submit
           </Button>
+        </div>
+      </div>
+      
+       <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
+        <div className="flex items-end justify-center h-full p-4 gap-2">
+          {mode === "create"
+            ? `Create By : ${operatedBy}`
+            : `Update By : ${operatedBy}`}
         </div>
       </div>
     </form>
