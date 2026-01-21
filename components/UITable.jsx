@@ -308,13 +308,13 @@ export default function DataTable({
             isCompact
             showControls
             showShadow
-            color="none"
+            color="secondary"
             size="md"
             radius="md"
             page={page}
             total={totalPages}
             onChange={setPage}
-            classNames={{ cursor: "border-1 border-default" }}
+            classNames={{ cursor: "text-background" }}
           />
         </div>
       </div>
