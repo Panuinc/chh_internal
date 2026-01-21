@@ -11,7 +11,6 @@ import {
   Button,
   Divider,
   Image,
-  Chip,
   useDisclosure,
 } from "@heroui/react";
 import {
@@ -43,23 +42,8 @@ const columns = [
   { name: "Items", uid: "lineCount", width: 80 },
   { name: "Qty", uid: "totalQuantity", width: 80 },
   { name: "Total", uid: "totalFormatted" },
-  { name: "Status", uid: "status" },
   { name: "Actions", uid: "actions", width: 120 },
 ];
-
-const statusOptions = [
-  { name: "Draft", uid: "Draft" },
-  { name: "Open", uid: "Open" },
-  { name: "Released", uid: "Released" },
-  { name: "Pending Approval", uid: "Pending Approval" },
-];
-
-const statusColorMap = {
-  Draft: "default",
-  Open: "secondary",
-  Released: "success",
-  "Pending Approval": "warning",
-};
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("th-TH", {
@@ -436,22 +420,11 @@ function OrderDetailModal({
       <ModalContent>
         <ModalHeader className="flex flex-col gap-2">
           <h3 className="text-lg font-semibold">Sales Order: {order.number}</h3>
-          <div className="flex items-center gap-2">
-            <Chip
-              color={statusColorMap[order.status] || "default"}
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="capitalize text-background"
-            >
-              {order.status}
-            </Chip>
-            {order.externalDocumentNumber && (
-              <span className="text-sm text-foreground/60">
-                Ref: {order.externalDocumentNumber}
-              </span>
-            )}
-          </div>
+          {order.externalDocumentNumber && (
+            <span className="text-sm text-foreground/60">
+              Ref: {order.externalDocumentNumber}
+            </span>
+          )}
         </ModalHeader>
         <ModalBody className="gap-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -524,11 +497,22 @@ function OrderDetailModal({
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="light" onPress={onClose}>
+          <Button
+            color="danger"
+            variant="shadow"
+            size="md"
+            radius="md"
+            className="w-2/12 text-background"
+            onPress={onClose}
+          >
             Close
           </Button>
           <Button
             color="primary"
+            variant="shadow"
+            size="md"
+            radius="md"
+            className="w-2/12 text-background"
             startContent={<Printer />}
             isDisabled={printing || !isConnected || lineCount === 0}
             onPress={() => {
@@ -623,8 +607,11 @@ export default function UISalesOrderOnline({
         <div className="flex items-center justify-center gap-2">
           <Button
             isIconOnly
-            variant="light"
+            color="default"
+            variant="shadow"
             size="md"
+            radius="md"
+            className="w-2/12 text-foreground"
             onPress={() => handleViewOrder(item._rawOrder)}
             title="View Details"
           >
@@ -632,8 +619,11 @@ export default function UISalesOrderOnline({
           </Button>
           <Button
             isIconOnly
-            variant="light"
+            color="default"
+            variant="shadow"
             size="md"
+            radius="md"
+            className="w-2/12 text-foreground"
             isDisabled={printing || !isConnected || item.lineCount === 0}
             onPress={() => handleOpenPreview(item._rawOrder)}
             title="พิมพ์ใบปะหน้า"
@@ -641,19 +631,6 @@ export default function UISalesOrderOnline({
             <Printer className={isConnected ? "text-success" : "text-danger"} />
           </Button>
         </div>
-      );
-    }
-    if (columnKey === "status") {
-      return (
-        <Chip
-          color={statusColorMap[item.status] || "default"}
-          variant="shadow"
-          size="md"
-          radius="md"
-          className="capitalize text-background"
-        >
-          {item.status}
-        </Chip>
       );
     }
     if (columnKey === "customerName") {
@@ -742,8 +719,6 @@ export default function UISalesOrderOnline({
           <DataTable
             columns={columns}
             data={normalized}
-            statusOptions={statusOptions}
-            statusColorMap={statusColorMap}
             searchPlaceholder="Search SO number or customer"
             emptyContent="No orders found"
             itemName="orders"
