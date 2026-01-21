@@ -14,16 +14,8 @@ export default function UIDepartmentForm({
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="flex flex-col items-center justify-start w-full xl:w-12/12 h-full gap-2 border-1 rounded-xl overflow-auto"
+      className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto"
     >
-      <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
-        <div className="flex items-center justify-center h-full p-4 gap-2 border-b-1">
-          {mode === "create"
-            ? `Create By : ${operatedBy}`
-            : `Update By : ${operatedBy}`}
-        </div>
-      </div>
-
       <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
         <div className="flex items-center justify-center w-full h-full p-2 gap-2">
           <Input
@@ -43,11 +35,9 @@ export default function UIDepartmentForm({
             errorMessage={errors.departmentName?.[0] || errors.departmentName}
           />
         </div>
-      </div>
 
-      {isUpdate && (
-        <div className="flex flex-col xl:flex-row items-center justify-end w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full xl:w-6/12 h-full p-2 gap-2">
+        {isUpdate && (
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Select
               name="departmentStatus"
               label="Department Status"
@@ -73,14 +63,14 @@ export default function UIDepartmentForm({
               <SelectItem key="Inactive">Inactive</SelectItem>
             </Select>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
         <div className="flex items-center justify-end w-full h-full p-2 gap-2">
           <Button
             type="submit"
-            color="success"
+            color="primary"
             variant="shadow"
             size="md"
             radius="md"
@@ -88,6 +78,14 @@ export default function UIDepartmentForm({
           >
             Submit
           </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
+        <div className="flex items-end justify-center h-full p-4 gap-2">
+          {mode === "create"
+            ? `Create By : ${operatedBy}`
+            : `Update By : ${operatedBy}`}
         </div>
       </div>
     </form>

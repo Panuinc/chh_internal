@@ -16,7 +16,7 @@ export default function UIAssignForm({
 }) {
   const totalPermissions = groupedPermissions.reduce(
     (sum, g) => sum + g.permissions.length,
-    0
+    0,
   );
   const selectedCount = selectedIds.size;
 
@@ -25,13 +25,13 @@ export default function UIAssignForm({
   };
 
   return (
-    <div className="flex flex-col items-center justify-start w-full xl:w-12/12 h-full gap-2 border-1 rounded-xl overflow-auto">
+    <div className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto">
       <div className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2">
-        <div className="flex items-center justify-center h-full p-2 gap-2 border-b-1">
+        <div className="flex items-end justify-center h-full p-4 gap-2">
           Employee: {employee?.employeeFirstName} {employee?.employeeLastName} (
           {employee?.employeeEmail})
         </div>
-        <div className="flex items-center justify-center h-full p-2 gap-2 border-b-1">
+        <div className="flex items-end justify-center h-full p-4 gap-2">
           Update By : {operatedBy}
         </div>
       </div>
@@ -44,19 +44,21 @@ export default function UIAssignForm({
         </div>
         <div className="flex items-center justify-end w-full xl:w-6/12 h-full p-2 gap-2">
           <Button
-            color="default"
-            variant="bordered"
+            color="primary"
+            variant="shadow"
             size="md"
             radius="md"
+            className="w-4/12 text-background"
             onPress={onSelectAll}
           >
             Select All
           </Button>
           <Button
-            color="default"
-            variant="bordered"
+            color="secondary"
+            variant="shadow"
             size="md"
             radius="md"
+            className="w-4/12 text-background"
             onPress={onDeselectAll}
           >
             Deselect All
@@ -67,7 +69,7 @@ export default function UIAssignForm({
       <div className="flex flex-col items-center justify-start w-full h-fit p-2 gap-2">
         {groupedPermissions.map((group) => {
           const allSelected = group.permissions.every((p) =>
-            selectedIds.has(p.permissionId)
+            selectedIds.has(p.permissionId),
           );
           const someSelected =
             !allSelected &&
@@ -78,10 +80,11 @@ export default function UIAssignForm({
               key={group.category}
               className="flex flex-col items-start justify-start w-full h-fit p-2 gap-2"
             >
-              <div className="flex items-center justify-between w-full h-fit pb-2 border-b-1">
+              <div className="flex items-center justify-between w-full h-fit pb-2 border-b-2 border-default">
                 <Checkbox
                   size="md"
-                  color={allSelected || someSelected ? "success" : "default"}
+                  radius="md"
+                  color={allSelected || someSelected ? "primary" : "default"}
                   isSelected={allSelected}
                   isIndeterminate={someSelected}
                   onValueChange={() =>
@@ -97,7 +100,7 @@ export default function UIAssignForm({
                 <span className="text-sm text-default-400">
                   {
                     group.permissions.filter((p) =>
-                      selectedIds.has(p.permissionId)
+                      selectedIds.has(p.permissionId),
                     ).length
                   }{" "}
                   / {group.permissions.length}
@@ -107,12 +110,12 @@ export default function UIAssignForm({
               <div className="flex flex-col w-full gap-2 pl-4">
                 {group.subGroups.map((subGroup) => {
                   const subAllSelected = subGroup.permissions.every((p) =>
-                    selectedIds.has(p.permissionId)
+                    selectedIds.has(p.permissionId),
                   );
                   const subSomeSelected =
                     !subAllSelected &&
                     subGroup.permissions.some((p) =>
-                      selectedIds.has(p.permissionId)
+                      selectedIds.has(p.permissionId),
                     );
 
                   return (
@@ -120,12 +123,13 @@ export default function UIAssignForm({
                       key={subGroup.subCategory}
                       className="flex flex-col w-full gap-2 p-2 bg-default-50 rounded-lg"
                     >
-                      <div className="flex items-center justify-between w-full pb-2 border-b-1">
+                      <div className="flex items-center justify-between w-full pb-2 border-b-2 border-default">
                         <Checkbox
                           size="md"
+                          radius="md"
                           color={
                             subAllSelected || subSomeSelected
-                              ? "warning"
+                              ? "secondary"
                               : "default"
                           }
                           isSelected={subAllSelected}
@@ -133,7 +137,7 @@ export default function UIAssignForm({
                           onValueChange={() =>
                             handleToggleSubGroup(
                               subGroup.permissions,
-                              subAllSelected
+                              subAllSelected,
                             )
                           }
                           classNames={{
@@ -146,7 +150,7 @@ export default function UIAssignForm({
                         <span className="text-xs text-default-400">
                           {
                             subGroup.permissions.filter((p) =>
-                              selectedIds.has(p.permissionId)
+                              selectedIds.has(p.permissionId),
                             ).length
                           }{" "}
                           / {subGroup.permissions.length}
@@ -161,9 +165,10 @@ export default function UIAssignForm({
                           >
                             <Checkbox
                               size="md"
-                              color="success"
+                              radius="md"
+                              color="primary"
                               isSelected={selectedIds.has(
-                                permission.permissionId
+                                permission.permissionId,
                               )}
                               onValueChange={() =>
                                 onToggle(permission.permissionId)
@@ -191,7 +196,7 @@ export default function UIAssignForm({
       <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
         <div className="flex items-center justify-end w-full h-full p-2 gap-2">
           <Button
-            color="success"
+            color="primary"
             variant="shadow"
             size="md"
             radius="md"

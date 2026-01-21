@@ -78,31 +78,33 @@ export default function UIEmployeeForm({
             errorMessage={errors.employeeEmail?.[0] || errors.employeeEmail}
           />
         </div>
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          <Select
-            name="employeeStatus"
-            label="Status"
-            labelPlacement="outside"
-            placeholder="Please Select"
-            color="default"
-            variant="bordered"
-            size="md"
-            radius="md"
-            isRequired
-            isDisabled={!isUpdate}
-            selectedKeys={
-              formData.employeeStatus ? [formData.employeeStatus] : []
-            }
-            onSelectionChange={(keys) =>
-              handleChange("employeeStatus")([...keys][0])
-            }
-            isInvalid={!!errors.employeeStatus}
-            errorMessage={errors.employeeStatus?.[0] || errors.employeeStatus}
-          >
-            <SelectItem key="Active">Active</SelectItem>
-            <SelectItem key="Inactive">Inactive</SelectItem>
-          </Select>
-        </div>
+
+        {isUpdate && (
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            <Select
+              name="employeeStatus"
+              label="Status"
+              labelPlacement="outside"
+              placeholder="Please Select"
+              color="default"
+              variant="bordered"
+              size="md"
+              radius="md"
+              isRequired
+              selectedKeys={
+                formData.employeeStatus ? [formData.employeeStatus] : []
+              }
+              onSelectionChange={(keys) =>
+                handleChange("employeeStatus")([...keys][0])
+              }
+              isInvalid={!!errors.employeeStatus}
+              errorMessage={errors.employeeStatus?.[0] || errors.employeeStatus}
+            >
+              <SelectItem key="Active">Active</SelectItem>
+              <SelectItem key="Inactive">Inactive</SelectItem>
+            </Select>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
@@ -119,8 +121,8 @@ export default function UIEmployeeForm({
           </Button>
         </div>
       </div>
-      
-       <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
+
+      <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
         <div className="flex items-end justify-center h-full p-4 gap-2">
           {mode === "create"
             ? `Create By : ${operatedBy}`
