@@ -5,13 +5,12 @@ import { useSalesOrdersOnline } from "@/app/api/sales/salesOrderOnline/core";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import UISalesOrderOnline from "@/module/sales/salesOrderOnline/UISalesOrderOnline";
+import { showToast } from "@/components";
 
 function SalesOrderOnlineContent() {
   const { orders, loading, refetch } = useSalesOrdersOnline({ limit: 100 });
   const { hasPermission } = useMenu();
-
   const { print, printing, isConnected } = useRFIDContext();
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [isPrintingSlip, setIsPrintingSlip] = useState(false);
@@ -19,7 +18,7 @@ function SalesOrderOnlineContent() {
   const handlePrintSingle = useCallback(
     async (order, options = {}) => {
       if (!isConnected) {
-        alert("Printer is not connected");
+        showToast("warning", "Printer is not connected");
         return;
       }
 
@@ -33,7 +32,7 @@ function SalesOrderOnlineContent() {
           );
 
           if (totalPieces === 0) {
-            alert("No items to print");
+            showToast("warning", "No items to print");
             return;
           }
 
@@ -42,13 +41,13 @@ function SalesOrderOnlineContent() {
           try {
             const { printPackingSlips } =
               await import("@/lib/chainWay/packingSlipLabel");
-
             const result = await printPackingSlips(order, (current, total) => {
               console.log(`Printing ${current}/${total}`);
             });
 
             if (result.success) {
-              alert(
+              showToast(
+                "success",
                 `พิมพ์ใบปะหน้า ${result.printed} ใบสำเร็จ (${order.number})`,
               );
             } else {
@@ -56,11 +55,10 @@ function SalesOrderOnlineContent() {
             }
           } catch (err) {
             console.error("Packing slip print error:", err);
-            alert(`Print failed: ${err.message}`);
+            showToast("danger", `Print failed: ${err.message}`);
           } finally {
             setIsPrintingSlip(false);
           }
-
           return;
         }
 
@@ -82,12 +80,14 @@ function SalesOrderOnlineContent() {
             },
           );
         }
-        alert(
+
+        showToast(
+          "success",
           `Printed ${lineItems.length} items from ${order.number} successfully`,
         );
       } catch (err) {
         console.error("Print error:", err);
-        alert(`Print failed: ${err.message}`);
+        showToast("danger", `Print failed: ${err.message}`);
       }
     },
     [print, isConnected],
@@ -100,13 +100,14 @@ function SalesOrderOnlineContent() {
 
   const handlePrintSuccess = useCallback((result) => {
     console.log("Print success:", result);
+    showToast("success", "Print completed successfully");
     setDialogOpen(false);
     setSelectedOrders([]);
   }, []);
 
   const handlePrintError = useCallback((error) => {
     console.error("Print error:", error);
-    alert(`Print failed: ${error}`);
+    showToast("danger", `Print failed: ${error}`);
   }, []);
 
   if (!hasPermission("sales.salesOrderOnline.view")) {
