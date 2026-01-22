@@ -14,7 +14,7 @@ import {
 import {
   Printer,
   RefreshCw,
-  Eye,
+  Telescope,
   Package,
   User,
   Calendar,
@@ -336,7 +336,7 @@ export default function UISalesOrderOnline({
             className="w-2/12 text-foreground"
             onPress={() => handleViewOrder(item._rawOrder)}
           >
-            <Eye />
+            <Telescope />
           </Button>
         </div>
       );
