@@ -381,7 +381,6 @@ export default function UISalesOrderDetail({
             variant="light"
             isIconOnly
             size="md"
-            size="sm"
           >
             <ArrowLeft />
           </Button>

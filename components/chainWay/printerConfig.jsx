@@ -107,7 +107,6 @@ function ActionBtn({
   return (
     <Button
       size="md"
-      size="sm"
       isLoading={loading}
       spinner={<Spinner size="md" color="current" />}
       startContent={!loading && Icon && <Icon size={15} />}

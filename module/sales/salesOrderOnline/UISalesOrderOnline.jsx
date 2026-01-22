@@ -613,7 +613,6 @@ export default function UISalesOrderOnline({
             radius="md"
             className="w-2/12 text-foreground"
             onPress={() => handleViewOrder(item._rawOrder)}
-            title="View Details"
           >
             <Eye />
           </Button>
@@ -626,7 +625,6 @@ export default function UISalesOrderOnline({
             className="w-2/12 text-foreground"
             isDisabled={printing || !isConnected || item.lineCount === 0}
             onPress={() => handleOpenPreview(item._rawOrder)}
-            title="พิมพ์ใบปะหน้า"
           >
             <Printer className={isConnected ? "text-success" : "text-danger"} />
           </Button>
@@ -652,13 +650,7 @@ export default function UISalesOrderOnline({
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <span className="font-medium">Printer</span>
-            <Button
-              isIconOnly
-              variant="light"
-              size="md"
-              onPress={openSettings}
-              title="Printer Settings"
-            >
+            <Button isIconOnly variant="light" size="md" onPress={openSettings}>
               <Settings />
             </Button>
           </div>
