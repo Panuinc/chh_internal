@@ -1,26 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  Button,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Progress,
-  Chip,
-  Tooltip,
-} from "@heroui/react";
+import React, { useState, useCallback } from "react";
+import { Button, Spinner, Tooltip } from "@heroui/react";
 import {
   Printer,
   RefreshCw,
   AlertCircle,
-  CheckCircle,
-  Circle,
-  FileText,
-  Radio,
   Gauge,
   StopCircle,
   RotateCcw,
@@ -169,7 +154,6 @@ export function PrinterControls({ compact = false, className = "" }) {
     printerLoading,
     printerStatus,
     printerError,
-    refreshPrinter,
     testConnection,
     calibrate,
     resetPrinter,
@@ -323,8 +307,6 @@ export function PrinterControls({ compact = false, className = "" }) {
 }
 
 export function PrinterSettings({
-  onClose,
-  compact = false,
   className = "",
   showHeader = true,
   title = "ควบคุมเครื่องพิมพ์",
