@@ -8,7 +8,6 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  Divider,
   Image,
 } from "@heroui/react";
 import { Printer, Package } from "lucide-react";
