@@ -11,8 +11,6 @@ function SalesOrderOnlineContent() {
   const { orders, loading, refetch } = useSalesOrdersOnline({ limit: 100 });
   const { hasPermission } = useMenu();
   const { print, printing, isConnected } = useRFIDContext();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedOrders, setSelectedOrders] = useState([]);
   const [isPrintingSlip, setIsPrintingSlip] = useState(false);
 
   const handlePrintSingle = useCallback(
@@ -93,23 +91,6 @@ function SalesOrderOnlineContent() {
     [print, isConnected],
   );
 
-  const handlePrintMultiple = useCallback((orders) => {
-    setSelectedOrders(orders);
-    setDialogOpen(true);
-  }, []);
-
-  const handlePrintSuccess = useCallback((result) => {
-    console.log("Print success:", result);
-    showToast("success", "Print completed successfully");
-    setDialogOpen(false);
-    setSelectedOrders([]);
-  }, []);
-
-  const handlePrintError = useCallback((error) => {
-    console.error("Print error:", error);
-    showToast("danger", `Print failed: ${error}`);
-  }, []);
-
   if (!hasPermission("sales.salesOrderOnline.view")) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -125,7 +106,6 @@ function SalesOrderOnlineContent() {
       orders={orders}
       loading={loading}
       onPrintSingle={handlePrintSingle}
-      onPrintMultiple={handlePrintMultiple}
       printerConnected={isConnected}
       printing={printing || isPrintingSlip}
       onRefresh={refetch}

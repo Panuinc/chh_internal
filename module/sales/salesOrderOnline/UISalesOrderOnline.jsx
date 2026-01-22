@@ -550,7 +550,6 @@ function PrinterSettingsModal({ isOpen, onClose }) {
       <ModalContent>
         <ModalBody className="py-6">
           <PrinterSettings
-            onClose={onClose}
             showHeader={true}
             title="ควบคุมเครื่องพิมพ์"
             subtitle="ChainWay RFID Printer"
