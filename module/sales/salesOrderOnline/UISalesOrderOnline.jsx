@@ -26,13 +26,8 @@ import Barcode from "react-barcode";
 import { DataTable, Loading } from "@/components";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
-
-const COMPANY_INFO = {
-  name: "บริษัท ชื้ออะฮวด อุตสาหกรรม จำกัด",
-  address: "9/1 หมู่ 2 ถนนบางเลน-ลาดหลุมแก้ว",
-  district: "ต.ขุนศรี อ.ไทรน้อย จ.นนทบุรี 11150",
-  phone: "02-921-9979",
-};
+import { COMPANY_INFO } from "@/lib/chainWay/config";
+import { getItemLines, getCommentLines } from "@/lib/chainWay/utils";
 
 const TABLE_COLUMNS = [
   { name: "#", uid: "index", width: 60 },
@@ -57,14 +52,6 @@ function generateBarcodeValue(itemNumber, pieceNumber, total) {
   return `${itemNumber}-${pieceNumber}/${total}`;
 }
 
-function getItemLines(lines) {
-  return lines?.filter((l) => l.lineType === "Item") || [];
-}
-
-function getCommentLines(lines) {
-  return lines?.filter((l) => l.lineType === "Comment") || [];
-}
-
 const ORDER_LINES_COLUMNS = [
   { name: "#", uid: "index", width: 50 },
   { name: "Item No.", uid: "itemNumber" },
@@ -77,8 +64,8 @@ const ORDER_LINES_COLUMNS = [
 ];
 
 function OrderLinesTable({ lines }) {
-  const itemLines = getItemLines(lines);
-  const commentLines = getCommentLines(lines);
+  const itemLines = getItemLines({ salesOrderLines: lines });
+  const commentLines = getCommentLines({ salesOrderLines: lines });
 
   const normalizedLines = itemLines.map((line, index) => ({
     ...line,
@@ -221,7 +208,7 @@ function OrderDetailModal({
   if (!order) return null;
 
   const lines = order.salesOrderLines || [];
-  const lineCount = getItemLines(lines).length;
+  const lineCount = getItemLines(order).length;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
@@ -349,7 +336,7 @@ function SlipPreviewModal({
 }) {
   if (!order) return null;
 
-  const itemLines = getItemLines(order.salesOrderLines);
+  const itemLines = getItemLines(order);
   const totalPieces = itemLines.reduce((sum, l) => sum + (l.quantity || 0), 0);
 
   const firstItem = itemLines[0];
@@ -400,7 +387,7 @@ function SlipPreviewModal({
                   </div>
                   <div className="flex gap-2">
                     <span className="font-semibold w-16">ที่อยู่:</span>
-                    <span>{COMPANY_INFO.address}</span>
+                    <span>{COMPANY_INFO.address1}</span>
                   </div>
                   <div className="flex gap-2">
                     <span className="font-semibold w-16">โทร:</span>

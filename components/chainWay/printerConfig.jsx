@@ -14,7 +14,6 @@ import {
   Activity,
 } from "lucide-react";
 import { useRFIDSafe } from "@/hooks";
-import { PRINT_TYPES, PRINT_TYPE_OPTIONS } from "@/lib/chainWay/config";
 
 function StatusBadge({ connected, loading }) {
   if (loading) {
@@ -486,5 +485,3 @@ export function PrinterSettings({
     </div>
   );
 }
-
-export { PRINT_TYPES, PRINT_TYPE_OPTIONS };

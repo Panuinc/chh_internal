@@ -2,6 +2,6 @@ export {
   PrinterStatusBadge,
   PrinterControls,
   PrinterSettings,
-  PRINT_TYPES,
-  PRINT_TYPE_OPTIONS,
 } from "./printerConfig.jsx";
+
+export { PRINT_TYPES, PRINT_TYPE_OPTIONS } from "@/lib/chainWay/config";
