@@ -335,6 +335,29 @@ export function PrinterSettings({
     }
   }, []);
 
+  const rfidCalibrate = useCallback(async () => {
+    try {
+      const response = await fetch("/api/chainWay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "command",
+          command: "^XA^HR^XZ", // RFID Tag Calibration command
+        }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert("RFID Calibration started. Please wait 1-5 minutes...");
+      } else {
+        alert(`RFID Calibration failed: ${result.error}`);
+      }
+      return result;
+    } catch (error) {
+      alert(`RFID Calibration error: ${error.message}`);
+      throw error;
+    }
+  }, []);
+
   return (
     <div className={`max-w-2xl mx-auto ${className}`}>
       {showHeader && (
@@ -398,6 +421,44 @@ export function PrinterSettings({
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Button
+              variant="bordered"
+              className="flex flex-col h-20 gap-1 border-warning/30"
+              onPress={async () => {
+                try {
+                  const response = await fetch("/api/chainWay", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      action: "command",
+                      command:
+                        "^XA^RS8^RFW,H,,,A^FD112233445566778899AABBCC^FS^FO50,50^A0N,30,30^FDTEST RFID^FS^PQ1^XZ",
+                    }),
+                  });
+                  const result = await response.json();
+                  alert(
+                    result.success
+                      ? "ส่งสำเร็จ! ดูที่เครื่องพิมพ์"
+                      : `Error: ${result.error}`,
+                  );
+                } catch (err) {
+                  alert(`Error: ${err.message}`);
+                }
+              }}
+            >
+              <Activity size={20} className="text-warning" />
+              <span className="text-xs">Test RFID</span>
+            </Button>
+            <Button
+              variant="bordered"
+              className="flex flex-col h-20 gap-1"
+              isLoading={actionLoading === "rfidCalibrate"}
+              onPress={() => handleAction("rfidCalibrate", rfidCalibrate)}
+            >
+              <Activity size={20} className="text-warning" />
+              <span className="text-xs">RFID Calibrate</span>
+            </Button>
+
             <Button
               variant="bordered"
               className="flex flex-col h-20 gap-1"
