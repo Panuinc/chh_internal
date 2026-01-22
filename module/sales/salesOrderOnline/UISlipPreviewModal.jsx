@@ -11,6 +11,7 @@ import {
   Image,
 } from "@heroui/react";
 import { Printer } from "lucide-react";
+import Barcode from "react-barcode";
 
 const COMPANY_INFO = {
   name: "บริษัท ชื้ออะฮวด อุตสาหกรรม จำกัด",
@@ -32,6 +33,19 @@ export default function UISlipPreviewModal({
     (l) => l.lineType === "Item",
   );
   const totalPieces = itemLines.reduce((sum, l) => sum + (l.quantity || 0), 0);
+
+  const generateBarcodeValue = (itemNumber, pieceNumber, total) => {
+    return `${itemNumber}-${pieceNumber}/${total}`;
+  };
+
+  const firstItem = itemLines[0];
+  const previewBarcodeValue = firstItem
+    ? generateBarcodeValue(
+        firstItem.itemNumber || firstItem.number,
+        1,
+        totalPieces,
+      )
+    : "NO-ITEM";
 
   return (
     <Modal
@@ -84,9 +98,24 @@ export default function UISlipPreviewModal({
                   1/{totalPieces}
                 </div>
               </div>
-              <div className="flex items-center justify-center w-full h-20 p-2 gap-2 border-2">
-                Barcode 
+
+              <div className="flex flex-col items-center justify-center w-full py-3 px-4 border-b-2 border-default bg-white">
+                <Barcode
+                  value={previewBarcodeValue}
+                  format="CODE128"
+                  width={1}
+                  height={50}
+                  displayValue={true}
+                  fontSize={12}
+                  fontOptions="bold"
+                  textAlign="center"
+                  textMargin={5}
+                  margin={5}
+                  background="#ffffff"
+                  lineColor="#000000"
+                />
               </div>
+
               <div className="flex flex-col p-2 border-b-2 border-default gap-2">
                 <div className="flex gap-2">
                   <span className="font-semibold w-12 text-sm">ผู้รับ:</span>
@@ -151,7 +180,7 @@ export default function UISlipPreviewModal({
                 </div>
 
                 <div className="flex items-center justify-center p-2">
-                  <div className="flex flex-col items-center justify-center w-20 h-20 ded-xl bg-default">
+                  <div className="flex flex-col items-center justify-center w-20 h-20 rounded-xl bg-default">
                     <Image
                       src="/qrcode/lineEvergreen.png"
                       alt="Logo"
