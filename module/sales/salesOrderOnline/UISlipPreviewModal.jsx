@@ -10,7 +10,7 @@ import {
   Button,
   Image,
 } from "@heroui/react";
-import { Printer, Package } from "lucide-react";
+import { Printer } from "lucide-react";
 
 const COMPANY_INFO = {
   name: "บริษัท ชื้ออะฮวด อุตสาหกรรม จำกัด",
@@ -34,233 +34,167 @@ export default function UISlipPreviewModal({
   const totalPieces = itemLines.reduce((sum, l) => sum + (l.quantity || 0), 0);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="2xl"
+      scrollBehavior="inside"
+      className="flex flex-col items-center justify-center w-full h-full gap-2"
+    >
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-2">
-          <h3 className="text-lg font-semibold">
+        <ModalHeader className="flex flex-col items-center justify-start w-full h-fit p-2 gap-2">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             ตัวอย่างใบปะหน้า - {order.number}
-          </h3>
-          <p className="text-sm text-foreground/60">
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             จะพิมพ์ทั้งหมด {totalPieces} ใบ (ตามจำนวนสินค้า)
-          </p>
+          </div>
         </ModalHeader>
-        <ModalBody>
-          <div className="flex flex-col items-center gap-4 py-4 bg-default rounded-xl">
-            <p className="text-sm text-foreground/60">
-              ตัวอย่างใบที่ 1 จาก {totalPieces} ใบ (ขนาด 100mm x 150mm)
-            </p>
 
-            <div
-              className="flex flex-col bg-background border-2 border-foreground mx-auto overflow-hidden"
-              style={{
-                width: "400px",
-                height: "600px",
-                fontFamily: "sans-serif",
-              }}
-            >
-              <div
-                className="flex border-b-2 border-foreground relative"
-                style={{ height: "80px" }}
-              >
-                <div
-                  className="flex items-center justify-center p-2"
-                  style={{ width: "72px" }}
-                >
+        <ModalBody className="flex flex-col items-center justify-start w-full h-fit p-2">
+          <div className="flex flex-col w-full bg-default rounded-xl p-2 gap-2">
+            <div className="flex flex-col w-full bg-background rounded-xl overflow-hidden">
+              <div className="flex flex-row items-stretch border-b-2 border-default">
+                <div className="flex items-center justify-center w-[15%] p-2 border-r-2 border-default">
                   <Image
                     src="/logo/logo-09.png"
                     alt="Logo"
                     width={64}
                     height={64}
                     className="object-contain"
-                    fallback={
-                      <div className="flex items-center justify-center w-16 h-16 border border-default text-sm font-bold">
-                        LOGO
-                      </div>
-                    }
                   />
                 </div>
-                <div className="flex flex-col flex-1 py-1 text-xs">
-                  <table className="w-full">
-                    <tbody>
-                      <tr>
-                        <td
-                          className="font-semibold whitespace-nowrap pr-1 align-top"
-                          style={{ width: "45px" }}
-                        >
-                          ผู้ส่ง:
-                        </td>
-                        <td className="align-top">{COMPANY_INFO.name}</td>
-                      </tr>
-                      <tr>
-                        <td className="font-semibold whitespace-nowrap pr-1 align-top">
-                          ที่อยู่:
-                        </td>
-                        <td className="align-top">{COMPANY_INFO.address}</td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                        <td>{COMPANY_INFO.district}</td>
-                      </tr>
-                      <tr>
-                        <td className="font-semibold whitespace-nowrap pr-1">
-                          โทร:
-                        </td>
-                        <td>{COMPANY_INFO.phone}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+
+                <div className="flex flex-col justify-center flex-1 p-2 text-sm">
+                  <div className="flex gap-2">
+                    <span className="font-semibold w-16">ผู้ส่ง:</span>
+                    <span>{COMPANY_INFO.name}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="font-semibold w-16">ที่อยู่:</span>
+                    <span>{COMPANY_INFO.address}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="font-semibold w-16">โทร:</span>
+                    <span>{COMPANY_INFO.phone}</span>
+                  </div>
                 </div>
-                <div className="absolute top-2 right-2">
-                  <span className="text-3xl font-bold">1/{totalPieces}</span>
+
+                <div className="flex items-center justify-center w-[15%] p-2 border-l-2 border-default text-xl font-bold">
+                  1/{totalPieces}
                 </div>
               </div>
-
-              <div
-                className="flex flex-col px-2 py-1 border-b-2 border-foreground"
-                style={{ height: "80px" }}
-              >
-                <table className="w-full text-xs">
-                  <tbody>
-                    <tr>
-                      <td
-                        className="font-semibold whitespace-nowrap pr-1 align-top text-sm"
-                        style={{ width: "45px" }}
-                      >
-                        ผู้รับ:
-                      </td>
-                      <td className="font-bold text-sm align-top">
-                        {order?.shipToName || order?.customerName}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="font-semibold whitespace-nowrap pr-1 align-top">
-                        ที่อยู่:
-                      </td>
-                      <td className="align-top">
-                        <div>{order?.shipToAddressLine1}</div>
-                        {order?.shipToAddressLine2 && (
-                          <div>{order?.shipToAddressLine2}</div>
-                        )}
-                        {(order?.shipToCity || order?.shipToPostCode) && (
-                          <div>
-                            {order?.shipToCity} {order?.shipToPostCode}
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="font-semibold whitespace-nowrap pr-1">
-                        โทร:
-                      </td>
-                      <td>{order?.phoneNumber || "-"}</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="flex items-center justify-center w-full h-20 p-2 gap-2 border-2">
+                Barcode 
               </div>
-
-              <div
-                className="flex items-center px-2 text-xs font-semibold border-b border-default"
-                style={{ height: "20px" }}
-              >
-                <span style={{ width: "40px" }}>Item</span>
-                <span className="flex-1">รายการสินค้า</span>
-                <span className="text-right" style={{ width: "50px" }}>
-                  จำนวน
-                </span>
-              </div>
-
-              <div className="overflow-auto" style={{ height: "300px" }}>
-                <table className="w-full text-xs">
-                  <tbody>
-                    {itemLines.slice(0, 14).map((line, index) => (
-                      <tr
-                        key={line.id || index}
-                        className="border-b border-default"
-                      >
-                        <td
-                          className="py-1 px-2 align-top"
-                          style={{ width: "40px" }}
-                        >
-                          {index + 1}
-                        </td>
-                        <td className="py-1 align-top">
-                          <div className="whitespace-pre-wrap break-words">
-                            {line.description}
-                          </div>
-                        </td>
-                        <td
-                          className="py-1 px-2 text-right align-top"
-                          style={{ width: "50px" }}
-                        >
-                          {line.quantity}
-                        </td>
-                      </tr>
-                    ))}
-                    {itemLines.length > 14 && (
-                      <tr>
-                        <td
-                          colSpan={3}
-                          className="py-1 px-2 text-foreground/50"
-                        >
-                          ... และอีก {itemLines.length - 14} รายการ
-                        </td>
-                      </tr>
+              <div className="flex flex-col p-2 border-b-2 border-default gap-2">
+                <div className="flex gap-2">
+                  <span className="font-semibold w-12 text-sm">ผู้รับ:</span>
+                  <span className="font-bold text-base">
+                    {order?.shipToName || order?.customerName}
+                  </span>
+                </div>
+                <div className="flex gap-2 text-xs">
+                  <span className="font-semibold w-12">ที่อยู่:</span>
+                  <div className="flex flex-col">
+                    <span>{order?.shipToAddressLine1}</span>
+                    {order?.shipToAddressLine2 && (
+                      <span>{order?.shipToAddressLine2}</span>
                     )}
-                  </tbody>
-                </table>
+                    {(order?.shipToCity || order?.shipToPostCode) && (
+                      <span>
+                        {order?.shipToCity} {order?.shipToPostCode}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-2 text-xs">
+                  <span className="font-semibold w-12">โทร:</span>
+                  <span>{order?.phoneNumber || "-"}</span>
+                </div>
               </div>
 
-              <div
-                className="flex border-t-2 border-foreground"
-                style={{ height: "100px" }}
-              >
-                <div className="flex flex-col flex-1 p-2 text-xs text-danger">
+              <div className="flex px-3 py-2 bg-default text-xs font-semibold">
+                <span className="w-10 text-center">#</span>
+                <span className="flex-1">รายการสินค้า</span>
+                <span className="w-16 text-right">จำนวน</span>
+              </div>
+
+              <div className="flex flex-col h-52 overflow-auto">
+                {itemLines.slice(0, 14).map((line, index) => (
+                  <div
+                    key={line.id || index}
+                    className="flex px-3 py-2 text-xs border-b-1 border-default hover:bg-default"
+                  >
+                    <span className="w-10 text-center">{index + 1}</span>
+                    <span className="flex-1 whitespace-pre-wrap break-words">
+                      {line.description}
+                    </span>
+                    <span className="w-16 text-right font-medium">
+                      {line.quantity}
+                    </span>
+                  </div>
+                ))}
+                {itemLines.length > 14 && (
+                  <div className="px-3 py-2 text-xs text-foreground italic">
+                    ... และอีก {itemLines.length - 14} รายการ
+                  </div>
+                )}
+              </div>
+
+              <div className="flex border-t-2 border-default">
+                <div className="flex flex-col flex-1 p-2 text-2xl text-danger gap-2">
                   <p className="font-bold">
-                    ❗ กรุณาถ่ายวิดีโอขณะแกะพัสดุ เพื่อใช้เป็นหลัก
-                  </p>
-                  <p className="ml-4">
-                    ฐานการเคลมสินค้า ไม่มีหลักฐานงดเคลมทุกกรณี
+                    ❗กรุณาถ่ายวิดีโอขณะแกะพัสดุ
+                    เพื่อใช้เป็นหลักฐานการเคลมสินค้า ไม่มีหลักฐานงดเคลมทุกกรณี
                   </p>
                 </div>
-                <div className="flex items-end justify-end p-2">
-                  <div
-                    className="flex items-center justify-center border border-default bg-default"
-                    style={{ width: "70px", height: "70px" }}
-                  >
-                    <div className="flex flex-col items-center text-xs text-foreground/40">
-                      <div>QR</div>
-                      <div>Code</div>
-                    </div>
+
+                <div className="flex items-center justify-center p-2">
+                  <div className="flex flex-col items-center justify-center w-20 h-20 ded-xl bg-default">
+                    <Image
+                      src="/qrcode/lineEvergreen.png"
+                      alt="Logo"
+                      width={80}
+                      height={80}
+                      className="object-contain"
+                    />
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </ModalBody>
-        <ModalFooter>
-          <Button
-            color="danger"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-6/12 text-background"
-            onPress={onClose}
-          >
-            ยกเลิก
-          </Button>
-          <Button
-            color="primary"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-6/12 text-background"
-            startContent={<Printer />}
-            onPress={() => onPrint(order)}
-            isLoading={printing}
-            isDisabled={totalPieces === 0}
-          >
-            {printing ? "กำลังพิมพ์..." : `พิมพ์ ${totalPieces} ใบ`}
-          </Button>
+
+        <ModalFooter className="flex flex-row items-center justify-start w-full h-fit p-2 gap-2">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            <Button
+              color="danger"
+              variant="shadow"
+              size="md"
+              radius="md"
+              className="w-full text-background"
+              onPress={onClose}
+            >
+              ยกเลิก
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            <Button
+              color="primary"
+              variant="shadow"
+              size="md"
+              radius="md"
+              className="w-full text-background"
+              startContent={<Printer />}
+              onPress={() => onPrint(order)}
+              isLoading={printing}
+              isDisabled={totalPieces === 0}
+            >
+              {printing ? "Printing..." : `Print ${totalPieces}`}
+            </Button>
+          </div>
         </ModalFooter>
       </ModalContent>
     </Modal>
