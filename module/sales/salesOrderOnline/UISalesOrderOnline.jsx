@@ -44,15 +44,6 @@ function formatCurrency(value) {
   }).format(value || 0);
 }
 
-function formatDate(dateStr) {
-  if (!dateStr || dateStr === "0001-01-01") return "-";
-  return new Date(dateStr).toLocaleDateString("th-TH", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
 function OrderLinesTable({ lines }) {
   const itemLines = lines?.filter((l) => l.lineType === "Item") || [];
   const commentLines = lines?.filter((l) => l.lineType === "Comment") || [];
@@ -103,7 +94,7 @@ function OrderLinesTable({ lines }) {
                   <td className="p-2 text-right">
                     {formatCurrency(line.amountIncludingTax)}
                   </td>
-                  <td className="p-2">{formatDate(line.shipmentDate)}</td>
+                  <td className="p-2">{line.shipmentDate}</td>
                 </tr>
               ))
             )}
@@ -164,10 +155,8 @@ function OrderDetailModal({
               <Calendar className="text-foreground/50 mt-1" />
               <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Dates</p>
-                <p className="text-sm">Order: {formatDate(order.orderDate)}</p>
-                <p className="text-sm">
-                  Delivery: {formatDate(order.requestedDeliveryDate)}
-                </p>
+                <p className="text-sm">Order: order.orderDate</p>
+                <p className="text-sm">Delivery: order.requestedDeliveryDate</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
@@ -292,8 +281,8 @@ export default function UISalesOrderOnline({
         ...order,
         index: i + 1,
         totalFormatted: formatCurrency(order.totalAmountIncludingTax),
-        orderDateFormatted: formatDate(order.orderDate),
-        deliveryDateFormatted: formatDate(order.requestedDeliveryDate),
+        orderDateFormatted: order.orderDate,
+        deliveryDateFormatted: order.requestedDeliveryDate,
         _rawOrder: order,
       }))
     : [];
