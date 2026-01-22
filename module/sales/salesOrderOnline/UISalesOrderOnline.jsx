@@ -65,62 +65,68 @@ function getCommentLines(lines) {
   return lines?.filter((l) => l.lineType === "Comment") || [];
 }
 
+const ORDER_LINES_COLUMNS = [
+  { name: "#", uid: "index", width: 50 },
+  { name: "Item No.", uid: "itemNumber" },
+  { name: "Description", uid: "description" },
+  { name: "Unit", uid: "unitOfMeasureCode", width: 80 },
+  { name: "Qty", uid: "quantity", width: 80 },
+  { name: "Unit Price", uid: "unitPriceFormatted", width: 120 },
+  { name: "Amount", uid: "amountFormatted", width: 120 },
+  { name: "Ship Date", uid: "shipmentDate", width: 120 },
+];
+
 function OrderLinesTable({ lines }) {
   const itemLines = getItemLines(lines);
   const commentLines = getCommentLines(lines);
 
+  const normalizedLines = itemLines.map((line, index) => ({
+    ...line,
+    id: line.id || index,
+    index: index + 1,
+    unitPriceFormatted: formatCurrency(line.unitPrice),
+    amountFormatted: formatCurrency(line.amountIncludingTax),
+  }));
+
+  const renderCustomCell = (item, columnKey) => {
+    switch (columnKey) {
+      case "itemNumber":
+        return <span className="font-mono text-xs">{item.itemNumber}</span>;
+
+      case "description":
+        return (
+          <div className="flex flex-col">
+            <span>{item.description}</span>
+            {item.description2 && (
+              <span className="text-xs text-foreground/60">
+                {item.description2}
+              </span>
+            )}
+          </div>
+        );
+
+      case "quantity":
+        return <span className="text-right">{item.quantity}</span>;
+
+      case "unitPriceFormatted":
+      case "amountFormatted":
+        return <span className="text-right">{item[columnKey]}</span>;
+
+      default:
+        return undefined;
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="max-h-80 overflow-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-default sticky top-0">
-            <tr>
-              <th className="text-left p-2 w-12">#</th>
-              <th className="text-left p-2">Item No.</th>
-              <th className="text-left p-2">Description</th>
-              <th className="text-left p-2 w-20">Unit</th>
-              <th className="text-right p-2 w-20">Qty</th>
-              <th className="text-right p-2 w-28">Unit Price</th>
-              <th className="text-right p-2 w-28">Amount</th>
-              <th className="text-left p-2 w-28">Ship Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {itemLines.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="p-4 text-center text-foreground/60">
-                  No items
-                </td>
-              </tr>
-            ) : (
-              itemLines.map((line, index) => (
-                <tr key={line.id || index} className="border-b border-default">
-                  <td className="p-2">{index + 1}</td>
-                  <td className="p-2 font-mono text-xs">{line.itemNumber}</td>
-                  <td className="p-2">
-                    <div className="flex flex-col">
-                      <span>{line.description}</span>
-                      {line.description2 && (
-                        <span className="text-xs text-foreground/60">
-                          {line.description2}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="p-2">{line.unitOfMeasureCode}</td>
-                  <td className="p-2 text-right">{line.quantity}</td>
-                  <td className="p-2 text-right">
-                    {formatCurrency(line.unitPrice)}
-                  </td>
-                  <td className="p-2 text-right">
-                    {formatCurrency(line.amountIncludingTax)}
-                  </td>
-                  <td className="p-2">{line.shipmentDate}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      <div className="max-h-80 overflow-hidden">
+        <DataTable
+          columns={ORDER_LINES_COLUMNS}
+          data={normalizedLines}
+          emptyContent="No items"
+          itemName="items"
+          renderCustomCell={renderCustomCell}
+        />
       </div>
 
       {commentLines.length > 0 && (
