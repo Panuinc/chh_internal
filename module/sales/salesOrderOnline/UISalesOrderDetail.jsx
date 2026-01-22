@@ -372,7 +372,6 @@ export default function UISalesOrderDetail({
 
   return (
     <div className="bg-gradient-to-b from-primary-50/50 to-background h-full overflow-auto">
-      {/* Header */}
       <div className="bg-white/80 backdrop-blur-md border-b sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <Button
@@ -394,9 +393,7 @@ export default function UISalesOrderDetail({
         </div>
       </div>
 
-      {/* Content */}
       <div className="max-w-lg mx-auto px-4 py-4 space-y-4">
-        {/* Logo */}
         <div className="flex justify-center">
           <Image
             src="/logo/logo-09.png"

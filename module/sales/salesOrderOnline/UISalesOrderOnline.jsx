@@ -93,7 +93,7 @@ function SlipPreviewModal({
             </p>
 
             <div
-              className="flex flex-col bg-white border-2 border-black mx-auto overflow-hidden"
+              className="flex flex-col bg-white border-2 border-default mx-auto overflow-hidden"
               style={{
                 width: "400px",
                 height: "600px",
@@ -101,7 +101,7 @@ function SlipPreviewModal({
               }}
             >
               <div
-                className="flex border-b-2 border-black relative"
+                className="flex border-b-2 border-default relative"
                 style={{ height: "80px" }}
               >
                 <div
@@ -158,7 +158,7 @@ function SlipPreviewModal({
               </div>
 
               <div
-                className="flex flex-col px-2 py-1 border-b-2 border-black"
+                className="flex flex-col px-2 py-1 border-b-2 border-default"
                 style={{ height: "80px" }}
               >
                 <table className="w-full text-xs">
@@ -250,7 +250,7 @@ function SlipPreviewModal({
               </div>
 
               <div
-                className="flex border-t-2 border-black"
+                className="flex border-t-2 border-default"
                 style={{ height: "100px" }}
               >
                 <div className="flex flex-col flex-1 p-2 text-xs text-red-600">
@@ -615,18 +615,6 @@ export default function UISalesOrderOnline({
             onPress={() => handleViewOrder(item._rawOrder)}
           >
             <Eye />
-          </Button>
-          <Button
-            isIconOnly
-            color="default"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-2/12 text-foreground"
-            isDisabled={printing || !isConnected || item.lineCount === 0}
-            onPress={() => handleOpenPreview(item._rawOrder)}
-          >
-            <Printer className={isConnected ? "text-success" : "text-danger"} />
           </Button>
         </div>
       );

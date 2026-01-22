@@ -395,9 +395,6 @@ export function PrinterSettings({
                 <p className="font-medium text-foreground/80">
                   {isConnected ? "เชื่อมต่อสำเร็จ" : "ไม่ได้เชื่อมต่อ"}
                 </p>
-                <p className="text-xs text-foreground/50">
-                  ตั้งค่า IP/Port ผ่านไฟล์ .env
-                </p>
               </div>
             </div>
             <ActionBtn
