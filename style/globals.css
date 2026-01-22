@@ -6,16 +6,12 @@
   font-family: var(--font-en), var(--font-th), sans-serif;
 }
 
-.border {
-  border: 8px dashed #F1F5F9;
-}
-
 .border-default-200 {
-  border: 2px solid #F1F5F9;
+  border: 2px solid #f1f5f9;
 }
 
 .bg-content1 {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 svg.lucide {

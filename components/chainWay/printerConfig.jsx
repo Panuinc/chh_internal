@@ -34,28 +34,28 @@ import { PRINT_TYPES, PRINT_TYPE_OPTIONS } from "@/lib/chainWay/config";
 function StatusBadge({ connected, loading }) {
   if (loading) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200">
-        <RefreshCw size={14} className="text-amber-500 animate-spin" />
-        <span className="text-sm text-amber-600">กำลังตรวจสอบ...</span>
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-warning/10 border-2 border-warning/30">
+        <RefreshCw size={14} className="text-warning animate-spin" />
+        <span className="text-sm text-warning">กำลังตรวจสอบ...</span>
       </div>
     );
   }
 
   return (
     <div
-      className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${
+      className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 ${
         connected
-          ? "bg-emerald-50 border-emerald-200"
-          : "bg-gray-50 border-gray-200"
+          ? "bg-success/10 border-success/30"
+          : "bg-default border-default"
       }`}
     >
       <span
-        className={`w-2 h-2 rounded-full ${
-          connected ? "bg-emerald-500" : "bg-gray-400"
+        className={`w-2 h-2 rounded-xl ${
+          connected ? "bg-success" : "bg-foreground/30"
         }`}
       />
       <span
-        className={`text-sm ${connected ? "text-emerald-700" : "text-gray-500"}`}
+        className={`text-sm ${connected ? "text-success" : "text-foreground/50"}`}
       >
         {connected ? "เชื่อมต่อแล้ว" : "ไม่ได้เชื่อมต่อ"}
       </span>
@@ -65,16 +65,20 @@ function StatusBadge({ connected, loading }) {
 
 function AlertBox({ children, type = "error" }) {
   const styles = {
-    error: { bg: "bg-red-50", border: "border-red-200", text: "text-red-700" },
+    error: {
+      bg: "bg-danger/10",
+      border: "border-danger/30",
+      text: "text-danger",
+    },
     warning: {
-      bg: "bg-amber-50",
-      border: "border-amber-200",
-      text: "text-amber-700",
+      bg: "bg-warning/10",
+      border: "border-warning/30",
+      text: "text-warning",
     },
     success: {
-      bg: "bg-emerald-50",
-      border: "border-emerald-200",
-      text: "text-emerald-700",
+      bg: "bg-success/10",
+      border: "border-success/30",
+      text: "text-success",
     },
   };
 
@@ -82,7 +86,7 @@ function AlertBox({ children, type = "error" }) {
 
   return (
     <div
-      className={`flex items-start gap-2 px-3 py-2 rounded-lg ${s.bg} border ${s.border}`}
+      className={`flex items-start gap-2 px-3 py-2 rounded-xl ${s.bg} border-2 ${s.border}`}
     >
       <AlertCircle size={16} className={`${s.text} mt-0.5 flex-shrink-0`} />
       <span className={`text-sm ${s.text}`}>{children}</span>
@@ -98,10 +102,10 @@ function ActionBtn({
   ...props
 }) {
   const variants = {
-    primary: "bg-gray-900 text-white",
-    secondary: "bg-white text-gray-700 border border-gray-300",
-    danger: "bg-white text-red-600 border border-red-300",
-    ghost: "bg-transparent text-gray-600",
+    primary: "bg-primary text-background",
+    secondary: "bg-background text-foreground/70 border-2 border-default",
+    danger: "bg-background text-danger border-2 border-danger/30",
+    ghost: "bg-transparent text-foreground/60",
   };
 
   return (
@@ -121,18 +125,20 @@ function ActionBtn({
 function StatusTile({ label, active }) {
   return (
     <div
-      className={`p-3 rounded-lg border ${
-        active ? "bg-emerald-50 border-emerald-200" : "bg-red-50 border-red-200"
+      className={`p-3 rounded-xl border-2 ${
+        active
+          ? "bg-success/10 border-success/30"
+          : "bg-danger/10 border-danger/30"
       }`}
     >
       <div className="flex items-center gap-2 mb-1">
         <span
-          className={`w-2 h-2 rounded-full ${active ? "bg-emerald-500" : "bg-red-400"}`}
+          className={`w-2 h-2 rounded-xl ${active ? "bg-success" : "bg-danger/70"}`}
         />
-        <span className="text-xs text-gray-500">{label}</span>
+        <span className="text-xs text-foreground/50">{label}</span>
       </div>
       <p
-        className={`text-sm font-medium ${active ? "text-emerald-700" : "text-red-600"}`}
+        className={`text-sm font-medium ${active ? "text-success" : "text-danger"}`}
       >
         {active ? "พร้อม" : "ไม่พร้อม"}
       </p>
@@ -149,7 +155,7 @@ export function PrinterStatusBadge({ className = "" }) {
       <button
         onClick={refreshPrinter}
         disabled={printerLoading}
-        className="p-1.5 rounded hover:bg-gray-100 text-gray-400 disabled:opacity-50"
+        className="p-1.5 rounded hover:bg-default text-foreground/40 disabled:opacity-50"
       >
         <RefreshCw size={16} className={printerLoading ? "animate-spin" : ""} />
       </button>
@@ -240,8 +246,10 @@ export function PrinterControls({ compact = false, className = "" }) {
     <div className={`space-y-4 ${className}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Printer size={18} className="text-gray-500" />
-          <span className="font-medium text-gray-800">Printer Controls</span>
+          <Printer size={18} className="text-foreground/50" />
+          <span className="font-medium text-foreground/80">
+            Printer Controls
+          </span>
         </div>
         <StatusBadge connected={isConnected} loading={printerLoading} />
       </div>
@@ -351,10 +359,12 @@ export function PrinterSettings({
       {showHeader && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <Printer size={24} className="text-gray-600" />
+            <Printer size={24} className="text-foreground/60" />
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
-              {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+              <h1 className="text-xl font-semibold text-foreground">{title}</h1>
+              {subtitle && (
+                <p className="text-sm text-foreground/50">{subtitle}</p>
+              )}
             </div>
           </div>
           <StatusBadge connected={isConnected} loading={printerLoading} />
@@ -368,25 +378,24 @@ export function PrinterSettings({
       )}
 
       <div className="space-y-6">
-        {/* Connection Status */}
-        <div className="p-4 rounded-lg border border-gray-200">
+        <div className="p-4 rounded-xl border-2 border-default">
           <div className="flex items-center gap-2 mb-4">
-            <Wifi size={18} className="text-gray-500" />
-            <h3 className="text-sm font-semibold text-gray-800">
+            <Wifi size={18} className="text-foreground/50" />
+            <h3 className="text-sm font-semibold text-foreground/80">
               สถานะการเชื่อมต่อ
             </h3>
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-default">
             <div className="flex items-center gap-3">
               <div
-                className={`w-3 h-3 rounded-full ${isConnected ? "bg-emerald-500" : "bg-gray-400"}`}
+                className={`w-3 h-3 rounded-xl ${isConnected ? "bg-success" : "bg-foreground/30"}`}
               />
               <div>
-                <p className="font-medium text-gray-800">
+                <p className="font-medium text-foreground/80">
                   {isConnected ? "เชื่อมต่อสำเร็จ" : "ไม่ได้เชื่อมต่อ"}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-foreground/50">
                   ตั้งค่า IP/Port ผ่านไฟล์ .env
                 </p>
               </div>
@@ -402,11 +411,10 @@ export function PrinterSettings({
           </div>
         </div>
 
-        {/* Printer Controls */}
-        <div className="p-4 rounded-lg border border-gray-200">
+        <div className="p-4 rounded-xl border-2 border-default">
           <div className="flex items-center gap-2 mb-4">
-            <Activity size={18} className="text-gray-500" />
-            <h3 className="text-sm font-semibold text-gray-800">
+            <Activity size={18} className="text-foreground/50" />
+            <h3 className="text-sm font-semibold text-foreground/80">
               ควบคุมเครื่องพิมพ์
             </h3>
           </div>
@@ -418,7 +426,7 @@ export function PrinterSettings({
               isLoading={actionLoading === "calibrate"}
               onPress={() => handleAction("calibrate", calibrate)}
             >
-              <Gauge size={20} className="text-blue-600" />
+              <Gauge size={20} className="text-primary" />
               <span className="text-xs">ปรับเทียบ</span>
             </Button>
 
@@ -428,7 +436,7 @@ export function PrinterSettings({
               isLoading={actionLoading === "cancel"}
               onPress={() => handleAction("cancel", cancelAllJobs)}
             >
-              <StopCircle size={20} className="text-orange-600" />
+              <StopCircle size={20} className="text-secondary" />
               <span className="text-xs">ยกเลิกงาน</span>
             </Button>
 
@@ -438,29 +446,28 @@ export function PrinterSettings({
               isLoading={actionLoading === "reset"}
               onPress={() => handleAction("reset", resetPrinter)}
             >
-              <RotateCcw size={20} className="text-gray-600" />
+              <RotateCcw size={20} className="text-foreground/60" />
               <span className="text-xs">Soft Reset</span>
             </Button>
 
             <Button
               variant="bordered"
-              className="flex flex-col h-20 gap-1 border-red-200"
+              className="flex flex-col h-20 gap-1 border-danger/30"
               isLoading={actionLoading === "fullReset"}
               onPress={() => handleAction("fullReset", fullReset)}
             >
-              <Zap size={20} className="text-red-600" />
-              <span className="text-xs text-red-600">Full Reset</span>
+              <Zap size={20} className="text-danger" />
+              <span className="text-xs text-danger">Full Reset</span>
             </Button>
           </div>
         </div>
 
-        {/* Printer Status */}
         {printerStatus && (
-          <div className="p-4 rounded-lg border border-gray-200">
+          <div className="p-4 rounded-xl border-2 border-default">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Activity size={18} className="text-gray-500" />
-                <h3 className="text-sm font-semibold text-gray-800">
+                <Activity size={18} className="text-foreground/50" />
+                <h3 className="text-sm font-semibold text-foreground/80">
                   สถานะเครื่องพิมพ์
                 </h3>
               </div>
