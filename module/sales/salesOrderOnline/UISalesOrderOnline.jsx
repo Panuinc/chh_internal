@@ -9,8 +9,6 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  Divider,
-  Image,
   useDisclosure,
 } from "@heroui/react";
 import {
@@ -25,13 +23,7 @@ import {
 } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
-
-const COMPANY_INFO = {
-  name: "บริษัท ชื้ออะฮวด อุตสาหกรรม จำกัด",
-  address: "9/1 หมู่ 2 ถนนบางเลน-ลาดหลุมแก้ว",
-  district: "ต.ขุนศรี อ.ไทรน้อย จ.นนทบุรี 11150",
-  phone: "02-921-9979",
-};
+import UISlipPreviewModal from "./UISlipPreviewModal";
 
 const columns = [
   { name: "#", uid: "index", width: 60 },
@@ -61,276 +53,6 @@ function formatDate(dateStr) {
   });
 }
 
-function SlipPreviewModal({
-  isOpen,
-  onClose,
-  order,
-  onPrint,
-  printing = false,
-}) {
-  if (!order) return null;
-
-  const itemLines = (order.salesOrderLines || []).filter(
-    (l) => l.lineType === "Item",
-  );
-  const totalPieces = itemLines.reduce((sum, l) => sum + (l.quantity || 0), 0);
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-2">
-          <h3 className="text-lg font-semibold">
-            ตัวอย่างใบปะหน้า - {order.number}
-          </h3>
-          <p className="text-sm text-foreground/60">
-            จะพิมพ์ทั้งหมด {totalPieces} ใบ (ตามจำนวนสินค้า)
-          </p>
-        </ModalHeader>
-        <ModalBody>
-          <div className="flex flex-col items-center gap-4 py-4 bg-gray-100 rounded-lg">
-            <p className="text-sm text-gray-600">
-              ตัวอย่างใบที่ 1 จาก {totalPieces} ใบ (ขนาด 100mm x 150mm)
-            </p>
-
-            <div
-              className="flex flex-col bg-white border-2 border-default mx-auto overflow-hidden"
-              style={{
-                width: "400px",
-                height: "600px",
-                fontFamily: "sans-serif",
-              }}
-            >
-              <div
-                className="flex border-b-2 border-default relative"
-                style={{ height: "80px" }}
-              >
-                <div
-                  className="flex items-center justify-center p-2"
-                  style={{ width: "72px" }}
-                >
-                  <Image
-                    src="/logo/logo-09.png"
-                    alt="Logo"
-                    width={64}
-                    height={64}
-                    className="object-contain"
-                    fallback={
-                      <div className="flex items-center justify-center w-16 h-16 border border-gray-400 text-sm font-bold">
-                        LOGO
-                      </div>
-                    }
-                  />
-                </div>
-                <div className="flex flex-col flex-1 py-1 text-xs">
-                  <table className="w-full">
-                    <tbody>
-                      <tr>
-                        <td
-                          className="font-semibold whitespace-nowrap pr-1 align-top"
-                          style={{ width: "45px" }}
-                        >
-                          ผู้ส่ง:
-                        </td>
-                        <td className="align-top">{COMPANY_INFO.name}</td>
-                      </tr>
-                      <tr>
-                        <td className="font-semibold whitespace-nowrap pr-1 align-top">
-                          ที่อยู่:
-                        </td>
-                        <td className="align-top">{COMPANY_INFO.address}</td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                        <td>{COMPANY_INFO.district}</td>
-                      </tr>
-                      <tr>
-                        <td className="font-semibold whitespace-nowrap pr-1">
-                          โทร:
-                        </td>
-                        <td>{COMPANY_INFO.phone}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="absolute top-2 right-2">
-                  <span className="text-3xl font-bold">1/{totalPieces}</span>
-                </div>
-              </div>
-
-              <div
-                className="flex flex-col px-2 py-1 border-b-2 border-default"
-                style={{ height: "80px" }}
-              >
-                <table className="w-full text-xs">
-                  <tbody>
-                    <tr>
-                      <td
-                        className="font-semibold whitespace-nowrap pr-1 align-top text-sm"
-                        style={{ width: "45px" }}
-                      >
-                        ผู้รับ:
-                      </td>
-                      <td className="font-bold text-sm align-top">
-                        {order?.shipToName || order?.customerName}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="font-semibold whitespace-nowrap pr-1 align-top">
-                        ที่อยู่:
-                      </td>
-                      <td className="align-top">
-                        <div>{order?.shipToAddressLine1}</div>
-                        {order?.shipToAddressLine2 && (
-                          <div>{order?.shipToAddressLine2}</div>
-                        )}
-                        {(order?.shipToCity || order?.shipToPostCode) && (
-                          <div>
-                            {order?.shipToCity} {order?.shipToPostCode}
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="font-semibold whitespace-nowrap pr-1">
-                        โทร:
-                      </td>
-                      <td>{order?.phoneNumber || "-"}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div
-                className="flex items-center px-2 text-xs font-semibold border-b border-gray-400"
-                style={{ height: "20px" }}
-              >
-                <span style={{ width: "40px" }}>Item</span>
-                <span className="flex-1">รายการสินค้า</span>
-                <span className="text-right" style={{ width: "50px" }}>
-                  จำนวน
-                </span>
-              </div>
-
-              <div className="overflow-auto" style={{ height: "300px" }}>
-                <table className="w-full text-xs">
-                  <tbody>
-                    {itemLines.slice(0, 14).map((line, index) => (
-                      <tr
-                        key={line.id || index}
-                        className="border-b border-gray-200"
-                      >
-                        <td
-                          className="py-1 px-2 align-top"
-                          style={{ width: "40px" }}
-                        >
-                          {index + 1}
-                        </td>
-                        <td className="py-1 align-top">
-                          <div className="whitespace-pre-wrap break-words">
-                            {line.description}
-                          </div>
-                        </td>
-                        <td
-                          className="py-1 px-2 text-right align-top"
-                          style={{ width: "50px" }}
-                        >
-                          {line.quantity}
-                        </td>
-                      </tr>
-                    ))}
-                    {itemLines.length > 14 && (
-                      <tr>
-                        <td colSpan={3} className="py-1 px-2 text-gray-500">
-                          ... และอีก {itemLines.length - 14} รายการ
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              <div
-                className="flex border-t-2 border-default"
-                style={{ height: "100px" }}
-              >
-                <div className="flex flex-col flex-1 p-2 text-xs text-red-600">
-                  <p className="font-bold">
-                    ❗ กรุณาถ่ายวิดีโอขณะแกะพัสดุ เพื่อใช้เป็นหลัก
-                  </p>
-                  <p className="ml-4">
-                    ฐานการเคลมสินค้า ไม่มีหลักฐานงดเคลมทุกกรณี
-                  </p>
-                </div>
-                <div className="flex items-end justify-end p-2">
-                  <div
-                    className="flex items-center justify-center border border-gray-300 bg-gray-50"
-                    style={{ width: "70px", height: "70px" }}
-                  >
-                    <div className="flex flex-col items-center text-xs text-gray-400">
-                      <div>QR</div>
-                      <div>Code</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <Divider className="my-4" />
-
-          <div className="flex flex-col gap-2">
-            <h4 className="flex items-center gap-2 font-medium">
-              <Package />
-              รายการสินค้าทั้งหมด ({itemLines.length} รายการ, {totalPieces}{" "}
-              ชิ้น)
-            </h4>
-            <div className="max-h-40 overflow-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 sticky top-0">
-                  <tr>
-                    <th className="text-left p-2">#</th>
-                    <th className="text-left p-2">รหัสสินค้า</th>
-                    <th className="text-left p-2">รายการ</th>
-                    <th className="text-right p-2">จำนวน</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {itemLines.map((line, index) => (
-                    <tr key={line.id} className="border-b">
-                      <td className="p-2">{index + 1}</td>
-                      <td className="p-2 font-mono text-xs">
-                        {line.itemNumber}
-                      </td>
-                      <td className="p-2">{line.description}</td>
-                      <td className="p-2 text-right font-bold">
-                        {line.quantity}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button variant="light" onPress={onClose}>
-            ยกเลิก
-          </Button>
-          <Button
-            color="primary"
-            startContent={<Printer />}
-            onPress={() => onPrint(order)}
-            isLoading={printing}
-            isDisabled={totalPieces === 0}
-          >
-            {printing ? "กำลังพิมพ์..." : `พิมพ์ ${totalPieces} ใบ`}
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
-  );
-}
-
 function OrderLinesTable({ lines }) {
   const itemLines = lines?.filter((l) => l.lineType === "Item") || [];
   const commentLines = lines?.filter((l) => l.lineType === "Comment") || [];
@@ -339,7 +61,7 @@ function OrderLinesTable({ lines }) {
     <div className="flex flex-col gap-4">
       <div className="max-h-80 overflow-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 sticky top-0">
+          <thead className="bg-default sticky top-0">
             <tr>
               <th className="text-left p-2 w-12">#</th>
               <th className="text-left p-2">Item No.</th>
@@ -360,7 +82,7 @@ function OrderLinesTable({ lines }) {
               </tr>
             ) : (
               itemLines.map((line, index) => (
-                <tr key={line.id || index} className="border-b">
+                <tr key={line.id || index} className="border-b border-default">
                   <td className="p-2">{index + 1}</td>
                   <td className="p-2 font-mono text-xs">{line.itemNumber}</td>
                   <td className="p-2">
@@ -465,7 +187,7 @@ function OrderDetailModal({
             </div>
           </div>
 
-          <div className="flex flex-col border-t pt-4">
+          <div className="flex flex-col border-t border-default pt-4">
             <div className="flex items-center gap-2 mb-3">
               <Package className="text-foreground/50" />
               <span className="font-medium">
@@ -475,7 +197,7 @@ function OrderDetailModal({
             <OrderLinesTable lines={lines} />
           </div>
 
-          <div className="flex justify-end border-t pt-4">
+          <div className="flex justify-end border-t border-default pt-4">
             <div className="flex flex-col items-end gap-2">
               <p className="text-sm">
                 Subtotal:{" "}
@@ -716,7 +438,7 @@ export default function UISalesOrderOnline({
         printing={printing}
       />
 
-      <SlipPreviewModal
+      <UISlipPreviewModal
         isOpen={isPreviewOpen}
         onClose={handleClosePreview}
         order={previewOrder}
