@@ -238,11 +238,22 @@ export default function UISlipPreviewModal({
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="light" onPress={onClose}>
+          <Button
+            color="danger"
+            variant="shadow"
+            size="md"
+            radius="md"
+            className="w-6/12 text-background"
+            onPress={onClose}
+          >
             ยกเลิก
           </Button>
           <Button
             color="primary"
+            variant="shadow"
+            size="md"
+            radius="md"
+            className="w-6/12 text-background"
             startContent={<Printer />}
             onPress={() => onPrint(order)}
             isLoading={printing}
