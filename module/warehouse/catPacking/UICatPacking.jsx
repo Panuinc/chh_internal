@@ -10,14 +10,27 @@ import {
   DropdownItem,
   Modal,
   ModalContent,
+  ModalHeader,
   ModalBody,
+  ModalFooter,
   useDisclosure,
+  Chip,
+  Divider,
+  ScrollShadow,
 } from "@heroui/react";
-import { Printer, RefreshCw, Settings } from "lucide-react";
+import {
+  Printer,
+  RefreshCw,
+  Settings,
+  Tag,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { PrintQuantityDialog } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
 import { PRINT_TYPE_OPTIONS, STATUS_COLORS } from "@/lib/chainWay/config";
+import { EPCService } from "@/lib/chainWay/epc";
 
 const columns = [
   { name: "#", uid: "index", width: 60 },
@@ -35,6 +48,240 @@ const statusOptions = [
   { name: "Active", uid: "Active" },
   { name: "Blocked", uid: "Blocked" },
 ];
+
+function RFIDLabelCard({
+  itemNumber,
+  displayName,
+  sequenceNumber,
+  totalQuantity,
+  epc,
+  isActive = false,
+}) {
+  const sequenceText = `${sequenceNumber}/${totalQuantity}`;
+
+  return (
+    <div
+      className={`
+        flex flex-col w-full bg-background rounded-xl border-2 
+        transition-all duration-200
+        ${isActive ? "border-primary shadow-lg scale-[1.02]" : "border-default"}
+      `}
+    >
+      <div className="flex items-center justify-between px-4 py-3 border-b border-default bg-default/30">
+        <div className="flex items-center gap-2">
+          <Tag className="w-4 h-4 text-primary" />
+          <span className="font-mono font-bold text-lg">{itemNumber}</span>
+        </div>
+        {totalQuantity > 1 && (
+          <Chip
+            size="sm"
+            color={isActive ? "primary" : "default"}
+            variant="flat"
+          >
+            {sequenceText}
+          </Chip>
+        )}
+      </div>
+
+      <div className="flex items-center justify-center px-4 py-4 min-h-[60px] border-b border-default">
+        <p className="text-center text-base font-medium text-foreground/90 line-clamp-2">
+          {displayName}
+        </p>
+      </div>
+
+      <div className="flex flex-col px-4 py-3 bg-default/20">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs font-semibold text-foreground/60">
+            RFID EPC:
+          </span>
+        </div>
+        <div className="font-mono text-xs text-foreground/70 break-all bg-default/50 rounded px-2 py-1">
+          {epc}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RFIDLabelPreviewModal({
+  isOpen,
+  onClose,
+  item,
+  quantity,
+  printType,
+  onConfirmPrint,
+  printing = false,
+}) {
+  const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
+
+  const allLabels = useMemo(() => {
+    if (!item || !quantity) return [];
+
+    const labels = [];
+    for (let seq = 1; seq <= quantity; seq++) {
+      const epc = EPCService.generate(
+        { number: item.number },
+        { sequenceNumber: seq, totalQuantity: quantity, bits: 96 },
+      );
+
+      labels.push({
+        itemNumber: item.number,
+        displayName: item.displayName || item.description || item.number,
+        sequenceNumber: seq,
+        totalQuantity: quantity,
+        epc,
+        sequenceText: `${seq}/${quantity}`,
+      });
+    }
+    return labels;
+  }, [item, quantity]);
+
+  const totalLabels = allLabels.length;
+  const currentLabel = allLabels[currentPreviewIndex];
+
+  const handlePrevious = () => {
+    setCurrentPreviewIndex((prev) => (prev > 0 ? prev - 1 : totalLabels - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentPreviewIndex((prev) => (prev < totalLabels - 1 ? prev + 1 : 0));
+  };
+
+  const handleConfirm = () => {
+    onConfirmPrint(item, quantity, { type: printType, labels: allLabels });
+  };
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setCurrentPreviewIndex(0);
+    }
+  }, [isOpen]);
+
+  if (!item) return null;
+
+  const printTypeLabel =
+    PRINT_TYPE_OPTIONS.find((opt) => opt.key === printType)?.label || printType;
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
+      <ModalContent>
+        <ModalHeader className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <Tag className="w-5 h-5 text-primary" />
+            <span>ตัวอย่าง RFID Label</span>
+          </div>
+          <p className="text-sm font-normal text-foreground/60">
+            ประเภท: {printTypeLabel} • จะพิมพ์ทั้งหมด {totalLabels} ใบ
+          </p>
+        </ModalHeader>
+
+        <ModalBody className="gap-4">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-foreground/70">
+                ตัวอย่างที่ {currentPreviewIndex + 1} / {totalLabels}
+              </span>
+
+              {totalLabels > 1 && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="flat"
+                    onPress={handlePrevious}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="flat"
+                    onPress={handleNext}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {currentLabel && (
+              <RFIDLabelCard
+                itemNumber={currentLabel.itemNumber}
+                displayName={currentLabel.displayName}
+                sequenceNumber={currentLabel.sequenceNumber}
+                totalQuantity={currentLabel.totalQuantity}
+                epc={currentLabel.epc}
+                isActive={true}
+              />
+            )}
+          </div>
+
+          <Divider />
+
+          <div className="flex flex-col gap-2 p-3 bg-default/30 rounded-lg">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-foreground/60">Item Number:</span>
+              <span className="font-mono font-medium">{item.number}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-foreground/60">Display Name:</span>
+              <span className="font-medium truncate max-w-[60%]">
+                {item.displayName}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-foreground/60">Category:</span>
+              <span>{item.itemCategoryCode || "-"}</span>
+            </div>
+            <Divider />
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold">จำนวนที่พิมพ์</span>
+              <Chip size="sm" color="success" variant="solid">
+                {totalLabels} ใบ
+              </Chip>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 p-3 bg-warning/10 rounded-lg border border-warning/30">
+            <p className="text-sm text-warning-600 font-medium">
+              ⚠️ ข้อควรทราบ
+            </p>
+            <ul className="text-xs text-warning-600/80 list-disc list-inside space-y-1">
+              <li>
+                Label แต่ละใบจะมี RFID EPC ไม่ซ้ำกัน (sequence 1/{totalLabels},
+                2/{totalLabels}, ...)
+              </li>
+              <li>ตรวจสอบให้แน่ใจว่าเครื่องพิมพ์ RFID พร้อมใช้งาน</li>
+              <li>EPC จะถูกเขียนลง RFID Tag อัตโนมัติ</li>
+            </ul>
+          </div>
+        </ModalBody>
+
+        <ModalFooter className="gap-2">
+          <Button
+            color="danger"
+            variant="light"
+            onPress={onClose}
+            className="flex-1"
+          >
+            ยกเลิก
+          </Button>
+          <Button
+            color="primary"
+            variant="shadow"
+            startContent={<Printer className="w-4 h-4" />}
+            onPress={handleConfirm}
+            isLoading={printing}
+            isDisabled={totalLabels === 0}
+            className="flex-1"
+          >
+            {printing ? "กำลังพิมพ์..." : `พิมพ์ ${totalLabels} ใบ`}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
 
 export default function UICatPacking({
   items = [],
@@ -55,10 +302,17 @@ export default function UICatPacking({
     onClose: closePrintDialog,
   } = useDisclosure();
 
+  const {
+    isOpen: isPreviewOpen,
+    onOpen: openPreview,
+    onClose: closePreview,
+  } = useDisclosure();
+
   const { isConnected } = useRFIDSafe();
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedPrintType, setSelectedPrintType] = useState("thai-rfid");
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   const total = items.length;
   const active = items.filter((i) => !i.blocked).length;
@@ -92,18 +346,27 @@ export default function UICatPacking({
     [openPrintDialog],
   );
 
-  const handlePrint = useCallback(
+  const handleQuantityConfirm = useCallback(
+    (item, quantity, options) => {
+      setSelectedQuantity(quantity);
+      closePrintDialog();
+      openPreview();
+    },
+    [closePrintDialog, openPreview],
+  );
+
+  const handleConfirmPrint = useCallback(
     async (item, quantity, options) => {
       if (onPrintWithQuantity) {
         try {
           await onPrintWithQuantity(item, quantity, options);
-          closePrintDialog();
+          closePreview();
         } catch (error) {
           console.error("Print error:", error);
         }
       }
     },
-    [onPrintWithQuantity, closePrintDialog],
+    [onPrintWithQuantity, closePreview],
   );
 
   const renderCustomCell = useCallback(
@@ -281,9 +544,19 @@ export default function UICatPacking({
         isOpen={isPrintDialogOpen}
         onClose={closePrintDialog}
         item={selectedItem}
-        onPrint={handlePrint}
-        printing={printing}
+        onPrint={handleQuantityConfirm}
+        printing={false}
         printType={selectedPrintType}
+      />
+
+      <RFIDLabelPreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        item={selectedItem}
+        quantity={selectedQuantity}
+        printType={selectedPrintType}
+        onConfirmPrint={handleConfirmPrint}
+        printing={printing}
       />
     </div>
   );
