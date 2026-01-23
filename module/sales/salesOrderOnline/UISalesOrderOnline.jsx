@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Modal,
   ModalContent,
@@ -20,6 +20,8 @@ import {
   Calendar,
   MapPin,
   Settings,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Barcode from "react-barcode";
 
@@ -50,6 +52,21 @@ function formatCurrency(value) {
 
 function generateBarcodeValue(itemNumber, pieceNumber, total) {
   return `${itemNumber}-${pieceNumber}/${total}`;
+}
+
+function expandItemsByQuantity(items) {
+  const expanded = [];
+  for (const item of items) {
+    const qty = item.quantity || 1;
+    for (let i = 1; i <= qty; i++) {
+      expanded.push({
+        item,
+        pieceIndexOfItem: i,
+        totalPiecesOfItem: qty,
+      });
+    }
+  }
+  return expanded;
 }
 
 const ORDER_LINES_COLUMNS = [
@@ -334,19 +351,47 @@ function SlipPreviewModal({
   onPrint,
   printing = false,
 }) {
+  const [previewIndex, setPreviewIndex] = useState(0);
+
+  React.useEffect(() => {
+    setPreviewIndex(0);
+  }, [order?.number]);
+
+  const { expandedItems, totalPieces, itemLines } = useMemo(() => {
+    if (!order) return { expandedItems: [], totalPieces: 0, itemLines: [] };
+
+    const items = getItemLines(order);
+    const total = items.reduce((sum, l) => sum + (l.quantity || 0), 0);
+    const expanded = expandItemsByQuantity(items);
+
+    return {
+      itemLines: items,
+      totalPieces: total,
+      expandedItems: expanded,
+    };
+  }, [order]);
+
   if (!order) return null;
 
-  const itemLines = getItemLines(order);
-  const totalPieces = itemLines.reduce((sum, l) => sum + (l.quantity || 0), 0);
+  const currentPiece = previewIndex + 1;
+  const currentExpandedItem = expandedItems[previewIndex];
+  const currentItem = currentExpandedItem?.item;
 
-  const firstItem = itemLines[0];
-  const previewBarcodeValue = firstItem
+  const previewBarcodeValue = currentItem
     ? generateBarcodeValue(
-        firstItem.itemNumber || firstItem.number,
-        1,
+        currentItem.itemNumber || currentItem.number,
+        currentPiece,
         totalPieces,
       )
     : "NO-ITEM";
+
+  const handlePrev = () => {
+    setPreviewIndex((prev) => Math.max(0, prev - 1));
+  };
+
+  const handleNext = () => {
+    setPreviewIndex((prev) => Math.min(totalPieces - 1, prev + 1));
+  };
 
   return (
     <Modal
@@ -361,8 +406,31 @@ function SlipPreviewModal({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             ตัวอย่างใบปะหน้า - {order.number}
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            จะพิมพ์ทั้งหมด {totalPieces} ใบ (ตามจำนวนสินค้า)
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-sm text-foreground/70">
+            จะพิมพ์ทั้งหมด {totalPieces} ใบ (1 ใบ = 1 สินค้า)
+          </div>
+          <div className="flex items-center justify-center w-full gap-4">
+            <Button
+              isIconOnly
+              variant="flat"
+              size="sm"
+              onPress={handlePrev}
+              isDisabled={previewIndex === 0}
+            >
+              <ChevronLeft size={20} />
+            </Button>
+            <span className="text-sm font-medium">
+              ดูตัวอย่างใบที่ {currentPiece} / {totalPieces}
+            </span>
+            <Button
+              isIconOnly
+              variant="flat"
+              size="sm"
+              onPress={handleNext}
+              isDisabled={previewIndex >= totalPieces - 1}
+            >
+              <ChevronRight size={20} />
+            </Button>
           </div>
         </ModalHeader>
 
@@ -396,7 +464,7 @@ function SlipPreviewModal({
                 </div>
 
                 <div className="flex items-center justify-center w-[15%] p-2 border-l-2 border-default text-xl font-bold">
-                  1/{totalPieces}
+                  {currentPiece}/{totalPieces}
                 </div>
               </div>
 
@@ -451,23 +519,27 @@ function SlipPreviewModal({
               </div>
 
               <div className="flex flex-col h-52 overflow-auto">
-                {itemLines.slice(0, 14).map((line, index) => (
-                  <div
-                    key={line.id || index}
-                    className="flex px-3 py-2 text-xs border-b-1 border-default hover:bg-default"
-                  >
-                    <span className="w-10 text-center">{index + 1}</span>
-                    <span className="flex-1 whitespace-pre-wrap break-words">
-                      {line.description}
-                    </span>
-                    <span className="w-16 text-right font-medium">
-                      {line.quantity}
-                    </span>
+                {currentItem ? (
+                  <div className="flex px-3 py-4 text-sm border-b-1 border-default bg-primary/5">
+                    <span className="w-10 text-center font-bold">1</span>
+                    <div className="flex-1 flex flex-col">
+                      <span className="whitespace-pre-wrap break-words font-medium">
+                        {currentItem.description}
+                      </span>
+                      {currentItem.description2 && (
+                        <span className="text-xs text-foreground/60 mt-1">
+                          {currentItem.description2}
+                        </span>
+                      )}
+                      <span className="text-xs text-foreground/50 mt-1">
+                        Item: {currentItem.itemNumber}
+                      </span>
+                    </div>
+                    <span className="w-16 text-right font-bold text-lg">1</span>
                   </div>
-                ))}
-                {itemLines.length > 14 && (
-                  <div className="px-3 py-2 text-xs text-foreground italic">
-                    ... และอีก {itemLines.length - 14} รายการ
+                ) : (
+                  <div className="flex items-center justify-center h-full text-foreground/50">
+                    ไม่มีสินค้า
                   </div>
                 )}
               </div>
@@ -492,6 +564,20 @@ function SlipPreviewModal({
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col w-full mt-4 p-3 bg-default/50 rounded-lg">
+            <p className="text-sm font-semibold mb-2">
+              สรุปรายการทั้งหมด ({itemLines.length} รายการ, {totalPieces} ใบ):
+            </p>
+            <div className="flex flex-col gap-1 text-xs max-h-32 overflow-auto">
+              {itemLines.map((item, idx) => (
+                <div key={idx} className="flex justify-between">
+                  <span className="truncate flex-1">{item.description}</span>
+                  <span className="ml-2 font-medium">x{item.quantity} ใบ</span>
+                </div>
+              ))}
             </div>
           </div>
         </ModalBody>
@@ -522,7 +608,7 @@ function SlipPreviewModal({
               isLoading={printing}
               isDisabled={totalPieces === 0}
             >
-              {printing ? "Printing..." : `Print ${totalPieces}`}
+              {printing ? "Printing..." : `Print ${totalPieces} ใบ`}
             </Button>
           </div>
         </ModalFooter>
