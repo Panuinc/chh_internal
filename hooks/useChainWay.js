@@ -9,7 +9,7 @@ import React, {
   useCallback,
   useRef,
 } from "react";
-import { TIMEOUTS, PRINTER_CONFIG } from "@/lib/chainWay/config";
+import { TIMEOUTS } from "@/lib/chainWay/config";
 
 const API_URL = "/api/chainWay";
 
@@ -61,11 +61,6 @@ async function withRetry(fn, retries = 2, delay = 1000) {
   }
 
   throw lastError;
-}
-
-function getErrorMessage(error) {
-  if (typeof error === "string") return error;
-  return error?.message || "Unknown error";
 }
 
 async function postApi(action, payload = {}) {
@@ -296,40 +291,6 @@ export function usePrinterStatus(config = {}) {
   };
 }
 
-export function useRFIDPreview() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [previewData, setPreviewData] = useState(null);
-
-  const preview = useCallback(async (params) => {
-    setLoading(true);
-    setError(null);
-    setPreviewData(null);
-
-    try {
-      const response = await getApi("preview", {
-        number: params.number,
-        displayName: params.displayName || params.number,
-        displayName2: params.displayName2 || "",
-        type: params.type || "barcode",
-        enableRFID: params.enableRFID ? "true" : "false",
-        quantity: params.quantity || "1",
-      });
-
-      setPreviewData(response.data);
-      return { success: true, data: response.data };
-    } catch (err) {
-      const message = getErrorMessage(err);
-      setError(message);
-      return { success: false, error: message };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return { preview, loading, error, previewData };
-}
-
 export function useRFID(config = {}) {
   const printHook = useRFIDPrint(config.printOptions);
   const printerHook = usePrinterStatus({
@@ -434,175 +395,6 @@ export function useRFIDSafe(config = {}) {
       : { autoConnect: true, pollInterval: 15000, ...config },
   );
   return context || directHook;
-}
-
-export function useChainWayCommand() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [result, setResult] = useState(null);
-
-  const sendCommand = useCallback(async (command, options = {}) => {
-    setLoading(true);
-    setError(null);
-    setResult(null);
-
-    try {
-      const response = await postApi("command", {
-        command,
-        host: options.host,
-        port: options.port,
-      });
-      setResult(response.data);
-      return { success: true, data: response.data };
-    } catch (err) {
-      const message = getErrorMessage(err);
-      setError(message);
-      return { success: false, error: message };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return { sendCommand, loading, error, result };
-}
-
-export function useChainWayPrint() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [printResult, setPrintResult] = useState(null);
-  const [previewData, setPreviewData] = useState(null);
-
-  const printBatch = useCallback(async (items, options = {}) => {
-    setLoading(true);
-    setError(null);
-    setPrintResult(null);
-
-    try {
-      const response = await postApi("print", { items, options });
-      setPrintResult(response.data);
-      return { success: true, data: response.data };
-    } catch (err) {
-      const message = getErrorMessage(err);
-      setError(message);
-      return { success: false, error: message };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const preview = useCallback(async (params) => {
-    setLoading(true);
-    setError(null);
-    setPreviewData(null);
-
-    try {
-      const response = await getApi("preview", {
-        number: params.number,
-        displayName: params.displayName || params.number,
-        displayName2: params.displayName2 || "",
-        type: params.type || "barcode",
-        enableRFID: params.enableRFID ? "true" : "false",
-        quantity: params.quantity || "1",
-      });
-
-      setPreviewData(response.data);
-      return { success: true, data: response.data };
-    } catch (err) {
-      const message = getErrorMessage(err);
-      setError(message);
-      return { success: false, error: message };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return { printBatch, preview, loading, error, printResult, previewData };
-}
-
-export function useChainWayPrinter() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [status, setStatus] = useState(null);
-  const [actionResult, setActionResult] = useState(null);
-
-  const getStatus = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setStatus(null);
-
-    try {
-      const response = await getApi("status");
-      setStatus(response.data);
-      return { success: true, data: response.data };
-    } catch (err) {
-      const message = getErrorMessage(err);
-      setError(message);
-      return { success: false, error: message };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const executeAction = useCallback(async (printerAction) => {
-    setLoading(true);
-    setError(null);
-    setActionResult(null);
-
-    try {
-      const response = await postApi("printer", { printerAction });
-      setActionResult(response.data);
-      return { success: true, data: response.data };
-    } catch (err) {
-      const message = getErrorMessage(err);
-      setError(message);
-      return { success: false, error: message };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return {
-    getStatus,
-    executeAction,
-    testConnection: () => executeAction("test"),
-    calibrate: () => executeAction("calibrate"),
-    reset: () => executeAction("reset"),
-    fullReset: () => executeAction("fullReset"),
-    cancelAll: () => executeAction("cancel"),
-    feedLabel: () => executeAction("feed"),
-    pause: () => executeAction("pause"),
-    resume: () => executeAction("resume"),
-    loading,
-    error,
-    status,
-    actionResult,
-  };
-}
-
-export function useChainWayPackingSlip() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [labels, setLabels] = useState([]);
-
-  const generatePackingSlips = useCallback(async (order) => {
-    setLoading(true);
-    setError(null);
-    setLabels([]);
-
-    try {
-      const response = await postApi("packingSlip", { order });
-      setLabels(response.labels || []);
-      return { success: true, labels: response.labels, count: response.count };
-    } catch (err) {
-      const message = getErrorMessage(err);
-      setError(message);
-      return { success: false, error: message };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return { generatePackingSlips, loading, error, labels };
 }
 
 export default useRFID;
