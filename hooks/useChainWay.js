@@ -140,7 +140,11 @@ export function useRFIDPrint(defaultOptions = {}) {
 
           return await postApi("print", {
             items: Array.isArray(items) ? items : [items],
-            options: { ...defaultOptions, ...options },
+            options: {
+              ...defaultOptions,
+              ...options,
+              quantity: options.quantity || 1,
+            },
           });
         });
 
@@ -309,6 +313,7 @@ export function useRFIDPreview() {
         displayName2: params.displayName2 || "",
         type: params.type || "barcode",
         enableRFID: params.enableRFID ? "true" : "false",
+        quantity: params.quantity || "1",
       });
 
       setPreviewData(response.data);
@@ -497,6 +502,7 @@ export function useChainWayPrint() {
         displayName2: params.displayName2 || "",
         type: params.type || "barcode",
         enableRFID: params.enableRFID ? "true" : "false",
+        quantity: params.quantity || "1",
       });
 
       setPreviewData(response.data);

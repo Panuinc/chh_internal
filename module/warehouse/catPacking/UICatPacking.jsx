@@ -1,12 +1,6 @@
 "use client";
 
-/**
- * UICatPacking - Option C
- * ใช้ PrinterSettings (Modal) - กดปุ่ม Settings เปิด Modal ควบคุมเครื่องพิมพ์
- * ไม่มี multi-select
- */
-
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import { DataTable, Loading } from "@/components";
 import {
   Button,
@@ -21,6 +15,7 @@ import {
 } from "@heroui/react";
 import { Printer, RefreshCw, Settings } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
+import { PrintQuantityDialog } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
 import { PRINT_TYPE_OPTIONS, STATUS_COLORS } from "@/lib/chainWay/config";
 
@@ -44,7 +39,7 @@ const statusOptions = [
 export default function UICatPacking({
   items = [],
   loading,
-  onPrintSingle,
+  onPrintWithQuantity,
   printing = false,
   onRefresh,
 }) {
@@ -54,7 +49,16 @@ export default function UICatPacking({
     onClose: closeSettings,
   } = useDisclosure();
 
+  const {
+    isOpen: isPrintDialogOpen,
+    onOpen: openPrintDialog,
+    onClose: closePrintDialog,
+  } = useDisclosure();
+
   const { isConnected } = useRFIDSafe();
+
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedPrintType, setSelectedPrintType] = useState("thai-rfid");
 
   const total = items.length;
   const active = items.filter((i) => !i.blocked).length;
@@ -73,14 +77,49 @@ export default function UICatPacking({
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               }) || "0.00",
-            inventory: item.inventory?.toLocaleString("th-TH") || "0",
+            inventoryDisplay: item.inventory?.toLocaleString("th-TH") || "0",
           }))
         : [],
     [items],
   );
 
+  const handleOpenPrintDialog = useCallback(
+    (item, printType) => {
+      setSelectedItem(item);
+      setSelectedPrintType(printType);
+      openPrintDialog();
+    },
+    [openPrintDialog],
+  );
+
+  const handlePrint = useCallback(
+    async (item, quantity, options) => {
+      if (onPrintWithQuantity) {
+        try {
+          await onPrintWithQuantity(item, quantity, options);
+          closePrintDialog();
+        } catch (error) {
+          console.error("Print error:", error);
+        }
+      }
+    },
+    [onPrintWithQuantity, closePrintDialog],
+  );
+
   const renderCustomCell = useCallback(
     (item, columnKey) => {
+      if (columnKey === "inventory") {
+        return (
+          <span
+            className={
+              item.inventory > 0 ? "text-success" : "text-foreground/50"
+            }
+          >
+            {item.inventoryDisplay}
+          </span>
+        );
+      }
+
       if (columnKey !== "actions") return undefined;
 
       return (
@@ -102,12 +141,7 @@ export default function UICatPacking({
               {PRINT_TYPE_OPTIONS.map((opt) => (
                 <DropdownItem
                   key={opt.key}
-                  onPress={() =>
-                    onPrintSingle(item, {
-                      type: opt.key,
-                      enableRFID: opt.hasRFID,
-                    })
-                  }
+                  onPress={() => handleOpenPrintDialog(item, opt.key)}
                 >
                   {opt.label}
                 </DropdownItem>
@@ -117,7 +151,7 @@ export default function UICatPacking({
         </div>
       );
     },
-    [onPrintSingle, isConnected, printing],
+    [handleOpenPrintDialog, isConnected, printing],
   );
 
   return (
@@ -182,9 +216,7 @@ export default function UICatPacking({
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
-        {/* Mobile Header */}
         <div className="flex xl:hidden items-center justify-between w-full p-2">
           <PrinterStatusBadge />
           <div className="flex gap-2">
@@ -227,7 +259,6 @@ export default function UICatPacking({
         )}
       </div>
 
-      {/* Settings Modal */}
       <Modal
         isOpen={isSettingsOpen}
         onClose={closeSettings}
@@ -245,6 +276,15 @@ export default function UICatPacking({
           </ModalBody>
         </ModalContent>
       </Modal>
+
+      <PrintQuantityDialog
+        isOpen={isPrintDialogOpen}
+        onClose={closePrintDialog}
+        item={selectedItem}
+        onPrint={handlePrint}
+        printing={printing}
+        printType={selectedPrintType}
+      />
     </div>
   );
 }

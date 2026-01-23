@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { useCatSupplyItems } from "@/app/api/warehouse/catSupply/core";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
@@ -9,55 +9,36 @@ import UICatSupply from "@/module/warehouse/catSupply/UICatSupply";
 function CatSupplyContent() {
   const { items, loading, refetch } = useCatSupplyItems({ limit: 500 });
   const { hasPermission } = useMenu();
+  const { printBatch, isConnected, printing } = useRFIDContext();
 
-  const { print, printing, isConnected } = useRFIDContext();
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedItems, setSelectedItems] = useState([]);
-
-  const handlePrintSingle = useCallback(
-    async (item, options = {}) => {
+  const handlePrintWithQuantity = useCallback(
+    async (item, quantity, options = {}) => {
       if (!isConnected) {
         alert("Printer is not connected");
         return;
       }
 
       try {
-        await print(
-          {
-            number: item.number,
-            displayName: item.displayName,
-            displayName2: item.displayName2 || "",
-          },
-          {
-            type: options.type || "thai",
-            enableRFID: options.enableRFID || false,
-          },
-        );
-        alert(`Printed ${item.number} successfully`);
+        const result = await printBatch([item], {
+          type: options.type || "thai-rfid",
+          enableRFID: options.enableRFID !== false,
+          quantity: quantity,
+        });
+
+        if (result?.success) {
+          const totalPrinted = result.results?.[0]?.labels?.length || quantity;
+          alert(`พิมพ์ ${item.number} สำเร็จ ${totalPrinted} ใบ`);
+        } else {
+          const errorMsg = result?.results?.[0]?.error || "Unknown error";
+          alert(`พิมพ์ไม่สำเร็จ: ${errorMsg}`);
+        }
       } catch (err) {
         console.error("Print error:", err);
         alert(`Print failed: ${err.message}`);
       }
     },
-    [print, isConnected],
+    [printBatch, isConnected],
   );
-
-  const handlePrintMultiple = useCallback((items) => {
-    setSelectedItems(items);
-    setDialogOpen(true);
-  }, []);
-
-  const handlePrintSuccess = useCallback((result) => {
-    console.log("Print success:", result);
-    setDialogOpen(false);
-    setSelectedItems([]);
-  }, []);
-
-  const handlePrintError = useCallback((error) => {
-    console.error("Print error:", error);
-    alert(`Print failed: ${error}`);
-  }, []);
 
   if (!hasPermission("warehouse.catSupply.view")) {
     return (
@@ -73,8 +54,7 @@ function CatSupplyContent() {
     <UICatSupply
       items={items}
       loading={loading}
-      onPrintSingle={handlePrintSingle}
-      onPrintMultiple={handlePrintMultiple}
+      onPrintWithQuantity={handlePrintWithQuantity}
       printerConnected={isConnected}
       printing={printing}
       onRefresh={refetch}
