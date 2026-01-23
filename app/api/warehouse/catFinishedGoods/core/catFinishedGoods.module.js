@@ -144,7 +144,7 @@ export function formatData(items) {
     displayName: item.displayName,
     displayName2: item.displayName2 || "",
     type: item.type,
-    itemCategoryCode: item.itemCategoryCode,
+    inventoryPostingGroupCode: item.inventoryPostingGroupCode,
     inventoryPostingGroupCode: item.inventoryPostingGroupCode,
     unitOfMeasureCode: item.baseUnitOfMeasureCode,
     unitPrice: item.unitPrice,

@@ -36,13 +36,13 @@ const Repository = {
         params.displayName,
         "displayName",
         "contains",
-        params.displayName
+        params.displayName,
       )
       .filterIf(
         params.description,
         "description",
         "contains",
-        params.description
+        params.description,
       )
       .count(true)
       .orderBy("number", "asc");
@@ -61,7 +61,7 @@ const Service = {
     const filtered = Array.isArray(items)
       ? items.filter(
           (item) =>
-            item.inventoryPostingGroupCode === INVENTORY_POSTING_GROUP_CODE
+            item.inventoryPostingGroupCode === INVENTORY_POSTING_GROUP_CODE,
         )
       : [];
 
@@ -135,7 +135,7 @@ export function formatData(items) {
     displayName: item.displayName,
     displayName2: item.displayName2 || "",
     type: item.type,
-    itemCategoryCode: item.itemCategoryCode,
+    inventoryPostingGroupCode: item.inventoryPostingGroupCode,
     inventoryPostingGroupCode: item.inventoryPostingGroupCode,
     unitOfMeasureCode: item.baseUnitOfMeasureCode,
     unitPrice: item.unitPrice,

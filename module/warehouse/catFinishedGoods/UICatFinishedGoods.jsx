@@ -16,7 +16,6 @@ import {
   useDisclosure,
   Chip,
   Divider,
-  ScrollShadow,
 } from "@heroui/react";
 import {
   Printer,
@@ -36,7 +35,7 @@ const columns = [
   { name: "#", uid: "index", width: 60 },
   { name: "Item No.", uid: "number" },
   { name: "Display Name", uid: "displayName" },
-  { name: "Category", uid: "itemCategoryCode" },
+  { name: "Category", uid: "inventoryPostingGroupCode" },
   { name: "Unit", uid: "unitOfMeasureCode" },
   { name: "Unit Price", uid: "unitPrice" },
   { name: "Inventory", uid: "inventory" },
@@ -231,7 +230,7 @@ function RFIDLabelPreviewModal({
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-foreground/60">Category:</span>
-              <span>{item.itemCategoryCode || "-"}</span>
+              <span>{item.inventoryPostingGroupCode || "-"}</span>
             </div>
             <Divider />
             <div className="flex items-center justify-between">
