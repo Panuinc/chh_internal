@@ -164,7 +164,7 @@ export const menuConfig = {
             edit: "warehouse.catPacking.edit",
           },
         },
-         {
+        {
           id: "catSupply",
           href: "/warehouse/catSupply",
           text: "Category Supply",
@@ -174,6 +174,18 @@ export const menuConfig = {
             view: "warehouse.catSupply.view",
             create: "warehouse.catSupply.create",
             edit: "warehouse.catSupply.edit",
+          },
+        },
+        {
+          id: "catFinishedGoods",
+          href: "/warehouse/catFinishedGoods",
+          text: "Category Finished Goods",
+          icon: Package,
+          permission: "warehouse.catFinishedGoods.view",
+          actions: {
+            view: "warehouse.catFinishedGoods.view",
+            create: "warehouse.catFinishedGoods.create",
+            edit: "warehouse.catFinishedGoods.edit",
           },
         },
       ],

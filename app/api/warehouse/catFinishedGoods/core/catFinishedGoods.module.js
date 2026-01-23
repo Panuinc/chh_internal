@@ -9,10 +9,10 @@ import {
   parseQueryParams,
 } from "@/lib/bc/server";
 
-const ENTITY_NAME = "Category Supply Item";
-const ENTITY_KEY = "catSupplyItems";
-const ENTITY_SINGULAR = "catSupplyItem";
-const INVENTORY_POSTING_GROUP_CODE = "SP";
+const ENTITY_NAME = "Category Finished Goods Item";
+const ENTITY_KEY = "catFinishedGoodsItems";
+const ENTITY_SINGULAR = "catFinishedGoodsItem";
+const INVENTORY_POSTING_GROUP_CODE = "FG";
 
 const QUERY_SCHEMA = {
   displayName: { type: "string", required: false },
@@ -83,7 +83,7 @@ const Service = {
 };
 
 export async function GetAllUseCase(searchParams) {
-  const log = createLogger("GetAllCatSupplyItems");
+  const log = createLogger("GetAllCatFinishedGoodsItems");
   const params = parseQueryParams(searchParams, QUERY_SCHEMA);
 
   log.start({
@@ -112,7 +112,7 @@ export async function GetAllUseCase(searchParams) {
 }
 
 export async function GetByIdUseCase(id) {
-  const log = createLogger("GetCatSupplyItemById");
+  const log = createLogger("GetCatFinishedGoodsItemById");
   log.start({ id });
 
   try {
@@ -155,12 +155,12 @@ const controller = createBCController({
   entitySingular: ENTITY_SINGULAR,
 });
 
-export const getAllCatSupplyItems = controller.getAll;
-export const getCatSupplyItemById = controller.getById;
+export const getAllCatFinishedGoodsItems = controller.getAll;
+export const getCatFinishedGoodsItemById = controller.getById;
 
 export default {
-  getAllCatSupplyItems,
-  getCatSupplyItemById,
+  getAllCatFinishedGoodsItems,
+  getCatFinishedGoodsItemById,
   GetAllUseCase,
   GetByIdUseCase,
   formatData,
