@@ -13,11 +13,13 @@ const ENTITY_NAME = "Category Finished Goods Item";
 const ENTITY_KEY = "catFinishedGoodsItems";
 const ENTITY_SINGULAR = "catFinishedGoodsItem";
 const INVENTORY_POSTING_GROUP_CODE = "FG";
+const NUMBER_PREFIX = "FG-";
 
 const QUERY_SCHEMA = {
   displayName: { type: "string", required: false },
   number: { type: "string", required: false },
   description: { type: "string", required: false },
+  includeZeroInventory: { type: "boolean", required: false, default: false },
   limit: {
     type: "number",
     required: false,
@@ -31,18 +33,19 @@ const Repository = {
   async findMany(params) {
     const q = query()
       .filter("inventoryPostingGroupCode", "eq", INVENTORY_POSTING_GROUP_CODE)
+      .filter("number", "startswith", NUMBER_PREFIX)
       .filterIf(params.number, "number", "startswith", params.number)
       .filterIf(
         params.displayName,
         "displayName",
         "contains",
-        params.displayName
+        params.displayName,
       )
       .filterIf(
         params.description,
         "description",
         "contains",
-        params.description
+        params.description,
       )
       .count(true)
       .orderBy("number", "asc");
@@ -61,7 +64,9 @@ const Service = {
     const filtered = Array.isArray(items)
       ? items.filter(
           (item) =>
-            item.inventoryPostingGroupCode === INVENTORY_POSTING_GROUP_CODE
+            item.inventoryPostingGroupCode === INVENTORY_POSTING_GROUP_CODE &&
+            item.number?.startsWith(NUMBER_PREFIX) &&
+            (params.includeZeroInventory || item.inventory > 0),
         )
       : [];
 
@@ -73,7 +78,8 @@ const Service = {
 
     if (
       !item?.id ||
-      item.inventoryPostingGroupCode !== INVENTORY_POSTING_GROUP_CODE
+      item.inventoryPostingGroupCode !== INVENTORY_POSTING_GROUP_CODE ||
+      !item.number?.startsWith(NUMBER_PREFIX)
     ) {
       throw new BCNotFoundError(ENTITY_NAME, id);
     }
@@ -89,6 +95,7 @@ export async function GetAllUseCase(searchParams) {
   log.start({
     ...params,
     inventoryPostingGroupCode: INVENTORY_POSTING_GROUP_CODE,
+    numberPrefix: NUMBER_PREFIX,
   });
 
   try {
@@ -100,6 +107,8 @@ export async function GetAllUseCase(searchParams) {
       total,
       filters: {
         inventoryPostingGroupCode: INVENTORY_POSTING_GROUP_CODE,
+        numberPrefix: NUMBER_PREFIX,
+        includeZeroInventory: params.includeZeroInventory || false,
         displayName: params.displayName || null,
         number: params.number || null,
         description: params.description || null,

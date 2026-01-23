@@ -6,14 +6,16 @@ const API_URL = "/api/warehouse/catFinishedGoods";
 
 function extractItems(result) {
   if (Array.isArray(result)) return result;
-  if (result?.data?.catFinishedGoodsItems) return result.data.catFinishedGoodsItems;
+  if (result?.data?.catFinishedGoodsItems)
+    return result.data.catFinishedGoodsItems;
   if (result?.data && Array.isArray(result.data)) return result.data;
   if (result?.catFinishedGoodsItems) return result.catFinishedGoodsItems;
   return [];
 }
 
 function extractItem(result) {
-  if (result?.data?.catFinishedGoodsItem) return result.data.catFinishedGoodsItem;
+  if (result?.data?.catFinishedGoodsItem)
+    return result.data.catFinishedGoodsItem;
   if (result?.data && !Array.isArray(result.data)) return result.data;
   if (result?.catFinishedGoodsItem) return result.catFinishedGoodsItem;
   return result;
@@ -30,7 +32,7 @@ async function fetchWithAbort(url, options, signal) {
 
   if (!response.ok) {
     throw new Error(
-      data.error || `Request failed with status ${response.status}`
+      data.error || `Request failed with status ${response.status}`,
     );
   }
 
@@ -56,6 +58,8 @@ export function useCatFinishedGoodsItems(params = {}) {
         if (params.description)
           searchParams.set("description", params.description);
         if (params.limit) searchParams.set("limit", String(params.limit));
+        if (params.includeZeroInventory)
+          searchParams.set("includeZeroInventory", "true");
 
         const queryString = searchParams.toString();
         const url = `${API_URL}${queryString ? `?${queryString}` : ""}`;
@@ -71,14 +75,20 @@ export function useCatFinishedGoodsItems(params = {}) {
         }
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("Error fetching cat packing items:", err);
+        console.error("Error fetching cat finished goods items:", err);
         setError(err.message);
         setItems([]);
       } finally {
         setLoading(false);
       }
     },
-    [params.displayName, params.number, params.description, params.limit]
+    [
+      params.displayName,
+      params.number,
+      params.description,
+      params.limit,
+      params.includeZeroInventory,
+    ],
   );
 
   useEffect(() => {
@@ -121,14 +131,14 @@ export function useCatFinishedGoodsItem(itemId) {
         }
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("Error fetching cat packing item:", err);
+        console.error("Error fetching cat finished goods item:", err);
         setError(err.message);
         setItem(null);
       } finally {
         setLoading(false);
       }
     },
-    [itemId]
+    [itemId],
   );
 
   useEffect(() => {
