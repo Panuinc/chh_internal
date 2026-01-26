@@ -4,10 +4,6 @@ import React, { useMemo, useCallback, useState } from "react";
 import { DataTable, Loading } from "@/components";
 import {
   Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Modal,
   ModalContent,
   ModalHeader,
@@ -24,6 +20,11 @@ import {
   Tag,
   ChevronLeft,
   ChevronRight,
+  Telescope,
+  Package,
+  Hash,
+  DollarSign,
+  Layers,
 } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { PrintQuantityDialog } from "@/components/chainWay";
@@ -282,6 +283,149 @@ function RFIDLabelPreviewModal({
   );
 }
 
+function ItemDetailModal({
+  isOpen,
+  onClose,
+  item,
+  onOpenPrintDialog,
+  isConnected,
+  printing,
+}) {
+  if (!item) return null;
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("th-TH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value || 0);
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
+      <ModalContent>
+        <ModalHeader className="flex flex-col gap-2">
+          <h3 className="text-lg font-semibold">Item Details</h3>
+          <span className="text-sm text-foreground/60 font-mono">
+            {item.number}
+          </span>
+        </ModalHeader>
+
+        <ModalBody className="gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3">
+              <Hash className="text-foreground/50 mt-1 w-5 h-5" />
+              <div className="flex flex-col">
+                <p className="text-xs text-foreground/60">Item Number</p>
+                <p className="font-mono font-medium">{item.number}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Package className="text-foreground/50 mt-1 w-5 h-5" />
+              <div className="flex flex-col">
+                <p className="text-xs text-foreground/60">Display Name</p>
+                <p className="font-medium">{item.displayName || "-"}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Layers className="text-foreground/50 mt-1 w-5 h-5" />
+              <div className="flex flex-col">
+                <p className="text-xs text-foreground/60">Category</p>
+                <p>{item.inventoryPostingGroupCode || "-"}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Tag className="text-foreground/50 mt-1 w-5 h-5" />
+              <div className="flex flex-col">
+                <p className="text-xs text-foreground/60">Unit</p>
+                <p>{item.unitOfMeasureCode || "-"}</p>
+              </div>
+            </div>
+          </div>
+
+          <Divider />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3">
+              <DollarSign className="text-foreground/50 mt-1 w-5 h-5" />
+              <div className="flex flex-col">
+                <p className="text-xs text-foreground/60">Unit Price</p>
+                <p className="font-medium text-lg">
+                  {formatCurrency(item.unitPrice)} THB
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Package className="text-foreground/50 mt-1 w-5 h-5" />
+              <div className="flex flex-col">
+                <p className="text-xs text-foreground/60">Inventory</p>
+                <p
+                  className={`font-medium text-lg ${item.inventory > 0 ? "text-success" : "text-foreground/50"}`}
+                >
+                  {item.inventory?.toLocaleString("th-TH") || "0"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 p-3 bg-default/30 rounded-lg">
+            <span className="text-sm text-foreground/60">Status:</span>
+            <Chip
+              size="sm"
+              color={item.blocked ? "danger" : "success"}
+              variant="flat"
+            >
+              {item.blocked ? "Blocked" : "Active"}
+            </Chip>
+          </div>
+
+          {!isConnected && (
+            <div className="flex flex-col gap-2 p-3 bg-danger/10 rounded-lg border border-danger/30">
+              <p className="text-sm text-danger font-medium">
+                ⚠️ Printer Not Connected
+              </p>
+              <p className="text-xs text-danger/80">
+                กรุณาเชื่อมต่อเครื่องพิมพ์ RFID ก่อนทำการพิมพ์
+              </p>
+            </div>
+          )}
+        </ModalBody>
+
+        <ModalFooter>
+          <Button
+            color="danger"
+            variant="shadow"
+            size="md"
+            radius="md"
+            className="flex-1"
+            onPress={onClose}
+          >
+            Close
+          </Button>
+          <Button
+            color="primary"
+            variant="shadow"
+            size="md"
+            radius="md"
+            className="flex-1"
+            startContent={<Printer className="w-4 h-4" />}
+            isDisabled={!isConnected || printing}
+            onPress={() => {
+              onClose();
+              onOpenPrintDialog(item, "thai-rfid");
+            }}
+          >
+            Print RFID Label
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
+
 export default function UICatFinishedGoods({
   items = [],
   loading,
@@ -305,6 +449,12 @@ export default function UICatFinishedGoods({
     isOpen: isPreviewOpen,
     onOpen: openPreview,
     onClose: closePreview,
+  } = useDisclosure();
+
+  const {
+    isOpen: isDetailOpen,
+    onOpen: openDetail,
+    onClose: closeDetail,
   } = useDisclosure();
 
   const { isConnected } = useRFIDSafe();
@@ -331,10 +481,24 @@ export default function UICatFinishedGoods({
                 maximumFractionDigits: 2,
               }) || "0.00",
             inventoryDisplay: item.inventory?.toLocaleString("th-TH") || "0",
+            _rawItem: item,
           }))
         : [],
     [items],
   );
+
+  const handleViewItem = useCallback(
+    (item) => {
+      setSelectedItem(item);
+      openDetail();
+    },
+    [openDetail],
+  );
+
+  const handleCloseDetail = useCallback(() => {
+    closeDetail();
+    setSelectedItem(null);
+  }, [closeDetail]);
 
   const handleOpenPrintDialog = useCallback(
     (item, printType) => {
@@ -385,35 +549,21 @@ export default function UICatFinishedGoods({
       if (columnKey !== "actions") return undefined;
 
       return (
-        <div className="flex items-center justify-center gap-1">
-          <Dropdown>
-            <DropdownTrigger>
-              <Button
-                isIconOnly
-                variant="light"
-                size="md"
-                isDisabled={printing || !isConnected}
-              >
-                <Printer
-                  className={isConnected ? "text-success" : "text-danger"}
-                />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Print options">
-              {PRINT_TYPE_OPTIONS.map((opt) => (
-                <DropdownItem
-                  key={opt.key}
-                  onPress={() => handleOpenPrintDialog(item, opt.key)}
-                >
-                  {opt.label}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            isIconOnly
+            color="default"
+            variant="shadow"
+            size="md"
+            radius="md"
+            onPress={() => handleViewItem(item._rawItem)}
+          >
+            <Telescope className="w-4 h-4" />
+          </Button>
         </div>
       );
     },
-    [handleOpenPrintDialog, isConnected, printing],
+    [handleViewItem],
   );
 
   return (
@@ -538,6 +688,15 @@ export default function UICatFinishedGoods({
           </ModalBody>
         </ModalContent>
       </Modal>
+
+      <ItemDetailModal
+        isOpen={isDetailOpen}
+        onClose={handleCloseDetail}
+        item={selectedItem}
+        onOpenPrintDialog={handleOpenPrintDialog}
+        isConnected={isConnected}
+        printing={printing}
+      />
 
       <PrintQuantityDialog
         isOpen={isPrintDialogOpen}
