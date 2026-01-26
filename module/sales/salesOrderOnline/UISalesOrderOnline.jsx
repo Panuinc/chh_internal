@@ -10,7 +10,6 @@ import {
   Button,
   Image,
   useDisclosure,
-  Progress,
   Checkbox,
   Input,
 } from "@heroui/react";
