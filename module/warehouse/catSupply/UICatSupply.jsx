@@ -263,9 +263,9 @@ function RFIDLabelPreviewModal({
         <ModalFooter className="gap-2">
           <Button
             color="danger"
-            variant="light"
+            variant="shadow"
             onPress={onClose}
-            className="flex-1"
+            className="w-full text-background"
           >
             ยกเลิก
           </Button>
@@ -276,7 +276,7 @@ function RFIDLabelPreviewModal({
             onPress={handleConfirm}
             isLoading={printing}
             isDisabled={totalLabels === 0}
-            className="flex-1"
+            className="w-full text-background"
           >
             {printing ? "กำลังพิมพ์..." : `พิมพ์ ${totalLabels} ใบ`}
           </Button>
@@ -403,7 +403,7 @@ function ItemDetailModal({
             variant="shadow"
             size="md"
             radius="md"
-            className="flex-1"
+            className="w-full text-background"
             onPress={onClose}
           >
             Close
@@ -413,7 +413,7 @@ function ItemDetailModal({
             variant="shadow"
             size="md"
             radius="md"
-            className="flex-1"
+            className="w-full text-background"
             startContent={<Printer className="w-4 h-4" />}
             isDisabled={!isConnected || printing}
             onPress={() => {

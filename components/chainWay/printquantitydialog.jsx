@@ -158,14 +158,22 @@ export default function PrintQuantityDialog({
         </ModalBody>
 
         <ModalFooter>
-          <Button variant="light" onPress={onClose} isDisabled={printing}>
+          <Button
+            color="danger"
+            variant="shadow"
+            onPress={onClose}
+            className="w-full text-background"
+            isDisabled={printing}
+          >
             ยกเลิก
           </Button>
           <Button
             color="primary"
+            variant="shadow"
             onPress={handlePrint}
             isLoading={printing}
             startContent={!printing && <Printer size={16} />}
+            className="w-full text-background"
           >
             พิมพ์ {quantity} ใบ
           </Button>
