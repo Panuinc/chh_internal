@@ -8,6 +8,7 @@ import {
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import UICatFinishedGoods from "@/module/warehouse/catFinishedGoods/UICatFinishedGoods";
+import { showToast } from "@/components";
 
 function useProjectNames(items) {
   const [projectNames, setProjectNames] = React.useState(new Map());
@@ -82,7 +83,7 @@ function CatFinishedGoodsContent() {
   const handlePrintWithQuantity = useCallback(
     async (item, quantity, options = {}) => {
       if (!isConnected) {
-        alert("Printer is not connected");
+        showToast("warning", "Printer is not connected");
         return;
       }
 
@@ -95,14 +96,17 @@ function CatFinishedGoodsContent() {
 
         if (result?.success) {
           const totalPrinted = result.results?.[0]?.labels?.length || quantity;
-          alert(`พิมพ์ ${item.number} สำเร็จ ${totalPrinted} ใบ`);
+          showToast(
+            "success",
+            `พิมพ์ ${item.number} สำเร็จ ${totalPrinted} ใบ`,
+          );
         } else {
           const errorMsg = result?.results?.[0]?.error || "Unknown error";
-          alert(`พิมพ์ไม่สำเร็จ: ${errorMsg}`);
+          showToast("danger", `พิมพ์ไม่สำเร็จ: ${errorMsg}`);
         }
       } catch (err) {
         console.error("Print error:", err);
-        alert(`Print failed: ${err.message}`);
+        showToast("danger", `Print failed: ${err.message}`);
       }
     },
     [printBatch, isConnected],

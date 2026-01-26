@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { useCatPackingItems } from "@/app/api/warehouse/catPacking/core";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import UICatPacking from "@/module/warehouse/catPacking/UICatPacking";
+import { showToast } from "@/components";
 
 function CatPackingContent() {
   const { items, loading, refetch } = useCatPackingItems({ limit: 500 });
@@ -14,7 +15,7 @@ function CatPackingContent() {
   const handlePrintWithQuantity = useCallback(
     async (item, quantity, options = {}) => {
       if (!isConnected) {
-        alert("Printer is not connected");
+        showToast("warning", "Printer is not connected");
         return;
       }
 
@@ -27,14 +28,17 @@ function CatPackingContent() {
 
         if (result?.success) {
           const totalPrinted = result.results?.[0]?.labels?.length || quantity;
-          alert(`พิมพ์ ${item.number} สำเร็จ ${totalPrinted} ใบ`);
+          showToast(
+            "success",
+            `พิมพ์ ${item.number} สำเร็จ ${totalPrinted} ใบ`,
+          );
         } else {
           const errorMsg = result?.results?.[0]?.error || "Unknown error";
-          alert(`พิมพ์ไม่สำเร็จ: ${errorMsg}`);
+          showToast("danger", `พิมพ์ไม่สำเร็จ: ${errorMsg}`);
         }
       } catch (err) {
         console.error("Print error:", err);
-        alert(`Print failed: ${err.message}`);
+        showToast("danger", `Print failed: ${err.message}`);
       }
     },
     [printBatch, isConnected],
