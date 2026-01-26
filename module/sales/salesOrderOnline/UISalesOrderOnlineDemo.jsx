@@ -10,9 +10,6 @@ import {
   Button,
   Image,
   useDisclosure,
-  Progress,
-  Checkbox,
-  Input,
 } from "@heroui/react";
 import {
   Printer,
@@ -25,21 +22,14 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Download,
-  FileImage,
-  Edit3,
 } from "lucide-react";
 import Barcode from "react-barcode";
 
-import { DataTable, Loading, showToast } from "@/components";
+import { DataTable, Loading } from "@/components";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
 import { COMPANY_INFO } from "@/lib/chainWay/config";
 import { getItemLines, getCommentLines } from "@/lib/chainWay/utils";
-import {
-  exportPackingSlipsAsZip,
-  exportSingleSlipAsPng,
-} from "@/lib/packingSlip/packingSlipExport";
 
 const TABLE_COLUMNS = [
   { name: "#", uid: "index", width: 60 },
@@ -339,14 +329,14 @@ function OrderDetailModal({
             size="md"
             radius="md"
             className="w-2/12 text-background"
-            startContent={<FileImage />}
-            isDisabled={lineCount === 0}
+            startContent={<Printer />}
+            isDisabled={printing || !isConnected || lineCount === 0}
             onPress={() => {
               onClose();
               onOpenPreview(order);
             }}
           >
-            ใบปะหน้า
+            พิมพ์ใบปะหน้า
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -362,35 +352,6 @@ function SlipPreviewModal({
   printing = false,
 }) {
   const [previewIndex, setPreviewIndex] = useState(0);
-  const [exporting, setExporting] = useState(false);
-  const [exportProgress, setExportProgress] = useState({
-    current: 0,
-    total: 0,
-  });
-
-  const [useCustomAddress, setUseCustomAddress] = useState(false);
-  const [customAddress, setCustomAddress] = useState({
-    shipToName: "",
-    shipToAddressLine1: "",
-    shipToAddressLine2: "",
-    shipToCity: "",
-    shipToPostCode: "",
-    phoneNumber: "",
-  });
-
-  React.useEffect(() => {
-    if (order) {
-      setCustomAddress({
-        shipToName: order.shipToName || order.customerName || "",
-        shipToAddressLine1: order.shipToAddressLine1 || "",
-        shipToAddressLine2: order.shipToAddressLine2 || "",
-        shipToCity: order.shipToCity || "",
-        shipToPostCode: order.shipToPostCode || "",
-        phoneNumber: order.phoneNumber || "",
-      });
-      setUseCustomAddress(false);
-    }
-  }, [order?.number]);
 
   React.useEffect(() => {
     setPreviewIndex(0);
@@ -409,20 +370,6 @@ function SlipPreviewModal({
       expandedItems: expanded,
     };
   }, [order]);
-
-  const displayAddress = useMemo(() => {
-    if (useCustomAddress) {
-      return customAddress;
-    }
-    return {
-      shipToName: order?.shipToName || order?.customerName || "",
-      shipToAddressLine1: order?.shipToAddressLine1 || "",
-      shipToAddressLine2: order?.shipToAddressLine2 || "",
-      shipToCity: order?.shipToCity || "",
-      shipToPostCode: order?.shipToPostCode || "",
-      phoneNumber: order?.phoneNumber || "",
-    };
-  }, [useCustomAddress, customAddress, order]);
 
   if (!order) return null;
 
@@ -446,53 +393,6 @@ function SlipPreviewModal({
     setPreviewIndex((prev) => Math.min(totalPieces - 1, prev + 1));
   };
 
-  const handleAddressChange = (field, value) => {
-    setCustomAddress((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const getExportOptions = () => {
-    if (useCustomAddress) {
-      return { customAddress };
-    }
-    return {};
-  };
-
-  const handleExportZip = async () => {
-    setExporting(true);
-    setExportProgress({ current: 0, total: totalPieces });
-
-    try {
-      const result = await exportPackingSlipsAsZip(
-        order,
-        (current, total) => {
-          setExportProgress({ current, total });
-        },
-        getExportOptions(),
-      );
-
-      if (result.success) {
-        showToast("success", `ส่งออกใบปะหน้า ${result.exported} ใบสำเร็จ`);
-        onClose();
-      }
-    } catch (error) {
-      console.error("Export error:", error);
-      showToast("danger", `ส่งออกไม่สำเร็จ: ${error.message}`);
-    } finally {
-      setExporting(false);
-      setExportProgress({ current: 0, total: 0 });
-    }
-  };
-
-  const handleExportSingle = async () => {
-    try {
-      await exportSingleSlipAsPng(order, currentPiece, getExportOptions());
-      showToast("success", `ส่งออกใบที่ ${currentPiece} สำเร็จ`);
-    } catch (error) {
-      console.error("Export error:", error);
-      showToast("danger", `ส่งออกไม่สำเร็จ: ${error.message}`);
-    }
-  };
-
   return (
     <Modal
       isOpen={isOpen}
@@ -507,7 +407,7 @@ function SlipPreviewModal({
             ตัวอย่างใบปะหน้า - {order.number}
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-sm text-foreground/70">
-            ทั้งหมด {totalPieces} ใบ (1 ใบ = 1 สินค้า)
+            จะพิมพ์ทั้งหมด {totalPieces} ใบ (1 ใบ = 1 สินค้า)
           </div>
           <div className="flex items-center justify-center w-full gap-4">
             <Button
@@ -535,22 +435,6 @@ function SlipPreviewModal({
         </ModalHeader>
 
         <ModalBody className="flex flex-col items-center justify-start w-full h-fit p-2">
-          {exporting && (
-            <div className="w-full mb-4">
-              <div className="flex justify-between text-sm mb-2">
-                <span>กำลังส่งออก...</span>
-                <span>
-                  {exportProgress.current} / {exportProgress.total}
-                </span>
-              </div>
-              <Progress
-                value={(exportProgress.current / exportProgress.total) * 100}
-                color="primary"
-                size="sm"
-              />
-            </div>
-          )}
-
           <div className="flex flex-col w-full bg-default rounded-xl p-2 gap-2">
             <div className="flex flex-col w-full bg-background rounded-xl overflow-hidden">
               <div className="flex flex-row items-stretch border-b-2 border-default">
@@ -605,28 +489,26 @@ function SlipPreviewModal({
                 <div className="flex gap-2">
                   <span className="font-semibold w-12 text-sm">ผู้รับ:</span>
                   <span className="font-bold text-base">
-                    {displayAddress.shipToName}
+                    {order?.shipToName || order?.customerName}
                   </span>
                 </div>
                 <div className="flex gap-2 text-xs">
                   <span className="font-semibold w-12">ที่อยู่:</span>
                   <div className="flex flex-col">
-                    <span>{displayAddress.shipToAddressLine1}</span>
-                    {displayAddress.shipToAddressLine2 && (
-                      <span>{displayAddress.shipToAddressLine2}</span>
+                    <span>{order?.shipToAddressLine1}</span>
+                    {order?.shipToAddressLine2 && (
+                      <span>{order?.shipToAddressLine2}</span>
                     )}
-                    {(displayAddress.shipToCity ||
-                      displayAddress.shipToPostCode) && (
+                    {(order?.shipToCity || order?.shipToPostCode) && (
                       <span>
-                        {displayAddress.shipToCity}{" "}
-                        {displayAddress.shipToPostCode}
+                        {order?.shipToCity} {order?.shipToPostCode}
                       </span>
                     )}
                   </div>
                 </div>
                 <div className="flex gap-2 text-xs">
                   <span className="font-semibold w-12">โทร:</span>
-                  <span>{displayAddress.phoneNumber || "-"}</span>
+                  <span>{order?.phoneNumber || "-"}</span>
                 </div>
               </div>
 
@@ -698,128 +580,35 @@ function SlipPreviewModal({
               ))}
             </div>
           </div>
-
-          <div className="flex flex-col w-full mt-4 p-3 bg-default/25 border-2 border-default rounded-xl">
-            <div className="flex items-center gap-2 mb-3">
-              <Checkbox
-                isSelected={useCustomAddress}
-                onValueChange={setUseCustomAddress}
-                size="sm"
-                color="warning"
-              >
-                <span className="text-sm font-semibold flex items-center gap-1">
-                  <Edit3 size={14} />
-                  แก้ไขที่อยู่จัดส่ง
-                </span>
-              </Checkbox>
-            </div>
-
-            {useCustomAddress && (
-              <div className="flex flex-col gap-3">
-                <Input
-                  label="ชื่อผู้รับ"
-                  size="sm"
-                  value={customAddress.shipToName}
-                  onValueChange={(v) => handleAddressChange("shipToName", v)}
-                />
-                <Input
-                  label="ที่อยู่ บรรทัด 1"
-                  size="sm"
-                  value={customAddress.shipToAddressLine1}
-                  onValueChange={(v) =>
-                    handleAddressChange("shipToAddressLine1", v)
-                  }
-                />
-                <Input
-                  label="ที่อยู่ บรรทัด 2"
-                  size="sm"
-                  value={customAddress.shipToAddressLine2}
-                  onValueChange={(v) =>
-                    handleAddressChange("shipToAddressLine2", v)
-                  }
-                />
-                <div className="flex gap-2">
-                  <Input
-                    label="อำเภอ/เขต จังหวัด"
-                    size="sm"
-                    className="flex-1"
-                    value={customAddress.shipToCity}
-                    onValueChange={(v) => handleAddressChange("shipToCity", v)}
-                  />
-                  <Input
-                    label="รหัสไปรษณีย์"
-                    size="sm"
-                    className="w-28"
-                    value={customAddress.shipToPostCode}
-                    onValueChange={(v) =>
-                      handleAddressChange("shipToPostCode", v)
-                    }
-                  />
-                </div>
-                <Input
-                  label="เบอร์โทรศัพท์"
-                  size="sm"
-                  value={customAddress.phoneNumber}
-                  onValueChange={(v) => handleAddressChange("phoneNumber", v)}
-                />
-              </div>
-            )}
-          </div>
         </ModalBody>
 
-        <ModalFooter className="flex flex-col items-center justify-start w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full h-full gap-2">
-            <Button
-              color="secondary"
-              variant="flat"
-              size="md"
-              radius="md"
-              className="flex-1"
-              startContent={<FileImage size={18} />}
-              onPress={handleExportSingle}
-              isDisabled={exporting || totalPieces === 0}
-            >
-              ส่งออกใบนี้ (PNG)
-            </Button>
-            <Button
-              color="success"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="flex-1 text-background"
-              startContent={<Download size={18} />}
-              onPress={handleExportZip}
-              isLoading={exporting}
-              isDisabled={totalPieces === 0}
-            >
-              {exporting ? "กำลังส่งออก..." : `ส่งออกทั้งหมด (ZIP)`}
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-center w-full h-full gap-2">
+        <ModalFooter className="flex flex-row items-center justify-start w-full h-fit p-2 gap-2">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Button
               color="danger"
               variant="shadow"
               size="md"
               radius="md"
-              className="flex-1 text-background"
+              className="w-full text-background"
               onPress={onClose}
-              isDisabled={exporting}
             >
-              ปิด
+              ยกเลิก
             </Button>
+          </div>
+
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <Button
               color="primary"
               variant="shadow"
               size="md"
               radius="md"
-              className="flex-1 text-background"
+              className="w-full text-background"
               startContent={<Printer />}
               onPress={() => onPrint(order)}
               isLoading={printing}
-              isDisabled={totalPieces === 0 || exporting}
+              isDisabled={totalPieces === 0}
             >
-              {printing ? "Printing..." : `Print (ChainWay)`}
+              {printing ? "Printing..." : `Print ${totalPieces} ใบ`}
             </Button>
           </div>
         </ModalFooter>
