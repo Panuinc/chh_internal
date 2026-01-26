@@ -97,7 +97,7 @@ function RFIDLabelCard({
             RFID EPC:
           </span>
         </div>
-        <div className="font-mono text-xs text-foreground/70 break-all bg-default/50 rounded p-2">
+        <div className="font-mono text-xs text-foreground/70 break-all bg-default/50 rounded-xl p-2">
           {epc}
         </div>
       </div>
@@ -200,7 +200,7 @@ function RFIDLabelPreviewModal({
         </ModalHeader>
 
         <ModalBody className="gap-2">
-          <div className="flex flex-col gap-2 p-2 bg-default/30 rounded-lg">
+          <div className="flex flex-col gap-2 p-2 bg-default/30 rounded-xl">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold">จำนวนที่ต้องการพิมพ์</span>
               <div className="flex items-center gap-2">
@@ -285,7 +285,7 @@ function RFIDLabelPreviewModal({
 
           <Divider />
 
-          <div className="flex flex-col gap-2 p-2 bg-default/30 rounded-lg">
+          <div className="flex flex-col gap-2 p-2 bg-default/30 rounded-xl">
             <div className="flex items-center justify-between text-sm">
               <span className="text-foreground/60">Item Number:</span>
               <span className="font-mono font-medium">{item.number}</span>
@@ -309,7 +309,7 @@ function RFIDLabelPreviewModal({
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 p-2 bg-warning/10 rounded-lg border border-warning/30">
+          <div className="flex flex-col gap-2 p-2 bg-warning/10 rounded-xl border border-warning/30">
             <p className="text-sm text-warning-600 font-medium">
               ⚠️ ข้อควรทราบ
             </p>
@@ -438,7 +438,7 @@ function ItemDetailModal({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 p-2 bg-default/30 rounded-lg">
+          <div className="flex items-center gap-2 p-2 bg-default/30 rounded-xl">
             <span className="text-sm text-foreground/60">Status:</span>
             <Chip
               size="md"
@@ -450,7 +450,7 @@ function ItemDetailModal({
           </div>
 
           {!isConnected && (
-            <div className="flex flex-col gap-2 p-2 bg-danger/10 rounded-lg border border-danger/30">
+            <div className="flex flex-col gap-2 p-2 bg-danger/10 rounded-xl border border-danger/30">
               <p className="text-sm text-danger font-medium">
                 ⚠️ Printer Not Connected
               </p>

@@ -225,7 +225,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
         <ModalBody>
           <div className="flex flex-col items-center justify-center w-full gap-2">
             {error && (
-              <div className="text-danger text-sm p-2 bg-danger-50 rounded-lg w-full text-center">
+              <div className="text-danger text-sm p-2 bg-danger-50 rounded-xl w-full text-center">
                 {error}
               </div>
             )}
@@ -427,7 +427,7 @@ function MultiCameraModal({
         <ModalBody>
           <div className="flex flex-col items-center justify-center w-full gap-2">
             {error && (
-              <div className="text-danger text-sm p-2 bg-danger-50 rounded-lg w-full text-center">
+              <div className="text-danger text-sm p-2 bg-danger-50 rounded-xl w-full text-center">
                 {error}
               </div>
             )}
@@ -465,7 +465,7 @@ function MultiCameraModal({
                       <Image
                         src={img.preview}
                         alt={`Document ${index + 1}`}
-                        className="w-24 h-24 object-cover rounded-lg"
+                        className="w-24 h-24 object-cover rounded-xl"
                       />
                       <Button
                         type="button"
@@ -541,7 +541,7 @@ function PhotoCaptureCard({
             <Image
               src={displayImage}
               alt="Captured"
-              className="max-w-full max-h-48 object-contain rounded-lg shadow-md"
+              className="max-w-full max-h-48 object-contain rounded-xl shadow-md"
             />
           </div>
           <div className="flex gap-2">
@@ -639,7 +639,7 @@ function DocumentCaptureCard({
                 <Image
                   src={src}
                   alt={`Document ${index + 1}`}
-                  className="w-24 h-24 object-cover rounded-lg shadow-md"
+                  className="w-24 h-24 object-cover rounded-xl shadow-md"
                 />
                 {capturedImages.length > 0 && (
                   <Button

@@ -125,7 +125,7 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
             </div>
           )}
 
-          <div className="relative flex flex-col items-center justify-center w-full h-fit p-2 gap-2 bg-black rounded-lg overflow-hidden">
+          <div className="relative flex flex-col items-center justify-center w-full h-fit p-2 gap-2 bg-black rounded-xl overflow-hidden">
             <div
               id="qr-reader"
               className="w-full"
@@ -294,7 +294,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
             </div>
           )}
 
-          <div className="relative flex flex-col items-center justify-center w-full aspect-video bg-black rounded-lg overflow-hidden">
+          <div className="relative flex flex-col items-center justify-center w-full aspect-video bg-black rounded-xl overflow-hidden">
             <video
               ref={videoRef}
               autoPlay
@@ -364,7 +364,7 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
             <div className="flex items-center justify-center w-full h-fit text-success">
               สแกนสำเร็จ
             </div>
-            <div className="flex items-center justify-center w-full h-fit p-2 bg-default rounded-lg break-all">
+            <div className="flex items-center justify-center w-full h-fit p-2 bg-default rounded-xl break-all">
               {qrCodeInfo}
             </div>
           </div>
@@ -446,7 +446,7 @@ function PhotoCaptureCard({
             <Image
               src={capturedImage}
               alt="Captured"
-              className="max-w-full max-h-48 object-contain rounded-lg shadow-md"
+              className="max-w-full max-h-48 object-contain rounded-xl shadow-md"
             />
           </div>
           <div className="flex flex-row items-center justify-center w-full h-fit gap-2">

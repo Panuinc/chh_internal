@@ -255,7 +255,7 @@ function OrderDetailModal({
           </div>
 
           {!isConnected && (
-            <div className="flex flex-col gap-2 p-2 bg-danger/10 rounded-lg border border-danger/30">
+            <div className="flex flex-col gap-2 p-2 bg-danger/10 rounded-xl border border-danger/30">
               <p className="text-sm text-danger font-medium">
                 ⚠️ Printer Not Connected
               </p>
@@ -564,7 +564,7 @@ function SlipPreviewModal({
             </div>
           </div>
 
-          <div className="flex flex-col w-full mt-4 p-2 bg-default/50 rounded-lg">
+          <div className="flex flex-col w-full mt-4 p-2 bg-default/50 rounded-xl">
             <p className="text-sm font-semibold mb-2">
               สรุปรายการทั้งหมด ({itemLines.length} รายการ, {totalPieces} ใบ):
             </p>

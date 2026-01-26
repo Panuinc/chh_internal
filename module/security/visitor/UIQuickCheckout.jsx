@@ -122,7 +122,7 @@ export default function UIQuickCheckout({
           <Divider className="my-4" />
 
           {!isLoggedIn && !isAlreadyCheckedOut && !success && (
-            <div className="bg-warning-50 text-warning-700 p-2 rounded-lg mb-4 text-center text-sm">
+            <div className="bg-warning-50 text-warning-700 p-2 rounded-xl mb-4 text-center text-sm">
               ⚠️ คุณยังไม่ได้เข้าสู่ระบบ กดปุ่ม Checkout จะพาไปหน้า Login
             </div>
           )}

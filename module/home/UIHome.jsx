@@ -11,7 +11,7 @@ function UserProfileCard({ user }) {
           alt="profile"
           width={200}
           height={200}
-          className="rounded-full"
+          className="rounded-xl"
         />
       </div>
       <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-xl font-black">
