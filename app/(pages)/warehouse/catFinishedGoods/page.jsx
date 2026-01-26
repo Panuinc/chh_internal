@@ -1,15 +1,83 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
-import { useCatFinishedGoodsItems } from "@/app/api/warehouse/catFinishedGoods/core";
+import React, { useCallback, useMemo } from "react";
+import {
+  useCatFinishedGoodsItems,
+  extractDimensionCodes,
+} from "@/app/api/warehouse/catFinishedGoods/core";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import UICatFinishedGoods from "@/module/warehouse/catFinishedGoods/UICatFinishedGoods";
+
+function useProjectNames(items) {
+  const [projectNames, setProjectNames] = React.useState(new Map());
+  const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!items || items.length === 0) return;
+
+    const uniqueProjectCodes = new Set();
+    items.forEach((item) => {
+      const extracted = extractDimensionCodes(item.number);
+      if (extracted.projectCode) {
+        uniqueProjectCodes.add(extracted.projectCode);
+      }
+    });
+
+    if (uniqueProjectCodes.size === 0) return;
+
+    const fetchProjectNames = async () => {
+      setLoading(true);
+      try {
+        const codes = Array.from(uniqueProjectCodes);
+        const response = await fetch(
+          `/api/warehouse/dimensionValues?codes=${codes.join(",")}&dimensionCode=PROJECT`,
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            const nameMap = new Map();
+            data.data.forEach((dim) => {
+              nameMap.set(dim.code, dim.displayName);
+            });
+            setProjectNames(nameMap);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching project names:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjectNames();
+  }, [items]);
+
+  return { projectNames, loading };
+}
 
 function CatFinishedGoodsContent() {
   const { items, loading, refetch } = useCatFinishedGoodsItems({ limit: 500 });
   const { hasPermission } = useMenu();
   const { printBatch, isConnected, printing } = useRFIDContext();
+  const { projectNames, loading: projectNamesLoading } = useProjectNames(items);
+
+  const itemsWithProject = useMemo(() => {
+    if (!items || items.length === 0) return [];
+
+    return items.map((item) => {
+      const extracted = extractDimensionCodes(item.number);
+      return {
+        ...item,
+        projectCode: extracted.projectCode || null,
+        projectName: extracted.projectCode
+          ? projectNames.get(extracted.projectCode) || null
+          : null,
+        productCode: extracted.productCode || null,
+      };
+    });
+  }, [items, projectNames]);
 
   const handlePrintWithQuantity = useCallback(
     async (item, quantity, options = {}) => {
@@ -52,8 +120,8 @@ function CatFinishedGoodsContent() {
 
   return (
     <UICatFinishedGoods
-      items={items}
-      loading={loading}
+      items={itemsWithProject}
+      loading={loading || projectNamesLoading}
       onPrintWithQuantity={handlePrintWithQuantity}
       printerConnected={isConnected}
       printing={printing}

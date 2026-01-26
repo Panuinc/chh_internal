@@ -28,6 +28,7 @@ import {
   Layers,
   Plus,
   Minus,
+  Building2,
 } from "lucide-react";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
@@ -38,6 +39,7 @@ const columns = [
   { name: "#", uid: "index", width: 60 },
   { name: "Item No.", uid: "number" },
   { name: "Display Name", uid: "displayName" },
+  { name: "Project", uid: "projectName" },
   { name: "Category", uid: "inventoryPostingGroupCode" },
   { name: "Unit", uid: "unitOfMeasureCode" },
   { name: "Unit Price", uid: "unitPrice" },
@@ -58,6 +60,7 @@ function RFIDLabelCard({
   totalQuantity,
   epc,
   isActive = false,
+  projectName = null,
 }) {
   const sequenceText = `${sequenceNumber}/${totalQuantity}`;
 
@@ -90,6 +93,15 @@ function RFIDLabelCard({
           {displayName}
         </p>
       </div>
+
+      {projectName && (
+        <div className="flex items-center justify-center p-2 border-b border-default bg-primary/5">
+          <div className="flex items-center gap-2">
+            <Building2 />
+            <span className="text-sm font-medium">{projectName}</span>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col p-2 bg-default/20">
         <div className="flex items-center gap-2 mb-2">
@@ -144,6 +156,7 @@ function RFIDLabelPreviewModal({
       labels.push({
         itemNumber: item.number,
         displayName: item.displayName || item.description || item.number,
+        projectName: item.projectName || null,
         sequenceNumber: seq,
         totalQuantity: quantity,
         epc,
@@ -197,6 +210,12 @@ function RFIDLabelPreviewModal({
           <p className="text-sm font-normal text-foreground/60">
             {item.number} - {item.displayName}
           </p>
+          {item.projectName && (
+            <div className="flex items-center gap-2">
+              <Building2 />
+              <span className="text-sm">{item.projectName}</span>
+            </div>
+          )}
         </ModalHeader>
 
         <ModalBody className="gap-2">
@@ -213,7 +232,7 @@ function RFIDLabelPreviewModal({
                   onPress={handleDecrement}
                   isDisabled={quantity <= 1}
                 >
-                  <Minus size={16} />
+                  <Minus />
                 </Button>
                 <Input
                   type="number"
@@ -234,7 +253,7 @@ function RFIDLabelPreviewModal({
                   onPress={handleIncrement}
                   isDisabled={quantity >= 999}
                 >
-                  <Plus size={16} />
+                  <Plus />
                 </Button>
               </div>
             </div>
@@ -277,6 +296,7 @@ function RFIDLabelPreviewModal({
               <RFIDLabelCard
                 itemNumber={currentLabel.itemNumber}
                 displayName={currentLabel.displayName}
+                projectName={currentLabel.projectName}
                 sequenceNumber={currentLabel.sequenceNumber}
                 totalQuantity={currentLabel.totalQuantity}
                 epc={currentLabel.epc}
@@ -298,6 +318,12 @@ function RFIDLabelPreviewModal({
                 {item.displayName}
               </span>
             </div>
+            {item.projectName && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-foreground/60">Project:</span>
+                <span className="font-medium">{item.projectName}</span>
+              </div>
+            )}
             <div className="flex items-center justify-between text-sm">
               <span className="text-foreground/60">Category:</span>
               <span>{item.inventoryPostingGroupCode || "-"}</span>
@@ -394,6 +420,16 @@ function ItemDetailModal({
               <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Display Name</p>
                 <p className="font-medium">{item.displayName || "-"}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2">
+              <Building2 className="text-foreground/50 mt-1 w-5 h-5" />
+              <div className="flex flex-col">
+                <p className="text-xs text-foreground/60">Project</p>
+                <p className={`font-medium ${item.projectName ? "" : ""}`}>
+                  {item.projectName || item.projectCode || "-"}
+                </p>
               </div>
             </div>
 
@@ -528,6 +564,14 @@ export default function UICatFinishedGoods({
   const active = items.filter((i) => !i.blocked).length;
   const blocked = items.filter((i) => i.blocked).length;
 
+  const uniqueProjects = useMemo(() => {
+    const projects = new Set();
+    items.forEach((item) => {
+      if (item.projectCode) projects.add(item.projectCode);
+    });
+    return projects.size;
+  }, [items]);
+
   const normalized = useMemo(
     () =>
       Array.isArray(items)
@@ -542,6 +586,7 @@ export default function UICatFinishedGoods({
                 maximumFractionDigits: 2,
               }) || "0.00",
             inventoryDisplay: item.inventory?.toLocaleString("th-TH") || "0",
+            projectNameDisplay: item.projectName || item.projectCode || "-",
             _rawItem: item,
           }))
         : [],
@@ -593,6 +638,16 @@ export default function UICatFinishedGoods({
             }
           >
             {item.inventoryDisplay}
+          </span>
+        );
+      }
+
+      if (columnKey === "projectName") {
+        return (
+          <span
+            className={item.projectName ? "font-medium" : "text-foreground/50"}
+          >
+            {item.projectNameDisplay}
           </span>
         );
       }
@@ -666,6 +721,16 @@ export default function UICatFinishedGoods({
         </div>
 
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            <Building2 />
+            <span>Projects</span>
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 font-medium">
+            {uniqueProjects}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
           <Button
             variant="light"
             size="md"
@@ -714,7 +779,7 @@ export default function UICatFinishedGoods({
             data={normalized}
             statusOptions={statusOptions}
             statusColorMap={STATUS_COLORS}
-            searchPlaceholder="Search item number or name"
+            searchPlaceholder="Search item number, name or project"
             emptyContent="No items found"
             itemName="items"
             renderCustomCell={renderCustomCell}
