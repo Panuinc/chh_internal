@@ -25,8 +25,6 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Download,
-  FileImage,
   Edit3,
 } from "lucide-react";
 import Barcode from "react-barcode";
@@ -36,10 +34,6 @@ import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
 import { COMPANY_INFO } from "@/lib/chainWay/config";
 import { getItemLines, getCommentLines } from "@/lib/chainWay/utils";
-import {
-  exportPackingSlipsAsZip,
-  exportSingleSlipAsPng,
-} from "@/lib/packingSlip/packingSlipExport";
 
 const TABLE_COLUMNS = [
   { name: "#", uid: "index", width: 60 },
@@ -339,7 +333,7 @@ function OrderDetailModal({
             size="md"
             radius="md"
             className="w-2/12 text-background"
-            startContent={<FileImage />}
+            startContent={<Printer />}
             isDisabled={lineCount === 0}
             onPress={() => {
               onClose();
@@ -362,11 +356,6 @@ function SlipPreviewModal({
   printing = false,
 }) {
   const [previewIndex, setPreviewIndex] = useState(0);
-  const [exporting, setExporting] = useState(false);
-  const [exportProgress, setExportProgress] = useState({
-    current: 0,
-    total: 0,
-  });
 
   const [useCustomAddress, setUseCustomAddress] = useState(false);
   const [customAddress, setCustomAddress] = useState({
@@ -450,49 +439,6 @@ function SlipPreviewModal({
     setCustomAddress((prev) => ({ ...prev, [field]: value }));
   };
 
-  const getExportOptions = () => {
-    if (useCustomAddress) {
-      return { customAddress };
-    }
-    return {};
-  };
-
-  const handleExportZip = async () => {
-    setExporting(true);
-    setExportProgress({ current: 0, total: totalPieces });
-
-    try {
-      const result = await exportPackingSlipsAsZip(
-        order,
-        (current, total) => {
-          setExportProgress({ current, total });
-        },
-        getExportOptions(),
-      );
-
-      if (result.success) {
-        showToast("success", `ส่งออกใบปะหน้า ${result.exported} ใบสำเร็จ`);
-        onClose();
-      }
-    } catch (error) {
-      console.error("Export error:", error);
-      showToast("danger", `ส่งออกไม่สำเร็จ: ${error.message}`);
-    } finally {
-      setExporting(false);
-      setExportProgress({ current: 0, total: 0 });
-    }
-  };
-
-  const handleExportSingle = async () => {
-    try {
-      await exportSingleSlipAsPng(order, currentPiece, getExportOptions());
-      showToast("success", `ส่งออกใบที่ ${currentPiece} สำเร็จ`);
-    } catch (error) {
-      console.error("Export error:", error);
-      showToast("danger", `ส่งออกไม่สำเร็จ: ${error.message}`);
-    }
-  };
-
   return (
     <Modal
       isOpen={isOpen}
@@ -535,22 +481,6 @@ function SlipPreviewModal({
         </ModalHeader>
 
         <ModalBody className="flex flex-col items-center justify-start w-full h-fit p-2">
-          {exporting && (
-            <div className="w-full mb-4">
-              <div className="flex justify-between text-sm mb-2">
-                <span>กำลังส่งออก...</span>
-                <span>
-                  {exportProgress.current} / {exportProgress.total}
-                </span>
-              </div>
-              <Progress
-                value={(exportProgress.current / exportProgress.total) * 100}
-                color="primary"
-                size="sm"
-              />
-            </div>
-          )}
-
           <div className="flex flex-col w-full bg-default rounded-xl p-2 gap-2">
             <div className="flex flex-col w-full bg-background rounded-xl overflow-hidden">
               <div className="flex flex-row items-stretch border-b-2 border-default">
@@ -770,41 +700,12 @@ function SlipPreviewModal({
         <ModalFooter className="flex flex-col items-center justify-start w-full h-fit p-2 gap-2">
           <div className="flex items-center justify-center w-full h-full gap-2">
             <Button
-              color="secondary"
-              variant="flat"
-              size="md"
-              radius="md"
-              className="flex-1"
-              startContent={<FileImage size={18} />}
-              onPress={handleExportSingle}
-              isDisabled={exporting || totalPieces === 0}
-            >
-              ส่งออกใบนี้ (PNG)
-            </Button>
-            <Button
-              color="success"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="flex-1 text-background"
-              startContent={<Download size={18} />}
-              onPress={handleExportZip}
-              isLoading={exporting}
-              isDisabled={totalPieces === 0}
-            >
-              {exporting ? "กำลังส่งออก..." : `ส่งออกทั้งหมด (ZIP)`}
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-center w-full h-full gap-2">
-            <Button
               color="danger"
               variant="shadow"
               size="md"
               radius="md"
               className="flex-1 text-background"
               onPress={onClose}
-              isDisabled={exporting}
             >
               ปิด
             </Button>
@@ -817,7 +718,7 @@ function SlipPreviewModal({
               startContent={<Printer />}
               onPress={() => onPrint(order)}
               isLoading={printing}
-              isDisabled={totalPieces === 0 || exporting}
+              isDisabled={totalPieces === 0}
             >
               {printing ? "Printing..." : `Print (ChainWay)`}
             </Button>

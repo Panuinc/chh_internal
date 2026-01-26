@@ -151,7 +151,6 @@ export function PrinterControls({ compact = false, className = "" }) {
   const {
     isConnected,
     printerLoading,
-    printerStatus,
     printerError,
     testConnection,
     calibrate,
@@ -279,28 +278,6 @@ export function PrinterControls({ compact = false, className = "" }) {
           Full Reset
         </ActionBtn>
       </div>
-
-      {printerStatus && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
-          <StatusTile label="ออนไลน์" active={printerStatus.online} />
-          {printerStatus.parsed && (
-            <>
-              <StatusTile
-                label="พร้อมทำงาน"
-                active={!printerStatus.parsed.isPaused}
-              />
-              <StatusTile
-                label="กระดาษ"
-                active={!printerStatus.parsed.paperOut}
-              />
-              <StatusTile
-                label="ริบบอน"
-                active={!printerStatus.parsed.ribbonOut}
-              />
-            </>
-          )}
-        </div>
-      )}
     </div>
   );
 }
@@ -314,7 +291,6 @@ export function PrinterSettings({
   const {
     isConnected,
     printerLoading,
-    printerStatus,
     printerError,
     refreshPrinter,
     testConnection,
@@ -500,48 +476,6 @@ export function PrinterSettings({
             </Button>
           </div>
         </div>
-
-        {printerStatus && (
-          <div className="p-4 rounded-xl border-2 border-default">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Activity size={18} className="text-foreground/50" />
-                <h3 className="text-sm font-semibold text-foreground/80">
-                  สถานะเครื่องพิมพ์
-                </h3>
-              </div>
-              <Button
-                size="md"
-                variant="light"
-                isLoading={printerLoading}
-                onPress={refreshPrinter}
-                startContent={!printerLoading && <RefreshCw size={14} />}
-              >
-                รีเฟรช
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <StatusTile label="ออนไลน์" active={printerStatus.online} />
-              {printerStatus.parsed && (
-                <>
-                  <StatusTile
-                    label="พร้อมทำงาน"
-                    active={!printerStatus.parsed.isPaused}
-                  />
-                  <StatusTile
-                    label="กระดาษ"
-                    active={!printerStatus.parsed.paperOut}
-                  />
-                  <StatusTile
-                    label="ริบบอน"
-                    active={!printerStatus.parsed.ribbonOut}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
