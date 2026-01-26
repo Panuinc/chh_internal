@@ -109,7 +109,7 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      size="2xl"
+      size="3xl"
       placement="center"
       backdrop="blur"
     >
@@ -278,7 +278,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      size="2xl"
+      size="3xl"
       placement="center"
       backdrop="blur"
     >

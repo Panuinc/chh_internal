@@ -231,7 +231,7 @@ function OrderDetailModal({
   const lineCount = getItemLines(order).length;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
+    <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
       <ModalContent>
         <ModalHeader className="flex flex-col gap-2">
           <h3 className="text-lg font-semibold">Sales Order: {order.number}</h3>
@@ -442,7 +442,7 @@ function SlipPreviewModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size="2xl"
+      size="3xl"
       scrollBehavior="inside"
       className="flex flex-col items-center justify-center w-full h-full gap-2"
     >
@@ -458,7 +458,7 @@ function SlipPreviewModal({
             <Button
               isIconOnly
               variant="flat"
-              size="sm"
+              size="md"
               onPress={handlePrev}
               isDisabled={previewIndex === 0}
             >
@@ -470,7 +470,7 @@ function SlipPreviewModal({
             <Button
               isIconOnly
               variant="flat"
-              size="sm"
+              size="md"
               onPress={handleNext}
               isDisabled={previewIndex >= totalPieces - 1}
             >
@@ -633,7 +633,7 @@ function SlipPreviewModal({
               <Checkbox
                 isSelected={useCustomAddress}
                 onValueChange={setUseCustomAddress}
-                size="sm"
+                size="md"
                 color="warning"
               >
                 <span className="text-sm font-semibold flex items-center gap-1">
@@ -647,13 +647,13 @@ function SlipPreviewModal({
               <div className="flex flex-col gap-3">
                 <Input
                   label="ชื่อผู้รับ"
-                  size="sm"
+                  size="md"
                   value={customAddress.shipToName}
                   onValueChange={(v) => handleAddressChange("shipToName", v)}
                 />
                 <Input
                   label="ที่อยู่ บรรทัด 1"
-                  size="sm"
+                  size="md"
                   value={customAddress.shipToAddressLine1}
                   onValueChange={(v) =>
                     handleAddressChange("shipToAddressLine1", v)
@@ -661,7 +661,7 @@ function SlipPreviewModal({
                 />
                 <Input
                   label="ที่อยู่ บรรทัด 2"
-                  size="sm"
+                  size="md"
                   value={customAddress.shipToAddressLine2}
                   onValueChange={(v) =>
                     handleAddressChange("shipToAddressLine2", v)
@@ -670,14 +670,14 @@ function SlipPreviewModal({
                 <div className="flex gap-2">
                   <Input
                     label="อำเภอ/เขต จังหวัด"
-                    size="sm"
+                    size="md"
                     className="flex-1"
                     value={customAddress.shipToCity}
                     onValueChange={(v) => handleAddressChange("shipToCity", v)}
                   />
                   <Input
                     label="รหัสไปรษณีย์"
-                    size="sm"
+                    size="md"
                     className="w-28"
                     value={customAddress.shipToPostCode}
                     onValueChange={(v) =>
@@ -687,7 +687,7 @@ function SlipPreviewModal({
                 </div>
                 <Input
                   label="เบอร์โทรศัพท์"
-                  size="sm"
+                  size="md"
                   value={customAddress.phoneNumber}
                   onValueChange={(v) => handleAddressChange("phoneNumber", v)}
                 />
@@ -730,7 +730,7 @@ function SlipPreviewModal({
 
 function PrinterSettingsModal({ isOpen, onClose }) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
+    <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
       <ModalContent>
         <ModalBody className="py-6">
           <PrinterSettings

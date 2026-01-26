@@ -211,7 +211,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
         stopCamera();
         onClose();
       }}
-      size="2xl"
+      size="3xl"
       placement="center"
       backdrop="blur"
     >

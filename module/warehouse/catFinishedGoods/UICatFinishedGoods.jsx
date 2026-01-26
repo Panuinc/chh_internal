@@ -69,12 +69,12 @@ function RFIDLabelCard({
     >
       <div className="flex items-center justify-between px-4 py-3 border-b border-default bg-default/30">
         <div className="flex items-center gap-2">
-          <Tag className="w-4 h-4 text-primary" />
+          <Tag className="text-primary" />
           <span className="font-mono font-bold text-lg">{itemNumber}</span>
         </div>
         {totalQuantity > 1 && (
           <Chip
-            size="sm"
+            size="md"
             color={isActive ? "primary" : "default"}
             variant="flat"
           >
@@ -163,11 +163,11 @@ function RFIDLabelPreviewModal({
     PRINT_TYPE_OPTIONS.find((opt) => opt.key === printType)?.label || printType;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
+    <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <Tag className="w-5 h-5 text-primary" />
+            <Tag className="text-primary" />
             <span>ตัวอย่าง RFID Label</span>
           </div>
           <p className="text-sm font-normal text-foreground/60">
@@ -186,19 +186,19 @@ function RFIDLabelPreviewModal({
                 <div className="flex items-center gap-2">
                   <Button
                     isIconOnly
-                    size="sm"
+                    size="md"
                     variant="flat"
                     onPress={handlePrevious}
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <ChevronLeft />
                   </Button>
                   <Button
                     isIconOnly
-                    size="sm"
+                    size="md"
                     variant="flat"
                     onPress={handleNext}
                   >
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight />
                   </Button>
                 </div>
               )}
@@ -236,7 +236,7 @@ function RFIDLabelPreviewModal({
             <Divider />
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold">จำนวนที่พิมพ์</span>
-              <Chip size="sm" color="success" variant="solid">
+              <Chip size="md" color="success" variant="solid">
                 {totalLabels} ใบ
               </Chip>
             </div>
@@ -269,7 +269,7 @@ function RFIDLabelPreviewModal({
           <Button
             color="primary"
             variant="shadow"
-            startContent={<Printer className="w-4 h-4" />}
+            startContent={<Printer />}
             onPress={handleConfirm}
             isLoading={printing}
             isDisabled={totalLabels === 0}
@@ -301,7 +301,7 @@ function ItemDetailModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
+    <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
       <ModalContent>
         <ModalHeader className="flex flex-col gap-2">
           <h3 className="text-lg font-semibold">Item Details</h3>
@@ -374,7 +374,7 @@ function ItemDetailModal({
           <div className="flex items-center gap-2 p-3 bg-default/30 rounded-lg">
             <span className="text-sm text-foreground/60">Status:</span>
             <Chip
-              size="sm"
+              size="md"
               color={item.blocked ? "danger" : "success"}
               variant="flat"
             >
@@ -411,7 +411,7 @@ function ItemDetailModal({
             size="md"
             radius="md"
             className="w-full text-background"
-            startContent={<Printer className="w-4 h-4" />}
+            startContent={<Printer />}
             isDisabled={!isConnected || printing}
             onPress={() => {
               onClose();
@@ -558,7 +558,7 @@ export default function UICatFinishedGoods({
             radius="md"
             onPress={() => handleViewItem(item._rawItem)}
           >
-            <Telescope className="w-4 h-4" />
+            <Telescope />
           </Button>
         </div>
       );
@@ -674,7 +674,7 @@ export default function UICatFinishedGoods({
       <Modal
         isOpen={isSettingsOpen}
         onClose={closeSettings}
-        size="2xl"
+        size="3xl"
         scrollBehavior="inside"
       >
         <ModalContent>

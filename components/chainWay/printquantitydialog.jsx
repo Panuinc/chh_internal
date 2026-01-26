@@ -63,7 +63,7 @@ export default function PrintQuantityDialog({
   const inventoryCount = item?.inventory || 0;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md">
+    <Modal isOpen={isOpen} onClose={onClose} size="3xl">
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
           <Printer />
@@ -100,7 +100,7 @@ export default function PrintQuantityDialog({
               <Checkbox
                 isSelected={useInventory}
                 onValueChange={handleUseInventoryChange}
-                size="sm"
+                size="md"
               >
                 ใช้จำนวนตามสต๊อก ({inventoryCount} ชิ้น)
               </Checkbox>
@@ -127,7 +127,7 @@ export default function PrintQuantityDialog({
               {[1, 3, 5, 10].map((num) => (
                 <Button
                   key={num}
-                  size="sm"
+                  size="md"
                   variant={quantity === num ? "solid" : "bordered"}
                   onPress={() => {
                     setQuantity(num);
