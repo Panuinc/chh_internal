@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -12,6 +12,7 @@ import {
   useDisclosure,
   Checkbox,
   Input,
+  Divider,
 } from "@heroui/react";
 import {
   Printer,
@@ -28,13 +29,13 @@ import {
 } from "lucide-react";
 import Barcode from "react-barcode";
 
-import { DataTable, Loading, showToast } from "@/components";
+import { DataTable, Loading } from "@/components";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
 import { COMPANY_INFO } from "@/lib/chainWay/config";
 import { getItemLines, getCommentLines } from "@/lib/chainWay/utils";
 
-const TABLE_COLUMNS = [
+const columns = [
   { name: "#", uid: "index", width: 60 },
   { name: "SO Number", uid: "number" },
   { name: "Customer", uid: "customerName" },
@@ -44,6 +45,17 @@ const TABLE_COLUMNS = [
   { name: "Qty", uid: "totalQuantity", width: 80 },
   { name: "Total", uid: "totalFormatted" },
   { name: "Actions", uid: "actions", width: 120 },
+];
+
+const orderLinesColumns = [
+  { name: "#", uid: "index", width: 50 },
+  { name: "Item No.", uid: "itemNumber" },
+  { name: "Description", uid: "description" },
+  { name: "Unit", uid: "unitOfMeasureCode", width: 80 },
+  { name: "Qty", uid: "quantity", width: 80 },
+  { name: "Unit Price", uid: "unitPriceFormatted", width: 120 },
+  { name: "Amount", uid: "amountFormatted", width: 120 },
+  { name: "Ship Date", uid: "shipmentDate", width: 120 },
 ];
 
 function formatCurrency(value) {
@@ -72,30 +84,23 @@ function expandItemsByQuantity(items) {
   return expanded;
 }
 
-const ORDER_LINES_COLUMNS = [
-  { name: "#", uid: "index", width: 50 },
-  { name: "Item No.", uid: "itemNumber" },
-  { name: "Description", uid: "description" },
-  { name: "Unit", uid: "unitOfMeasureCode", width: 80 },
-  { name: "Qty", uid: "quantity", width: 80 },
-  { name: "Unit Price", uid: "unitPriceFormatted", width: 120 },
-  { name: "Amount", uid: "amountFormatted", width: 120 },
-  { name: "Ship Date", uid: "shipmentDate", width: 120 },
-];
-
 function OrderLinesTable({ lines }) {
   const itemLines = getItemLines({ salesOrderLines: lines });
   const commentLines = getCommentLines({ salesOrderLines: lines });
 
-  const normalizedLines = itemLines.map((line, index) => ({
-    ...line,
-    id: line.id || index,
-    index: index + 1,
-    unitPriceFormatted: formatCurrency(line.unitPrice),
-    amountFormatted: formatCurrency(line.amountIncludingTax),
-  }));
+  const normalizedLines = useMemo(
+    () =>
+      itemLines.map((line, index) => ({
+        ...line,
+        id: line.id || index,
+        index: index + 1,
+        unitPriceFormatted: formatCurrency(line.unitPrice),
+        amountFormatted: formatCurrency(line.amountIncludingTax),
+      })),
+    [itemLines],
+  );
 
-  const renderCustomCell = (item, columnKey) => {
+  const renderCustomCell = useCallback((item, columnKey) => {
     switch (columnKey) {
       case "itemNumber":
         return <span className="font-mono text-xs">{item.itemNumber}</span>;
@@ -122,13 +127,13 @@ function OrderLinesTable({ lines }) {
       default:
         return undefined;
     }
-  };
+  }, []);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="max-h-80 overflow-hidden">
         <DataTable
-          columns={ORDER_LINES_COLUMNS}
+          columns={orderLinesColumns}
           data={normalizedLines}
           emptyContent="No items"
           itemName="items"
@@ -146,73 +151,6 @@ function OrderLinesTable({ lines }) {
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function OrderSummaryPanel({
-  total,
-  totalItems,
-  totalAmount,
-  loading,
-  onRefresh,
-  onOpenSettings,
-}) {
-  return (
-    <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
-      <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          <span className="font-medium">Printer</span>
-          <Button isIconOnly variant="light" size="md" onPress={onOpenSettings}>
-            <Settings />
-          </Button>
-        </div>
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          <PrinterStatusBadge />
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          Total Orders
-        </div>
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          {total}
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          Total Items
-        </div>
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          {totalItems}
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          Total Amount
-        </div>
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          {formatCurrency(totalAmount)}
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          <Button
-            variant="light"
-            size="md"
-            onPress={onRefresh}
-            isDisabled={loading}
-            className="w-full"
-          >
-            <RefreshCw className={loading ? "animate-spin" : ""} />
-            <span className="ml-2">Refresh Data</span>
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
@@ -283,7 +221,9 @@ function OrderDetailModal({
             </div>
           </div>
 
-          <div className="flex flex-col border-t border-default pt-4">
+          <Divider />
+
+          <div className="flex flex-col">
             <div className="flex items-center gap-2 mb-3">
               <Package className="text-foreground/50" />
               <span className="font-medium">
@@ -313,6 +253,17 @@ function OrderDetailModal({
               </p>
             </div>
           </div>
+
+          {!isConnected && (
+            <div className="flex flex-col gap-2 p-3 bg-danger/10 rounded-lg border border-danger/30">
+              <p className="text-sm text-danger font-medium">
+                ⚠️ Printer Not Connected
+              </p>
+              <p className="text-xs text-danger/80">
+                กรุณาเชื่อมต่อเครื่องพิมพ์ RFID ก่อนทำการพิมพ์
+              </p>
+            </div>
+          )}
         </ModalBody>
 
         <ModalFooter>
@@ -321,7 +272,7 @@ function OrderDetailModal({
             variant="shadow"
             size="md"
             radius="md"
-            className="w-2/12 text-background"
+            className="w-full text-background"
             onPress={onClose}
           >
             Close
@@ -331,9 +282,9 @@ function OrderDetailModal({
             variant="shadow"
             size="md"
             radius="md"
-            className="w-2/12 text-background"
+            className="w-full text-background"
             startContent={<Printer />}
-            isDisabled={lineCount === 0}
+            isDisabled={!isConnected || printing || lineCount === 0}
             onPress={() => {
               onClose();
               onOpenPreview(order);
@@ -355,7 +306,6 @@ function SlipPreviewModal({
   printing = false,
 }) {
   const [previewIndex, setPreviewIndex] = useState(0);
-
   const [useCustomAddress, setUseCustomAddress] = useState(false);
   const [customAddress, setCustomAddress] = useState({
     shipToName: "",
@@ -412,8 +362,6 @@ function SlipPreviewModal({
     };
   }, [useCustomAddress, customAddress, order]);
 
-  if (!order) return null;
-
   const currentPiece = previewIndex + 1;
   const currentExpandedItem = expandedItems[previewIndex];
   const currentItem = currentExpandedItem?.item;
@@ -426,17 +374,19 @@ function SlipPreviewModal({
       )
     : "NO-ITEM";
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     setPreviewIndex((prev) => Math.max(0, prev - 1));
-  };
+  }, []);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setPreviewIndex((prev) => Math.min(totalPieces - 1, prev + 1));
-  };
+  }, [totalPieces]);
 
-  const handleAddressChange = (field, value) => {
+  const handleAddressChange = useCallback((field, value) => {
     setCustomAddress((prev) => ({ ...prev, [field]: value }));
-  };
+  }, []);
+
+  if (!order) return null;
 
   return (
     <Modal
@@ -728,22 +678,6 @@ function SlipPreviewModal({
   );
 }
 
-function PrinterSettingsModal({ isOpen, onClose }) {
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
-      <ModalContent>
-        <ModalBody className="py-6">
-          <PrinterSettings
-            showHeader={true}
-            title="ควบคุมเครื่องพิมพ์"
-            subtitle="ChainWay RFID Printer"
-          />
-        </ModalBody>
-      </ModalContent>
-    </Modal>
-  );
-}
-
 export default function UISalesOrderOnline({
   orders = [],
   loading,
@@ -751,9 +685,6 @@ export default function UISalesOrderOnline({
   printing = false,
   onRefresh,
 }) {
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [previewOrder, setPreviewOrder] = useState(null);
-
   const {
     isOpen: isDetailOpen,
     onOpen: openDetail,
@@ -774,6 +705,9 @@ export default function UISalesOrderOnline({
 
   const { isConnected } = useRFIDSafe();
 
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [previewOrder, setPreviewOrder] = useState(null);
+
   const total = orders.length;
   const totalAmount = orders.reduce(
     (sum, o) => sum + (o.totalAmountIncludingTax || 0),
@@ -781,96 +715,188 @@ export default function UISalesOrderOnline({
   );
   const totalItems = orders.reduce((sum, o) => sum + (o.lineCount || 0), 0);
 
-  const normalizedOrders = Array.isArray(orders)
-    ? orders.map((order, i) => ({
-        ...order,
-        index: i + 1,
-        totalFormatted: formatCurrency(order.totalAmountIncludingTax),
-        orderDateFormatted: order.orderDate,
-        deliveryDateFormatted: order.requestedDeliveryDate,
-        _rawOrder: order,
-      }))
-    : [];
+  const normalized = useMemo(
+    () =>
+      Array.isArray(orders)
+        ? orders.map((order, i) => ({
+            ...order,
+            index: i + 1,
+            totalFormatted: formatCurrency(order.totalAmountIncludingTax),
+            orderDateFormatted: order.orderDate,
+            deliveryDateFormatted: order.requestedDeliveryDate,
+            _rawOrder: order,
+          }))
+        : [],
+    [orders],
+  );
 
-  const handleViewOrder = (order) => {
-    setSelectedOrder(order);
-    openDetail();
-  };
+  const handleViewOrder = useCallback(
+    (order) => {
+      setSelectedOrder(order);
+      openDetail();
+    },
+    [openDetail],
+  );
 
-  const handleCloseDetail = () => {
+  const handleCloseDetail = useCallback(() => {
     closeDetail();
     setSelectedOrder(null);
-  };
+  }, [closeDetail]);
 
-  const handleOpenPreview = (order) => {
-    setPreviewOrder(order);
-    openPreview();
-  };
+  const handleOpenPreview = useCallback(
+    (order) => {
+      setPreviewOrder(order);
+      openPreview();
+    },
+    [openPreview],
+  );
 
-  const handleClosePreview = () => {
+  const handleClosePreview = useCallback(() => {
     closePreview();
     setPreviewOrder(null);
-  };
+  }, [closePreview]);
 
-  const handlePrintPackingSlip = (order) => {
-    closePreview();
-    onPrintSingle(order, { type: "packingSlip", enableRFID: false });
-  };
+  const handlePrintPackingSlip = useCallback(
+    (order) => {
+      closePreview();
+      onPrintSingle(order, { type: "packingSlip", enableRFID: false });
+    },
+    [closePreview, onPrintSingle],
+  );
 
-  const renderCustomCell = (item, columnKey) => {
-    switch (columnKey) {
-      case "actions":
-        return (
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              isIconOnly
-              color="default"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-2/12 text-foreground"
-              onPress={() => handleViewOrder(item._rawOrder)}
-            >
-              <Telescope />
-            </Button>
-          </div>
-        );
+  const renderCustomCell = useCallback(
+    (item, columnKey) => {
+      switch (columnKey) {
+        case "actions":
+          return (
+            <div className="flex items-center justify-center gap-2">
+              <Button
+                isIconOnly
+                color="default"
+                variant="shadow"
+                size="md"
+                radius="md"
+                onPress={() => handleViewOrder(item._rawOrder)}
+              >
+                <Telescope />
+              </Button>
+            </div>
+          );
 
-      case "customerName":
-        return (
-          <div className="flex flex-col">
-            <span className="truncate max-w-[200px]">{item.customerName}</span>
-            <span className="text-xs text-foreground/60">
-              {item.customerNumber}
-            </span>
-          </div>
-        );
+        case "customerName":
+          return (
+            <div className="flex flex-col">
+              <span className="truncate max-w-[200px]">
+                {item.customerName}
+              </span>
+              <span className="text-xs text-foreground/60">
+                {item.customerNumber}
+              </span>
+            </div>
+          );
 
-      default:
-        return undefined;
-    }
-  };
+        default:
+          return undefined;
+      }
+    },
+    [handleViewOrder],
+  );
 
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
-      <OrderSummaryPanel
-        total={total}
-        totalItems={totalItems}
-        totalAmount={totalAmount}
-        loading={loading}
-        onRefresh={onRefresh}
-        onOpenSettings={openSettings}
-      />
+      <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            <span className="font-medium">Printer</span>
+            <Button
+              isIconOnly
+              variant="light"
+              size="md"
+              onPress={openSettings}
+              title="Printer Settings"
+            >
+              <Settings />
+            </Button>
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            <PrinterStatusBadge />
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Total Orders
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            {total}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Total Items
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            {totalItems}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            Total Amount
+          </div>
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+            {formatCurrency(totalAmount)}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+          <Button
+            variant="light"
+            size="md"
+            onPress={onRefresh}
+            isDisabled={loading}
+            className="w-full"
+          >
+            <RefreshCw className={loading ? "animate-spin" : ""} />
+            <span className="ml-2">Refresh</span>
+          </Button>
+        </div>
+      </div>
 
       <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
+        <div className="flex xl:hidden items-center justify-between w-full p-2">
+          <PrinterStatusBadge />
+          <div className="flex gap-2">
+            <Button
+              isIconOnly
+              variant="light"
+              size="md"
+              onPress={openSettings}
+              title="Printer Settings"
+            >
+              <Settings />
+            </Button>
+            <Button
+              isIconOnly
+              variant="light"
+              size="md"
+              onPress={onRefresh}
+              isDisabled={loading}
+            >
+              <RefreshCw className={loading ? "animate-spin" : ""} />
+            </Button>
+          </div>
+        </div>
+
         {loading ? (
           <div className="flex items-center justify-center w-full h-full gap-2">
             <Loading />
           </div>
         ) : (
           <DataTable
-            columns={TABLE_COLUMNS}
-            data={normalizedOrders}
+            columns={columns}
+            data={normalized}
             searchPlaceholder="Search SO number or customer"
             emptyContent="No orders found"
             itemName="orders"
@@ -878,6 +904,24 @@ export default function UISalesOrderOnline({
           />
         )}
       </div>
+
+      <Modal
+        isOpen={isSettingsOpen}
+        onClose={closeSettings}
+        size="3xl"
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          <ModalBody className="py-6">
+            <PrinterSettings
+              onClose={closeSettings}
+              showHeader={true}
+              title="ควบคุมเครื่องพิมพ์"
+              subtitle="ChainWay RFID Printer"
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
 
       <OrderDetailModal
         isOpen={isDetailOpen}
@@ -895,8 +939,6 @@ export default function UISalesOrderOnline({
         onPrint={handlePrintPackingSlip}
         printing={printing}
       />
-
-      <PrinterSettingsModal isOpen={isSettingsOpen} onClose={closeSettings} />
     </div>
   );
 }
