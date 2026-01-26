@@ -283,7 +283,7 @@ export default function DataTable({
               <TableColumn
                 key={column.uid}
                 align={column.uid === "actions" ? "center" : "start"}
-                className="p-4 gap-2 border-b-2 border-t-2 border-default bg-default"
+                className="p-2 gap-2 border-b-2 border-t-2 border-default bg-default"
               >
                 {column.name}
               </TableColumn>

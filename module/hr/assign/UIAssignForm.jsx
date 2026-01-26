@@ -27,11 +27,11 @@ export default function UIAssignForm({
   return (
     <div className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto">
       <div className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2">
-        <div className="flex items-end justify-center h-full p-4 gap-2">
+        <div className="flex items-end justify-center h-full p-2 gap-2">
           Employee: {employee?.employeeFirstName} {employee?.employeeLastName} (
           {employee?.employeeEmail})
         </div>
-        <div className="flex items-end justify-center h-full p-4 gap-2">
+        <div className="flex items-end justify-center h-full p-2 gap-2">
           Update By : {operatedBy}
         </div>
       </div>

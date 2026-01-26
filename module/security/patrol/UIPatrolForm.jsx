@@ -114,11 +114,11 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
       backdrop="blur"
     >
       <ModalContent>
-        <ModalHeader className="flex flex-row items-center justify-start w-full h-fit p-4 gap-2">
+        <ModalHeader className="flex flex-row items-center justify-start w-full h-fit p-2 gap-2">
           <QrCode />
           {label}
         </ModalHeader>
-        <ModalBody className="flex flex-col items-center justify-center w-full h-fit p-4 gap-2">
+        <ModalBody className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2">
           {error && (
             <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-danger">
               {error}
@@ -146,7 +146,7 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
             </div>
           )}
         </ModalBody>
-        <ModalFooter className="flex flex-row items-center justify-end w-full h-fit p-4 gap-2">
+        <ModalFooter className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
           <Button
             color="danger"
             variant="shadow"
@@ -283,11 +283,11 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
       backdrop="blur"
     >
       <ModalContent>
-        <ModalHeader className="flex flex-row items-center justify-start w-full h-fit p-4 gap-2">
+        <ModalHeader className="flex flex-row items-center justify-start w-full h-fit p-2 gap-2">
           <Camera />
           {label}
         </ModalHeader>
-        <ModalBody className="flex flex-col items-center justify-center w-full h-fit p-4 gap-2">
+        <ModalBody className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2">
           {error && (
             <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-danger">
               {error}
@@ -313,15 +313,15 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
 
             {isStreaming && (
               <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-4 left-4 w-12 h-12 border-l-2 border-t-2 border-white/50 rounded-tl-lg"></div>
-                <div className="absolute top-4 right-4 w-12 h-12 border-r-2 border-t-2 border-white/50 rounded-tr-lg"></div>
+                <div className="absolute top-2 left-4 w-12 h-12 border-l-2 border-t-2 border-white/50 rounded-tl-lg"></div>
+                <div className="absolute top-2 right-4 w-12 h-12 border-r-2 border-t-2 border-white/50 rounded-tr-lg"></div>
                 <div className="absolute bottom-4 left-4 w-12 h-12 border-l-2 border-b-2 border-white/50 rounded-bl-lg"></div>
                 <div className="absolute bottom-4 right-4 w-12 h-12 border-r-2 border-b-2 border-white/50 rounded-br-lg"></div>
               </div>
             )}
           </div>
         </ModalBody>
-        <ModalFooter className="flex flex-row items-center justify-end w-full h-fit p-4 gap-2">
+        <ModalFooter className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
           <Button
             color="danger"
             variant="shadow"
@@ -352,14 +352,14 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
 
 function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
       <div className="flex items-center justify-center w-full h-fit gap-2 font-semibold">
         <QrCode />
         {label}
       </div>
 
       {qrCodeInfo ? (
-        <div className="flex flex-col items-center justify-center w-full h-fit gap-4">
+        <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
           <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
             <div className="flex items-center justify-center w-full h-fit text-success">
               สแกนสำเร็จ
@@ -395,7 +395,7 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full h-fit gap-4 py-4">
+        <div className="flex flex-col items-center justify-center w-full h-fit gap-2 py-4">
           <div className="flex items-center justify-center w-20 h-20">
             <QrCode />
           </div>
@@ -434,14 +434,14 @@ function PhotoCaptureCard({
   error,
 }) {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
       <div className="flex items-center justify-center w-full h-fit gap-2 font-semibold">
         <Camera />
         {label}
       </div>
 
       {capturedImage ? (
-        <div className="flex flex-col items-center justify-center w-full h-fit gap-4">
+        <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
           <div className="flex items-center justify-center w-full h-fit">
             <Image
               src={capturedImage}
@@ -476,7 +476,7 @@ function PhotoCaptureCard({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full h-fit gap-4 py-4">
+        <div className="flex flex-col items-center justify-center w-full h-fit gap-2 py-4">
           <div className="flex items-center justify-center w-20 h-20">
             <Camera />
           </div>
@@ -605,7 +605,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
         </div>
 
         <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
-          <div className="flex items-end justify-center h-full p-4 gap-2">
+          <div className="flex items-end justify-center h-full p-2 gap-2">
             สร้างโดย : {operatedBy}
           </div>
         </div>

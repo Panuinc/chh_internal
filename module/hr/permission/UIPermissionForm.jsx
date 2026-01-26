@@ -82,7 +82,7 @@ export default function UIPermissionForm({
       </div>
 
       <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
-        <div className="flex items-end justify-center h-full p-4 gap-2">
+        <div className="flex items-end justify-center h-full p-2 gap-2">
           {mode === "create"
             ? `Create By : ${operatedBy}`
             : `Update By : ${operatedBy}`}

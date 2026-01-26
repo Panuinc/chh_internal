@@ -70,9 +70,9 @@ export default function PrintQuantityDialog({
           <span>พิมพ์ฉลาก {isRFID ? "RFID" : ""}</span>
         </ModalHeader>
 
-        <ModalBody className="gap-4">
+        <ModalBody className="gap-2">
           {item && (
-            <div className="p-3 rounded-lg bg-default-100">
+            <div className="p-2 rounded-lg bg-default-100">
               <div className="flex items-center gap-2 mb-2">
                 <Package className="text-foreground/60" />
                 <span className="font-medium">{item.number}</span>
@@ -142,7 +142,7 @@ export default function PrintQuantityDialog({
           </div>
 
           {isRFID && quantity > 1 && (
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-warning-50 border border-warning-200">
+            <div className="flex items-start gap-2 p-2 rounded-lg bg-warning-50 border border-warning-200">
               <AlertCircle className="text-warning mt-0.5" />
               <div className="text-sm">
                 <p className="font-medium text-warning-700">

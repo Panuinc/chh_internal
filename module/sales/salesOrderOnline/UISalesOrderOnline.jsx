@@ -130,7 +130,7 @@ function OrderLinesTable({ lines }) {
   }, []);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <div className="max-h-80 overflow-hidden">
         <DataTable
           columns={orderLinesColumns}
@@ -180,8 +180,8 @@ function OrderDetailModal({
           )}
         </ModalHeader>
 
-        <ModalBody className="gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <ModalBody className="gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             <div className="flex items-start gap-2">
               <User className="text-foreground/50 mt-1" />
               <div className="flex flex-col">
@@ -255,7 +255,7 @@ function OrderDetailModal({
           </div>
 
           {!isConnected && (
-            <div className="flex flex-col gap-2 p-3 bg-danger/10 rounded-lg border border-danger/30">
+            <div className="flex flex-col gap-2 p-2 bg-danger/10 rounded-lg border border-danger/30">
               <p className="text-sm text-danger font-medium">
                 ⚠️ Printer Not Connected
               </p>
@@ -404,7 +404,7 @@ function SlipPreviewModal({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-sm text-foreground/70">
             ทั้งหมด {totalPieces} ใบ (1 ใบ = 1 สินค้า)
           </div>
-          <div className="flex items-center justify-center w-full gap-4">
+          <div className="flex items-center justify-center w-full gap-2">
             <Button
               isIconOnly
               variant="flat"
@@ -564,7 +564,7 @@ function SlipPreviewModal({
             </div>
           </div>
 
-          <div className="flex flex-col w-full mt-4 p-3 bg-default/50 rounded-lg">
+          <div className="flex flex-col w-full mt-4 p-2 bg-default/50 rounded-lg">
             <p className="text-sm font-semibold mb-2">
               สรุปรายการทั้งหมด ({itemLines.length} รายการ, {totalPieces} ใบ):
             </p>
@@ -578,7 +578,7 @@ function SlipPreviewModal({
             </div>
           </div>
 
-          <div className="flex flex-col w-full mt-4 p-3 bg-default/25 border-2 border-default rounded-xl">
+          <div className="flex flex-col w-full mt-4 p-2 bg-default/25 border-2 border-default rounded-xl">
             <div className="flex items-center gap-2 mb-3">
               <Checkbox
                 isSelected={useCustomAddress}
@@ -594,7 +594,7 @@ function SlipPreviewModal({
             </div>
 
             {useCustomAddress && (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 <Input
                   label="ชื่อผู้รับ"
                   size="md"

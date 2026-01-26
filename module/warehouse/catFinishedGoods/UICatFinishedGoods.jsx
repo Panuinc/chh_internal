@@ -175,8 +175,8 @@ function RFIDLabelPreviewModal({
           </p>
         </ModalHeader>
 
-        <ModalBody className="gap-4">
-          <div className="flex flex-col gap-3">
+        <ModalBody className="gap-2">
+          <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-sm text-foreground/70">
                 ตัวอย่างที่ {currentPreviewIndex + 1} / {totalLabels}
@@ -218,7 +218,7 @@ function RFIDLabelPreviewModal({
 
           <Divider />
 
-          <div className="flex flex-col gap-2 p-3 bg-default/30 rounded-lg">
+          <div className="flex flex-col gap-2 p-2 bg-default/30 rounded-lg">
             <div className="flex items-center justify-between text-sm">
               <span className="text-foreground/60">Item Number:</span>
               <span className="font-mono font-medium">{item.number}</span>
@@ -242,7 +242,7 @@ function RFIDLabelPreviewModal({
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 p-3 bg-warning/10 rounded-lg border border-warning/30">
+          <div className="flex flex-col gap-2 p-2 bg-warning/10 rounded-lg border border-warning/30">
             <p className="text-sm text-warning-600 font-medium">
               ⚠️ ข้อควรทราบ
             </p>
@@ -310,9 +310,9 @@ function ItemDetailModal({
           </span>
         </ModalHeader>
 
-        <ModalBody className="gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3">
+        <ModalBody className="gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="flex items-start gap-2">
               <Hash className="text-foreground/50 mt-1 w-5 h-5" />
               <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Item Number</p>
@@ -320,7 +320,7 @@ function ItemDetailModal({
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2">
               <Package className="text-foreground/50 mt-1 w-5 h-5" />
               <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Display Name</p>
@@ -328,7 +328,7 @@ function ItemDetailModal({
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2">
               <Layers className="text-foreground/50 mt-1 w-5 h-5" />
               <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Category</p>
@@ -336,7 +336,7 @@ function ItemDetailModal({
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2">
               <Tag className="text-foreground/50 mt-1 w-5 h-5" />
               <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Unit</p>
@@ -347,8 +347,8 @@ function ItemDetailModal({
 
           <Divider />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="flex items-start gap-2">
               <DollarSign className="text-foreground/50 mt-1 w-5 h-5" />
               <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Unit Price</p>
@@ -358,7 +358,7 @@ function ItemDetailModal({
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2">
               <Package className="text-foreground/50 mt-1 w-5 h-5" />
               <div className="flex flex-col">
                 <p className="text-xs text-foreground/60">Inventory</p>
@@ -371,7 +371,7 @@ function ItemDetailModal({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 p-3 bg-default/30 rounded-lg">
+          <div className="flex items-center gap-2 p-2 bg-default/30 rounded-lg">
             <span className="text-sm text-foreground/60">Status:</span>
             <Chip
               size="md"
@@ -383,7 +383,7 @@ function ItemDetailModal({
           </div>
 
           {!isConnected && (
-            <div className="flex flex-col gap-2 p-3 bg-danger/10 rounded-lg border border-danger/30">
+            <div className="flex flex-col gap-2 p-2 bg-danger/10 rounded-lg border border-danger/30">
               <p className="text-sm text-danger font-medium">
                 ⚠️ Printer Not Connected
               </p>

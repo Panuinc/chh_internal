@@ -109,7 +109,7 @@ function ActionBtn({
 function StatusTile({ label, active }) {
   return (
     <div
-      className={`p-3 rounded-xl border-2 ${
+      className={`p-2 rounded-xl border-2 ${
         active
           ? "bg-success/10 border-success/30"
           : "bg-danger/10 border-danger/30"
@@ -139,7 +139,7 @@ export function PrinterStatusBadge({ className = "" }) {
       <button
         onClick={refreshPrinter}
         disabled={printerLoading}
-        className="p-1.5 rounded hover:bg-default text-foreground/40 disabled:opacity-50"
+        className="p-2 hover:bg-default text-foreground/40 disabled:opacity-50 rounded-xl"
       >
         <RefreshCw className={printerLoading ? "animate-spin" : ""} />
       </button>
@@ -337,8 +337,8 @@ export function PrinterSettings({
   return (
     <div className={`max-w-2xl mx-auto ${className}`}>
       {showHeader && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6">
+          <div className="flex items-center gap-2">
             <Printer className="text-foreground/60" />
             <div>
               <h1 className="text-xl font-semibold text-foreground">{title}</h1>
@@ -358,7 +358,7 @@ export function PrinterSettings({
       )}
 
       <div className="space-y-6">
-        <div className="p-4 rounded-xl border-2 border-default">
+        <div className="p-2 rounded-xl border-2 border-default">
           <div className="flex items-center gap-2 mb-4">
             <Wifi className="text-foreground/50" />
             <h3 className="text-sm font-semibold text-foreground/80">
@@ -366,8 +366,8 @@ export function PrinterSettings({
             </h3>
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-xl bg-default">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between p-2 rounded-xl bg-default">
+            <div className="flex items-center gap-2">
               <div
                 className={`w-3 h-3 rounded-xl ${isConnected ? "bg-success" : "bg-foreground/30"}`}
               />
@@ -388,7 +388,7 @@ export function PrinterSettings({
           </div>
         </div>
 
-        <div className="p-4 rounded-xl border-2 border-default">
+        <div className="p-2 rounded-xl border-2 border-default">
           <div className="flex items-center gap-2 mb-4">
             <Activity className="text-foreground/50" />
             <h3 className="text-sm font-semibold text-foreground/80">
@@ -396,7 +396,7 @@ export function PrinterSettings({
             </h3>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <Button
               variant="bordered"
               className="flex flex-col h-20 gap-1 border-warning/30"

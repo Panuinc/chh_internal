@@ -223,9 +223,9 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
           </div>
         </ModalHeader>
         <ModalBody>
-          <div className="flex flex-col items-center justify-center w-full gap-4">
+          <div className="flex flex-col items-center justify-center w-full gap-2">
             {error && (
-              <div className="text-danger text-sm p-4 bg-danger-50 rounded-lg w-full text-center">
+              <div className="text-danger text-sm p-2 bg-danger-50 rounded-lg w-full text-center">
                 {error}
               </div>
             )}
@@ -245,8 +245,8 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
               )}
               {isStreaming && (
                 <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-4 left-4 w-16 h-16 border-l-4 border-t-4 border-white/50 rounded-tl-lg"></div>
-                  <div className="absolute top-4 right-4 w-16 h-16 border-r-4 border-t-4 border-white/50 rounded-tr-lg"></div>
+                  <div className="absolute top-2 left-4 w-16 h-16 border-l-4 border-t-4 border-white/50 rounded-tl-lg"></div>
+                  <div className="absolute top-2 right-4 w-16 h-16 border-r-4 border-t-4 border-white/50 rounded-tr-lg"></div>
                   <div className="absolute bottom-4 left-4 w-16 h-16 border-l-4 border-b-4 border-white/50 rounded-bl-lg"></div>
                   <div className="absolute bottom-4 right-4 w-16 h-16 border-r-4 border-b-4 border-white/50 rounded-br-lg"></div>
                 </div>
@@ -425,9 +425,9 @@ function MultiCameraModal({
           </div>
         </ModalHeader>
         <ModalBody>
-          <div className="flex flex-col items-center justify-center w-full gap-4">
+          <div className="flex flex-col items-center justify-center w-full gap-2">
             {error && (
-              <div className="text-danger text-sm p-4 bg-danger-50 rounded-lg w-full text-center">
+              <div className="text-danger text-sm p-2 bg-danger-50 rounded-lg w-full text-center">
                 {error}
               </div>
             )}
@@ -447,8 +447,8 @@ function MultiCameraModal({
               )}
               {isStreaming && (
                 <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-4 left-4 w-16 h-16 border-l-4 border-t-4 border-white/50 rounded-tl-lg"></div>
-                  <div className="absolute top-4 right-4 w-16 h-16 border-r-4 border-t-4 border-white/50 rounded-tr-lg"></div>
+                  <div className="absolute top-2 left-4 w-16 h-16 border-l-4 border-t-4 border-white/50 rounded-tl-lg"></div>
+                  <div className="absolute top-2 right-4 w-16 h-16 border-r-4 border-t-4 border-white/50 rounded-tr-lg"></div>
                   <div className="absolute bottom-4 left-4 w-16 h-16 border-l-4 border-b-4 border-white/50 rounded-bl-lg"></div>
                   <div className="absolute bottom-4 right-4 w-16 h-16 border-r-4 border-b-4 border-white/50 rounded-br-lg"></div>
                 </div>
@@ -530,13 +530,13 @@ function PhotoCaptureCard({
     capturedImage || (existingImage ? `/api/uploads/${existingImage}` : null);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4 border-t-1 border-b-1 border-default">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-t-1 border-b-1 border-default">
       <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
         <Camera />
         {label}
       </div>
       {displayImage ? (
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-2">
           <div className="relative group">
             <Image
               src={displayImage}
@@ -571,7 +571,7 @@ function PhotoCaptureCard({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-3 py-8">
+        <div className="flex flex-col items-center gap-2 py-8">
           <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
             <Camera className="text-default-400" />
           </div>
@@ -621,7 +621,7 @@ function DocumentCaptureCard({
       : parsedExistingImages.map((path) => `/api/uploads/${path}`);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4 border-t-1 border-b-1 border-default">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-t-1 border-b-1 border-default">
       <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
         <FileText />
         {label}
@@ -632,7 +632,7 @@ function DocumentCaptureCard({
         )}
       </div>
       {displayImages.length > 0 ? (
-        <div className="flex flex-col items-center gap-3 w-full">
+        <div className="flex flex-col items-center gap-2 w-full">
           <div className="flex flex-wrap justify-center gap-2 w-full">
             {displayImages.map((src, index) => (
               <div key={index} className="relative group">
@@ -687,7 +687,7 @@ function DocumentCaptureCard({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-3 py-8">
+        <div className="flex flex-col items-center gap-2 py-8">
           <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
             <FileText className="text-default-400" />
           </div>
@@ -1021,7 +1021,7 @@ export default function UIVisitorForm({
         </div>
 
         <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
-          <div className="flex items-end justify-center h-full p-4 gap-2">
+          <div className="flex items-end justify-center h-full p-2 gap-2">
             {mode === "create"
               ? `Create By : ${operatedBy}`
               : `Update By : ${operatedBy}`}
