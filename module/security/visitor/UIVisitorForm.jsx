@@ -571,7 +571,7 @@ function PhotoCaptureCard({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-2 py-8">
+        <div className="flex flex-col items-center gap-2 p-2">
           <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
             <Camera className="text-default-400" />
           </div>
@@ -687,7 +687,7 @@ function DocumentCaptureCard({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-2 py-8">
+        <div className="flex flex-col items-center gap-2 p-2">
           <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
             <FileText className="text-default-400" />
           </div>

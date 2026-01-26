@@ -18,7 +18,7 @@ import { useRFIDSafe } from "@/hooks";
 function StatusBadge({ connected, loading }) {
   if (loading) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-warning/10 border-2 border-warning/30">
+      <div className="flex items-center gap-2 p-2 rounded-xl bg-warning/10 border-2 border-warning/30">
         <RefreshCw className="text-warning animate-spin" />
         <span className="text-sm text-warning">กำลังตรวจสอบ...</span>
       </div>
@@ -27,7 +27,7 @@ function StatusBadge({ connected, loading }) {
 
   return (
     <div
-      className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 ${
+      className={`flex items-center gap-2 p-2 rounded-xl border-2 ${
         connected
           ? "bg-success/10 border-success/30"
           : "bg-default border-default"
@@ -70,7 +70,7 @@ function AlertBox({ children, type = "error" }) {
 
   return (
     <div
-      className={`flex items-start gap-2 px-3 py-2 rounded-xl ${s.bg} border-2 ${s.border}`}
+      className={`flex items-start gap-2 p-2 rounded-xl ${s.bg} border-2 ${s.border}`}
     >
       <AlertCircle className={`${s.text} mt-0.5 flex-shrink-0`} />
       <span className={`text-sm ${s.text}`}>{children}</span>
@@ -98,7 +98,7 @@ function ActionBtn({
       isLoading={loading}
       spinner={<Spinner size="md" color="current" />}
       startContent={!loading && Icon && <Icon />}
-      className={`${variants[variant]} text-sm h-9 px-3`}
+      className={`${variants[variant]} text-sm h-9 p-2`}
       {...props}
     >
       {children}

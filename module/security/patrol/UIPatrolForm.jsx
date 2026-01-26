@@ -395,7 +395,7 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full h-fit gap-2 py-4">
+        <div className="flex flex-col items-center justify-center w-full h-fit gap-2 p-2">
           <div className="flex items-center justify-center w-20 h-20">
             <QrCode />
           </div>
@@ -476,7 +476,7 @@ function PhotoCaptureCard({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full h-fit gap-2 py-4">
+        <div className="flex flex-col items-center justify-center w-full h-fit gap-2 p-2">
           <div className="flex items-center justify-center w-20 h-20">
             <Camera />
           </div>

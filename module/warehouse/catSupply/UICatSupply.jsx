@@ -69,7 +69,7 @@ function RFIDLabelCard({
         ${isActive ? "border-primary shadow-lg scale-[1.02]" : "border-default"}
       `}
     >
-      <div className="flex items-center justify-between px-4 py-3 border-b border-default bg-default/30">
+      <div className="flex items-center justify-between p-2 border-b border-default bg-default/30">
         <div className="flex items-center gap-2">
           <Tag className="text-primary" />
           <span className="font-mono font-bold text-lg">{itemNumber}</span>
@@ -85,19 +85,19 @@ function RFIDLabelCard({
         )}
       </div>
 
-      <div className="flex items-center justify-center px-4 py-4 min-h-[60px] border-b border-default">
+      <div className="flex items-center justify-center p-2 min-h-[60px] border-b border-default">
         <p className="text-center text-base font-medium text-foreground/90 line-clamp-2">
           {displayName}
         </p>
       </div>
 
-      <div className="flex flex-col px-4 py-3 bg-default/20">
+      <div className="flex flex-col p-2 bg-default/20">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-xs font-semibold text-foreground/60">
             RFID EPC:
           </span>
         </div>
-        <div className="font-mono text-xs text-foreground/70 break-all bg-default/50 rounded px-2 py-1">
+        <div className="font-mono text-xs text-foreground/70 break-all bg-default/50 rounded p-2">
           {epc}
         </div>
       </div>
@@ -727,7 +727,7 @@ export default function UICatSupply({
         scrollBehavior="inside"
       >
         <ModalContent>
-          <ModalBody className="py-6">
+          <ModalBody className="p-2">
             <PrinterSettings
               onClose={closeSettings}
               showHeader={true}

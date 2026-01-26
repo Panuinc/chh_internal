@@ -53,7 +53,7 @@ export default function UIQuickCheckout({
     return (
       <div className="flex flex-col items-center justify-center w-full h-full p-2">
         <Card className="w-full p-2 gap-2">
-          <CardBody className="text-center py-8 gap-2">
+          <CardBody className="text-center p-2 gap-2">
             <div className="text-6xl mb-4">🔍</div>
             <h2 className="text-xl font-bold text-danger mb-2">
               ไม่พบข้อมูลผู้เยี่ยม
@@ -87,7 +87,7 @@ export default function UIQuickCheckout({
           />
         </CardHeader>
 
-        <CardBody className="px-6 py-4">
+        <CardBody className="p-2">
           {visitor.visitorPhoto && (
             <div className="flex justify-center mb-4">
               <img
@@ -238,7 +238,7 @@ function ActionButtons({
           ✅ Checkout ผู้เยี่ยม
         </Button>
       ) : (
-        <div className="text-center text-default-500 py-2">
+        <div className="text-center text-default-500 p-2">
           ผู้เยี่ยมได้ออกจากพื้นที่แล้ว
         </div>
       )}

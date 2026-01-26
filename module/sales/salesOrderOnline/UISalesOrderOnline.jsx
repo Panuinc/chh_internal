@@ -463,7 +463,7 @@ function SlipPreviewModal({
                 </div>
               </div>
 
-              <div className="flex flex-col items-center justify-center w-full py-3 px-4 border-b-2 border-default bg-white">
+              <div className="flex flex-col items-center justify-center w-full p-2 border-b-2 border-default bg-white">
                 <Barcode
                   value={previewBarcodeValue}
                   format="CODE128"
@@ -509,7 +509,7 @@ function SlipPreviewModal({
                 </div>
               </div>
 
-              <div className="flex px-3 py-2 bg-default text-xs font-semibold">
+              <div className="flex p-2 bg-default text-xs font-semibold">
                 <span className="w-10 text-center">#</span>
                 <span className="flex-1">รายการสินค้า</span>
                 <span className="w-16 text-right">จำนวน</span>
@@ -517,7 +517,7 @@ function SlipPreviewModal({
 
               <div className="flex flex-col h-52 overflow-auto">
                 {currentItem ? (
-                  <div className="flex px-3 py-4 text-sm border-b-1 border-default bg-primary/5">
+                  <div className="flex p-2 text-sm border-b-1 border-default bg-primary/5">
                     <span className="w-10 text-center font-bold">1</span>
                     <div className="flex-1 flex flex-col">
                       <span className="whitespace-pre-wrap break-words font-medium">
@@ -912,7 +912,7 @@ export default function UISalesOrderOnline({
         scrollBehavior="inside"
       >
         <ModalContent>
-          <ModalBody className="py-6">
+          <ModalBody className="p-2">
             <PrinterSettings
               onClose={closeSettings}
               showHeader={true}
