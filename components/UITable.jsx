@@ -100,8 +100,8 @@ const RowsPerPageSelector = ({ onChange }) => (
       defaultValue="5"
     >
       <option value="10">10</option>
-      <option value="15">15</option>
       <option value="50">50</option>
+      <option value="100">100</option>
     </select>
   </label>
 );

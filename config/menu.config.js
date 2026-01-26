@@ -188,6 +188,18 @@ export const menuConfig = {
             edit: "warehouse.catFinishedGoods.edit",
           },
         },
+        {
+          id: "catRawMaterial",
+          href: "/warehouse/catRawMaterial",
+          text: "Category Raw Material",
+          icon: Package,
+          permission: "warehouse.catRawMaterial.view",
+          actions: {
+            view: "warehouse.catRawMaterial.view",
+            create: "warehouse.catRawMaterial.create",
+            edit: "warehouse.catRawMaterial.edit",
+          },
+        },
       ],
     },
     production: {
