@@ -64,46 +64,49 @@ function RFIDLabelCard({
 }) {
   const sequenceText = `${sequenceNumber}/${totalQuantity}`;
 
+  const getShortItemNumber = (fullNumber) => {
+    if (!fullNumber) return fullNumber;
+    const parts = fullNumber.split("-");
+    if (parts.length >= 3) {
+      return parts.slice(-2).join("-");
+    }
+    return fullNumber;
+  };
+
+  const shortItemNumber = getShortItemNumber(itemNumber);
+
   return (
     <div
       className={`
         flex flex-col w-full bg-background rounded-xl border-2 
         transition-all duration-200
-        ${isActive ? "border-primary shadow-lg scale-[1.02]" : "border-default"}
+        ${isActive ? "border-default shadow-md scale-[1.02]" : "border-default"}
       `}
     >
-      <div className="flex items-center justify-between p-2 border-b border-default bg-default/30">
+      <div className="flex items-center justify-between p-3 border-b border-default bg-default/30">
         <div className="flex items-center gap-2">
           <Tag className="text-primary" />
-          <span className="font-mono font-bold text-lg">{itemNumber}</span>
+          <span className="font-mono font-bold text-lg">{shortItemNumber}</span>
         </div>
-        {totalQuantity > 1 && (
-          <Chip
-            size="md"
-            color={isActive ? "primary" : "default"}
-            variant="flat"
-          >
-            {sequenceText}
-          </Chip>
-        )}
+        <Chip size="md" color={isActive ? "primary" : "default"} variant="flat">
+          {sequenceText}
+        </Chip>
       </div>
 
-      <div className="flex items-center justify-center p-2 min-h-[60px] border-b border-default">
+      <div className="flex items-center justify-center p-2 border-b border-default bg-primary/5">
+        <div className="flex items-center gap-2">
+          <Building2 className="w-4 h-4 text-primary" />
+          <span className="text-sm font-medium">{projectName || "-"}</span>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-center p-3 min-h-[60px] border-b border-default">
         <p className="text-center text-base font-medium text-foreground/90 line-clamp-2">
           {displayName}
         </p>
       </div>
 
-      {projectName && (
-        <div className="flex items-center justify-center p-2 border-b border-default bg-primary/5">
-          <div className="flex items-center gap-2">
-            <Building2 />
-            <span className="text-sm font-medium">{projectName}</span>
-          </div>
-        </div>
-      )}
-
-      <div className="flex flex-col p-2 bg-default/20">
+      <div className="flex flex-col p-3 bg-default/20">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-xs font-semibold text-foreground/60">
             RFID EPC:
@@ -116,7 +119,6 @@ function RFIDLabelCard({
     </div>
   );
 }
-
 function RFIDLabelPreviewModal({
   isOpen,
   onClose,

@@ -66,7 +66,7 @@ function RFIDLabelCard({
       className={`
         flex flex-col w-full bg-background rounded-xl border-2 
         transition-all duration-200
-        ${isActive ? "border-primary shadow-lg scale-[1.02]" : "border-default"}
+        ${isActive ? "border-primary shadow-md scale-[1.02]" : "border-default"}
       `}
     >
       <div className="flex items-center justify-between p-2 border-b border-default bg-default/30">
