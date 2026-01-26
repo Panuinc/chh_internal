@@ -19,7 +19,7 @@ function StatusBadge({ connected, loading }) {
   if (loading) {
     return (
       <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-warning/10 border-2 border-warning/30">
-        <RefreshCw size={14} className="text-warning animate-spin" />
+        <RefreshCw className="text-warning animate-spin" />
         <span className="text-sm text-warning">กำลังตรวจสอบ...</span>
       </div>
     );
@@ -72,7 +72,7 @@ function AlertBox({ children, type = "error" }) {
     <div
       className={`flex items-start gap-2 px-3 py-2 rounded-xl ${s.bg} border-2 ${s.border}`}
     >
-      <AlertCircle size={16} className={`${s.text} mt-0.5 flex-shrink-0`} />
+      <AlertCircle className={`${s.text} mt-0.5 flex-shrink-0`} />
       <span className={`text-sm ${s.text}`}>{children}</span>
     </div>
   );
@@ -97,7 +97,7 @@ function ActionBtn({
       size="md"
       isLoading={loading}
       spinner={<Spinner size="md" color="current" />}
-      startContent={!loading && Icon && <Icon size={15} />}
+      startContent={!loading && Icon && <Icon />}
       className={`${variants[variant]} text-sm h-9 px-3`}
       {...props}
     >
@@ -141,7 +141,7 @@ export function PrinterStatusBadge({ className = "" }) {
         disabled={printerLoading}
         className="p-1.5 rounded hover:bg-default text-foreground/40 disabled:opacity-50"
       >
-        <RefreshCw size={16} className={printerLoading ? "animate-spin" : ""} />
+        <RefreshCw className={printerLoading ? "animate-spin" : ""} />
       </button>
     </div>
   );
@@ -183,7 +183,7 @@ export function PrinterControls({ compact = false, className = "" }) {
               isLoading={actionLoading === "test"}
               onPress={() => handleAction("test", testConnection)}
             >
-              <Wifi size={16} />
+              <Wifi />
             </Button>
           </Tooltip>
           <Tooltip content="ปรับเทียบ">
@@ -194,7 +194,7 @@ export function PrinterControls({ compact = false, className = "" }) {
               isLoading={actionLoading === "calibrate"}
               onPress={() => handleAction("calibrate", calibrate)}
             >
-              <Gauge size={16} />
+              <Gauge />
             </Button>
           </Tooltip>
           <Tooltip content="ยกเลิกงานพิมพ์">
@@ -205,7 +205,7 @@ export function PrinterControls({ compact = false, className = "" }) {
               isLoading={actionLoading === "cancel"}
               onPress={() => handleAction("cancel", cancelAllJobs)}
             >
-              <StopCircle size={16} />
+              <StopCircle />
             </Button>
           </Tooltip>
           <Tooltip content="รีเซ็ต">
@@ -216,7 +216,7 @@ export function PrinterControls({ compact = false, className = "" }) {
               isLoading={actionLoading === "reset"}
               onPress={() => handleAction("reset", resetPrinter)}
             >
-              <RotateCcw size={16} />
+              <RotateCcw />
             </Button>
           </Tooltip>
         </div>
@@ -228,7 +228,7 @@ export function PrinterControls({ compact = false, className = "" }) {
     <div className={`space-y-4 ${className}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Printer size={18} className="text-foreground/50" />
+          <Printer className="text-foreground/50" />
           <span className="font-medium text-foreground/80">
             Printer Controls
           </span>
@@ -339,7 +339,7 @@ export function PrinterSettings({
       {showHeader && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <Printer size={24} className="text-foreground/60" />
+            <Printer className="text-foreground/60" />
             <div>
               <h1 className="text-xl font-semibold text-foreground">{title}</h1>
               {subtitle && (
@@ -360,7 +360,7 @@ export function PrinterSettings({
       <div className="space-y-6">
         <div className="p-4 rounded-xl border-2 border-default">
           <div className="flex items-center gap-2 mb-4">
-            <Wifi size={18} className="text-foreground/50" />
+            <Wifi className="text-foreground/50" />
             <h3 className="text-sm font-semibold text-foreground/80">
               สถานะการเชื่อมต่อ
             </h3>
@@ -390,7 +390,7 @@ export function PrinterSettings({
 
         <div className="p-4 rounded-xl border-2 border-default">
           <div className="flex items-center gap-2 mb-4">
-            <Activity size={18} className="text-foreground/50" />
+            <Activity className="text-foreground/50" />
             <h3 className="text-sm font-semibold text-foreground/80">
               ควบคุมเครื่องพิมพ์
             </h3>
@@ -422,7 +422,7 @@ export function PrinterSettings({
                 }
               }}
             >
-              <Activity size={20} className="text-warning" />
+              <Activity className="text-warning" />
               <span className="text-xs">Test RFID</span>
             </Button>
             <Button
@@ -431,7 +431,7 @@ export function PrinterSettings({
               isLoading={actionLoading === "rfidCalibrate"}
               onPress={() => handleAction("rfidCalibrate", rfidCalibrate)}
             >
-              <Activity size={20} className="text-warning" />
+              <Activity className="text-warning" />
               <span className="text-xs">RFID Calibrate</span>
             </Button>
 
@@ -441,7 +441,7 @@ export function PrinterSettings({
               isLoading={actionLoading === "calibrate"}
               onPress={() => handleAction("calibrate", calibrate)}
             >
-              <Gauge size={20} className="text-primary" />
+              <Gauge className="text-primary" />
               <span className="text-xs">ปรับเทียบ</span>
             </Button>
 
@@ -451,7 +451,7 @@ export function PrinterSettings({
               isLoading={actionLoading === "cancel"}
               onPress={() => handleAction("cancel", cancelAllJobs)}
             >
-              <StopCircle size={20} className="text-secondary" />
+              <StopCircle className="text-secondary" />
               <span className="text-xs">ยกเลิกงาน</span>
             </Button>
 
@@ -461,7 +461,7 @@ export function PrinterSettings({
               isLoading={actionLoading === "reset"}
               onPress={() => handleAction("reset", resetPrinter)}
             >
-              <RotateCcw size={20} className="text-foreground/60" />
+              <RotateCcw className="text-foreground/60" />
               <span className="text-xs">Soft Reset</span>
             </Button>
 
@@ -471,7 +471,7 @@ export function PrinterSettings({
               isLoading={actionLoading === "fullReset"}
               onPress={() => handleAction("fullReset", fullReset)}
             >
-              <Zap size={20} className="text-danger" />
+              <Zap className="text-danger" />
               <span className="text-xs text-danger">Full Reset</span>
             </Button>
           </div>

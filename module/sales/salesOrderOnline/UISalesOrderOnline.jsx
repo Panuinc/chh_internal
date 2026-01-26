@@ -462,7 +462,7 @@ function SlipPreviewModal({
               onPress={handlePrev}
               isDisabled={previewIndex === 0}
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft />
             </Button>
             <span className="text-sm font-medium">
               ดูตัวอย่างใบที่ {currentPiece} / {totalPieces}
@@ -474,7 +474,7 @@ function SlipPreviewModal({
               onPress={handleNext}
               isDisabled={previewIndex >= totalPieces - 1}
             >
-              <ChevronRight size={20} />
+              <ChevronRight />
             </Button>
           </div>
         </ModalHeader>
@@ -637,7 +637,7 @@ function SlipPreviewModal({
                 color="warning"
               >
                 <span className="text-sm font-semibold flex items-center gap-1">
-                  <Edit3 size={14} />
+                  <Edit3 />
                   แก้ไขที่อยู่จัดส่ง
                 </span>
               </Checkbox>

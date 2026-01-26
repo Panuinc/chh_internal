@@ -66,7 +66,7 @@ export default function PrintQuantityDialog({
     <Modal isOpen={isOpen} onClose={onClose} size="md">
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <Printer size={20} />
+          <Printer />
           <span>พิมพ์ฉลาก {isRFID ? "RFID" : ""}</span>
         </ModalHeader>
 
@@ -74,7 +74,7 @@ export default function PrintQuantityDialog({
           {item && (
             <div className="p-3 rounded-lg bg-default-100">
               <div className="flex items-center gap-2 mb-2">
-                <Package size={16} className="text-foreground/60" />
+                <Package className="text-foreground/60" />
                 <span className="font-medium">{item.number}</span>
               </div>
               <p className="text-sm text-foreground/70 ml-6">
@@ -92,7 +92,7 @@ export default function PrintQuantityDialog({
 
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Hash size={16} className="text-foreground/60" />
+              <Hash className="text-foreground/60" />
               <span className="font-medium">จำนวนที่ต้องการพิมพ์</span>
             </div>
 
@@ -143,7 +143,7 @@ export default function PrintQuantityDialog({
 
           {isRFID && quantity > 1 && (
             <div className="flex items-start gap-2 p-3 rounded-lg bg-warning-50 border border-warning-200">
-              <AlertCircle size={16} className="text-warning mt-0.5" />
+              <AlertCircle className="text-warning mt-0.5" />
               <div className="text-sm">
                 <p className="font-medium text-warning-700">
                   RFID Sequential Labels
@@ -172,7 +172,7 @@ export default function PrintQuantityDialog({
             variant="shadow"
             onPress={handlePrint}
             isLoading={printing}
-            startContent={!printing && <Printer size={16} />}
+            startContent={!printing && <Printer />}
             className="w-full text-background"
           >
             พิมพ์ {quantity} ใบ

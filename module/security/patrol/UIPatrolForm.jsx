@@ -340,7 +340,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
             className="w-full text-background"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
-            startContent={<Camera size={18} />}
+            startContent={<Camera />}
           >
             ถ่ายรูป
           </Button>
@@ -354,7 +354,7 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4">
       <div className="flex items-center justify-center w-full h-fit gap-2 font-semibold">
-        <QrCode size={20} />
+        <QrCode />
         {label}
       </div>
 
@@ -377,7 +377,7 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
               radius="md"
               className="w-full text-background"
               onPress={onOpenScanner}
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw />}
             >
               สแกนใหม่
             </Button>
@@ -410,7 +410,7 @@ function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
             radius="md"
             className="w-6/12 text-background"
             onPress={onOpenScanner}
-            startContent={<QrCode size={18} />}
+            startContent={<QrCode />}
           >
             สแกน QR Code
           </Button>
@@ -436,7 +436,7 @@ function PhotoCaptureCard({
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-4 gap-4">
       <div className="flex items-center justify-center w-full h-fit gap-2 font-semibold">
-        <Camera size={20} />
+        <Camera />
         {label}
       </div>
 
@@ -458,7 +458,7 @@ function PhotoCaptureCard({
               radius="md"
               className="w-full text-background"
               onPress={onOpenCamera}
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw />}
             >
               ถ่ายใหม่
             </Button>
@@ -491,7 +491,7 @@ function PhotoCaptureCard({
             radius="md"
             className="w-6/12 text-background"
             onPress={onOpenCamera}
-            startContent={<Camera size={18} />}
+            startContent={<Camera />}
           >
             เปิดกล้อง
           </Button>
