@@ -600,7 +600,7 @@ export default function UICatFinishedGoods({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Active Items
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-green-600">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {active}
           </div>
         </div>
@@ -609,7 +609,7 @@ export default function UICatFinishedGoods({
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Blocked Items
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-danger">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {blocked}
           </div>
         </div>
