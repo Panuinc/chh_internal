@@ -216,7 +216,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
       backdrop="blur"
     >
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
+        <ModalHeader className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Camera />
             {label}
@@ -413,7 +413,7 @@ function MultiCameraModal({
       scrollBehavior="inside"
     >
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
+        <ModalHeader className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <FileText />
             {label}

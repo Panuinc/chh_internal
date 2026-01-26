@@ -174,7 +174,7 @@ export function PrinterControls({ compact = false, className = "" }) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
         <StatusBadge connected={isConnected} loading={printerLoading} />
-        <div className="flex gap-1">
+        <div className="flex gap-2">
           <Tooltip content="ทดสอบการเชื่อมต่อ">
             <Button
               isIconOnly
@@ -399,7 +399,7 @@ export function PrinterSettings({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <Button
               variant="bordered"
-              className="flex flex-col h-20 gap-1 border-warning/30"
+              className="flex flex-col h-20 gap-2 border-warning/30"
               onPress={async () => {
                 try {
                   const response = await fetch("/api/chainWay", {
@@ -427,7 +427,7 @@ export function PrinterSettings({
             </Button>
             <Button
               variant="bordered"
-              className="flex flex-col h-20 gap-1"
+              className="flex flex-col h-20 gap-2"
               isLoading={actionLoading === "rfidCalibrate"}
               onPress={() => handleAction("rfidCalibrate", rfidCalibrate)}
             >
@@ -437,7 +437,7 @@ export function PrinterSettings({
 
             <Button
               variant="bordered"
-              className="flex flex-col h-20 gap-1"
+              className="flex flex-col h-20 gap-2"
               isLoading={actionLoading === "calibrate"}
               onPress={() => handleAction("calibrate", calibrate)}
             >
@@ -447,7 +447,7 @@ export function PrinterSettings({
 
             <Button
               variant="bordered"
-              className="flex flex-col h-20 gap-1"
+              className="flex flex-col h-20 gap-2"
               isLoading={actionLoading === "cancel"}
               onPress={() => handleAction("cancel", cancelAllJobs)}
             >
@@ -457,7 +457,7 @@ export function PrinterSettings({
 
             <Button
               variant="bordered"
-              className="flex flex-col h-20 gap-1"
+              className="flex flex-col h-20 gap-2"
               isLoading={actionLoading === "reset"}
               onPress={() => handleAction("reset", resetPrinter)}
             >
@@ -467,7 +467,7 @@ export function PrinterSettings({
 
             <Button
               variant="bordered"
-              className="flex flex-col h-20 gap-1 border-danger/30"
+              className="flex flex-col h-20 gap-2 border-danger/30"
               isLoading={actionLoading === "fullReset"}
               onPress={() => handleAction("fullReset", fullReset)}
             >

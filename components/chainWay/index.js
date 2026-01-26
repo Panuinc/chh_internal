@@ -5,4 +5,3 @@ export {
 } from "./printerConfig.jsx";
 
 export { PRINT_TYPE_OPTIONS } from "@/lib/chainWay/config";
-export { default as PrintQuantityDialog } from "./printquantitydialog.jsx";

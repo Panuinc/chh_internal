@@ -568,7 +568,7 @@ function SlipPreviewModal({
             <p className="text-sm font-semibold mb-2">
               สรุปรายการทั้งหมด ({itemLines.length} รายการ, {totalPieces} ใบ):
             </p>
-            <div className="flex flex-col gap-1 text-xs max-h-32 overflow-auto">
+            <div className="flex flex-col gap-2 text-xs max-h-32 overflow-auto">
               {itemLines.map((item, idx) => (
                 <div key={idx} className="flex justify-between">
                   <span className="truncate flex-1">{item.description}</span>
@@ -586,7 +586,7 @@ function SlipPreviewModal({
                 size="md"
                 color="warning"
               >
-                <span className="text-sm font-semibold flex items-center gap-1">
+                <span className="text-sm font-semibold flex items-center gap-2">
                   <Edit3 />
                   แก้ไขที่อยู่จัดส่ง
                 </span>
