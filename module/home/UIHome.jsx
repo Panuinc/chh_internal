@@ -69,7 +69,7 @@ export default function UIHome({ user, modules }) {
               <span className="relative inline-block">
                 r
                 <svg
-                  className="absolute -top-4 -right-1 w-7 h-7 text-primary"
+                  className="absolute -top-4 -right-2 w-7 h-7 text-primary"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
