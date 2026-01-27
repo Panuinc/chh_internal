@@ -895,32 +895,6 @@ function SlipPreviewModal({
                   }
                 />
                 <Input
-                  label="ที่อยู่ บรรทัด 2"
-                  size="md"
-                  value={customAddress.shipToAddressLine2}
-                  onValueChange={(v) =>
-                    handleAddressChange("shipToAddressLine2", v)
-                  }
-                />
-                <div className="flex gap-2">
-                  <Input
-                    label="อำเภอ/เขต จังหวัด"
-                    size="md"
-                    className="flex-1"
-                    value={customAddress.shipToCity}
-                    onValueChange={(v) => handleAddressChange("shipToCity", v)}
-                  />
-                  <Input
-                    label="รหัสไปรษณีย์"
-                    size="md"
-                    className="w-28"
-                    value={customAddress.shipToPostCode}
-                    onValueChange={(v) =>
-                      handleAddressChange("shipToPostCode", v)
-                    }
-                  />
-                </div>
-                <Input
                   label="เบอร์โทรศัพท์"
                   size="md"
                   value={customAddress.phoneNumber}
