@@ -314,7 +314,7 @@ function ItemQuantitySelector({
   onReset,
 }) {
   return (
-    <div className="flex flex-col w-full p-3 bg-default/25 border-2 border-default rounded-xl">
+    <div className="flex flex-col w-full p-3 bg-default/25 border-1 border-default rounded-xl">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Package className="text-foreground/60" />
@@ -324,7 +324,7 @@ function ItemQuantitySelector({
           size="md"
           color="default"
           variant="shadow"
-          startContent={<RotateCcw size={14} />}
+          startContent={<RotateCcw />}
           onPress={onReset}
         >
           รีเซ็ต
@@ -366,19 +366,19 @@ function ItemQuantitySelector({
               <div className="flex items-center gap-1">
                 <Button
                   isIconOnly
-                  size="sm"
+                  size="md"
                   variant="flat"
                   isDisabled={!isSelected || currentQty <= 1}
                   onPress={() =>
                     onQuantityChange(item.itemNumber, currentQty - 1)
                   }
                 >
-                  <Minus size={14} />
+                  <Minus />
                 </Button>
 
                 <Input
                   type="number"
-                  size="sm"
+                  size="md"
                   className="w-16 text-center"
                   value={String(currentQty)}
                   min={1}
@@ -398,14 +398,14 @@ function ItemQuantitySelector({
 
                 <Button
                   isIconOnly
-                  size="sm"
+                  size="md"
                   variant="flat"
                   isDisabled={!isSelected || currentQty >= maxQty}
                   onPress={() =>
                     onQuantityChange(item.itemNumber, currentQty + 1)
                   }
                 >
-                  <Plus size={14} />
+                  <Plus />
                 </Button>
 
                 <span className="text-xs text-foreground/50 w-12 text-right">
@@ -651,7 +651,7 @@ function SlipPreviewModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size="4xl"
+      size="3xl"
       scrollBehavior="inside"
       className="flex flex-col items-center justify-center w-full h-full gap-2"
     >
@@ -703,7 +703,7 @@ function SlipPreviewModal({
           {totalPieces > 0 ? (
             <div className="flex flex-col w-full bg-default rounded-xl p-2 gap-2">
               <div className="flex flex-col w-full bg-background rounded-xl overflow-hidden">
-                <div className="flex flex-row items-stretch border-b-2 border-default">
+                <div className="flex flex-row items-stretch border-b-1 border-default">
                   <div className="flex items-center justify-center w-[15%] p-2 border-r-2 border-default">
                     <Image
                       src="/logo/logo-09.png"
@@ -734,14 +734,13 @@ function SlipPreviewModal({
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center w-full p-2 border-b-2 border-default bg-white">
+                <div className="flex flex-col items-center justify-center w-full p-2 border-b-1 border-default bg-white">
                   <Barcode
                     value={previewBarcodeValue}
                     format="CODE128"
                     width={1}
                     height={50}
                     displayValue={true}
-                    fontSize={12}
                     fontOptions="bold"
                     textAlign="center"
                     textMargin={5}
@@ -751,7 +750,7 @@ function SlipPreviewModal({
                   />
                 </div>
 
-                <div className="flex flex-col p-2 border-b-2 border-default gap-2">
+                <div className="flex flex-col p-2 border-b-1 border-default gap-2">
                   <div className="flex gap-2">
                     <span className="font-semibold w-12 text-sm">ผู้รับ:</span>
                     <span className="font-bold text-base">
@@ -814,7 +813,7 @@ function SlipPreviewModal({
                   )}
                 </div>
 
-                <div className="flex border-t-2 border-default">
+                <div className="flex border-t-1 border-default">
                   <div className="flex flex-col flex-1 p-2 text-lg text-danger gap-2">
                     <p className="font-bold">
                       ❗กรุณาถ่ายวิดีโอขณะแกะพัสดุ
@@ -862,7 +861,7 @@ function SlipPreviewModal({
             </div>
           </div>
 
-          <div className="flex flex-col w-full p-3 bg-default/25 border-2 border-default rounded-xl">
+          <div className="flex flex-col w-full p-3 bg-default/25 border-1 border-default rounded-xl">
             <div className="flex items-center gap-2 mb-3">
               <Checkbox
                 isSelected={useCustomAddress}
@@ -872,7 +871,7 @@ function SlipPreviewModal({
                 className="text-background"
               >
                 <span className="text-sm font-semibold flex items-center gap-2">
-                  <Edit3 size={16} />
+                  <Edit3 />
                   แก้ไขที่อยู่จัดส่ง
                 </span>
               </Checkbox>
@@ -1085,7 +1084,7 @@ export default function UISalesOrderOnline({
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
       <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <span className="font-medium">Printer</span>
             <Button
@@ -1103,7 +1102,7 @@ export default function UISalesOrderOnline({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Total Orders
           </div>
@@ -1112,7 +1111,7 @@ export default function UISalesOrderOnline({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Total Items
           </div>
@@ -1121,7 +1120,7 @@ export default function UISalesOrderOnline({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Total Amount
           </div>
@@ -1130,7 +1129,7 @@ export default function UISalesOrderOnline({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <Button
             variant="light"
             size="md"

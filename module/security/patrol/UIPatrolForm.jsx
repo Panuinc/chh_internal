@@ -134,7 +134,7 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
 
             {!isScanning && !error && (
               <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-black/80">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-1 border-white"></div>
                 <span className="text-white">กำลังเปิดกล้อง...</span>
               </div>
             )}
@@ -306,17 +306,17 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
 
             {!isStreaming && !error && (
               <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-black">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-1 border-white"></div>
                 <span className="text-white">กำลังเปิดกล้อง...</span>
               </div>
             )}
 
             {isStreaming && (
               <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-2 left-4 w-12 h-12 border-l-2 border-t-2 border-white/50 rounded-tl-lg"></div>
-                <div className="absolute top-2 right-4 w-12 h-12 border-r-2 border-t-2 border-white/50 rounded-tr-lg"></div>
-                <div className="absolute bottom-4 left-4 w-12 h-12 border-l-2 border-b-2 border-white/50 rounded-bl-lg"></div>
-                <div className="absolute bottom-4 right-4 w-12 h-12 border-r-2 border-b-2 border-white/50 rounded-br-lg"></div>
+                <div className="absolute top-2 left-4 w-12 h-12 border-l-2 border-t-1 border-white/50 rounded-tl-lg"></div>
+                <div className="absolute top-2 right-4 w-12 h-12 border-r-2 border-t-1 border-white/50 rounded-tr-lg"></div>
+                <div className="absolute bottom-4 left-4 w-12 h-12 border-l-2 border-b-1 border-white/50 rounded-bl-lg"></div>
+                <div className="absolute bottom-4 right-4 w-12 h-12 border-r-2 border-b-1 border-white/50 rounded-br-lg"></div>
               </div>
             )}
           </div>
@@ -548,7 +548,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
         className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto"
       >
         <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-b-2 xl:border-b-0 xl:border-r-2 border-default">
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-b-1 xl:border-b-0 xl:border-r-2 border-default">
             <QrCodeCard
               label="สแกน QR Code"
               qrCodeInfo={formData.patrolQrCodeInfo}

@@ -80,7 +80,7 @@ export default function UIAssignForm({
               key={group.category}
               className="flex flex-col items-start justify-start w-full h-fit p-2 gap-2"
             >
-              <div className="flex items-center justify-between w-full h-fit pb-2 border-b-2 border-default">
+              <div className="flex items-center justify-between w-full h-fit pb-2 border-b-1 border-default">
                 <Checkbox
                   size="md"
                   radius="md"
@@ -123,7 +123,7 @@ export default function UIAssignForm({
                       key={subGroup.subCategory}
                       className="flex flex-col w-full gap-2 p-2 bg-default-50 rounded-xl"
                     >
-                      <div className="flex items-center justify-between w-full pb-2 border-b-2 border-default">
+                      <div className="flex items-center justify-between w-full pb-2 border-b-1 border-default">
                         <Checkbox
                           size="md"
                           radius="md"

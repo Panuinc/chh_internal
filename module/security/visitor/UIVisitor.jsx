@@ -82,7 +82,7 @@ export default function UIVisitor({
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
       <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             จำนวนผู้เยี่ยมชมทั้งหมด
           </div>
@@ -90,7 +90,7 @@ export default function UIVisitor({
             {total}
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             ผู้เยี่ยมชมที่เข้า
           </div>
@@ -98,7 +98,7 @@ export default function UIVisitor({
             {checkIn}
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             ผู้เยี่ยมชมที่ออก
           </div>

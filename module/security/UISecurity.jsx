@@ -9,7 +9,7 @@ function SecuritySidebar() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-b-2 border-default">
+    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-b-1 border-default">
       <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
         Quick Stats
       </div>
@@ -25,7 +25,7 @@ function SecuritySidebar() {
 
 function StatItem({ label, value }) {
   return (
-    <div className="flex items-center justify-between w-full h-full gap-2 border-b-2 border-default">
+    <div className="flex items-center justify-between w-full h-full gap-2 border-b-1 border-default">
       <div className="flex items-center justify-center w-full h-full p-2 gap-2">
         {label}
       </div>

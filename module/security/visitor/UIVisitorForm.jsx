@@ -240,7 +240,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
               <canvas ref={canvasRef} className="hidden" />
               {!isStreaming && !error && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-1 border-white"></div>
                 </div>
               )}
               {isStreaming && (
@@ -442,7 +442,7 @@ function MultiCameraModal({
               <canvas ref={canvasRef} className="hidden" />
               {!isStreaming && !error && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-1 border-white"></div>
                 </div>
               )}
               {isStreaming && (

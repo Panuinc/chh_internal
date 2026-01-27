@@ -18,7 +18,7 @@ import { useRFIDSafe } from "@/hooks";
 function StatusBadge({ connected, loading }) {
   if (loading) {
     return (
-      <div className="flex items-center gap-2 p-2 rounded-xl bg-warning/10 border-2 border-warning/30">
+      <div className="flex items-center gap-2 p-2 rounded-xl bg-warning/10 border-1 border-warning/30">
         <RefreshCw className="text-warning animate-spin" />
         <span className="text-sm text-warning">กำลังตรวจสอบ...</span>
       </div>
@@ -27,7 +27,7 @@ function StatusBadge({ connected, loading }) {
 
   return (
     <div
-      className={`flex items-center gap-2 p-2 rounded-xl border-2 ${
+      className={`flex items-center gap-2 p-2 rounded-xl border-1 ${
         connected
           ? "bg-success/10 border-success/30"
           : "bg-default border-default"
@@ -70,7 +70,7 @@ function AlertBox({ children, type = "error" }) {
 
   return (
     <div
-      className={`flex items-start gap-2 p-2 rounded-xl ${s.bg} border-2 ${s.border}`}
+      className={`flex items-start gap-2 p-2 rounded-xl ${s.bg} border-1 ${s.border}`}
     >
       <AlertCircle className={`${s.text} mt-0.5 flex-shrink-0`} />
       <span className={`text-sm ${s.text}`}>{children}</span>
@@ -87,8 +87,8 @@ function ActionBtn({
 }) {
   const variants = {
     primary: "bg-primary text-background",
-    secondary: "bg-background text-foreground/70 border-2 border-default",
-    danger: "bg-background text-danger border-2 border-danger/30",
+    secondary: "bg-background text-foreground/70 border-1 border-default",
+    danger: "bg-background text-danger border-1 border-danger/30",
     ghost: "bg-transparent text-foreground/60",
   };
 
@@ -109,7 +109,7 @@ function ActionBtn({
 function StatusTile({ label, active }) {
   return (
     <div
-      className={`p-2 rounded-xl border-2 ${
+      className={`p-2 rounded-xl border-1 ${
         active
           ? "bg-success/10 border-success/30"
           : "bg-danger/10 border-danger/30"
@@ -358,7 +358,7 @@ export function PrinterSettings({
       )}
 
       <div className="space-y-6">
-        <div className="p-2 rounded-xl border-2 border-default">
+        <div className="p-2 rounded-xl border-1 border-default">
           <div className="flex items-center gap-2 mb-4">
             <Wifi className="text-foreground/50" />
             <h3 className="text-sm font-semibold text-foreground/80">
@@ -388,7 +388,7 @@ export function PrinterSettings({
           </div>
         </div>
 
-        <div className="p-2 rounded-xl border-2 border-default">
+        <div className="p-2 rounded-xl border-1 border-default">
           <div className="flex items-center gap-2 mb-4">
             <Activity className="text-foreground/50" />
             <h3 className="text-sm font-semibold text-foreground/80">

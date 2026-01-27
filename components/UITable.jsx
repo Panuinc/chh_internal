@@ -293,7 +293,7 @@ export default function DataTable({
             {(item) => (
               <TableRow key={item.id}>
                 {(columnKey) => (
-                  <TableCell className="border-b-2 border-default">
+                  <TableCell className="border-b-1 border-default">
                     {renderCell(item, columnKey)}
                   </TableCell>
                 )}

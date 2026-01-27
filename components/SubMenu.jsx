@@ -8,7 +8,7 @@ export default function SubMenu({
   className = "",
 }) {
   const baseClasses =
-    "flex flex-col items-center justify-center w-32 h-32 p-2 gap-2 border-2 border-default shadow-md rounded-xl transition-all duration-200";
+    "flex flex-col items-center justify-center w-32 h-32 p-2 gap-2 border-1 border-default shadow-md rounded-xl transition-all duration-200";
 
   const enabledClasses = "hover:scale-110 hover:shadow-md cursor-pointer";
   const disabledClasses = "opacity-50 cursor-not-allowed";

@@ -64,7 +64,7 @@ function RFIDLabelCard({
   return (
     <div
       className={`
-        flex flex-col w-full bg-background rounded-xl border-2 
+        flex flex-col w-full bg-background rounded-xl border-1 
         transition-all duration-200
         ${isActive ? "border-default shadow-md scale-[1.02]" : "border-default"}
       `}
@@ -208,12 +208,12 @@ function RFIDLabelPreviewModal({
               <div className="flex items-center gap-2">
                 <Button
                   isIconOnly
-                  size="sm"
+                  size="md"
                   variant="flat"
                   onPress={handleDecrement}
                   isDisabled={quantity <= 1}
                 >
-                  <Minus size={16} />
+                  <Minus />
                 </Button>
                 <Input
                   type="number"
@@ -225,16 +225,16 @@ function RFIDLabelPreviewModal({
                   }}
                   min={1}
                   max={999}
-                  size="sm"
+                  size="md"
                 />
                 <Button
                   isIconOnly
-                  size="sm"
+                  size="md"
                   variant="flat"
                   onPress={handleIncrement}
                   isDisabled={quantity >= 999}
                 >
-                  <Plus size={16} />
+                  <Plus />
                 </Button>
               </div>
             </div>
@@ -620,7 +620,7 @@ export default function UICatRawMaterial({
   return (
     <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
       <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             <span className="font-medium">Printer</span>
             <Button
@@ -638,7 +638,7 @@ export default function UICatRawMaterial({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Total Items
           </div>
@@ -647,7 +647,7 @@ export default function UICatRawMaterial({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Active Items
           </div>
@@ -656,7 +656,7 @@ export default function UICatRawMaterial({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             Blocked Items
           </div>
@@ -665,7 +665,7 @@ export default function UICatRawMaterial({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-2 border-default">
+        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <Button
             variant="light"
             size="md"
