@@ -208,15 +208,15 @@ export const menuConfig = {
       description: "Management About production",
       items: [
         {
-          id: "oneDoor",
-          href: "/production/oneDoor",
-          text: "One Door Optimize",
+          id: "doorBom",
+          href: "/production/doorBom",
+          text: "Door Bom",
           icon: DoorOpen,
-          permission: "production.oneDoor.view",
+          permission: "production.doorBom.view",
           actions: {
-            view: "production.oneDoor.view",
-            create: "production.oneDoor.create",
-            edit: "production.oneDoor.edit",
+            view: "production.doorBom.view",
+            create: "production.doorBom.create",
+            edit: "production.doorBom.edit",
           },
         },
       ],

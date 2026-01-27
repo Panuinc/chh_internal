@@ -3,3 +3,5 @@
 [2026-01-27 12:53:16] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
 [2026-01-27 12:56:16] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
 [2026-01-27 12:56:16] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
+[2026-01-27 13:33:51] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":1000000}
+[2026-01-27 13:33:51] [INFO] GetAllEmployeeUseCase success {"total":3,"returned":3}
