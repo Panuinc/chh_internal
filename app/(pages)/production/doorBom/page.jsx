@@ -1,29 +1,65 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
+
+// Uncontrolled number input - ไม่ re-render ขณะพิมพ์
+const NumberInput = ({ value, onChange, className, step = 1 }) => {
+  const inputRef = useRef(null);
+
+  // Sync input value เมื่อ value เปลี่ยนจากภายนอก (เช่น กดปุ่ม)
+  useEffect(() => {
+    if (inputRef.current && document.activeElement !== inputRef.current) {
+      inputRef.current.value = value;
+    }
+  }, [value]);
+
+  const handleBlur = (e) => {
+    const newVal = parseFloat(e.target.value) || 0;
+    onChange(newVal);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.target.blur();
+    }
+  };
+
+  return (
+    <input
+      ref={inputRef}
+      type="text"
+      inputMode="numeric"
+      defaultValue={value}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      className={className}
+    />
+  );
+};
 
 export default function DoorConfigurator() {
   // ===== 1. สเปคจากลูกค้า =====
-  const [doorThickness, setDoorThickness] = useState(35);
-  const [doorWidth, setDoorWidth] = useState(800);
-  const [doorHeight, setDoorHeight] = useState(2000);
+  const [doorThickness, setDoorThickness] = useState("");
+  const [doorWidth, setDoorWidth] = useState("");
+  const [doorHeight, setDoorHeight] = useState("");
 
   // ===== 2. วัสดุปิดผิว =====
   const [surfaceMaterial, setSurfaceMaterial] = useState("melamine");
-  const [surfaceThickness, setSurfaceThickness] = useState(4);
+  const [surfaceThickness, setSurfaceThickness] = useState(4); // ผู้ใช้กรอกเอง
+  const GLUE_THICKNESS = 1; // ความหนากาว 1mm ต่อด้าน
 
   // ===== 3. โครง (Frame) - ตาม ERP =====
   const [frameType, setFrameType] = useState("rubberwood");
   const [selectedFrameCode, setSelectedFrameCode] = useState("");
   const [hasDoubleFrame, setHasDoubleFrame] = useState(false);
 
-  // ===== 4. Lock Block - เลือกตำแหน่ง (ซ้าย/ขวา/ทั้งสอง) - แต่ละฝั่งเบิ้ล 2 ชิ้นเสมอ =====
+  // ===== 4. Lock Block - เลือกตำแหน่ง (ซ้าย/ขวา/ทั้งสอง) + จำนวนต่อฝั่ง =====
   const [lockBlockLeft, setLockBlockLeft] = useState(true);
   const [lockBlockRight, setLockBlockRight] = useState(true);
+  const [lockBlockPiecesPerSide, setLockBlockPiecesPerSide] = useState(2); // จำนวนต่อฝั่ง (1-4)
 
   // Fixed Lock Block values
   const LOCK_BLOCK_HEIGHT = 400; // Fix 400mm
   const LOCK_BLOCK_POSITION = 1000; // Fix 1000mm จากพื้น
-  const LOCK_BLOCK_PIECES_PER_SIDE = 2; // เบิ้ลเสมอ - ฝั่งละ 2 ชิ้น
 
   // ===== ERP Frame Data =====
   const erpFrames = {
@@ -198,7 +234,8 @@ export default function DoorConfigurator() {
 
   // Find best matching frame with flipping logic + LENGTH consideration + SPLICING
   const frameSelection = useMemo(() => {
-    const requiredThickness = doorThickness - surfaceThickness * 2;
+    const requiredThickness =
+      doorThickness - (surfaceThickness + GLUE_THICKNESS) * 2; // รวมกาว
     const requiredLength = doorHeight; // ไม้ต้องยาวพอสำหรับโครงตั้ง
     const frames = erpFrames[frameType] || [];
 
@@ -491,7 +528,7 @@ export default function DoorConfigurator() {
     const H = parseFloat(doorHeight) || 0;
     const S = parseFloat(surfaceThickness) || 0;
 
-    const totalSurfaceThickness = S * 2;
+    const totalSurfaceThickness = (S + GLUE_THICKNESS) * 2; // รวมกาว 1mm ต่อด้าน
     const frameThickness = T - totalSurfaceThickness;
     const F = currentFrame.useWidth;
     const R = currentFrame.useThickness;
@@ -550,12 +587,12 @@ export default function DoorConfigurator() {
       }
     }
 
-    // Lock block calculations - แต่ละฝั่งเบิ้ล 2 ชิ้นเสมอ
+    // Lock block calculations - จำนวนตามที่เลือก
     const lockBlockTop = LOCK_BLOCK_POSITION - LOCK_BLOCK_HEIGHT / 2;
     const lockBlockBottom = LOCK_BLOCK_POSITION + LOCK_BLOCK_HEIGHT / 2;
     const lockBlockWidth = F;
     const lockBlockSides = (lockBlockLeft ? 1 : 0) + (lockBlockRight ? 1 : 0);
-    const lockBlockCount = lockBlockSides * LOCK_BLOCK_PIECES_PER_SIDE; // ฝั่งละ 2 ชิ้น
+    const lockBlockCount = lockBlockSides * lockBlockPiecesPerSide; // จำนวนรวม
 
     // Check if any rail was adjusted
     const railsAdjusted = railPositions.some(
@@ -600,6 +637,7 @@ export default function DoorConfigurator() {
     currentFrame,
     lockBlockLeft,
     lockBlockRight,
+    lockBlockPiecesPerSide,
   ]);
 
   // ===== Cutting Optimization =====
@@ -802,34 +840,41 @@ export default function DoorConfigurator() {
       lockBlockRight,
     } = results;
 
+    // Guard against invalid values - ป้องกันค่า 0 หรือค่าลบ
+    const safeH = H > 0 ? H : 2000;
+    const safeW = W > 0 ? W : 800;
+    const safeT = T > 0 ? T : 35;
+    const safeS = S > 0 ? S : 4;
+    const safeF = F > 0 ? F : 50;
+
     const viewBoxWidth = 950;
     const viewBoxHeight = 750;
 
-    const frontScale = 300 / H;
-    const fW = W * frontScale;
-    const fH = H * frontScale;
-    const fF = F * frontScale;
+    const frontScale = 300 / safeH;
+    const fW = safeW * frontScale;
+    const fH = safeH * frontScale;
+    const fF = safeF * frontScale;
     const fDF = DF * frontScale;
     const fTotalFrame = totalFrameWidth * frontScale;
     const fR = Math.max(R * frontScale, 3);
     const fLockBlockW = lockBlockWidth * frontScale;
 
-    const sideScale = 300 / H;
-    const sT = Math.max(T * sideScale * 5, 25);
-    const sH = H * sideScale;
-    const sS = Math.max(S * sideScale * 5, 4);
+    const sideScale = 300 / safeH;
+    const sT = Math.max(safeT * sideScale * 5, 25);
+    const sH = safeH * sideScale;
+    const sS = Math.max(safeS * sideScale * 5, 4);
 
     const topScaleW = 0.15;
     const topScaleT = 3;
-    const tW = W * topScaleW;
-    const tT = Math.max(T * topScaleT, 30);
-    const tF = F * topScaleW;
+    const tW = safeW * topScaleW;
+    const tT = Math.max(safeT * topScaleT, 30);
+    const tF = safeF * topScaleW;
     const tDF = DF * topScaleW;
-    const tS = Math.max(S * topScaleT, 3);
+    const tS = Math.max(safeS * topScaleT, 3);
 
-    const secF = Math.max((F * 2) / 10, 8);
+    const secF = Math.max((safeF * 2) / 10, 8);
     const secDF = Math.max((DF * 2) / 10, 0);
-    const secS = Math.max(S * 2, 5);
+    const secS = Math.max(safeS * 2, 5);
 
     const frontX = 80;
     const frontY = 100;
@@ -838,6 +883,12 @@ export default function DoorConfigurator() {
     const topX = 50;
     const topY = 530;
     const sectionX = 620;
+
+    // Safe array length calculation - ป้องกัน Invalid array length
+    const safeArrayLen = (n) => {
+      const len = Math.floor(n);
+      return len > 0 && len < 500 ? len : 0;
+    };
 
     return (
       <svg
@@ -984,29 +1035,29 @@ export default function DoorConfigurator() {
             );
           })}
 
-          {/* Lock Block - LEFT (เบิ้ล 2 ชิ้น) */}
+          {/* Lock Block - LEFT (ตามจำนวนที่เลือก) */}
           {lockBlockLeft && (
             <g id="lock-block-left">
-              {/* ชิ้นที่ 1 */}
-              <rect
-                x={frontX + fTotalFrame}
-                y={frontY + fH - lockBlockBottom * frontScale}
-                width={fLockBlockW}
-                height={results.lockBlockHeight * frontScale}
-                fill="#ffcdd2"
-                stroke="#c62828"
-                strokeWidth="1.5"
-              />
-              {/* ชิ้นที่ 2 (เบิ้ล) */}
-              <rect
-                x={frontX + fTotalFrame + fLockBlockW}
-                y={frontY + fH - lockBlockBottom * frontScale}
-                width={fLockBlockW}
-                height={results.lockBlockHeight * frontScale}
-                fill="#ef9a9a"
-                stroke="#c62828"
-                strokeWidth="1"
-              />
+              {[...Array(lockBlockPiecesPerSide)].map((_, i) => (
+                <rect
+                  key={`lb-left-${i}`}
+                  x={frontX + fTotalFrame + fLockBlockW * i}
+                  y={frontY + fH - lockBlockBottom * frontScale}
+                  width={fLockBlockW}
+                  height={results.lockBlockHeight * frontScale}
+                  fill={
+                    i === 0
+                      ? "#ffcdd2"
+                      : i === 1
+                        ? "#ef9a9a"
+                        : i === 2
+                          ? "#e57373"
+                          : "#ef5350"
+                  }
+                  stroke="#c62828"
+                  strokeWidth={i === 0 ? "1.5" : "1"}
+                />
+              ))}
               {[...Array(4)].map((_, i) => (
                 <line
                   key={`lb-hatch-l-${i}`}
@@ -1022,35 +1073,48 @@ export default function DoorConfigurator() {
             </g>
           )}
 
-          {/* Lock Block - RIGHT (เบิ้ล 2 ชิ้น) */}
+          {/* Lock Block - RIGHT (ตามจำนวนที่เลือก) */}
           {lockBlockRight && (
             <g id="lock-block-right">
-              {/* ชิ้นที่ 1 */}
-              <rect
-                x={frontX + fW - fTotalFrame - fLockBlockW}
-                y={frontY + fH - lockBlockBottom * frontScale}
-                width={fLockBlockW}
-                height={results.lockBlockHeight * frontScale}
-                fill="#ffcdd2"
-                stroke="#c62828"
-                strokeWidth="1.5"
-              />
-              {/* ชิ้นที่ 2 (เบิ้ล) */}
-              <rect
-                x={frontX + fW - fTotalFrame - fLockBlockW * 2}
-                y={frontY + fH - lockBlockBottom * frontScale}
-                width={fLockBlockW}
-                height={results.lockBlockHeight * frontScale}
-                fill="#ef9a9a"
-                stroke="#c62828"
-                strokeWidth="1"
-              />
+              {[...Array(lockBlockPiecesPerSide)].map((_, i) => (
+                <rect
+                  key={`lb-right-${i}`}
+                  x={frontX + fW - fTotalFrame - fLockBlockW * (i + 1)}
+                  y={frontY + fH - lockBlockBottom * frontScale}
+                  width={fLockBlockW}
+                  height={results.lockBlockHeight * frontScale}
+                  fill={
+                    i === 0
+                      ? "#ffcdd2"
+                      : i === 1
+                        ? "#ef9a9a"
+                        : i === 2
+                          ? "#e57373"
+                          : "#ef5350"
+                  }
+                  stroke="#c62828"
+                  strokeWidth={i === 0 ? "1.5" : "1"}
+                />
+              ))}
               {[...Array(4)].map((_, i) => (
                 <line
                   key={`lb-hatch-r-${i}`}
-                  x1={frontX + fW - fTotalFrame - fLockBlockW * 2 + i * 6}
+                  x1={
+                    frontX +
+                    fW -
+                    fTotalFrame -
+                    fLockBlockW * lockBlockPiecesPerSide +
+                    i * 6
+                  }
                   y1={frontY + fH - lockBlockBottom * frontScale}
-                  x2={frontX + fW - fTotalFrame - fLockBlockW * 2 + i * 6 + 8}
+                  x2={
+                    frontX +
+                    fW -
+                    fTotalFrame -
+                    fLockBlockW * lockBlockPiecesPerSide +
+                    i * 6 +
+                    8
+                  }
                   y2={frontY + fH - lockBlockTop * frontScale}
                   stroke="#c62828"
                   strokeWidth="0.5"
@@ -1357,7 +1421,7 @@ export default function DoorConfigurator() {
                   stroke="#5d4037"
                   strokeWidth="0.5"
                 />
-                {[...Array(Math.floor(sH / 12))].map((_, i) => (
+                {[...Array(safeArrayLen(sH / 12))].map((_, i) => (
                   <line
                     key={`sf1-${i}`}
                     x1={layerStartX + surfaceW}
@@ -1430,7 +1494,7 @@ export default function DoorConfigurator() {
                   stroke="#5d4037"
                   strokeWidth="0.5"
                 />
-                {[...Array(Math.floor(sH / 12))].map((_, i) => (
+                {[...Array(safeArrayLen(sH / 12))].map((_, i) => (
                   <line
                     key={`sf2-${i}`}
                     x1={layerStartX + surfaceW + frameW + coreW}
@@ -1883,60 +1947,62 @@ export default function DoorConfigurator() {
                   strokeDasharray="4,2"
                 />
 
-                {/* Lock blocks in section (เบิ้ล 2 ชิ้นต่อฝั่ง) */}
+                {/* Lock blocks in section (ตามจำนวนที่เลือก) */}
                 {lockBlockLeft && (
                   <>
-                    <rect
-                      x={secStartX + 5 + secF + secDF}
-                      y={secStartY + 5 + secS + 20}
-                      width={lockBlockSecW}
-                      height={totalH - 10 - 2 * secS - 40}
-                      fill="#ffcdd2"
-                      stroke="#c62828"
-                      strokeWidth="0.5"
-                      fillOpacity="0.9"
-                    />
-                    <rect
-                      x={secStartX + 5 + secF + secDF + lockBlockSecW}
-                      y={secStartY + 5 + secS + 20}
-                      width={lockBlockSecW}
-                      height={totalH - 10 - 2 * secS - 40}
-                      fill="#ef9a9a"
-                      stroke="#c62828"
-                      strokeWidth="0.5"
-                      fillOpacity="0.7"
-                    />
+                    {[...Array(lockBlockPiecesPerSide)].map((_, i) => (
+                      <rect
+                        key={`sec-lb-left-${i}`}
+                        x={secStartX + 5 + secF + secDF + lockBlockSecW * i}
+                        y={secStartY + 5 + secS + 20}
+                        width={lockBlockSecW}
+                        height={totalH - 10 - 2 * secS - 40}
+                        fill={
+                          i === 0
+                            ? "#ffcdd2"
+                            : i === 1
+                              ? "#ef9a9a"
+                              : i === 2
+                                ? "#e57373"
+                                : "#ef5350"
+                        }
+                        stroke="#c62828"
+                        strokeWidth="0.5"
+                        fillOpacity={0.9 - i * 0.15}
+                      />
+                    ))}
                   </>
                 )}
                 {lockBlockRight && (
                   <>
-                    <rect
-                      x={secStartX + totalW - 5 - secF - secDF - lockBlockSecW}
-                      y={secStartY + 5 + secS + 20}
-                      width={lockBlockSecW}
-                      height={totalH - 10 - 2 * secS - 40}
-                      fill="#ffcdd2"
-                      stroke="#c62828"
-                      strokeWidth="0.5"
-                      fillOpacity="0.9"
-                    />
-                    <rect
-                      x={
-                        secStartX +
-                        totalW -
-                        5 -
-                        secF -
-                        secDF -
-                        lockBlockSecW * 2
-                      }
-                      y={secStartY + 5 + secS + 20}
-                      width={lockBlockSecW}
-                      height={totalH - 10 - 2 * secS - 40}
-                      fill="#ef9a9a"
-                      stroke="#c62828"
-                      strokeWidth="0.5"
-                      fillOpacity="0.7"
-                    />
+                    {[...Array(lockBlockPiecesPerSide)].map((_, i) => (
+                      <rect
+                        key={`sec-lb-right-${i}`}
+                        x={
+                          secStartX +
+                          totalW -
+                          5 -
+                          secF -
+                          secDF -
+                          lockBlockSecW * (i + 1)
+                        }
+                        y={secStartY + 5 + secS + 20}
+                        width={lockBlockSecW}
+                        height={totalH - 10 - 2 * secS - 40}
+                        fill={
+                          i === 0
+                            ? "#ffcdd2"
+                            : i === 1
+                              ? "#ef9a9a"
+                              : i === 2
+                                ? "#e57373"
+                                : "#ef5350"
+                        }
+                        stroke="#c62828"
+                        strokeWidth="0.5"
+                        fillOpacity={0.9 - i * 0.15}
+                      />
+                    ))}
                   </>
                 )}
 
@@ -2153,7 +2219,7 @@ export default function DoorConfigurator() {
             strokeWidth="1"
           />
           <text x="18" y={hasDoubleFrame ? 100 : 84} fontSize="8" fill="#333">
-            Lock Block (×2)
+            Lock Block (×{lockBlockPiecesPerSide})
           </text>
           <line
             x1="0"
@@ -2335,15 +2401,15 @@ export default function DoorConfigurator() {
   };
 
   const standardWidths = [700, 800, 900, 1000];
-  const standardHeights = [2000, 2100, 2200, 2400, 2700, 3000];
-  const standardThickness = [33, 35, 40, 45];
+  const standardHeights = [2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700];
+  const standardThickness = [35, 40, 45];
 
   const surfaceMaterials = [
-    { value: "melamine", label: "เมลามีน", thickness: 4 },
-    { value: "laminate", label: "ลามิเนต", thickness: 4 },
-    { value: "veneer", label: "วีเนียร์", thickness: 3 },
-    { value: "pvc", label: "PVC", thickness: 3 },
-    { value: "paint", label: "สีพ่น", thickness: 2 },
+    { value: "upvc", label: "UPVC" },
+    { value: "wpc", label: "WPC" },
+    { value: "laminate", label: "ลามิเนต" },
+    { value: "plywood", label: "ไม้อัด" },
+    { value: "melamine", label: "เมลามีน" },
   ];
 
   const frameTypes = [
@@ -2388,12 +2454,9 @@ export default function DoorConfigurator() {
                       ))}
                     </div>
                     <div className="flex items-center gap-1">
-                      <input
-                        type="text"
+                      <NumberInput
                         value={doorThickness}
-                        onChange={(e) =>
-                          setDoorThickness(Number(e.target.value))
-                        }
+                        onChange={setDoorThickness}
                         className="flex-1 px-2 py-1.5 border rounded text-center text-sm font-bold focus:ring-2 focus:ring-blue-500"
                       />
                       <span className="text-xs text-gray-500">mm</span>
@@ -2416,11 +2479,10 @@ export default function DoorConfigurator() {
                       ))}
                     </div>
                     <div className="flex items-center gap-1">
-                      <input
-                        type="text"
+                      <NumberInput
                         value={doorWidth}
-                        onChange={(e) => setDoorWidth(Number(e.target.value))}
-                        className="flex-1 px-2 py-1.5 border rounded text-sm focus:ring-2 focus:ring-blue-500"
+                        onChange={setDoorWidth}
+                        className="flex-1 px-2 py-1.5 border rounded text-center text-sm font-bold focus:ring-2 focus:ring-blue-500"
                       />
                       <span className="text-xs text-gray-500">mm</span>
                     </div>
@@ -2442,11 +2504,10 @@ export default function DoorConfigurator() {
                       ))}
                     </div>
                     <div className="flex items-center gap-1">
-                      <input
-                        type="text"
+                      <NumberInput
                         value={doorHeight}
-                        onChange={(e) => setDoorHeight(Number(e.target.value))}
-                        className="flex-1 px-2 py-1.5 border rounded text-sm focus:ring-2 focus:ring-blue-500"
+                        onChange={setDoorHeight}
+                        className="flex-1 px-2 py-1.5 border rounded text-center text-sm font-bold focus:ring-2 focus:ring-blue-500"
                       />
                       <span className="text-xs text-gray-500">mm</span>
                     </div>
@@ -2467,19 +2528,21 @@ export default function DoorConfigurator() {
               {/* 2. วัสดุปิดผิว */}
               <SectionCard text="2" title="วัสดุปิดผิว" icon="🎨" color="green">
                 <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-1">
-                    {surfaceMaterials.map((mat) => (
-                      <button
-                        key={mat.value}
-                        onClick={() => {
-                          setSurfaceMaterial(mat.value);
-                          setSurfaceThickness(mat.thickness);
-                        }}
-                        className={`py-1.5 px-2 rounded text-xs font-medium transition-all ${surfaceMaterial === mat.value ? "bg-green-600 text-white shadow-md" : "bg-gray-100 hover:bg-gray-200"}`}
-                      >
-                        {mat.label} ({mat.thickness}mm)
-                      </button>
-                    ))}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      ประเภทวัสดุ
+                    </label>
+                    <div className="grid grid-cols-2 gap-1">
+                      {surfaceMaterials.map((mat) => (
+                        <button
+                          key={mat.value}
+                          onClick={() => setSurfaceMaterial(mat.value)}
+                          className={`py-1.5 px-2 rounded text-xs font-medium transition-all ${surfaceMaterial === mat.value ? "bg-green-600 text-white shadow-md" : "bg-gray-100 hover:bg-gray-200"}`}
+                        >
+                          {mat.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   <div>
@@ -2487,14 +2550,10 @@ export default function DoorConfigurator() {
                       ความหนา/แผ่น
                     </label>
                     <div className="flex items-center gap-1">
-                      <input
-                        type="text"
+                      <NumberInput
                         value={surfaceThickness}
-                        onChange={(e) =>
-                          setSurfaceThickness(Number(e.target.value))
-                        }
+                        onChange={setSurfaceThickness}
                         className="flex-1 px-2 py-1.5 border rounded text-center text-sm font-bold focus:ring-2 focus:ring-green-500"
-                        step="0.5"
                       />
                       <span className="text-xs text-gray-500">mm</span>
                     </div>
@@ -2502,7 +2561,29 @@ export default function DoorConfigurator() {
 
                   <div className="p-2 bg-green-50 rounded-lg border border-green-200 text-xs">
                     <div className="flex justify-between">
-                      <span>รวม 2 ด้าน:</span>
+                      <span>วัสดุ:</span>
+                      <span className="font-bold text-green-700">
+                        {
+                          surfaceMaterials.find(
+                            (m) => m.value === surfaceMaterial,
+                          )?.label
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>วัสดุปิดผิว:</span>
+                      <span>
+                        {surfaceThickness} mm × 2 = {surfaceThickness * 2} mm
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>กาว:</span>
+                      <span>
+                        {GLUE_THICKNESS} mm × 2 = {GLUE_THICKNESS * 2} mm
+                      </span>
+                    </div>
+                    <div className="flex justify-between font-medium border-t border-green-200 pt-1 mt-1">
+                      <span>รวมทั้งหมด:</span>
                       <span className="font-bold">
                         {results.totalSurfaceThickness} mm
                       </span>
@@ -2701,7 +2782,7 @@ export default function DoorConfigurator() {
               </SectionCard>
             </div>
 
-            {/* 5. Lock Block - เลือกตำแหน่ง (แต่ละฝั่งเบิ้ล 2 ชิ้น) */}
+            {/* 5. Lock Block - เลือกตำแหน่ง + จำนวน */}
             <SectionCard
               text="5"
               title="Lock Block (รองลูกบิด)"
@@ -2709,11 +2790,29 @@ export default function DoorConfigurator() {
               color="red"
             >
               <div className="space-y-3">
-                <div className="p-2 bg-red-100 rounded-lg border border-red-300 text-xs text-red-700 mb-2">
-                  ⚠️ แต่ละฝั่งที่เลือกจะมี <strong>2 ชิ้นเสมอ</strong>{" "}
-                  (เบิ้ลอัตโนมัติ)
+                {/* จำนวนต่อฝั่ง */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    จำนวนต่อฝั่ง
+                  </label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3].map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => setLockBlockPiecesPerSide(n)}
+                        className={`flex-1 py-2 rounded text-sm font-bold transition-all ${
+                          lockBlockPiecesPerSide === n
+                            ? "bg-red-500 text-white shadow-md"
+                            : "bg-gray-100 hover:bg-gray-200"
+                        }`}
+                      >
+                        {n} ชิ้น
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
+                {/* เลือกฝั่ง */}
                 <div className="grid grid-cols-3 gap-2">
                   <label
                     className={`flex flex-col items-center gap-1 p-3 rounded-lg border-2 cursor-pointer transition-all ${lockBlockLeft && !lockBlockRight ? "bg-red-50 border-red-400" : "bg-gray-50 border-gray-200 hover:border-gray-300"}`}
@@ -2730,7 +2829,7 @@ export default function DoorConfigurator() {
                     />
                     <span className="text-xs font-medium">ซ้าย</span>
                     <span className="text-[10px] text-red-500 font-bold">
-                      (2 ชิ้น)
+                      ({lockBlockPiecesPerSide} ชิ้น)
                     </span>
                   </label>
 
@@ -2749,7 +2848,7 @@ export default function DoorConfigurator() {
                     />
                     <span className="text-xs font-medium">ขวา</span>
                     <span className="text-[10px] text-red-500 font-bold">
-                      (2 ชิ้น)
+                      ({lockBlockPiecesPerSide} ชิ้น)
                     </span>
                   </label>
 
@@ -2768,7 +2867,7 @@ export default function DoorConfigurator() {
                     />
                     <span className="text-xs font-medium">ทั้งสอง</span>
                     <span className="text-[10px] text-red-500 font-bold">
-                      (4 ชิ้น)
+                      ({lockBlockPiecesPerSide * 2} ชิ้น)
                     </span>
                   </label>
                 </div>
@@ -2780,10 +2879,10 @@ export default function DoorConfigurator() {
                       <span className="font-bold text-red-700">
                         {results.lockBlockCount} ชิ้น (
                         {lockBlockLeft && lockBlockRight
-                          ? "ซ้าย 2 + ขวา 2"
+                          ? `ซ้าย ${lockBlockPiecesPerSide} + ขวา ${lockBlockPiecesPerSide}`
                           : lockBlockLeft
-                            ? "ซ้าย 2"
-                            : "ขวา 2"}
+                            ? `ซ้าย ${lockBlockPiecesPerSide}`
+                            : `ขวา ${lockBlockPiecesPerSide}`}
                         )
                       </span>
                     </div>
@@ -2795,7 +2894,7 @@ export default function DoorConfigurator() {
                       </span>
                     </div>
                     <div className="text-gray-500 text-[10px] mb-2">
-                      (ใช้ไม้เดียวกับโครง, แต่ละฝั่งเบิ้ล 2 ชิ้น)
+                      (ใช้ไม้เดียวกับโครง)
                     </div>
                     <div className="pt-2 border-t border-red-200 text-red-700 space-y-1">
                       <div className="flex justify-between">
@@ -2837,7 +2936,11 @@ export default function DoorConfigurator() {
                 <div className="p-2 bg-gray-50 rounded-lg">
                   <span className="text-gray-500 block">ปิดผิว:</span>
                   <span className="font-bold text-green-600">
-                    {surfaceMaterial} {surfaceThickness}mm × 2
+                    {
+                      surfaceMaterials.find((m) => m.value === surfaceMaterial)
+                        ?.label
+                    }{" "}
+                    {surfaceThickness}mm + กาว {GLUE_THICKNESS}mm (×2)
                   </span>
                 </div>
                 <div
@@ -2869,10 +2972,10 @@ export default function DoorConfigurator() {
                   <span className="font-bold text-red-600">
                     {results.lockBlockCount} ชิ้น (
                     {lockBlockLeft && lockBlockRight
-                      ? "ซ้าย 2 + ขวา 2"
+                      ? `ซ้าย ${lockBlockPiecesPerSide} + ขวา ${lockBlockPiecesPerSide}`
                       : lockBlockLeft
-                        ? "ซ้าย 2"
-                        : "ขวา 2"}
+                        ? `ซ้าย ${lockBlockPiecesPerSide}`
+                        : `ขวา ${lockBlockPiecesPerSide}`}
                     )
                   </span>
                 </div>
@@ -3085,15 +3188,56 @@ export default function DoorConfigurator() {
                 </h3>
               </div>
               <div className="p-3 bg-gray-50">
-                <ArchitecturalDrawing results={results} />
+                {doorThickness && doorWidth && doorHeight ? (
+                  <ArchitecturalDrawing results={results} />
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-96 text-gray-400">
+                    <svg
+                      className="w-24 h-24 mb-4 opacity-30"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1}
+                        d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+                      />
+                    </svg>
+                    <p className="text-lg font-medium mb-2">
+                      กรุณากรอกข้อมูลสเปคประตู
+                    </p>
+                    <p className="text-sm">
+                      ระบุ ความหนา (T), ความกว้าง (W), ความสูง (H)
+                    </p>
+                    <div className="mt-4 flex gap-2 text-xs">
+                      <span
+                        className={`px-2 py-1 rounded ${doorThickness ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
+                      >
+                        T: {doorThickness || "—"}
+                      </span>
+                      <span
+                        className={`px-2 py-1 rounded ${doorWidth ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
+                      >
+                        W: {doorWidth || "—"}
+                      </span>
+                      <span
+                        className={`px-2 py-1 rounded ${doorHeight ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
+                      >
+                        H: {doorHeight || "—"}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         <div className="mt-4 text-center text-gray-500 text-xs">
-          C.H.H INDUSTRY CO., LTD. | Door Configuration System v31.0 - Always
-          Avoid Lock Block
+          C.H.H INDUSTRY CO., LTD. | Door Configuration System v38.1 - Fixed
+          Frame Selection with Glue
         </div>
       </div>
     </div>
