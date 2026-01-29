@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useMemo, useRef, useEffect } from "react";
 
-// ===== CONSTANTS =====
 const GLUE_THICKNESS = 1;
 const LOCK_BLOCK_HEIGHT = 400;
 const LOCK_BLOCK_POSITION = 1000;
@@ -205,7 +204,6 @@ const SECTION_COLORS = {
   slate: "from-slate-700 to-slate-800",
 };
 
-// ===== UTILITY FUNCTIONS =====
 const formatDimension = (t, w, h, separator = "×") =>
   `${t || "-"}${separator}${w || "-"}${separator}${h || "-"}`;
 
@@ -219,9 +217,6 @@ const getEfficiencyColor = (efficiency) => {
   return { bg: "bg-red-500", text: "text-red-600" };
 };
 
-// ===== REUSABLE UI COMPONENTS =====
-
-// Uncontrolled number input - ไม่ re-render ขณะพิมพ์
 const NumberInput = ({ value, onChange, className }) => {
   const inputRef = useRef(null);
 
@@ -247,7 +242,6 @@ const NumberInput = ({ value, onChange, className }) => {
   );
 };
 
-// Button group for selecting values
 const SelectButtonGroup = ({
   options,
   value,
@@ -285,7 +279,6 @@ const SelectButtonGroup = ({
   </div>
 );
 
-// Quick select buttons with custom input
 const QuickSelectWithInput = ({
   label,
   options,
@@ -326,7 +319,6 @@ const QuickSelectWithInput = ({
   </div>
 );
 
-// Info row component
 const InfoRow = ({ label, value, className = "" }) => (
   <div className={`flex justify-between ${className}`}>
     <span>{label}</span>
@@ -334,7 +326,6 @@ const InfoRow = ({ label, value, className = "" }) => (
   </div>
 );
 
-// Stat card component
 const StatCard = ({
   value,
   label,
@@ -347,7 +338,6 @@ const StatCard = ({
   </div>
 );
 
-// Section card wrapper
 const SectionCard = ({ text, title, icon, children, color = "blue" }) => (
   <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
     <div className={`bg-gradient-to-r ${SECTION_COLORS[color]} px-4 py-2.5`}>
@@ -363,7 +353,6 @@ const SectionCard = ({ text, title, icon, children, color = "blue" }) => (
   </div>
 );
 
-// Info box with colored background
 const InfoBox = ({ children, color = "blue", className = "" }) => {
   const colorMap = {
     blue: "bg-blue-50 border-blue-200 text-blue-700",
@@ -383,7 +372,6 @@ const InfoBox = ({ children, color = "blue", className = "" }) => {
   );
 };
 
-// Checkbox with label
 const CheckboxOption = ({ checked, onChange, label, sublabel, isActive }) => (
   <label
     className={`flex items-center gap-2 p-2 rounded-lg border-2 cursor-pointer transition-all ${
@@ -405,7 +393,6 @@ const CheckboxOption = ({ checked, onChange, label, sublabel, isActive }) => (
   </label>
 );
 
-// Radio option card
 const RadioOptionCard = ({
   name,
   checked,
@@ -435,7 +422,6 @@ const RadioOptionCard = ({
   </label>
 );
 
-// Modal component
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
   return (
@@ -459,7 +445,6 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-// Empty state placeholder
 const EmptyState = ({ icon, title, subtitle, children }) => (
   <div className="flex flex-col items-center justify-center h-96 text-gray-400">
     {icon}
@@ -469,9 +454,6 @@ const EmptyState = ({ icon, title, subtitle, children }) => (
   </div>
 );
 
-// ===== SVG COMPONENTS =====
-
-// Dimension line for engineering drawings
 const DimLine = ({
   x1,
   y1,
@@ -603,7 +585,6 @@ const DimLine = ({
   );
 };
 
-// Center line for drawings
 const CenterLine = ({ x1, y1, x2, y2 }) => (
   <line
     x1={x1}
@@ -616,7 +597,6 @@ const CenterLine = ({ x1, y1, x2, y2 }) => (
   />
 );
 
-// Hatch pattern lines
 const HatchLines = ({
   x,
   y,
@@ -641,7 +621,6 @@ const HatchLines = ({
   </>
 );
 
-// Lock block SVG element
 const LockBlockSVG = ({ x, y, width, height, strokeColor = "#c62828" }) => (
   <g>
     <rect
@@ -672,7 +651,6 @@ const LockBlockSVG = ({ x, y, width, height, strokeColor = "#c62828" }) => (
   </g>
 );
 
-// Position annotation
 const PositionAnnotation = ({ x, y, value, align = "end" }) => (
   <g>
     <line x1={x - 10} y1={y} x2={x} y2={y} stroke="#666" strokeWidth="0.4" />
@@ -682,9 +660,6 @@ const PositionAnnotation = ({ x, y, value, align = "end" }) => (
   </g>
 );
 
-// ===== CUSTOM HOOKS =====
-
-// Frame selection logic
 const useFrameSelection = (
   frameType,
   doorThickness,
@@ -719,6 +694,17 @@ const useFrameSelection = (
         }
       }
       return null;
+    };
+
+    const createDisplaySize = (f, isFlipped, planeAmount, needSplice) => {
+      const parts = [];
+      if (isFlipped) parts.push("พลิก");
+      if (planeAmount > 0) parts.push(`ไส ${planeAmount}mm`);
+      if (needSplice) parts.push("ต่อ 2 ท่อน");
+      const suffix = parts.length > 0 ? ` (${parts.join("+")})` : "";
+      return isFlipped
+        ? `${f.width}×${f.thickness}×${f.length}${suffix}`
+        : `${f.thickness}×${f.width}×${f.length}${suffix}`;
     };
 
     const createFrameResult = (
@@ -756,27 +742,13 @@ const useFrameSelection = (
       };
     };
 
-    const createDisplaySize = (f, isFlipped, planeAmount, needSplice) => {
-      const parts = [];
-      if (isFlipped) parts.push("พลิก");
-      if (planeAmount > 0) parts.push(`ไส ${planeAmount}mm`);
-      if (needSplice) parts.push("ต่อ 2 ท่อน");
-      const suffix = parts.length > 0 ? ` (${parts.join("+")})` : "";
-      return isFlipped
-        ? `${f.width}×${f.thickness}×${f.length}${suffix}`
-        : `${f.thickness}×${f.width}×${f.length}${suffix}`;
-    };
-
-    // Try each matching strategy in order
     const strategies = [
-      // 1. Exact match
       () => {
         const exact = filterAndSort(
           frames.filter((f) => f.thickness === requiredThickness),
         );
         return exact.length > 0 ? createFrameResult(exact, false, 0) : null;
       },
-      // 2. Flip exact
       () => {
         const flipExact = filterAndSort(
           frames.filter((f) => f.width === requiredThickness),
@@ -785,7 +757,6 @@ const useFrameSelection = (
           ? createFrameResult(flipExact, true, 0)
           : null;
       },
-      // 3. Plane thicker
       () => {
         const thicker = frames
           .filter(
@@ -805,7 +776,6 @@ const useFrameSelection = (
             )
           : null;
       },
-      // 4. Flip and plane
       () => {
         const flipPlane = frames
           .filter(
@@ -822,7 +792,6 @@ const useFrameSelection = (
             )
           : null;
       },
-      // 5-8. Splice variations
       () => {
         const splice = findSpliceable(
           frames.filter((f) => f.thickness === requiredThickness),
@@ -886,18 +855,18 @@ const useFrameSelection = (
   }, [frameType, doorThickness, surfaceThickness, doorHeight]);
 };
 
-// Calculations hook
 const useCalculations = (params) => {
   const {
     doorThickness,
     doorWidth,
     doorHeight,
     surfaceThickness,
-    hasDoubleFrame,
     currentFrame,
     lockBlockLeft,
     lockBlockRight,
     lockBlockPiecesPerSide,
+    doubleFrameSides,
+    doubleFrameCount,
   } = params;
 
   return useMemo(() => {
@@ -910,6 +879,25 @@ const useCalculations = (params) => {
     const frameThickness = T - totalSurfaceThickness;
     const F = currentFrame.useWidth || 0;
     const R = currentFrame.useThickness || 0;
+
+    const effectiveSides = {
+      top: !!(doubleFrameSides?.all || doubleFrameSides?.top),
+      bottom: !!(doubleFrameSides?.all || doubleFrameSides?.bottom),
+      left: !!(doubleFrameSides?.all || doubleFrameSides?.left),
+      right: !!(doubleFrameSides?.all || doubleFrameSides?.right),
+      center: !!(doubleFrameSides?.all || doubleFrameSides?.center),
+    };
+
+    const numericDoubleCount = parseInt(doubleFrameCount) || 0;
+
+    const hasDoubleFrame =
+      numericDoubleCount > 0 &&
+      (effectiveSides.top ||
+        effectiveSides.bottom ||
+        effectiveSides.left ||
+        effectiveSides.right ||
+        effectiveSides.center);
+
     const DF = hasDoubleFrame ? F : 0;
     const totalFrameWidth = F + DF;
     const innerWidth = W - 2 * totalFrameWidth;
@@ -917,14 +905,12 @@ const useCalculations = (params) => {
     const doorArea = W * H;
     const railSections = H >= 2400 ? 4 : 3;
 
-    // Lock block zone calculations
     const lockBlockZoneTop = LOCK_BLOCK_POSITION - LOCK_BLOCK_HEIGHT / 2;
     const lockBlockZoneBottom = LOCK_BLOCK_POSITION + LOCK_BLOCK_HEIGHT / 2;
     const lockBlockZoneBuffer = 50;
     const avoidZoneTop = lockBlockZoneTop - lockBlockZoneBuffer;
     const avoidZoneBottom = lockBlockZoneBottom + lockBlockZoneBuffer;
 
-    // Calculate rail positions
     const railPositions = [];
     const railPositionsOriginal = [];
     const railThickness = currentFrame.useWidth || 50;
@@ -991,24 +977,33 @@ const useCalculations = (params) => {
       lockBlockLeft,
       lockBlockRight,
       currentFrame,
+      doubleFrame: {
+        count: numericDoubleCount,
+        top: effectiveSides.top,
+        bottom: effectiveSides.bottom,
+        left: effectiveSides.left,
+        right: effectiveSides.right,
+        center: effectiveSides.center,
+        hasAny: hasDoubleFrame,
+      },
     };
   }, [
     doorThickness,
     doorWidth,
     doorHeight,
     surfaceThickness,
-    hasDoubleFrame,
     currentFrame,
     lockBlockLeft,
     lockBlockRight,
     lockBlockPiecesPerSide,
+    doubleFrameSides,
+    doubleFrameCount,
   ]);
 };
 
-// Cutting optimization hook
-const useCuttingPlan = (results, currentFrame, hasDoubleFrame) => {
+const useCuttingPlan = (results, currentFrame) => {
   return useMemo(() => {
-    const { W, H, F, totalFrameWidth, railSections, lockBlockCount } = results;
+    const { W, H, F, railSections, lockBlockCount, doubleFrame } = results;
     const stockLength = currentFrame.length || 2040;
     const sawKerf = 5;
     const needSplice = currentFrame.needSplice || false;
@@ -1016,12 +1011,11 @@ const useCuttingPlan = (results, currentFrame, hasDoubleFrame) => {
 
     const cutPieces = [];
 
-    // Helper to add pieces
     const addPiece = (name, length, qty, color, isSplice = false) => {
+      if (!length || !qty) return;
       cutPieces.push({ name, length, qty, color, isSplice });
     };
 
-    // Stiles
     const stileLength = H;
     if (needSplice && stileLength > stockLength) {
       const pieceLength = Math.ceil(stileLength / 2) + spliceOverlap / 2;
@@ -1031,35 +1025,46 @@ const useCuttingPlan = (results, currentFrame, hasDoubleFrame) => {
       addPiece("โครงตั้ง", stileLength, 2, "#8d6e63");
     }
 
-    // Rails
     addPiece("โครงนอน", W - 2 * F, 2, "#a1887f");
 
-    // Double frame
-    if (hasDoubleFrame) {
-      const doubleStileLength = H - 2 * F;
-      if (needSplice && doubleStileLength > stockLength) {
-        const pieceLength =
-          Math.ceil(doubleStileLength / 2) + spliceOverlap / 2;
-        addPiece("เบิ้ลโครงตั้ง (ท่อน 1)", pieceLength, 2, "#ff8f00", true);
-        addPiece("เบิ้ลโครงตั้ง (ท่อน 2)", pieceLength, 2, "#e65100", true);
-      } else {
-        addPiece("เบิ้ลโครงตั้ง", doubleStileLength, 2, "#ff8f00");
-      }
-      addPiece("เบิ้ลโครงนอน", W - 2 * totalFrameWidth, 2, "#ffb74d");
+    const clearHeight = H - 2 * F;
+    const clearWidth = W - 2 * F;
+
+    if (doubleFrame && doubleFrame.hasAny && doubleFrame.count > 0) {
+      const count = doubleFrame.count;
+
+      const addDoubleVertical = (label, enabled) => {
+        if (!enabled) return;
+        if (needSplice && clearHeight > stockLength) {
+          const pieceLength = Math.ceil(clearHeight / 2) + spliceOverlap / 2;
+          addPiece(`${label} (ท่อน 1)`, pieceLength, count, "#ff8f00", true);
+          addPiece(`${label} (ท่อน 2)`, pieceLength, count, "#e65100", true);
+        } else {
+          addPiece(label, clearHeight, count, "#ff8f00");
+        }
+      };
+
+      const addDoubleHorizontal = (label, enabled) => {
+        if (!enabled) return;
+        addPiece(label, clearWidth, count, "#ffb74d");
+      };
+
+      addDoubleVertical("เบิ้ลโครงตั้งซ้าย", doubleFrame.left);
+      addDoubleVertical("เบิ้ลโครงตั้งขวา", doubleFrame.right);
+      addDoubleVertical("โครงกลาง", doubleFrame.center);
+      addDoubleHorizontal("เบิ้ลโครงบน", doubleFrame.top);
+      addDoubleHorizontal("เบิ้ลโครงล่าง", doubleFrame.bottom);
     }
 
-    // Horizontal rails
     const railCount = railSections - 1;
     if (railCount > 0) {
-      addPiece("ไม้ดาม", W - 2 * totalFrameWidth, railCount, "#a67c52");
+      addPiece("ไม้ดาม", clearWidth, railCount, "#a67c52");
     }
 
-    // Lock blocks
     if (lockBlockCount > 0) {
       addPiece("Lock Block", LOCK_BLOCK_HEIGHT, lockBlockCount, "#c62828");
     }
 
-    // Flatten and sort pieces
     const allPieces = cutPieces
       .flatMap((piece) =>
         Array.from({ length: piece.qty }, (_, i) => ({
@@ -1069,7 +1074,6 @@ const useCuttingPlan = (results, currentFrame, hasDoubleFrame) => {
       )
       .sort((a, b) => b.length - a.length);
 
-    // Bin packing
     const stocks = [];
     allPieces.forEach((piece) => {
       const pieceWithKerf = piece.length + sawKerf;
@@ -1093,7 +1097,9 @@ const useCuttingPlan = (results, currentFrame, hasDoubleFrame) => {
     const totalWaste = stocks.reduce((sum, s) => sum + s.remaining, 0);
     const totalStock = totalStocks * stockLength;
     const usedWithoutKerf = allPieces.reduce((sum, p) => sum + p.length, 0);
-    const efficiency = ((usedWithoutKerf / totalStock) * 100).toFixed(1);
+    const efficiency = totalStock
+      ? ((usedWithoutKerf / totalStock) * 100).toFixed(1)
+      : "0.0";
     const spliceCount =
       cutPieces.filter((p) => p.isSplice).reduce((sum, p) => sum + p.qty, 0) /
       2;
@@ -1113,10 +1119,9 @@ const useCuttingPlan = (results, currentFrame, hasDoubleFrame) => {
       spliceCount,
       spliceOverlap,
     };
-  }, [results, currentFrame, hasDoubleFrame]);
+  }, [results, currentFrame]);
 };
 
-// ===== ENGINEERING DRAWING COMPONENT =====
 const EngineeringDrawing = ({ results }) => {
   const {
     W,
@@ -1136,9 +1141,10 @@ const EngineeringDrawing = ({ results }) => {
     lockBlockPosition,
     lockBlockCount,
     currentFrame,
+    doubleFrame,
   } = results;
 
-  // Safe values
+  // Default ถ้าไม่มีค่า
   const safeH = H > 0 ? H : 2000;
   const safeW = W > 0 ? W : 800;
   const safeT = T > 0 ? T : 35;
@@ -1146,37 +1152,35 @@ const EngineeringDrawing = ({ results }) => {
   const safeF = F > 0 ? F : 50;
   const safeR = R > 0 ? R : 27;
 
-  const viewBoxWidth = 1200;
-  const viewBoxHeight = 970;
+  // A4 210 × 297 mm → viewBox ×10 = scale 1:10 ตอน print
+  const viewBoxWidth = 2100; // 210mm * 10
+  const viewBoxHeight = 2970; // 297mm * 10
 
-  // Scales
-  const frontScale = 200 / safeH;
-  const sideScale = 200 / safeH;
-  const topScaleW = 0.15;
-  const topScaleT = 2.5;
-  const backScale = 200 / safeH;
+  // ใช้หน่วย "mm จริง" เป็น user units
+  const frontScale = 1;
+  const sideScale = 1;
+  const backScale = 1;
 
-  // Calculated dimensions for each view
+  // คำนวณ DF สำหรับ drawing (ใช้ค่าจาก doubleFrame)
+  const drawingDF =
+    doubleFrame && doubleFrame.hasAny && doubleFrame.count > 0
+      ? safeF * doubleFrame.count
+      : 0;
+
   const dims = {
     front: {
       W: safeW * frontScale,
       H: safeH * frontScale,
       F: safeF * frontScale,
-      DF: DF * frontScale,
+      DF: drawingDF * frontScale,
       totalFrame: totalFrameWidth * frontScale,
-      R: Math.max(safeR * frontScale, 2),
+      R: safeR * frontScale,
       lockBlockW: safeF * frontScale,
     },
     side: {
-      T: Math.max(safeT * sideScale * 4, 25),
+      T: safeT * sideScale,
       H: safeH * sideScale,
-      S: Math.max(safeS * sideScale * 4, 3),
-    },
-    top: {
-      W: safeW * topScaleW,
-      T: Math.max(safeT * topScaleT, 30),
-      F: safeF * topScaleW,
-      S: Math.max(safeS * topScaleT, 2),
+      S: safeS * sideScale,
     },
     back: {
       W: safeW * backScale,
@@ -1185,19 +1189,22 @@ const EngineeringDrawing = ({ results }) => {
     },
   };
 
-  // Positions
+  // margin (หน่วย viewBox = mm*10)
+  const marginX = 150; // 15mm
+  const marginY = 200; // 20mm
+
   const positions = {
-    top: { x: 600, y: 130 },
-    back: { x: 120, y: 370 },
-    side: { x: 480, y: 370 },
-    front: { x: 750, y: 370 },
+    side: { x: marginX, y: marginY + 200 },
+    front: { x: marginX + 700, y: marginY + 200 },
+    back: { x: marginX + 400, y: marginY + 200 },
+    top: { x: marginX + 700, y: marginY },
   };
 
   const piecesPerSide =
     parseInt(results.lockBlockCount / results.lockBlockSides) || 0;
-  const hasDoubleFrame = DF > 0;
+  const hasDoubleFrame =
+    doubleFrame && doubleFrame.hasAny && doubleFrame.count > 0;
 
-  // Render lock blocks helper
   const renderLockBlocks = (
     viewX,
     viewY,
@@ -1218,6 +1225,7 @@ const EngineeringDrawing = ({ results }) => {
             (hasDoubleFrame ? frameWidth : 0) -
             frameWidth * (i + 1)
           : viewX + dims.front.totalFrame + dims.front.lockBlockW * i;
+
         blocks.push(
           <LockBlockSVG
             key={`lb-${isBack ? "back" : "front"}-left-${i}`}
@@ -1241,6 +1249,7 @@ const EngineeringDrawing = ({ results }) => {
             dims.front.W -
             dims.front.totalFrame -
             dims.front.lockBlockW * (i + 1);
+
         blocks.push(
           <LockBlockSVG
             key={`lb-${isBack ? "back" : "front"}-right-${i}`}
@@ -1256,12 +1265,138 @@ const EngineeringDrawing = ({ results }) => {
     return blocks;
   };
 
+  // Helper function to render double frames based on selected sides
+  const renderDoubleFrames = () => {
+    if (!hasDoubleFrame) return null;
+
+    const elements = [];
+    const strokeColor = "#ff8f00";
+    const strokeWidth = "1.5";
+    const strokeDasharray = "8,4";
+
+    // Double Frame - Left (vertical)
+    if (doubleFrame.left) {
+      for (let i = 0; i < doubleFrame.count; i++) {
+        elements.push(
+          <rect
+            key={`df-left-${i}`}
+            x={positions.front.x + dims.front.F + dims.front.F * i}
+            y={positions.front.y + dims.front.F}
+            width={dims.front.F}
+            height={dims.front.H - 2 * dims.front.F}
+            fill="rgba(255, 143, 0, 0.1)"
+            stroke={strokeColor}
+            strokeWidth={strokeWidth}
+            strokeDasharray={strokeDasharray}
+          />,
+        );
+      }
+    }
+
+    // Double Frame - Right (vertical)
+    if (doubleFrame.right) {
+      for (let i = 0; i < doubleFrame.count; i++) {
+        elements.push(
+          <rect
+            key={`df-right-${i}`}
+            x={
+              positions.front.x +
+              dims.front.W -
+              dims.front.F -
+              dims.front.F * (i + 1)
+            }
+            y={positions.front.y + dims.front.F}
+            width={dims.front.F}
+            height={dims.front.H - 2 * dims.front.F}
+            fill="rgba(255, 143, 0, 0.1)"
+            stroke={strokeColor}
+            strokeWidth={strokeWidth}
+            strokeDasharray={strokeDasharray}
+          />,
+        );
+      }
+    }
+
+    // Double Frame - Top (horizontal)
+    if (doubleFrame.top) {
+      for (let i = 0; i < doubleFrame.count; i++) {
+        elements.push(
+          <rect
+            key={`df-top-${i}`}
+            x={positions.front.x + dims.front.F}
+            y={positions.front.y + dims.front.F + dims.front.F * i}
+            width={dims.front.W - 2 * dims.front.F}
+            height={dims.front.F}
+            fill="rgba(255, 143, 0, 0.1)"
+            stroke={strokeColor}
+            strokeWidth={strokeWidth}
+            strokeDasharray={strokeDasharray}
+          />,
+        );
+      }
+    }
+
+    // Double Frame - Bottom (horizontal)
+    if (doubleFrame.bottom) {
+      for (let i = 0; i < doubleFrame.count; i++) {
+        elements.push(
+          <rect
+            key={`df-bottom-${i}`}
+            x={positions.front.x + dims.front.F}
+            y={
+              positions.front.y +
+              dims.front.H -
+              dims.front.F -
+              dims.front.F * (i + 1)
+            }
+            width={dims.front.W - 2 * dims.front.F}
+            height={dims.front.F}
+            fill="rgba(255, 143, 0, 0.1)"
+            stroke={strokeColor}
+            strokeWidth={strokeWidth}
+            strokeDasharray={strokeDasharray}
+          />,
+        );
+      }
+    }
+
+    // Double Frame - Center (vertical)
+    if (doubleFrame.center) {
+      for (let i = 0; i < doubleFrame.count; i++) {
+        const offsetFromCenter =
+          (i - (doubleFrame.count - 1) / 2) * dims.front.F;
+        elements.push(
+          <rect
+            key={`df-center-${i}`}
+            x={
+              positions.front.x +
+              dims.front.W / 2 -
+              dims.front.F / 2 +
+              offsetFromCenter
+            }
+            y={positions.front.y + dims.front.F}
+            width={dims.front.F}
+            height={dims.front.H - 2 * dims.front.F}
+            fill="rgba(255, 143, 0, 0.1)"
+            stroke={strokeColor}
+            strokeWidth={strokeWidth}
+            strokeDasharray={strokeDasharray}
+          />,
+        );
+      }
+    }
+
+    return elements;
+  };
+
   return (
     <svg
       viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+      width="210mm"
+      height="297mm"
       className="w-full h-auto bg-white"
     >
-      {/* Border frames */}
+      {/* กรอบกระดาษ */}
       <rect
         x="8"
         y="8"
@@ -1281,20 +1416,25 @@ const EngineeringDrawing = ({ results }) => {
         strokeWidth="0.5"
       />
 
-      {/* Grid reference */}
-      <g id="grid-ref" fontSize="8" fill="#666">
+      {/* Grid ref */}
+      <g id="grid-ref" fontSize="20" fill="#666">
         {["A", "B", "C", "D", "E", "F"].map((letter, i) => (
           <text
             key={`grid-${letter}`}
-            x="20"
-            y={80 + i * 130}
+            x="40"
+            y={200 + i * 400}
             textAnchor="middle"
           >
             {letter}
           </text>
         ))}
         {[1, 2, 3, 4, 5, 6, 7, 8].map((num, i) => (
-          <text key={`grid-${num}`} x={80 + i * 140} y="40" textAnchor="middle">
+          <text
+            key={`grid-${num}`}
+            x={250 + i * 200}
+            y="120"
+            textAnchor="middle"
+          >
             {num}
           </text>
         ))}
@@ -1303,9 +1443,9 @@ const EngineeringDrawing = ({ results }) => {
       {/* Title */}
       <text
         x={viewBoxWidth / 2}
-        y="32"
+        y="80"
         textAnchor="middle"
-        fontSize="14"
+        fontSize="40"
         fontWeight="bold"
       >
         DOOR FRAME STRUCTURE DRAWING
@@ -1315,15 +1455,14 @@ const EngineeringDrawing = ({ results }) => {
       <g id="side-view">
         <text
           x={positions.side.x + dims.side.T / 2}
-          y={positions.side.y - 15}
+          y={positions.side.y - 60}
           textAnchor="middle"
-          fontSize="11"
+          fontSize="32"
           fontWeight="bold"
         >
           Side View
         </text>
 
-        {/* Main outline */}
         <rect
           x={positions.side.x}
           y={positions.side.y}
@@ -1331,10 +1470,10 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.side.H}
           fill="#fafafa"
           stroke="#000"
-          strokeWidth="1.5"
+          strokeWidth="3"
         />
 
-        {/* Surface layers */}
+        {/* ผิวปิด */}
         <rect
           x={positions.side.x}
           y={positions.side.y}
@@ -1342,7 +1481,7 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.side.H}
           fill="#e8f5e9"
           stroke="#000"
-          strokeWidth="0.6"
+          strokeWidth="1.2"
         />
         <rect
           x={positions.side.x + dims.side.T - dims.side.S}
@@ -1351,10 +1490,10 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.side.H}
           fill="#e8f5e9"
           stroke="#000"
-          strokeWidth="0.6"
+          strokeWidth="1.2"
         />
 
-        {/* Frame layers */}
+        {/* โครงรอบ + core */}
         <rect
           x={positions.side.x + dims.side.S}
           y={positions.side.y}
@@ -1362,7 +1501,7 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.side.H}
           fill="#fff3e0"
           stroke="#000"
-          strokeWidth="0.4"
+          strokeWidth="1"
         />
         <rect
           x={
@@ -1376,10 +1515,8 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.side.H}
           fill="#fff3e0"
           stroke="#000"
-          strokeWidth="0.4"
+          strokeWidth="1"
         />
-
-        {/* Core area */}
         <rect
           x={
             positions.side.x +
@@ -1391,22 +1528,20 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.side.H}
           fill="#fce4ec"
           stroke="#000"
-          strokeWidth="0.3"
-          strokeDasharray="2,2"
+          strokeWidth="0.8"
+          strokeDasharray="4,4"
         />
 
-        {/* Center line */}
         <CenterLine
           x1={positions.side.x + dims.side.T / 2}
-          y1={positions.side.y - 8}
+          y1={positions.side.y - 40}
           x2={positions.side.x + dims.side.T / 2}
-          y2={positions.side.y + dims.side.H + 8}
+          y2={positions.side.y + dims.side.H + 40}
         />
 
-        {/* Rails in side view */}
         {railPositions.map((pos, idx) => {
           const railY = positions.side.y + dims.side.H - pos * sideScale;
-          const railH = Math.max(safeR * sideScale * 0.5, 2);
+          const railH = safeR * sideScale * 0.5;
           return (
             <rect
               key={`side-rail-${idx}`}
@@ -1416,12 +1551,11 @@ const EngineeringDrawing = ({ results }) => {
               height={railH}
               fill="#ffe0b2"
               stroke="#000"
-              strokeWidth="0.5"
+              strokeWidth="1"
             />
           );
         })}
 
-        {/* Lock block indicator */}
         {(lockBlockLeft || lockBlockRight) && (
           <rect
             x={positions.side.x + dims.side.S}
@@ -1430,19 +1564,18 @@ const EngineeringDrawing = ({ results }) => {
             height={LOCK_BLOCK_HEIGHT * sideScale}
             fill="none"
             stroke="#c62828"
-            strokeWidth="0.6"
-            strokeDasharray="3,2"
+            strokeWidth="1.4"
+            strokeDasharray="6,4"
           />
         )}
 
-        {/* Dimensions */}
         <DimLine
           x1={positions.side.x}
           y1={positions.side.y + dims.side.H}
           x2={positions.side.x + dims.side.T}
           y2={positions.side.y + dims.side.H}
           value={T}
-          offset={40}
+          offset={120}
         />
         <DimLine
           x1={positions.side.x + dims.side.T}
@@ -1450,7 +1583,7 @@ const EngineeringDrawing = ({ results }) => {
           x2={positions.side.x + dims.side.T}
           y2={positions.side.y + dims.side.H}
           value={H}
-          offset={35}
+          offset={100}
           vertical
         />
         <DimLine
@@ -1459,8 +1592,8 @@ const EngineeringDrawing = ({ results }) => {
           x2={positions.side.x + dims.side.S}
           y2={positions.side.y}
           value={S}
-          offset={-20}
-          fontSize={7}
+          offset={-60}
+          fontSize={18}
         />
         <DimLine
           x1={positions.side.x + dims.side.S}
@@ -1468,8 +1601,8 @@ const EngineeringDrawing = ({ results }) => {
           x2={positions.side.x + dims.side.T - dims.side.S}
           y2={positions.side.y}
           value={T - 2 * S}
-          offset={-35}
-          fontSize={7}
+          offset={-120}
+          fontSize={18}
         />
       </g>
 
@@ -1477,15 +1610,14 @@ const EngineeringDrawing = ({ results }) => {
       <g id="front-view">
         <text
           x={positions.front.x + dims.front.W / 2}
-          y={positions.front.y - 15}
+          y={positions.front.y - 60}
           textAnchor="middle"
-          fontSize="11"
+          fontSize="32"
           fontWeight="bold"
         >
           Front View
         </text>
 
-        {/* Main outline */}
         <rect
           x={positions.front.x}
           y={positions.front.y}
@@ -1493,10 +1625,10 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.front.H}
           fill="#fafafa"
           stroke="#000"
-          strokeWidth="1.5"
+          strokeWidth="3"
         />
 
-        {/* Stiles */}
+        {/* Main frame - Left stile */}
         <rect
           x={positions.front.x}
           y={positions.front.y}
@@ -1504,8 +1636,9 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.front.H}
           fill="#fff3e0"
           stroke="#000"
-          strokeWidth="0.8"
+          strokeWidth="1.6"
         />
+        {/* Main frame - Right stile */}
         <rect
           x={positions.front.x + dims.front.W - dims.front.F}
           y={positions.front.y}
@@ -1513,10 +1646,10 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.front.H}
           fill="#fff3e0"
           stroke="#000"
-          strokeWidth="0.8"
+          strokeWidth="1.6"
         />
 
-        {/* Top and bottom rails */}
+        {/* Main frame - Top rail */}
         <rect
           x={positions.front.x + dims.front.F}
           y={positions.front.y}
@@ -1524,8 +1657,9 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.front.F}
           fill="#ffe0b2"
           stroke="#000"
-          strokeWidth="0.8"
+          strokeWidth="1.6"
         />
+        {/* Main frame - Bottom rail */}
         <rect
           x={positions.front.x + dims.front.F}
           y={positions.front.y + dims.front.H - dims.front.F}
@@ -1533,36 +1667,11 @@ const EngineeringDrawing = ({ results }) => {
           height={dims.front.F}
           fill="#ffe0b2"
           stroke="#000"
-          strokeWidth="0.8"
+          strokeWidth="1.6"
         />
 
-        {/* Double frame indicator */}
-        {hasDoubleFrame && (
-          <>
-            <rect
-              x={positions.front.x + dims.front.F}
-              y={positions.front.y + dims.front.F}
-              width={dims.front.DF}
-              height={dims.front.H - 2 * dims.front.F}
-              fill="none"
-              stroke="#ff8f00"
-              strokeWidth="0.5"
-              strokeDasharray="4,2"
-            />
-            <rect
-              x={
-                positions.front.x + dims.front.W - dims.front.F - dims.front.DF
-              }
-              y={positions.front.y + dims.front.F}
-              width={dims.front.DF}
-              height={dims.front.H - 2 * dims.front.F}
-              fill="none"
-              stroke="#ff8f00"
-              strokeWidth="0.5"
-              strokeDasharray="4,2"
-            />
-          </>
-        )}
+        {/* Render Double Frames based on selected sides */}
+        {renderDoubleFrames()}
 
         {/* Horizontal rails */}
         {railPositions.map((pos, idx) => {
@@ -1570,27 +1679,26 @@ const EngineeringDrawing = ({ results }) => {
           return (
             <g key={`front-rail-${idx}`}>
               <rect
-                x={positions.front.x + dims.front.totalFrame}
+                x={positions.front.x + dims.front.F}
                 y={railY - dims.front.R / 2}
-                width={dims.front.W - 2 * dims.front.totalFrame}
+                width={dims.front.W - 2 * dims.front.F}
                 height={dims.front.R}
                 fill="#ffe0b2"
                 stroke="#000"
-                strokeWidth="0.6"
+                strokeWidth="1.2"
               />
               <line
-                x1={positions.front.x + dims.front.totalFrame}
+                x1={positions.front.x + dims.front.F}
                 y1={railY - dims.front.R / 2}
-                x2={positions.front.x + dims.front.W - dims.front.totalFrame}
+                x2={positions.front.x + dims.front.W - dims.front.F}
                 y2={railY + dims.front.R / 2}
                 stroke="#d7ccc8"
-                strokeWidth="0.3"
+                strokeWidth="0.6"
               />
             </g>
           );
         })}
 
-        {/* Lock blocks */}
         {renderLockBlocks(
           positions.front.x,
           positions.front.y,
@@ -1599,28 +1707,26 @@ const EngineeringDrawing = ({ results }) => {
           false,
         )}
 
-        {/* Center lines */}
         <CenterLine
           x1={positions.front.x + dims.front.W / 2}
-          y1={positions.front.y - 10}
+          y1={positions.front.y - 40}
           x2={positions.front.x + dims.front.W / 2}
-          y2={positions.front.y + dims.front.H + 10}
+          y2={positions.front.y + dims.front.H + 40}
         />
         <CenterLine
-          x1={positions.front.x - 10}
+          x1={positions.front.x - 40}
           y1={positions.front.y + dims.front.H / 2}
-          x2={positions.front.x + dims.front.W + 10}
+          x2={positions.front.x + dims.front.W + 40}
           y2={positions.front.y + dims.front.H / 2}
         />
 
-        {/* Dimensions */}
         <DimLine
           x1={positions.front.x}
           y1={positions.front.y + dims.front.H}
           x2={positions.front.x + dims.front.W}
           y2={positions.front.y + dims.front.H}
           value={W}
-          offset={40}
+          offset={120}
         />
         <DimLine
           x1={positions.front.x + dims.front.W}
@@ -1628,7 +1734,7 @@ const EngineeringDrawing = ({ results }) => {
           x2={positions.front.x + dims.front.W}
           y2={positions.front.y + dims.front.H}
           value={H}
-          offset={35}
+          offset={100}
           vertical
         />
         <DimLine
@@ -1637,8 +1743,8 @@ const EngineeringDrawing = ({ results }) => {
           x2={positions.front.x + dims.front.F}
           y2={positions.front.y}
           value={F}
-          offset={-20}
-          fontSize={7}
+          offset={-60}
+          fontSize={18}
         />
         <DimLine
           x1={positions.front.x + dims.front.F}
@@ -1646,11 +1752,10 @@ const EngineeringDrawing = ({ results }) => {
           x2={positions.front.x + dims.front.W - dims.front.F}
           y2={positions.front.y}
           value={W - 2 * F}
-          offset={-35}
-          fontSize={7}
+          offset={-120}
+          fontSize={18}
         />
 
-        {/* Lock block position */}
         {(lockBlockLeft || lockBlockRight) && (
           <DimLine
             x1={positions.front.x}
@@ -1660,27 +1765,26 @@ const EngineeringDrawing = ({ results }) => {
               positions.front.y + dims.front.H - lockBlockPosition * frontScale
             }
             value={lockBlockPosition}
-            offset={-35}
+            offset={-100}
             vertical
-            fontSize={7}
+            fontSize={18}
           />
         )}
 
-        {/* Rail position annotations */}
         {railPositions.map((pos, idx) => (
           <g key={`front-ann-${idx}`}>
             <line
-              x1={positions.front.x + dims.front.W + 50}
+              x1={positions.front.x + dims.front.W + 200}
               y1={positions.front.y + dims.front.H - pos * frontScale}
-              x2={positions.front.x + dims.front.W + 60}
+              x2={positions.front.x + dims.front.W + 240}
               y2={positions.front.y + dims.front.H - pos * frontScale}
               stroke="#666"
-              strokeWidth="0.4"
+              strokeWidth="0.8"
             />
             <text
-              x={positions.front.x + dims.front.W + 63}
-              y={positions.front.y + dims.front.H - pos * frontScale + 3}
-              fontSize="7"
+              x={positions.front.x + dims.front.W + 260}
+              y={positions.front.y + dims.front.H - pos * frontScale + 10}
+              fontSize="18"
               fill="#666"
             >
               {pos}
@@ -1689,7 +1793,6 @@ const EngineeringDrawing = ({ results }) => {
         ))}
       </g>
 
-      {/* BOTTOM INFO BAR */}
       <BottomInfoBar
         viewBoxWidth={viewBoxWidth}
         viewBoxHeight={viewBoxHeight}
@@ -1702,6 +1805,7 @@ const EngineeringDrawing = ({ results }) => {
         surfaceMaterial={results.currentFrame.desc?.split(" ")[0] || "-"}
         frameType={results.currentFrame.desc?.split(" ")[0] || "-"}
         hasDoubleFrame={hasDoubleFrame}
+        doubleFrame={doubleFrame}
         railSections={railSections}
         railPositions={railPositions}
         lockBlockCount={lockBlockCount}
@@ -1711,7 +1815,6 @@ const EngineeringDrawing = ({ results }) => {
   );
 };
 
-// Bottom info bar component for drawing
 const BottomInfoBar = ({
   viewBoxWidth,
   viewBoxHeight,
@@ -1724,461 +1827,470 @@ const BottomInfoBar = ({
   surfaceMaterial,
   frameType,
   hasDoubleFrame,
+  doubleFrame,
   railSections,
   railPositions,
   lockBlockCount,
   currentFrame,
-}) => (
-  <g id="bottom-info">
-    {/* Main container */}
-    <rect
-      x="20"
-      y={viewBoxHeight - 145}
-      width={viewBoxWidth - 40}
-      height="130"
-      fill="#f8fafc"
-      stroke="#1e3a5f"
-      strokeWidth="1.5"
-      rx="3"
-    />
+}) => {
+  // Generate double frame description
+  const getDoubleFrameDesc = () => {
+    if (!hasDoubleFrame || !doubleFrame) return "";
+    const sides = [];
+    if (doubleFrame.top) sides.push("บน");
+    if (doubleFrame.bottom) sides.push("ล่าง");
+    if (doubleFrame.left) sides.push("ซ้าย");
+    if (doubleFrame.right) sides.push("ขวา");
+    if (doubleFrame.center) sides.push("กลาง");
+    return sides.length > 0
+      ? `(Double: ${sides.join(", ")} x${doubleFrame.count})`
+      : "(Double)";
+  };
 
-    {/* SPECIFICATIONS SECTION */}
-    <g id="specs">
+  return (
+    <g id="bottom-info">
       <rect
-        x="25"
-        y={viewBoxHeight - 140}
-        width="370"
-        height="20"
-        fill="#1e3a5f"
-        rx="2"
-      />
-      <text
-        x="35"
-        y={viewBoxHeight - 126}
-        fontSize="10"
-        fontWeight="bold"
-        fill="white"
-      >
-        📋 SPECIFICATIONS
-      </text>
-      <rect
-        x="25"
-        y={viewBoxHeight - 118}
-        width="370"
-        height="100"
-        fill="white"
-        stroke="#e2e8f0"
-        strokeWidth="0.5"
-      />
-
-      <text x="35" y={viewBoxHeight - 100} fontSize="8" fill="#64748b">
-        Door Size:
-      </text>
-      <text
-        x="35"
-        y={viewBoxHeight - 88}
-        fontSize="11"
-        fontWeight="bold"
-        fill="#1e293b"
-      >
-        {T} × {W} × {H} mm
-      </text>
-
-      <text x="35" y={viewBoxHeight - 70} fontSize="8" fill="#64748b">
-        Surface Material:
-      </text>
-      <text
-        x="35"
-        y={viewBoxHeight - 58}
-        fontSize="9"
-        fontWeight="600"
-        fill="#059669"
-      >
-        {surfaceMaterial} {S || 0}mm × 2
-      </text>
-
-      <text x="35" y={viewBoxHeight - 40} fontSize="8" fill="#64748b">
-        Frame:
-      </text>
-      <text
-        x="35"
-        y={viewBoxHeight - 28}
-        fontSize="9"
-        fontWeight="600"
-        fill="#d97706"
-      >
-        {R || 0}×{F || 0}mm {hasDoubleFrame ? "(Double)" : ""}
-      </text>
-
-      <text x="200" y={viewBoxHeight - 100} fontSize="8" fill="#64748b">
-        Horizontal Rails:
-      </text>
-      <text
-        x="200"
-        y={viewBoxHeight - 88}
-        fontSize="9"
-        fontWeight="600"
-        fill="#ea580c"
-      >
-        {railSections - 1} pcs @ {railPositions.join(", ") || "-"} mm
-      </text>
-
-      <text x="200" y={viewBoxHeight - 70} fontSize="8" fill="#64748b">
-        Lock Block:
-      </text>
-      <text
-        x="200"
-        y={viewBoxHeight - 58}
-        fontSize="9"
-        fontWeight="600"
-        fill="#dc2626"
-      >
-        {lockBlockCount} pcs ({R || 0}×{F || 0}×{LOCK_BLOCK_HEIGHT}mm)
-      </text>
-
-      {currentFrame.code && (
-        <>
-          <text x="200" y={viewBoxHeight - 40} fontSize="8" fill="#64748b">
-            ERP Code:
-          </text>
-          <text
-            x="200"
-            y={viewBoxHeight - 28}
-            fontSize="8"
-            fontWeight="500"
-            fill="#6366f1"
-            fontFamily="monospace"
-          >
-            {currentFrame.code}
-          </text>
-        </>
-      )}
-    </g>
-
-    {/* LEGEND SECTION */}
-    <g id="legend">
-      <rect
-        x="405"
-        y={viewBoxHeight - 140}
-        width="280"
-        height="20"
-        fill="#1e3a5f"
-        rx="2"
-      />
-      <text
-        x="415"
-        y={viewBoxHeight - 126}
-        fontSize="10"
-        fontWeight="bold"
-        fill="white"
-      >
-        🎨 LEGEND
-      </text>
-      <rect
-        x="405"
-        y={viewBoxHeight - 118}
-        width="280"
-        height="100"
-        fill="white"
-        stroke="#e2e8f0"
-        strokeWidth="0.5"
-      />
-
-      {/* Legend items */}
-      {[
-        {
-          x: 415,
-          y: -105,
-          fill: "#e8f5e9",
-          stroke: "#4caf50",
-          label: "Surface Material",
-        },
-        {
-          x: 525,
-          y: -105,
-          fill: "#fff3e0",
-          stroke: "#ff9800",
-          label: "Frame (Stile)",
-        },
-        {
-          x: 415,
-          y: -88,
-          fill: "#ffe0b2",
-          stroke: "#f57c00",
-          label: "Frame (Rail)",
-        },
-        {
-          x: 525,
-          y: -88,
-          fill: "#ffcdd2",
-          stroke: "#c62828",
-          label: "Lock Block",
-        },
-        {
-          x: 415,
-          y: -71,
-          fill: "#fce4ec",
-          stroke: "#9e9e9e",
-          label: "Core (Honeycomb)",
-          dashed: true,
-        },
-        {
-          x: 525,
-          y: -71,
-          fill: "none",
-          stroke: "#ff8f00",
-          label: "Double Frame",
-          dashed: true,
-        },
-      ].map((item, i) => (
-        <g key={`legend-${i}`}>
-          <rect
-            x={item.x}
-            y={viewBoxHeight + item.y}
-            width="16"
-            height="10"
-            fill={item.fill}
-            stroke={item.stroke}
-            strokeWidth="0.8"
-            rx="1"
-            strokeDasharray={item.dashed ? "2,1" : undefined}
-          />
-          <text
-            x={item.x + 20}
-            y={viewBoxHeight + item.y + 8}
-            fontSize="7"
-            fill="#374151"
-          >
-            {item.label}
-          </text>
-        </g>
-      ))}
-
-      {/* Line legends */}
-      <line
-        x1="415"
-        y1={viewBoxHeight - 49}
-        x2="431"
-        y2={viewBoxHeight - 49}
-        stroke="#333"
-        strokeWidth="0.6"
-        strokeDasharray="8,2,2,2"
-      />
-      <text x="435" y={viewBoxHeight - 46} fontSize="7" fill="#374151">
-        Center Line
-      </text>
-
-      <line
-        x1="525"
-        y1={viewBoxHeight - 49}
-        x2="541"
-        y2={viewBoxHeight - 49}
-        stroke="#333"
-        strokeWidth="0.6"
-        strokeDasharray="3,3"
-      />
-      <text x="545" y={viewBoxHeight - 46} fontSize="7" fill="#374151">
-        Hidden Line
-      </text>
-
-      <line
-        x1="415"
-        y1={viewBoxHeight - 32}
-        x2="431"
-        y2={viewBoxHeight - 32}
-        stroke="#333"
-        strokeWidth="0.6"
-      />
-      <polygon
-        points={`415,${viewBoxHeight - 32} 418,${viewBoxHeight - 34} 418,${viewBoxHeight - 30}`}
-        fill="#333"
-      />
-      <polygon
-        points={`431,${viewBoxHeight - 32} 428,${viewBoxHeight - 34} 428,${viewBoxHeight - 30}`}
-        fill="#333"
-      />
-      <text x="435" y={viewBoxHeight - 29} fontSize="7" fill="#374151">
-        Dimension Line
-      </text>
-    </g>
-
-    {/* TITLE BLOCK */}
-    <g id="title-block">
-      <rect
-        x={viewBoxWidth - 305}
-        y={viewBoxHeight - 140}
-        width="280"
-        height="120"
-        fill="white"
+        x="20"
+        y={viewBoxHeight - 145}
+        width={viewBoxWidth - 40}
+        height="130"
+        fill="#f8fafc"
         stroke="#1e3a5f"
         strokeWidth="1.5"
-        rx="2"
-      />
-      <rect
-        x={viewBoxWidth - 305}
-        y={viewBoxHeight - 140}
-        width="280"
-        height="28"
-        fill="#1e3a5f"
-        rx="2"
-      />
-      <rect
-        x={viewBoxWidth - 305}
-        y={viewBoxHeight - 115}
-        width="280"
-        height="3"
-        fill="#1e3a5f"
-      />
-      <text
-        x={viewBoxWidth - 165}
-        y={viewBoxHeight - 121}
-        textAnchor="middle"
-        fontSize="13"
-        fontWeight="bold"
-        fill="white"
-      >
-        DOOR FRAME ASSEMBLY
-      </text>
-
-      <rect
-        x={viewBoxWidth - 300}
-        y={viewBoxHeight - 107}
-        width="270"
-        height="22"
-        fill="#f1f5f9"
-        rx="1"
-      />
-      <text
-        x={viewBoxWidth - 290}
-        y={viewBoxHeight - 92}
-        fontSize="8"
-        fill="#64748b"
-      >
-        Size:
-      </text>
-      <text
-        x={viewBoxWidth - 165}
-        y={viewBoxHeight - 91}
-        textAnchor="middle"
-        fontSize="14"
-        fontWeight="bold"
-        fill="#1e293b"
-      >
-        {T} × {W} × {H} mm
-      </text>
-
-      <line
-        x1={viewBoxWidth - 300}
-        y1={viewBoxHeight - 82}
-        x2={viewBoxWidth - 30}
-        y2={viewBoxHeight - 82}
-        stroke="#e2e8f0"
-        strokeWidth="0.5"
-      />
-      <text
-        x={viewBoxWidth - 290}
-        y={viewBoxHeight - 68}
-        fontSize="8"
-        fill="#64748b"
-      >
-        Material:
-      </text>
-      <text
-        x={viewBoxWidth - 165}
-        y={viewBoxHeight - 68}
-        textAnchor="middle"
-        fontSize="10"
-        fontWeight="600"
-        fill="#059669"
-      >
-        {surfaceMaterial} + {frameType}
-      </text>
-
-      <line
-        x1={viewBoxWidth - 300}
-        y1={viewBoxHeight - 55}
-        x2={viewBoxWidth - 30}
-        y2={viewBoxHeight - 55}
-        stroke="#e2e8f0"
-        strokeWidth="0.5"
-      />
-      <line
-        x1={viewBoxWidth - 165}
-        y1={viewBoxHeight - 55}
-        x2={viewBoxWidth - 165}
-        y2={viewBoxHeight - 35}
-        stroke="#e2e8f0"
-        strokeWidth="0.5"
+        rx="3"
       />
 
-      <text
-        x={viewBoxWidth - 290}
-        y={viewBoxHeight - 42}
-        fontSize="8"
-        fill="#64748b"
-      >
-        Scale:
-      </text>
-      <text
-        x={viewBoxWidth - 240}
-        y={viewBoxHeight - 42}
-        fontSize="10"
-        fontWeight="600"
-        fill="#1e293b"
-      >
-        NTS
-      </text>
+      <g id="specs">
+        <rect
+          x="25"
+          y={viewBoxHeight - 140}
+          width="370"
+          height="20"
+          fill="#1e3a5f"
+          rx="2"
+        />
+        <text
+          x="35"
+          y={viewBoxHeight - 126}
+          fontSize="10"
+          fontWeight="bold"
+          fill="white"
+        >
+          📋 SPECIFICATIONS
+        </text>
+        <rect
+          x="25"
+          y={viewBoxHeight - 118}
+          width="370"
+          height="100"
+          fill="white"
+          stroke="#e2e8f0"
+          strokeWidth="0.5"
+        />
 
-      <text
-        x={viewBoxWidth - 155}
-        y={viewBoxHeight - 42}
-        fontSize="8"
-        fill="#64748b"
-      >
-        Rev:
-      </text>
-      <text
-        x={viewBoxWidth - 120}
-        y={viewBoxHeight - 42}
-        fontSize="10"
-        fontWeight="600"
-        fill="#1e293b"
-      >
-        1.0
-      </text>
+        <text x="35" y={viewBoxHeight - 100} fontSize="8" fill="#64748b">
+          Door Size:
+        </text>
+        <text
+          x="35"
+          y={viewBoxHeight - 88}
+          fontSize="11"
+          fontWeight="bold"
+          fill="#1e293b"
+        >
+          {T} × {W} × {H} mm
+        </text>
 
-      <rect
-        x={viewBoxWidth - 305}
-        y={viewBoxHeight - 35}
-        width="280"
-        height="15"
-        fill="#f8fafc"
-      />
-      <line
-        x1={viewBoxWidth - 300}
-        y1={viewBoxHeight - 35}
-        x2={viewBoxWidth - 30}
-        y2={viewBoxHeight - 35}
-        stroke="#e2e8f0"
-        strokeWidth="0.5"
-      />
-      <text
-        x={viewBoxWidth - 165}
-        y={viewBoxHeight - 24}
-        textAnchor="middle"
-        fontSize="9"
-        fontWeight="bold"
-        fill="#1e3a5f"
-      >
-        C.H.H INDUSTRY CO., LTD.
-      </text>
+        <text x="35" y={viewBoxHeight - 70} fontSize="8" fill="#64748b">
+          Surface Material:
+        </text>
+        <text
+          x="35"
+          y={viewBoxHeight - 58}
+          fontSize="9"
+          fontWeight="600"
+          fill="#059669"
+        >
+          {surfaceMaterial} {S || 0}mm × 2
+        </text>
+
+        <text x="35" y={viewBoxHeight - 40} fontSize="8" fill="#64748b">
+          Frame:
+        </text>
+        <text
+          x="35"
+          y={viewBoxHeight - 28}
+          fontSize="9"
+          fontWeight="600"
+          fill="#d97706"
+        >
+          {R || 0}×{F || 0}mm {hasDoubleFrame ? getDoubleFrameDesc() : ""}
+        </text>
+
+        <text x="200" y={viewBoxHeight - 100} fontSize="8" fill="#64748b">
+          Horizontal Rails:
+        </text>
+        <text
+          x="200"
+          y={viewBoxHeight - 88}
+          fontSize="9"
+          fontWeight="600"
+          fill="#ea580c"
+        >
+          {railSections - 1} pcs @ {railPositions.join(", ") || "-"} mm
+        </text>
+
+        <text x="200" y={viewBoxHeight - 70} fontSize="8" fill="#64748b">
+          Lock Block:
+        </text>
+        <text
+          x="200"
+          y={viewBoxHeight - 58}
+          fontSize="9"
+          fontWeight="600"
+          fill="#dc2626"
+        >
+          {lockBlockCount} pcs ({R || 0}×{F || 0}×{LOCK_BLOCK_HEIGHT}mm)
+        </text>
+
+        {currentFrame.code && (
+          <>
+            <text x="200" y={viewBoxHeight - 40} fontSize="8" fill="#64748b">
+              ERP Code:
+            </text>
+            <text
+              x="200"
+              y={viewBoxHeight - 28}
+              fontSize="8"
+              fontWeight="500"
+              fill="#6366f1"
+              fontFamily="monospace"
+            >
+              {currentFrame.code}
+            </text>
+          </>
+        )}
+      </g>
+
+      <g id="legend">
+        <rect
+          x="405"
+          y={viewBoxHeight - 140}
+          width="280"
+          height="20"
+          fill="#1e3a5f"
+          rx="2"
+        />
+        <text
+          x="415"
+          y={viewBoxHeight - 126}
+          fontSize="10"
+          fontWeight="bold"
+          fill="white"
+        >
+          🎨 LEGEND
+        </text>
+        <rect
+          x="405"
+          y={viewBoxHeight - 118}
+          width="280"
+          height="100"
+          fill="white"
+          stroke="#e2e8f0"
+          strokeWidth="0.5"
+        />
+
+        {[
+          {
+            x: 415,
+            y: -105,
+            fill: "#e8f5e9",
+            stroke: "#4caf50",
+            label: "Surface Material",
+          },
+          {
+            x: 525,
+            y: -105,
+            fill: "#fff3e0",
+            stroke: "#ff9800",
+            label: "Frame (Stile)",
+          },
+          {
+            x: 415,
+            y: -88,
+            fill: "#ffe0b2",
+            stroke: "#f57c00",
+            label: "Frame (Rail)",
+          },
+          {
+            x: 525,
+            y: -88,
+            fill: "#ffcdd2",
+            stroke: "#c62828",
+            label: "Lock Block",
+          },
+          {
+            x: 415,
+            y: -71,
+            fill: "#fce4ec",
+            stroke: "#9e9e9e",
+            label: "Core (Honeycomb)",
+            dashed: true,
+          },
+          {
+            x: 525,
+            y: -71,
+            fill: "rgba(255, 143, 0, 0.1)",
+            stroke: "#ff8f00",
+            label: "Double Frame",
+            dashed: true,
+          },
+        ].map((item, i) => (
+          <g key={`legend-${i}`}>
+            <rect
+              x={item.x}
+              y={viewBoxHeight + item.y}
+              width="16"
+              height="10"
+              fill={item.fill}
+              stroke={item.stroke}
+              strokeWidth="0.8"
+              rx="1"
+              strokeDasharray={item.dashed ? "2,1" : undefined}
+            />
+            <text
+              x={item.x + 20}
+              y={viewBoxHeight + item.y + 8}
+              fontSize="7"
+              fill="#374151"
+            >
+              {item.label}
+            </text>
+          </g>
+        ))}
+
+        <line
+          x1="415"
+          y1={viewBoxHeight - 49}
+          x2="431"
+          y2={viewBoxHeight - 49}
+          stroke="#333"
+          strokeWidth="0.6"
+          strokeDasharray="8,2,2,2"
+        />
+        <text x="435" y={viewBoxHeight - 46} fontSize="7" fill="#374151">
+          Center Line
+        </text>
+
+        <line
+          x1="525"
+          y1={viewBoxHeight - 49}
+          x2="541"
+          y2={viewBoxHeight - 49}
+          stroke="#333"
+          strokeWidth="0.6"
+          strokeDasharray="3,3"
+        />
+        <text x="545" y={viewBoxHeight - 46} fontSize="7" fill="#374151">
+          Hidden Line
+        </text>
+
+        <line
+          x1="415"
+          y1={viewBoxHeight - 32}
+          x2="431"
+          y2={viewBoxHeight - 32}
+          stroke="#333"
+          strokeWidth="0.6"
+        />
+        <polygon
+          points={`415,${viewBoxHeight - 32} 418,${viewBoxHeight - 34} 418,${viewBoxHeight - 30}`}
+          fill="#333"
+        />
+        <polygon
+          points={`431,${viewBoxHeight - 32} 428,${viewBoxHeight - 34} 428,${viewBoxHeight - 30}`}
+          fill="#333"
+        />
+        <text x="435" y={viewBoxHeight - 29} fontSize="7" fill="#374151">
+          Dimension Line
+        </text>
+      </g>
+
+      <g id="title-block">
+        <rect
+          x={viewBoxWidth - 305}
+          y={viewBoxHeight - 140}
+          width="280"
+          height="120"
+          fill="white"
+          stroke="#1e3a5f"
+          strokeWidth="1.5"
+          rx="2"
+        />
+        <rect
+          x={viewBoxWidth - 305}
+          y={viewBoxHeight - 140}
+          width="280"
+          height="28"
+          fill="#1e3a5f"
+          rx="2"
+        />
+        <rect
+          x={viewBoxWidth - 305}
+          y={viewBoxHeight - 115}
+          width="280"
+          height="3"
+          fill="#1e3a5f"
+        />
+        <text
+          x={viewBoxWidth - 165}
+          y={viewBoxHeight - 121}
+          textAnchor="middle"
+          fontSize="13"
+          fontWeight="bold"
+          fill="white"
+        >
+          DOOR FRAME ASSEMBLY
+        </text>
+
+        <rect
+          x={viewBoxWidth - 300}
+          y={viewBoxHeight - 107}
+          width="270"
+          height="22"
+          fill="#f1f5f9"
+          rx="1"
+        />
+        <text
+          x={viewBoxWidth - 290}
+          y={viewBoxHeight - 92}
+          fontSize="8"
+          fill="#64748b"
+        >
+          Size:
+        </text>
+        <text
+          x={viewBoxWidth - 165}
+          y={viewBoxHeight - 91}
+          textAnchor="middle"
+          fontSize="14"
+          fontWeight="bold"
+          fill="#1e293b"
+        >
+          {T} × {W} × {H} mm
+        </text>
+
+        <line
+          x1={viewBoxWidth - 300}
+          y1={viewBoxHeight - 82}
+          x2={viewBoxWidth - 30}
+          y2={viewBoxHeight - 82}
+          stroke="#e2e8f0"
+          strokeWidth="0.5"
+        />
+        <text
+          x={viewBoxWidth - 290}
+          y={viewBoxHeight - 68}
+          fontSize="8"
+          fill="#64748b"
+        >
+          Material:
+        </text>
+        <text
+          x={viewBoxWidth - 165}
+          y={viewBoxHeight - 68}
+          textAnchor="middle"
+          fontSize="10"
+          fontWeight="600"
+          fill="#059669"
+        >
+          {surfaceMaterial} + {frameType}
+        </text>
+
+        <line
+          x1={viewBoxWidth - 300}
+          y1={viewBoxHeight - 55}
+          x2={viewBoxWidth - 30}
+          y2={viewBoxHeight - 55}
+          stroke="#e2e8f0"
+          strokeWidth="0.5"
+        />
+        <line
+          x1={viewBoxWidth - 165}
+          y1={viewBoxHeight - 55}
+          x2={viewBoxWidth - 165}
+          y2={viewBoxHeight - 35}
+          stroke="#e2e8f0"
+          strokeWidth="0.5"
+        />
+
+        <text
+          x={viewBoxWidth - 290}
+          y={viewBoxHeight - 42}
+          fontSize="8"
+          fill="#64748b"
+        >
+          Scale:
+        </text>
+        <text
+          x={viewBoxWidth - 240}
+          y={viewBoxHeight - 42}
+          fontSize="10"
+          fontWeight="600"
+          fill="#1e293b"
+        >
+          NTS
+        </text>
+
+        <text
+          x={viewBoxWidth - 155}
+          y={viewBoxHeight - 42}
+          fontSize="8"
+          fill="#64748b"
+        >
+          Rev:
+        </text>
+        <text
+          x={viewBoxWidth - 120}
+          y={viewBoxHeight - 42}
+          fontSize="10"
+          fontWeight="600"
+          fill="#1e293b"
+        >
+          1.0
+        </text>
+
+        <rect
+          x={viewBoxWidth - 305}
+          y={viewBoxHeight - 35}
+          width="280"
+          height="15"
+          fill="#f8fafc"
+        />
+        <line
+          x1={viewBoxWidth - 300}
+          y1={viewBoxHeight - 35}
+          x2={viewBoxWidth - 30}
+          y2={viewBoxHeight - 35}
+          stroke="#e2e8f0"
+          strokeWidth="0.5"
+        />
+        <text
+          x={viewBoxWidth - 165}
+          y={viewBoxHeight - 24}
+          textAnchor="middle"
+          fontSize="9"
+          fontWeight="bold"
+          fill="#1e3a5f"
+        >
+          C.H.H INDUSTRY CO., LTD.
+        </text>
+      </g>
     </g>
-  </g>
-);
+  );
+};
 
-// ===== MAIN COMPONENT =====
 export default function DoorConfigurator() {
-  // State
   const [doorThickness, setDoorThickness] = useState("");
   const [doorWidth, setDoorWidth] = useState("");
   const [doorHeight, setDoorHeight] = useState("");
@@ -2187,12 +2299,19 @@ export default function DoorConfigurator() {
   const [surfaceThickness, setSurfaceThickness] = useState("");
   const [frameType, setFrameType] = useState("");
   const [selectedFrameCode, setSelectedFrameCode] = useState("");
-  const [hasDoubleFrame, setHasDoubleFrame] = useState(false);
   const [lockBlockLeft, setLockBlockLeft] = useState(false);
   const [lockBlockRight, setLockBlockRight] = useState(false);
   const [lockBlockPiecesPerSide, setLockBlockPiecesPerSide] = useState("");
+  const [doubleFrameSides, setDoubleFrameSides] = useState({
+    top: false,
+    bottom: false,
+    left: false,
+    center: false,
+    right: false,
+    all: false,
+  });
+  const [doubleFrameCount, setDoubleFrameCount] = useState("");
 
-  // Computed values
   const frameSelection = useFrameSelection(
     frameType,
     doorThickness,
@@ -2220,40 +2339,71 @@ export default function DoorConfigurator() {
     );
   }, [frameSelection, selectedFrameCode]);
 
-  // Auto-select first frame when selection changes
   useEffect(() => {
     if (frameSelection.frames.length > 0) {
       setSelectedFrameCode(frameSelection.frames[0].code);
     }
   }, [frameSelection]);
 
+  const numericDoubleCount = parseInt(doubleFrameCount) || 0;
+
   const results = useCalculations({
     doorThickness,
     doorWidth,
     doorHeight,
     surfaceThickness,
-    hasDoubleFrame,
     currentFrame,
     lockBlockLeft,
     lockBlockRight,
     lockBlockPiecesPerSide,
+    doubleFrameSides,
+    doubleFrameCount: numericDoubleCount,
   });
 
-  const cuttingPlan = useCuttingPlan(results, currentFrame, hasDoubleFrame);
+  const cuttingPlan = useCuttingPlan(results, currentFrame);
 
   const isDataComplete = doorThickness && doorWidth && doorHeight;
   const piecesPerSide = parseInt(lockBlockPiecesPerSide) || 0;
 
-  // Lock block handler
   const handleLockBlockChange = (left, right) => {
     setLockBlockLeft(left);
     setLockBlockRight(right);
   };
 
+  const handleToggleDoubleSide = (side) => {
+    setDoubleFrameSides((prev) => {
+      if (side === "all") {
+        const newValue = !prev.all;
+        return {
+          top: newValue,
+          bottom: newValue,
+          left: newValue,
+          center: newValue,
+          right: newValue,
+          all: newValue,
+        };
+      }
+      const next = { ...prev, [side]: !prev[side], all: false };
+      return next;
+    });
+  };
+
+  const doubleConfigSummary = useMemo(() => {
+    const df = results.doubleFrame;
+    if (!df || !df.hasAny || !df.count) return "";
+    const sides = [];
+    if (df.top) sides.push("บน");
+    if (df.bottom) sides.push("ล่าง");
+    if (df.left) sides.push("ซ้าย");
+    if (df.center) sides.push("กลาง");
+    if (df.right) sides.push("ขวา");
+    if (!sides.length) return "";
+    return `เบิ้ลโครงด้าน ${sides.join(", ")} จำนวน ${df.count} ชั้น/ด้าน`;
+  }, [results]);
+
   return (
     <div className="flex flex-col items-center justify-start w-full h-full p-4 gap-4 overflow-auto bg-gradient-to-br from-blue-50 to-gray-100">
       <div className="max-w-7xl mx-auto w-full">
-        {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-1">
             🚪 Door Configuration System
@@ -2264,10 +2414,8 @@ export default function DoorConfigurator() {
         </div>
 
         <div className="grid lg:grid-cols-5 gap-4">
-          {/* Left Panel */}
           <div className="lg:col-span-2 space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
-              {/* 1. สเปคลูกค้า */}
               <SectionCard text="1" title="สเปคลูกค้า" icon="📝" color="blue">
                 <div className="space-y-3">
                   <QuickSelectWithInput
@@ -2303,7 +2451,6 @@ export default function DoorConfigurator() {
                 </div>
               </SectionCard>
 
-              {/* 2. วัสดุปิดผิว */}
               <SectionCard text="2" title="วัสดุปิดผิว" icon="🎨" color="green">
                 <div className="space-y-3">
                   <div>
@@ -2346,12 +2493,16 @@ export default function DoorConfigurator() {
                     />
                     <InfoRow
                       label="วัสดุปิดผิว:"
-                      value={`${surfaceThickness || 0} mm × 2 = ${(parseFloat(surfaceThickness) || 0) * 2} mm`}
+                      value={`${surfaceThickness || 0} mm × 2 = ${
+                        (parseFloat(surfaceThickness) || 0) * 2
+                      } mm`}
                       className="text-gray-600"
                     />
                     <InfoRow
                       label="กาว:"
-                      value={`${GLUE_THICKNESS} mm × 2 = ${GLUE_THICKNESS * 2} mm`}
+                      value={`${GLUE_THICKNESS} mm × 2 = ${
+                        GLUE_THICKNESS * 2
+                      } mm`}
                       className="text-gray-600"
                     />
                     <InfoRow
@@ -2372,7 +2523,6 @@ export default function DoorConfigurator() {
                 </div>
               </SectionCard>
 
-              {/* 3. โครง (ERP) */}
               <SectionCard text="3" title="โครง (ERP)" icon="🪵" color="amber">
                 <div className="space-y-3">
                   <div className="grid grid-cols-3 gap-1">
@@ -2493,21 +2643,117 @@ export default function DoorConfigurator() {
                     </InfoBox>
                   )}
 
-                  <CheckboxOption
-                    checked={hasDoubleFrame}
-                    onChange={(e) => setHasDoubleFrame(e.target.checked)}
-                    label="เบิ้ลโครง"
-                    sublabel={
-                      hasDoubleFrame
-                        ? `(${results.totalFrameWidth}mm/ด้าน)`
-                        : null
-                    }
-                    isActive={hasDoubleFrame}
-                  />
+                  <div className="space-y-2">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        ด้านที่ต้องการเบิ้ลโครง
+                      </label>
+                      <div className="grid grid-cols-3 gap-1">
+                        <button
+                          onClick={() => handleToggleDoubleSide("top")}
+                          className={`py-1.5 rounded text-xs font-medium transition-all ${
+                            doubleFrameSides.top
+                              ? "bg-amber-500 text-white shadow-md"
+                              : "bg-gray-100 hover:bg-gray-200"
+                          }`}
+                        >
+                          บน
+                        </button>
+                        <button
+                          onClick={() => handleToggleDoubleSide("bottom")}
+                          className={`py-1.5 rounded text-xs font-medium transition-all ${
+                            doubleFrameSides.bottom
+                              ? "bg-amber-500 text-white shadow-md"
+                              : "bg-gray-100 hover:bg-gray-200"
+                          }`}
+                        >
+                          ล่าง
+                        </button>
+                        <button
+                          onClick={() => handleToggleDoubleSide("left")}
+                          className={`py-1.5 rounded text-xs font-medium transition-all ${
+                            doubleFrameSides.left
+                              ? "bg-amber-500 text-white shadow-md"
+                              : "bg-gray-100 hover:bg-gray-200"
+                          }`}
+                        >
+                          ซ้าย
+                        </button>
+                        <button
+                          onClick={() => handleToggleDoubleSide("center")}
+                          className={`py-1.5 rounded text-xs font-medium transition-all ${
+                            doubleFrameSides.center
+                              ? "bg-amber-500 text-white shadow-md"
+                              : "bg-gray-100 hover:bg-gray-200"
+                          }`}
+                        >
+                          กลาง
+                        </button>
+                        <button
+                          onClick={() => handleToggleDoubleSide("right")}
+                          className={`py-1.5 rounded text-xs font-medium transition-all ${
+                            doubleFrameSides.right
+                              ? "bg-amber-500 text-white shadow-md"
+                              : "bg-gray-100 hover:bg-gray-200"
+                          }`}
+                        >
+                          ขวา
+                        </button>
+                        <button
+                          onClick={() => handleToggleDoubleSide("all")}
+                          className={`py-1.5 rounded text-xs font-medium transition-all ${
+                            doubleFrameSides.all
+                              ? "bg-amber-600 text-white shadow-md"
+                              : "bg-gray-100 hover:bg-gray-200"
+                          }`}
+                        >
+                          ทั้งหมด
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        จำนวนไม้เบิ้ลต่อด้าน
+                      </label>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3].map((n) => (
+                          <button
+                            key={n}
+                            onClick={() => setDoubleFrameCount(String(n))}
+                            className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                              numericDoubleCount === n
+                                ? "bg-amber-500 text-white shadow-md"
+                                : "bg-gray-100 hover:bg-gray-200"
+                            }`}
+                          >
+                            {n}
+                          </button>
+                        ))}
+                        <div className="flex-1">
+                          <NumberInput
+                            value={numericDoubleCount}
+                            onChange={(v) =>
+                              setDoubleFrameCount(String(v || 0))
+                            }
+                            className="w-full px-2 py-1.5 border rounded text-center text-xs font-bold"
+                          />
+                        </div>
+                        <span className="text-xs text-gray-500">ชั้น/ด้าน</span>
+                      </div>
+                    </div>
+
+                    {doubleConfigSummary && (
+                      <InfoBox color="amber">
+                        <div className="text-[11px] text-amber-800">
+                          {doubleConfigSummary}
+                        </div>
+                      </InfoBox>
+                    )}
+                  </div>
                 </div>
               </SectionCard>
 
-              {/* 4. ไม้ดามแนวนอน */}
               <SectionCard
                 text="4"
                 title="ไม้ดามแนวนอน"
@@ -2578,7 +2824,6 @@ export default function DoorConfigurator() {
               </SectionCard>
             </div>
 
-            {/* 5. Lock Block */}
             <SectionCard
               text="5"
               title="Lock Block (รองลูกบิด)"
@@ -2683,7 +2928,6 @@ export default function DoorConfigurator() {
               </div>
             </SectionCard>
 
-            {/* Summary */}
             <div className="bg-white rounded-xl shadow-lg p-4">
               <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
                 📋 สรุปโครงสร้าง
@@ -2703,7 +2947,11 @@ export default function DoorConfigurator() {
                   </span>
                 </div>
                 <div
-                  className={`p-2 rounded-lg ${currentFrame.planeAmount > 0 || currentFrame.isFlipped ? "bg-orange-50" : "bg-amber-50"}`}
+                  className={`p-2 rounded-lg ${
+                    currentFrame.planeAmount > 0 || currentFrame.isFlipped
+                      ? "bg-orange-50"
+                      : "bg-amber-50"
+                  }`}
                 >
                   <span className="text-gray-500 block">โครงไม้:</span>
                   <span className="font-bold text-amber-600">
@@ -2742,6 +2990,11 @@ export default function DoorConfigurator() {
                   </span>
                 </div>
               </div>
+              {doubleConfigSummary && (
+                <div className="mt-3 p-2 bg-amber-50 rounded-lg text-[11px] text-amber-800">
+                  {doubleConfigSummary}
+                </div>
+              )}
               {selectedFrameCode && (
                 <div className="mt-3 p-2 bg-blue-50 rounded-lg text-xs">
                   <div className="font-medium text-blue-800">
@@ -2754,7 +3007,6 @@ export default function DoorConfigurator() {
               )}
             </div>
 
-            {/* 6. Cutting Optimization */}
             {isDataComplete ? (
               <SectionCard
                 text="6"
@@ -2790,7 +3042,7 @@ export default function DoorConfigurator() {
                       textColor="text-indigo-600"
                     />
                     <StatCard
-                      value={`${cuttingPlan.efficiency}%`}
+                      value={cuttingPlan.efficiency}
                       label="ประสิทธิภาพ"
                       bgColor="bg-green-50"
                       textColor="text-green-600"
@@ -2809,16 +3061,18 @@ export default function DoorConfigurator() {
                     />
                   </div>
 
-                  {/* Piece list */}
                   <div className="border rounded-lg overflow-hidden">
                     <div className="bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-700">
-                      📋 รายการชิ้นส่วน (เผื่อรอยเลื่อย {cuttingPlan.sawKerf}mm)
+                      📋 รายการชิ้นส่วน (เผื่อรอยเลื่อย {cuttingPlan.sawKerf}
+                      mm)
                     </div>
                     <div className="divide-y">
                       {cuttingPlan.cutPieces.map((piece, idx) => (
                         <div
                           key={idx}
-                          className={`flex items-center justify-between px-3 py-2 text-xs hover:bg-gray-50 ${piece.isSplice ? "bg-purple-50" : ""}`}
+                          className={`flex items-center justify-between px-3 py-2 text-xs hover:bg-gray-50 ${
+                            piece.isSplice ? "bg-purple-50" : ""
+                          }`}
                         >
                           <div className="flex items-center gap-2">
                             <div
@@ -2843,7 +3097,6 @@ export default function DoorConfigurator() {
                     </div>
                   </div>
 
-                  {/* Stock visualization */}
                   <div className="border rounded-lg overflow-hidden">
                     <div className="bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-700">
                       🪵 แผนการตัด (ไม้ยาว {cuttingPlan.stockLength}mm ×{" "}
@@ -2899,7 +3152,9 @@ export default function DoorConfigurator() {
                               <div
                                 className="absolute right-0 h-full bg-gray-200 flex items-center justify-center text-[8px] text-gray-500"
                                 style={{
-                                  width: `${(stock.remaining / stock.length) * 100}%`,
+                                  width: `${
+                                    (stock.remaining / stock.length) * 100
+                                  }%`,
                                 }}
                               >
                                 {stock.remaining > 100 && (
@@ -2913,21 +3168,24 @@ export default function DoorConfigurator() {
                     </div>
                   </div>
 
-                  {/* Efficiency bar */}
                   <div className="p-2 bg-gray-50 rounded-lg">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-gray-600">
                         ประสิทธิภาพการใช้ไม้
                       </span>
                       <span
-                        className={`font-bold ${getEfficiencyColor(cuttingPlan.efficiency).text}`}
+                        className={`font-bold ${
+                          getEfficiencyColor(cuttingPlan.efficiency).text
+                        }`}
                       >
                         {cuttingPlan.efficiency}%
                       </span>
                     </div>
                     <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all ${getEfficiencyColor(cuttingPlan.efficiency).bg}`}
+                        className={`h-full rounded-full transition-all ${
+                          getEfficiencyColor(cuttingPlan.efficiency).bg
+                        }`}
                         style={{ width: `${cuttingPlan.efficiency}%` }}
                       />
                     </div>
@@ -2969,7 +3227,6 @@ export default function DoorConfigurator() {
             )}
           </div>
 
-          {/* Right Panel - Drawing */}
           <div className="lg:col-span-3">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-4">
               <div className="bg-gradient-to-r from-slate-700 to-slate-800 px-4 py-2.5 flex justify-between items-center">
@@ -2999,7 +3256,11 @@ export default function DoorConfigurator() {
                 )}
               </div>
               <div
-                className={`p-3 bg-gray-50 ${isDataComplete ? "cursor-pointer hover:bg-gray-100 transition-colors" : ""}`}
+                className={`p-3 bg-gray-50 ${
+                  isDataComplete
+                    ? "cursor-pointer hover:bg-gray-100 transition-colors"
+                    : ""
+                }`}
                 onClick={() => isDataComplete && setIsDrawingModalOpen(true)}
               >
                 {isDataComplete ? (
@@ -3031,17 +3292,29 @@ export default function DoorConfigurator() {
                   >
                     <div className="mt-4 flex gap-2 text-xs">
                       <span
-                        className={`px-2 py-1 rounded ${doorThickness ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
+                        className={`px-2 py-1 rounded ${
+                          doorThickness
+                            ? "bg-green-100 text-green-600"
+                            : "bg-red-100 text-red-500"
+                        }`}
                       >
                         T: {doorThickness || "—"}
                       </span>
                       <span
-                        className={`px-2 py-1 rounded ${doorWidth ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
+                        className={`px-2 py-1 rounded ${
+                          doorWidth
+                            ? "bg-green-100 text-green-600"
+                            : "bg-red-100 text-red-500"
+                        }`}
                       >
                         W: {doorWidth || "—"}
                       </span>
                       <span
-                        className={`px-2 py-1 rounded ${doorHeight ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
+                        className={`px-2 py-1 rounded ${
+                          doorHeight
+                            ? "bg-green-100 text-green-600"
+                            : "bg-red-100 text-red-500"
+                        }`}
                       >
                         H: {doorHeight || "—"}
                       </span>
@@ -3054,7 +3327,6 @@ export default function DoorConfigurator() {
         </div>
       </div>
 
-      {/* Drawing Modal */}
       <Modal
         isOpen={isDrawingModalOpen}
         onClose={() => setIsDrawingModalOpen(false)}
