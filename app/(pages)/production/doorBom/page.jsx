@@ -5,10 +5,6 @@ const GLUE_THICKNESS = 1;
 const LOCK_BLOCK_HEIGHT = 400;
 const LOCK_BLOCK_POSITION = 1000;
 
-const STANDARD_THICKNESS = [33, 35, 40, 45];
-const STANDARD_WIDTHS = [700, 800, 900, 1000];
-const STANDARD_HEIGHTS = [2000, 2100, 2200, 2400, 2700, 3000];
-
 const SURFACE_MATERIALS = [
   { value: "upvc", label: "UPVC" },
   { value: "wpc", label: "WPC" },
@@ -242,71 +238,16 @@ const NumberInput = ({ value, onChange, className }) => {
   );
 };
 
-const SelectButtonGroup = ({
-  options,
-  value,
-  onChange,
-  gridCols = "grid-cols-4",
-  renderLabel,
-}) => (
-  <div className={`grid ${gridCols} gap-1`}>
-    {options.map((opt) => {
-      const optValue = typeof opt === "object" ? opt.value : opt;
-      const optLabel = renderLabel
-        ? renderLabel(opt)
-        : typeof opt === "object"
-          ? opt.label
-          : opt;
-      return (
-        <button
-          key={optValue}
-          onClick={() => onChange(optValue)}
-          className={`py-1.5 px-2 rounded text-xs font-medium transition-all ${
-            value === optValue
-              ? "bg-current-theme text-white shadow-md"
-              : "bg-gray-100 hover:bg-gray-200"
-          }`}
-          style={
-            value === optValue
-              ? { backgroundColor: "var(--theme-color, #2563eb)" }
-              : {}
-          }
-        >
-          {optLabel}
-        </button>
-      );
-    })}
-  </div>
-);
-
 const QuickSelectWithInput = ({
   label,
-  options,
   value,
   onChange,
-  unit = "mm",
   themeColor = "#2563eb",
 }) => (
   <div>
     <label className="block text-xs font-medium text-gray-600 mb-1">
       {label}
     </label>
-    <div className="flex flex-wrap gap-1 mb-1">
-      {options.map((opt) => (
-        <button
-          key={opt}
-          onClick={() => onChange(opt)}
-          className={`px-2 py-1 rounded text-xs font-medium transition-all ${
-            value === opt
-              ? "text-white shadow-md"
-              : "bg-gray-100 hover:bg-gray-200"
-          }`}
-          style={value === opt ? { backgroundColor: themeColor } : {}}
-        >
-          {opt}
-        </button>
-      ))}
-    </div>
     <div className="flex items-center gap-1">
       <NumberInput
         value={value}
@@ -314,7 +255,6 @@ const QuickSelectWithInput = ({
         className="flex-1 px-2 py-1.5 border rounded text-center text-sm font-bold focus:ring-2"
         style={{ "--tw-ring-color": themeColor }}
       />
-      <span className="text-xs text-gray-500">{unit}</span>
     </div>
   </div>
 );
@@ -2419,22 +2359,19 @@ export default function DoorConfigurator() {
               <SectionCard text="1" title="สเปคลูกค้า" icon="📝" color="blue">
                 <div className="space-y-3">
                   <QuickSelectWithInput
-                    label="ความหนา (T)"
-                    options={STANDARD_THICKNESS}
+                    label="ความหนา (T) mm"
                     value={doorThickness}
                     onChange={setDoorThickness}
                     themeColor="#2563eb"
                   />
                   <QuickSelectWithInput
-                    label="ความกว้าง (W)"
-                    options={STANDARD_WIDTHS}
+                    label="ความกว้าง (W mm)"
                     value={doorWidth}
                     onChange={setDoorWidth}
                     themeColor="#2563eb"
                   />
                   <QuickSelectWithInput
-                    label="ความสูง (H)"
-                    options={STANDARD_HEIGHTS}
+                    label="ความสูง (H) mm"
                     value={doorHeight}
                     onChange={setDoorHeight}
                     themeColor="#2563eb"
@@ -2476,7 +2413,6 @@ export default function DoorConfigurator() {
 
                   <QuickSelectWithInput
                     label="ความหนา/แผ่น"
-                    options={[]}
                     value={surfaceThickness}
                     onChange={setSurfaceThickness}
                     themeColor="#16a34a"
