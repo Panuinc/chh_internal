@@ -1,8 +1,228 @@
 "use client";
 import React, { useState, useMemo, useRef, useEffect } from "react";
 
+// ===== CONSTANTS =====
+const GLUE_THICKNESS = 1;
+const LOCK_BLOCK_HEIGHT = 400;
+const LOCK_BLOCK_POSITION = 1000;
+
+const STANDARD_THICKNESS = [33, 35, 40, 45];
+const STANDARD_WIDTHS = [700, 800, 900, 1000];
+const STANDARD_HEIGHTS = [2000, 2100, 2200, 2400, 2700, 3000];
+
+const SURFACE_MATERIALS = [
+  { value: "upvc", label: "UPVC" },
+  { value: "wpc", label: "WPC" },
+  { value: "laminate", label: "ลามิเนต" },
+  { value: "plywood", label: "ไม้อัด" },
+  { value: "melamine", label: "เมลามีน" },
+];
+
+const FRAME_TYPES = [
+  { value: "rubberwood", label: "ยางพารา" },
+  { value: "sadao", label: "สะเดา" },
+  { value: "lvl", label: "LVL" },
+];
+
+const ERP_FRAMES = {
+  rubberwood: [
+    {
+      code: "RM-14-01-26-30-200",
+      desc: "ไม้ยางพาราจ๊อย 26x30x2040mm",
+      thickness: 26,
+      width: 30,
+      length: 2040,
+    },
+    {
+      code: "RM-14-01-26-30-230",
+      desc: "ไม้ยางพาราจ๊อย 26x30x2310mm",
+      thickness: 26,
+      width: 30,
+      length: 2310,
+    },
+    {
+      code: "RM-14-01-26-30-250",
+      desc: "ไม้ยางพาราจ๊อย 26x30x2510mm",
+      thickness: 26,
+      width: 30,
+      length: 2510,
+    },
+    {
+      code: "RM-14-01-26-32-200",
+      desc: "ไม้ยางพาราจ๊อย 26x32x2040mm",
+      thickness: 26,
+      width: 32,
+      length: 2040,
+    },
+    {
+      code: "RM-14-01-26-32-230",
+      desc: "ไม้ยางพาราจ๊อย 26x32x2310mm",
+      thickness: 26,
+      width: 32,
+      length: 2310,
+    },
+    {
+      code: "RM-14-01-26-32-250",
+      desc: "ไม้ยางพาราจ๊อย 26x32x2510mm",
+      thickness: 26,
+      width: 32,
+      length: 2510,
+    },
+    {
+      code: "RM-14-01-28-50-200",
+      desc: "ไม้ยางพาราจ๊อย 28x50x2040mm",
+      thickness: 28,
+      width: 50,
+      length: 2040,
+    },
+    {
+      code: "RM-14-01-28-50-230",
+      desc: "ไม้ยางพาราจ๊อย 28x50x2310mm",
+      thickness: 28,
+      width: 50,
+      length: 2310,
+    },
+    {
+      code: "RM-14-01-28-50-230B",
+      desc: "ไม้ยางพาราจ๊อยB 28x50x2310mm",
+      thickness: 28,
+      width: 50,
+      length: 2310,
+    },
+    {
+      code: "RM-14-01-28-50-250",
+      desc: "ไม้ยางพาราจ๊อย 28x50x2510mm",
+      thickness: 28,
+      width: 50,
+      length: 2510,
+    },
+    {
+      code: "RM-14-01-32-50-200",
+      desc: "ไม้ยางพาราจ๊อย 32x50x2040mm",
+      thickness: 32,
+      width: 50,
+      length: 2040,
+    },
+    {
+      code: "RM-14-01-32-50-230",
+      desc: "ไม้ยางพาราจ๊อย 32x50x2310mm",
+      thickness: 32,
+      width: 50,
+      length: 2310,
+    },
+    {
+      code: "RM-14-01-32-50-250",
+      desc: "ไม้ยางพาราจ๊อย 32x50x2510mm",
+      thickness: 32,
+      width: 50,
+      length: 2510,
+    },
+  ],
+  sadao: [
+    {
+      code: "RM-14-04-32-50-200",
+      desc: "ไม้สะเดาจ๊อย 32x50x2040mm",
+      thickness: 32,
+      width: 50,
+      length: 2040,
+    },
+    {
+      code: "RM-14-04-32-50-225",
+      desc: "ไม้สะเดาจ๊อย 32x50x2250mm",
+      thickness: 32,
+      width: 50,
+      length: 2250,
+    },
+    {
+      code: "RM-14-04-32-50-230",
+      desc: "ไม้สะเดาจ๊อย 32x50x2300mm",
+      thickness: 32,
+      width: 50,
+      length: 2300,
+    },
+    {
+      code: "RM-14-04-32-50-250",
+      desc: "ไม้สะเดาจ๊อย 32x50x2500mm",
+      thickness: 32,
+      width: 50,
+      length: 2500,
+    },
+  ],
+  lvl: [
+    {
+      code: "RM-16-19-2.9-3.4-258",
+      desc: "ไม้อัด LVL 29x34x2580mm",
+      thickness: 29,
+      width: 34,
+      length: 2580,
+    },
+    {
+      code: "RM-16-19-2.9-3.5-202",
+      desc: "ไม้อัด LVL 29x35x2020mm",
+      thickness: 29,
+      width: 35,
+      length: 2020,
+    },
+    {
+      code: "RM-16-19-2.9-3.5-244",
+      desc: "ไม้อัด LVL 29x35x2440mm",
+      thickness: 29,
+      width: 35,
+      length: 2440,
+    },
+    {
+      code: "RM-16-19-2.9-3.5-258",
+      desc: "ไม้อัด LVL 29x35x2580mm",
+      thickness: 29,
+      width: 35,
+      length: 2580,
+    },
+    {
+      code: "RM-16-19-3.2-3.5-202",
+      desc: "ไม้อัด LVL 32x35x2020mm",
+      thickness: 32,
+      width: 35,
+      length: 2020,
+    },
+    {
+      code: "RM-16-19-3.2-3.5-244",
+      desc: "ไม้อัด LVL 32x35x2440mm",
+      thickness: 32,
+      width: 35,
+      length: 2440,
+    },
+  ],
+};
+
+const SECTION_COLORS = {
+  blue: "from-blue-600 to-blue-700",
+  green: "from-green-600 to-green-700",
+  amber: "from-amber-500 to-amber-600",
+  orange: "from-orange-500 to-orange-600",
+  red: "from-red-500 to-red-600",
+  indigo: "from-indigo-600 to-indigo-700",
+  gray: "from-gray-400 to-gray-500",
+  slate: "from-slate-700 to-slate-800",
+};
+
+// ===== UTILITY FUNCTIONS =====
+const formatDimension = (t, w, h, separator = "×") =>
+  `${t || "-"}${separator}${w || "-"}${separator}${h || "-"}`;
+
+const getMaterialLabel = (materials, value) =>
+  materials.find((m) => m.value === value)?.label || "-";
+
+const getEfficiencyColor = (efficiency) => {
+  const val = parseFloat(efficiency);
+  if (val >= 80) return { bg: "bg-green-500", text: "text-green-600" };
+  if (val >= 60) return { bg: "bg-yellow-500", text: "text-yellow-600" };
+  return { bg: "bg-red-500", text: "text-red-600" };
+};
+
+// ===== REUSABLE UI COMPONENTS =====
+
 // Uncontrolled number input - ไม่ re-render ขณะพิมพ์
-const NumberInput = ({ value, onChange, className, step = 1 }) => {
+const NumberInput = ({ value, onChange, className }) => {
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -11,16 +231,8 @@ const NumberInput = ({ value, onChange, className, step = 1 }) => {
     }
   }, [value]);
 
-  const handleBlur = (e) => {
-    const newVal = parseFloat(e.target.value) || 0;
-    onChange(newVal);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.target.blur();
-    }
-  };
+  const handleBlur = (e) => onChange(parseFloat(e.target.value) || 0);
+  const handleKeyDown = (e) => e.key === "Enter" && e.target.blur();
 
   return (
     <input
@@ -35,216 +247,460 @@ const NumberInput = ({ value, onChange, className, step = 1 }) => {
   );
 };
 
-export default function DoorConfigurator() {
-  // ===== 1. สเปคจากลูกค้า =====
-  const [doorThickness, setDoorThickness] = useState("");
-  const [doorWidth, setDoorWidth] = useState("");
-  const [doorHeight, setDoorHeight] = useState("");
+// Button group for selecting values
+const SelectButtonGroup = ({
+  options,
+  value,
+  onChange,
+  gridCols = "grid-cols-4",
+  renderLabel,
+}) => (
+  <div className={`grid ${gridCols} gap-1`}>
+    {options.map((opt) => {
+      const optValue = typeof opt === "object" ? opt.value : opt;
+      const optLabel = renderLabel
+        ? renderLabel(opt)
+        : typeof opt === "object"
+          ? opt.label
+          : opt;
+      return (
+        <button
+          key={optValue}
+          onClick={() => onChange(optValue)}
+          className={`py-1.5 px-2 rounded text-xs font-medium transition-all ${
+            value === optValue
+              ? "bg-current-theme text-white shadow-md"
+              : "bg-gray-100 hover:bg-gray-200"
+          }`}
+          style={
+            value === optValue
+              ? { backgroundColor: "var(--theme-color, #2563eb)" }
+              : {}
+          }
+        >
+          {optLabel}
+        </button>
+      );
+    })}
+  </div>
+);
 
-  // ===== Modal State =====
-  const [isDrawingModalOpen, setIsDrawingModalOpen] = useState(false);
+// Quick select buttons with custom input
+const QuickSelectWithInput = ({
+  label,
+  options,
+  value,
+  onChange,
+  unit = "mm",
+  themeColor = "#2563eb",
+}) => (
+  <div>
+    <label className="block text-xs font-medium text-gray-600 mb-1">
+      {label}
+    </label>
+    <div className="flex flex-wrap gap-1 mb-1">
+      {options.map((opt) => (
+        <button
+          key={opt}
+          onClick={() => onChange(opt)}
+          className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+            value === opt
+              ? "text-white shadow-md"
+              : "bg-gray-100 hover:bg-gray-200"
+          }`}
+          style={value === opt ? { backgroundColor: themeColor } : {}}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+    <div className="flex items-center gap-1">
+      <NumberInput
+        value={value}
+        onChange={onChange}
+        className="flex-1 px-2 py-1.5 border rounded text-center text-sm font-bold focus:ring-2"
+        style={{ "--tw-ring-color": themeColor }}
+      />
+      <span className="text-xs text-gray-500">{unit}</span>
+    </div>
+  </div>
+);
 
-  // ===== 2. วัสดุปิดผิว =====
-  const [surfaceMaterial, setSurfaceMaterial] = useState("melamine");
-  const [surfaceThickness, setSurfaceThickness] = useState(4);
-  const GLUE_THICKNESS = 1;
+// Info row component
+const InfoRow = ({ label, value, className = "" }) => (
+  <div className={`flex justify-between ${className}`}>
+    <span>{label}</span>
+    <span className="font-bold">{value}</span>
+  </div>
+);
 
-  // ===== 3. โครง (Frame) - ตาม ERP =====
-  const [frameType, setFrameType] = useState("rubberwood");
-  const [selectedFrameCode, setSelectedFrameCode] = useState("");
-  const [hasDoubleFrame, setHasDoubleFrame] = useState(false);
+// Stat card component
+const StatCard = ({
+  value,
+  label,
+  bgColor = "bg-gray-50",
+  textColor = "text-gray-600",
+}) => (
+  <div className={`p-2 ${bgColor} rounded-lg text-center`}>
+    <div className={`${textColor} font-bold text-lg`}>{value}</div>
+    <div className="text-gray-500">{label}</div>
+  </div>
+);
 
-  // ===== 4. Lock Block =====
-  const [lockBlockLeft, setLockBlockLeft] = useState(true);
-  const [lockBlockRight, setLockBlockRight] = useState(true);
-  const [lockBlockPiecesPerSide, setLockBlockPiecesPerSide] = useState(2);
+// Section card wrapper
+const SectionCard = ({ text, title, icon, children, color = "blue" }) => (
+  <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className={`bg-gradient-to-r ${SECTION_COLORS[color]} px-4 py-2.5`}>
+      <h3 className="text-base font-semibold text-white flex items-center gap-2">
+        <span className="bg-white text-gray-700 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">
+          {text}
+        </span>
+        <span>{icon}</span>
+        {title}
+      </h3>
+    </div>
+    <div className="p-4">{children}</div>
+  </div>
+);
 
-  const LOCK_BLOCK_HEIGHT = 400;
-  const LOCK_BLOCK_POSITION = 1000;
-
-  // ===== ERP Frame Data =====
-  const erpFrames = {
-    rubberwood: [
-      {
-        code: "RM-14-01-26-30-200",
-        desc: "ไม้ยางพาราจ๊อย 26x30x2040mm",
-        thickness: 26,
-        width: 30,
-        length: 2040,
-      },
-      {
-        code: "RM-14-01-26-30-230",
-        desc: "ไม้ยางพาราจ๊อย 26x30x2310mm",
-        thickness: 26,
-        width: 30,
-        length: 2310,
-      },
-      {
-        code: "RM-14-01-26-30-250",
-        desc: "ไม้ยางพาราจ๊อย 26x30x2510mm",
-        thickness: 26,
-        width: 30,
-        length: 2510,
-      },
-      {
-        code: "RM-14-01-26-32-200",
-        desc: "ไม้ยางพาราจ๊อย 26x32x2040mm",
-        thickness: 26,
-        width: 32,
-        length: 2040,
-      },
-      {
-        code: "RM-14-01-26-32-230",
-        desc: "ไม้ยางพาราจ๊อย 26x32x2310mm",
-        thickness: 26,
-        width: 32,
-        length: 2310,
-      },
-      {
-        code: "RM-14-01-26-32-250",
-        desc: "ไม้ยางพาราจ๊อย 26x32x2510mm",
-        thickness: 26,
-        width: 32,
-        length: 2510,
-      },
-      {
-        code: "RM-14-01-28-50-200",
-        desc: "ไม้ยางพาราจ๊อย 28x50x2040mm",
-        thickness: 28,
-        width: 50,
-        length: 2040,
-      },
-      {
-        code: "RM-14-01-28-50-230",
-        desc: "ไม้ยางพาราจ๊อย 28x50x2310mm",
-        thickness: 28,
-        width: 50,
-        length: 2310,
-      },
-      {
-        code: "RM-14-01-28-50-230B",
-        desc: "ไม้ยางพาราจ๊อยB 28x50x2310mm",
-        thickness: 28,
-        width: 50,
-        length: 2310,
-      },
-      {
-        code: "RM-14-01-28-50-250",
-        desc: "ไม้ยางพาราจ๊อย 28x50x2510mm",
-        thickness: 28,
-        width: 50,
-        length: 2510,
-      },
-      {
-        code: "RM-14-01-32-50-200",
-        desc: "ไม้ยางพาราจ๊อย 32x50x2040mm",
-        thickness: 32,
-        width: 50,
-        length: 2040,
-      },
-      {
-        code: "RM-14-01-32-50-230",
-        desc: "ไม้ยางพาราจ๊อย 32x50x2310mm",
-        thickness: 32,
-        width: 50,
-        length: 2310,
-      },
-      {
-        code: "RM-14-01-32-50-250",
-        desc: "ไม้ยางพาราจ๊อย 32x50x2510mm",
-        thickness: 32,
-        width: 50,
-        length: 2510,
-      },
-    ],
-    sadao: [
-      {
-        code: "RM-14-04-32-50-200",
-        desc: "ไม้สะเดาจ๊อย 32x50x2040mm",
-        thickness: 32,
-        width: 50,
-        length: 2040,
-      },
-      {
-        code: "RM-14-04-32-50-225",
-        desc: "ไม้สะเดาจ๊อย 32x50x2250mm",
-        thickness: 32,
-        width: 50,
-        length: 2250,
-      },
-      {
-        code: "RM-14-04-32-50-230",
-        desc: "ไม้สะเดาจ๊อย 32x50x2300mm",
-        thickness: 32,
-        width: 50,
-        length: 2300,
-      },
-      {
-        code: "RM-14-04-32-50-250",
-        desc: "ไม้สะเดาจ๊อย 32x50x2500mm",
-        thickness: 32,
-        width: 50,
-        length: 2500,
-      },
-    ],
-    lvl: [
-      {
-        code: "RM-16-19-2.9-3.4-258",
-        desc: "ไม้อัด LVL 29x34x2580mm",
-        thickness: 29,
-        width: 34,
-        length: 2580,
-      },
-      {
-        code: "RM-16-19-2.9-3.5-202",
-        desc: "ไม้อัด LVL 29x35x2020mm",
-        thickness: 29,
-        width: 35,
-        length: 2020,
-      },
-      {
-        code: "RM-16-19-2.9-3.5-244",
-        desc: "ไม้อัด LVL 29x35x2440mm",
-        thickness: 29,
-        width: 35,
-        length: 2440,
-      },
-      {
-        code: "RM-16-19-2.9-3.5-258",
-        desc: "ไม้อัด LVL 29x35x2580mm",
-        thickness: 29,
-        width: 35,
-        length: 2580,
-      },
-      {
-        code: "RM-16-19-3.2-3.5-202",
-        desc: "ไม้อัด LVL 32x35x2020mm",
-        thickness: 32,
-        width: 35,
-        length: 2020,
-      },
-      {
-        code: "RM-16-19-3.2-3.5-244",
-        desc: "ไม้อัด LVL 32x35x2440mm",
-        thickness: 32,
-        width: 35,
-        length: 2440,
-      },
-    ],
+// Info box with colored background
+const InfoBox = ({ children, color = "blue", className = "" }) => {
+  const colorMap = {
+    blue: "bg-blue-50 border-blue-200 text-blue-700",
+    green: "bg-green-50 border-green-200 text-green-700",
+    amber: "bg-amber-50 border-amber-200 text-amber-700",
+    orange: "bg-orange-50 border-orange-200 text-orange-700",
+    red: "bg-red-50 border-red-200 text-red-700",
+    purple: "bg-purple-50 border-purple-300 text-purple-700",
+    gray: "bg-gray-50 border-gray-200 text-gray-700",
   };
+  return (
+    <div
+      className={`p-2 rounded-lg border text-xs ${colorMap[color]} ${className}`}
+    >
+      {children}
+    </div>
+  );
+};
 
-  // Frame selection logic
-  const frameSelection = useMemo(() => {
-    const requiredThickness =
-      doorThickness - (surfaceThickness + GLUE_THICKNESS) * 2;
+// Checkbox with label
+const CheckboxOption = ({ checked, onChange, label, sublabel, isActive }) => (
+  <label
+    className={`flex items-center gap-2 p-2 rounded-lg border-2 cursor-pointer transition-all ${
+      isActive ? "bg-yellow-50 border-yellow-400" : "bg-gray-50 border-gray-200"
+    }`}
+  >
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={onChange}
+      className="w-4 h-4 text-yellow-500 rounded"
+    />
+    <div>
+      <span className="text-xs font-medium">{label}</span>
+      {sublabel && (
+        <span className="text-xs text-yellow-600 ml-1">{sublabel}</span>
+      )}
+    </div>
+  </label>
+);
+
+// Radio option card
+const RadioOptionCard = ({
+  name,
+  checked,
+  onChange,
+  label,
+  sublabel,
+  isActive,
+}) => (
+  <label
+    className={`flex flex-col items-center gap-1 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+      isActive
+        ? "bg-red-50 border-red-400"
+        : "bg-gray-50 border-gray-200 hover:border-gray-300"
+    }`}
+  >
+    <input
+      type="radio"
+      name={name}
+      checked={checked}
+      onChange={onChange}
+      className="w-4 h-4 text-red-500"
+    />
+    <span className="text-xs font-medium">{label}</span>
+    {sublabel && (
+      <span className="text-[10px] text-red-500 font-bold">{sublabel}</span>
+    )}
+  </label>
+);
+
+// Modal component
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative bg-white rounded-lg shadow-2xl max-w-[95vw] max-h-[95vh] overflow-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold shadow-lg transition-colors"
+        >
+          ✕
+        </button>
+        <div className="p-4">{children}</div>
+      </div>
+    </div>
+  );
+};
+
+// Empty state placeholder
+const EmptyState = ({ icon, title, subtitle, children }) => (
+  <div className="flex flex-col items-center justify-center h-96 text-gray-400">
+    {icon}
+    <p className="text-lg font-medium mb-2">{title}</p>
+    <p className="text-sm">{subtitle}</p>
+    {children}
+  </div>
+);
+
+// ===== SVG COMPONENTS =====
+
+// Dimension line for engineering drawings
+const DimLine = ({
+  x1,
+  y1,
+  x2,
+  y2,
+  value,
+  offset = 25,
+  vertical = false,
+  color = "#000",
+  fontSize = 9,
+  unit = "",
+}) => {
+  const arrowSize = 3;
+  const displayValue = unit ? `${value}${unit}` : value;
+  const textWidth = String(displayValue).length * 4 + 8;
+
+  if (vertical) {
+    const lineX = x1 + offset;
+    const midY = (y1 + y2) / 2;
+    return (
+      <g className="dimension">
+        <line
+          x1={x1 + 2}
+          y1={y1}
+          x2={lineX + 3}
+          y2={y1}
+          stroke={color}
+          strokeWidth="0.4"
+        />
+        <line
+          x1={x1 + 2}
+          y1={y2}
+          x2={lineX + 3}
+          y2={y2}
+          stroke={color}
+          strokeWidth="0.4"
+        />
+        <line
+          x1={lineX}
+          y1={y1}
+          x2={lineX}
+          y2={y2}
+          stroke={color}
+          strokeWidth="0.6"
+        />
+        <polygon
+          points={`${lineX},${y1} ${lineX - arrowSize},${y1 + arrowSize * 1.5} ${lineX + arrowSize},${y1 + arrowSize * 1.5}`}
+          fill={color}
+        />
+        <polygon
+          points={`${lineX},${y2} ${lineX - arrowSize},${y2 - arrowSize * 1.5} ${lineX + arrowSize},${y2 - arrowSize * 1.5}`}
+          fill={color}
+        />
+        <rect
+          x={lineX - textWidth / 2}
+          y={midY - 6}
+          width={textWidth}
+          height="12"
+          fill="white"
+        />
+        <text
+          x={lineX}
+          y={midY + 3}
+          textAnchor="middle"
+          fontSize={fontSize}
+          fontWeight="500"
+          fill={color}
+        >
+          {displayValue}
+        </text>
+      </g>
+    );
+  }
+
+  const lineY = y1 + offset;
+  const midX = (x1 + x2) / 2;
+  return (
+    <g className="dimension">
+      <line
+        x1={x1}
+        y1={y1 + 2}
+        x2={x1}
+        y2={lineY + 3}
+        stroke={color}
+        strokeWidth="0.4"
+      />
+      <line
+        x1={x2}
+        y1={y1 + 2}
+        x2={x2}
+        y2={lineY + 3}
+        stroke={color}
+        strokeWidth="0.4"
+      />
+      <line
+        x1={x1}
+        y1={lineY}
+        x2={x2}
+        y2={lineY}
+        stroke={color}
+        strokeWidth="0.6"
+      />
+      <polygon
+        points={`${x1},${lineY} ${x1 + arrowSize * 1.5},${lineY - arrowSize} ${x1 + arrowSize * 1.5},${lineY + arrowSize}`}
+        fill={color}
+      />
+      <polygon
+        points={`${x2},${lineY} ${x2 - arrowSize * 1.5},${lineY - arrowSize} ${x2 - arrowSize * 1.5},${lineY + arrowSize}`}
+        fill={color}
+      />
+      <rect
+        x={midX - textWidth / 2}
+        y={lineY - 6}
+        width={textWidth}
+        height="12"
+        fill="white"
+      />
+      <text
+        x={midX}
+        y={lineY + 3}
+        textAnchor="middle"
+        fontSize={fontSize}
+        fontWeight="500"
+        fill={color}
+      >
+        {displayValue}
+      </text>
+    </g>
+  );
+};
+
+// Center line for drawings
+const CenterLine = ({ x1, y1, x2, y2 }) => (
+  <line
+    x1={x1}
+    y1={y1}
+    x2={x2}
+    y2={y2}
+    stroke="#000"
+    strokeWidth="0.3"
+    strokeDasharray="10,3,2,3"
+  />
+);
+
+// Hatch pattern lines
+const HatchLines = ({
+  x,
+  y,
+  width,
+  height,
+  count,
+  color = "#ddd",
+  direction = "diagonal",
+}) => (
+  <>
+    {[...Array(count)].map((_, i) => (
+      <line
+        key={i}
+        x1={x + 1}
+        y1={y + i * (height / count)}
+        x2={x + width - 1}
+        y2={y + i * (height / count) + 4}
+        stroke={color}
+        strokeWidth="0.2"
+      />
+    ))}
+  </>
+);
+
+// Lock block SVG element
+const LockBlockSVG = ({ x, y, width, height, strokeColor = "#c62828" }) => (
+  <g>
+    <rect
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      fill="#ffcdd2"
+      stroke={strokeColor}
+      strokeWidth="0.8"
+    />
+    <line
+      x1={x}
+      y1={y}
+      x2={x + width}
+      y2={y + height}
+      stroke={strokeColor}
+      strokeWidth="0.4"
+    />
+    <line
+      x1={x + width}
+      y1={y}
+      x2={x}
+      y2={y + height}
+      stroke={strokeColor}
+      strokeWidth="0.4"
+    />
+  </g>
+);
+
+// Position annotation
+const PositionAnnotation = ({ x, y, value, align = "end" }) => (
+  <g>
+    <line x1={x - 10} y1={y} x2={x} y2={y} stroke="#666" strokeWidth="0.4" />
+    <text x={x - 13} y={y + 3} fontSize="7" fill="#666" textAnchor={align}>
+      {value}
+    </text>
+  </g>
+);
+
+// ===== CUSTOM HOOKS =====
+
+// Frame selection logic
+const useFrameSelection = (
+  frameType,
+  doorThickness,
+  surfaceThickness,
+  doorHeight,
+) => {
+  return useMemo(() => {
+    const S = parseFloat(surfaceThickness) || 0;
+    const requiredThickness = doorThickness - (S + GLUE_THICKNESS) * 2;
     const requiredLength = doorHeight;
-    const frames = erpFrames[frameType] || [];
+    const frames = ERP_FRAMES[frameType] || [];
 
-    const filterAndSort = (frameList) => {
-      return frameList
+    const filterAndSort = (frameList) =>
+      frameList
         .filter((f) => f.length >= requiredLength)
         .sort((a, b) => a.length - b.length);
-    };
 
     const findSpliceable = (frameList) => {
       const sorted = [...frameList].sort((a, b) => b.length - a.length);
@@ -265,202 +721,153 @@ export default function DoorConfigurator() {
       return null;
     };
 
-    const exactMatch = filterAndSort(
-      frames.filter((f) => f.thickness === requiredThickness),
-    );
-    if (exactMatch.length > 0) {
-      return {
-        frames: exactMatch.map((f) => ({
-          ...f,
-          useThickness: f.thickness,
-          useWidth: f.width,
-          isFlipped: false,
-          planeAmount: 0,
-          needSplice: false,
-          displaySize: `${f.thickness}×${f.width}×${f.length}`,
-        })),
-        needFlip: false,
-        needPlane: false,
-        needSplice: false,
-      };
-    }
-
-    const flipExact = filterAndSort(
-      frames.filter((f) => f.width === requiredThickness),
-    );
-    if (flipExact.length > 0) {
-      return {
-        frames: flipExact.map((f) => ({
-          ...f,
-          useThickness: f.width,
-          useWidth: f.thickness,
-          isFlipped: true,
-          planeAmount: 0,
-          needSplice: false,
-          displaySize: `${f.width}×${f.thickness}×${f.length} (พลิก)`,
-        })),
-        needFlip: true,
-        needPlane: false,
-        needSplice: false,
-      };
-    }
-
-    const thickerFrames = frames
-      .filter(
-        (f) => f.thickness > requiredThickness && f.length >= requiredLength,
-      )
-      .sort((a, b) => {
-        if (a.thickness !== b.thickness) return a.thickness - b.thickness;
-        return a.length - b.length;
+    const createFrameResult = (
+      frameList,
+      isFlipped,
+      planeAmount,
+      needSplice = false,
+      spliceInfo = null,
+    ) => {
+      const mapFrame = (f) => ({
+        ...f,
+        useThickness: isFlipped
+          ? f.width - planeAmount
+          : f.thickness - planeAmount,
+        useWidth: isFlipped ? f.thickness : f.width,
+        isFlipped,
+        planeAmount,
+        needSplice,
+        ...(spliceInfo && {
+          spliceCount: spliceInfo.spliceCount,
+          spliceOverlap: spliceInfo.spliceOverlap,
+          splicePosition: spliceInfo.splicePosition,
+          effectiveLength: spliceInfo.effectiveLength,
+        }),
+        displaySize: createDisplaySize(f, isFlipped, planeAmount, needSplice),
       });
-    if (thickerFrames.length > 0) {
-      return {
-        frames: thickerFrames.map((f) => ({
-          ...f,
-          useThickness: requiredThickness,
-          useWidth: f.width,
-          isFlipped: false,
-          planeAmount: f.thickness - requiredThickness,
-          needSplice: false,
-          displaySize: `${f.thickness}×${f.width}×${f.length} (ไส ${f.thickness - requiredThickness}mm)`,
-        })),
-        needFlip: false,
-        needPlane: true,
-        needSplice: false,
-      };
-    }
 
-    const flipAndPlane = frames
-      .filter((f) => f.width > requiredThickness && f.length >= requiredLength)
-      .sort((a, b) => {
-        if (a.width !== b.width) return a.width - b.width;
-        return a.length - b.length;
-      });
-    if (flipAndPlane.length > 0) {
       return {
-        frames: flipAndPlane.map((f) => ({
-          ...f,
-          useThickness: requiredThickness,
-          useWidth: f.thickness,
-          isFlipped: true,
-          planeAmount: f.width - requiredThickness,
-          needSplice: false,
-          displaySize: `${f.width}×${f.thickness}×${f.length} (พลิก+ไส ${f.width - requiredThickness}mm)`,
-        })),
-        needFlip: true,
-        needPlane: true,
-        needSplice: false,
+        frames: needSplice
+          ? [mapFrame(spliceInfo.frame)]
+          : frameList.map(mapFrame),
+        needFlip: isFlipped,
+        needPlane: planeAmount > 0,
+        needSplice,
       };
-    }
+    };
 
-    const exactForSplice = frames.filter(
-      (f) => f.thickness === requiredThickness,
-    );
-    const spliceExact = findSpliceable(exactForSplice);
-    if (spliceExact) {
-      const f = spliceExact.frame;
-      return {
-        frames: [
-          {
-            ...f,
-            useThickness: f.thickness,
-            useWidth: f.width,
-            isFlipped: false,
-            planeAmount: 0,
-            needSplice: true,
-            spliceCount: spliceExact.spliceCount,
-            spliceOverlap: spliceExact.spliceOverlap,
-            splicePosition: spliceExact.splicePosition,
-            effectiveLength: spliceExact.effectiveLength,
-            displaySize: `${f.thickness}×${f.width}×${f.length} (ต่อ 2 ท่อน)`,
-          },
-        ],
-        needFlip: false,
-        needPlane: false,
-        needSplice: true,
-      };
-    }
+    const createDisplaySize = (f, isFlipped, planeAmount, needSplice) => {
+      const parts = [];
+      if (isFlipped) parts.push("พลิก");
+      if (planeAmount > 0) parts.push(`ไส ${planeAmount}mm`);
+      if (needSplice) parts.push("ต่อ 2 ท่อน");
+      const suffix = parts.length > 0 ? ` (${parts.join("+")})` : "";
+      return isFlipped
+        ? `${f.width}×${f.thickness}×${f.length}${suffix}`
+        : `${f.thickness}×${f.width}×${f.length}${suffix}`;
+    };
 
-    const flipForSplice = frames.filter((f) => f.width === requiredThickness);
-    const spliceFlip = findSpliceable(flipForSplice);
-    if (spliceFlip) {
-      const f = spliceFlip.frame;
-      return {
-        frames: [
-          {
-            ...f,
-            useThickness: f.width,
-            useWidth: f.thickness,
-            isFlipped: true,
-            planeAmount: 0,
-            needSplice: true,
-            spliceCount: spliceFlip.spliceCount,
-            spliceOverlap: spliceFlip.spliceOverlap,
-            splicePosition: spliceFlip.splicePosition,
-            effectiveLength: spliceFlip.effectiveLength,
-            displaySize: `${f.width}×${f.thickness}×${f.length} (พลิก+ต่อ 2 ท่อน)`,
-          },
-        ],
-        needFlip: true,
-        needPlane: false,
-        needSplice: true,
-      };
-    }
+    // Try each matching strategy in order
+    const strategies = [
+      // 1. Exact match
+      () => {
+        const exact = filterAndSort(
+          frames.filter((f) => f.thickness === requiredThickness),
+        );
+        return exact.length > 0 ? createFrameResult(exact, false, 0) : null;
+      },
+      // 2. Flip exact
+      () => {
+        const flipExact = filterAndSort(
+          frames.filter((f) => f.width === requiredThickness),
+        );
+        return flipExact.length > 0
+          ? createFrameResult(flipExact, true, 0)
+          : null;
+      },
+      // 3. Plane thicker
+      () => {
+        const thicker = frames
+          .filter(
+            (f) =>
+              f.thickness > requiredThickness && f.length >= requiredLength,
+          )
+          .sort((a, b) =>
+            a.thickness !== b.thickness
+              ? a.thickness - b.thickness
+              : a.length - b.length,
+          );
+        return thicker.length > 0
+          ? createFrameResult(
+              thicker,
+              false,
+              thicker[0].thickness - requiredThickness,
+            )
+          : null;
+      },
+      // 4. Flip and plane
+      () => {
+        const flipPlane = frames
+          .filter(
+            (f) => f.width > requiredThickness && f.length >= requiredLength,
+          )
+          .sort((a, b) =>
+            a.width !== b.width ? a.width - b.width : a.length - b.length,
+          );
+        return flipPlane.length > 0
+          ? createFrameResult(
+              flipPlane,
+              true,
+              flipPlane[0].width - requiredThickness,
+            )
+          : null;
+      },
+      // 5-8. Splice variations
+      () => {
+        const splice = findSpliceable(
+          frames.filter((f) => f.thickness === requiredThickness),
+        );
+        return splice ? createFrameResult([], false, 0, true, splice) : null;
+      },
+      () => {
+        const splice = findSpliceable(
+          frames.filter((f) => f.width === requiredThickness),
+        );
+        return splice ? createFrameResult([], true, 0, true, splice) : null;
+      },
+      () => {
+        const splice = findSpliceable(
+          frames.filter((f) => f.thickness > requiredThickness),
+        );
+        return splice
+          ? createFrameResult(
+              [],
+              false,
+              splice.frame.thickness - requiredThickness,
+              true,
+              splice,
+            )
+          : null;
+      },
+      () => {
+        const splice = findSpliceable(
+          frames.filter((f) => f.width > requiredThickness),
+        );
+        return splice
+          ? createFrameResult(
+              [],
+              true,
+              splice.frame.width - requiredThickness,
+              true,
+              splice,
+            )
+          : null;
+      },
+    ];
 
-    const thickForSplice = frames.filter(
-      (f) => f.thickness > requiredThickness,
-    );
-    const spliceThick = findSpliceable(thickForSplice);
-    if (spliceThick) {
-      const f = spliceThick.frame;
-      return {
-        frames: [
-          {
-            ...f,
-            useThickness: requiredThickness,
-            useWidth: f.width,
-            isFlipped: false,
-            planeAmount: f.thickness - requiredThickness,
-            needSplice: true,
-            spliceCount: spliceThick.spliceCount,
-            spliceOverlap: spliceThick.spliceOverlap,
-            splicePosition: spliceThick.splicePosition,
-            effectiveLength: spliceThick.effectiveLength,
-            displaySize: `${f.thickness}×${f.width}×${f.length} (ไส+ต่อ 2 ท่อน)`,
-          },
-        ],
-        needFlip: false,
-        needPlane: true,
-        needSplice: true,
-      };
-    }
-
-    const flipPlaneForSplice = frames.filter(
-      (f) => f.width > requiredThickness,
-    );
-    const spliceFlipPlane = findSpliceable(flipPlaneForSplice);
-    if (spliceFlipPlane) {
-      const f = spliceFlipPlane.frame;
-      return {
-        frames: [
-          {
-            ...f,
-            useThickness: requiredThickness,
-            useWidth: f.thickness,
-            isFlipped: true,
-            planeAmount: f.width - requiredThickness,
-            needSplice: true,
-            spliceCount: spliceFlipPlane.spliceCount,
-            spliceOverlap: spliceFlipPlane.spliceOverlap,
-            splicePosition: spliceFlipPlane.splicePosition,
-            effectiveLength: spliceFlipPlane.effectiveLength,
-            displaySize: `${f.width}×${f.thickness}×${f.length} (พลิก+ไส+ต่อ 2 ท่อน)`,
-          },
-        ],
-        needFlip: true,
-        needPlane: true,
-        needSplice: true,
-      };
+    for (const strategy of strategies) {
+      const result = strategy();
+      if (result) return result;
     }
 
     const maxLength = Math.max(...frames.map((f) => f.length), 0);
@@ -477,35 +884,23 @@ export default function DoorConfigurator() {
           : `ไม่มีไม้ความหนา ${requiredThickness}mm`,
     };
   }, [frameType, doorThickness, surfaceThickness, doorHeight]);
+};
 
-  const currentFrame = useMemo(() => {
-    if (frameSelection.frames.length === 0) {
-      return {
-        thickness: 27,
-        width: 50,
-        length: 2000,
-        useThickness: 27,
-        useWidth: 50,
-        isFlipped: false,
-        planeAmount: 0,
-        code: "",
-        desc: "",
-      };
-    }
-    return (
-      frameSelection.frames.find((f) => f.code === selectedFrameCode) ||
-      frameSelection.frames[0]
-    );
-  }, [frameSelection, selectedFrameCode]);
+// Calculations hook
+const useCalculations = (params) => {
+  const {
+    doorThickness,
+    doorWidth,
+    doorHeight,
+    surfaceThickness,
+    hasDoubleFrame,
+    currentFrame,
+    lockBlockLeft,
+    lockBlockRight,
+    lockBlockPiecesPerSide,
+  } = params;
 
-  React.useEffect(() => {
-    if (frameSelection.frames.length > 0) {
-      setSelectedFrameCode(frameSelection.frames[0].code);
-    }
-  }, [frameSelection]);
-
-  // ===== Calculations =====
-  const results = useMemo(() => {
+  return useMemo(() => {
     const T = parseFloat(doorThickness) || 0;
     const W = parseFloat(doorWidth) || 0;
     const H = parseFloat(doorHeight) || 0;
@@ -513,26 +908,27 @@ export default function DoorConfigurator() {
 
     const totalSurfaceThickness = (S + GLUE_THICKNESS) * 2;
     const frameThickness = T - totalSurfaceThickness;
-    const F = currentFrame.useWidth;
-    const R = currentFrame.useThickness;
-
+    const F = currentFrame.useWidth || 0;
+    const R = currentFrame.useThickness || 0;
     const DF = hasDoubleFrame ? F : 0;
     const totalFrameWidth = F + DF;
     const innerWidth = W - 2 * totalFrameWidth;
     const innerHeight = H - 2 * totalFrameWidth;
     const doorArea = W * H;
-
     const railSections = H >= 2400 ? 4 : 3;
 
+    // Lock block zone calculations
     const lockBlockZoneTop = LOCK_BLOCK_POSITION - LOCK_BLOCK_HEIGHT / 2;
     const lockBlockZoneBottom = LOCK_BLOCK_POSITION + LOCK_BLOCK_HEIGHT / 2;
     const lockBlockZoneBuffer = 50;
     const avoidZoneTop = lockBlockZoneTop - lockBlockZoneBuffer;
     const avoidZoneBottom = lockBlockZoneBottom + lockBlockZoneBuffer;
 
+    // Calculate rail positions
     const railPositions = [];
     const railPositionsOriginal = [];
     const railThickness = currentFrame.useWidth || 50;
+    const hasLockBlock = lockBlockLeft || lockBlockRight;
 
     for (let i = 1; i < railSections; i++) {
       const eqPosition = Math.round((H * i) / railSections);
@@ -540,8 +936,6 @@ export default function DoorConfigurator() {
 
       const railTop = eqPosition + railThickness / 2;
       const railBottom = eqPosition - railThickness / 2;
-
-      const hasLockBlock = lockBlockLeft || lockBlockRight;
       const hitLockBlock =
         hasLockBlock &&
         railBottom <= avoidZoneBottom &&
@@ -550,12 +944,11 @@ export default function DoorConfigurator() {
       if (hitLockBlock) {
         const distToTop = eqPosition - avoidZoneTop;
         const distToBottom = avoidZoneBottom - eqPosition;
-
-        if (distToTop <= distToBottom) {
-          railPositions.push(avoidZoneTop - railThickness / 2);
-        } else {
-          railPositions.push(avoidZoneBottom + railThickness / 2);
-        }
+        railPositions.push(
+          distToTop <= distToBottom
+            ? avoidZoneTop - railThickness / 2
+            : avoidZoneBottom + railThickness / 2,
+        );
       } else {
         railPositions.push(eqPosition);
       }
@@ -563,10 +956,9 @@ export default function DoorConfigurator() {
 
     const lockBlockTop = LOCK_BLOCK_POSITION - LOCK_BLOCK_HEIGHT / 2;
     const lockBlockBottom = LOCK_BLOCK_POSITION + LOCK_BLOCK_HEIGHT / 2;
-    const lockBlockWidth = F;
     const lockBlockSides = (lockBlockLeft ? 1 : 0) + (lockBlockRight ? 1 : 0);
-    const lockBlockCount = lockBlockSides * lockBlockPiecesPerSide;
-
+    const piecesPerSide = parseInt(lockBlockPiecesPerSide) || 0;
+    const lockBlockCount = lockBlockSides * piecesPerSide;
     const railsAdjusted = railPositions.some(
       (pos, idx) => pos !== railPositionsOriginal[idx],
     );
@@ -593,7 +985,7 @@ export default function DoorConfigurator() {
       lockBlockBottom,
       lockBlockHeight: LOCK_BLOCK_HEIGHT,
       lockBlockPosition: LOCK_BLOCK_POSITION,
-      lockBlockWidth,
+      lockBlockWidth: F,
       lockBlockCount,
       lockBlockSides,
       lockBlockLeft,
@@ -611,11 +1003,12 @@ export default function DoorConfigurator() {
     lockBlockRight,
     lockBlockPiecesPerSide,
   ]);
+};
 
-  // ===== Cutting Optimization =====
-  const cuttingPlan = useMemo(() => {
-    const { W, H, F, DF, totalFrameWidth, railSections, lockBlockCount } =
-      results;
+// Cutting optimization hook
+const useCuttingPlan = (results, currentFrame, hasDoubleFrame) => {
+  return useMemo(() => {
+    const { W, H, F, totalFrameWidth, railSections, lockBlockCount } = results;
     const stockLength = currentFrame.length || 2040;
     const sawKerf = 5;
     const needSplice = currentFrame.needSplice || false;
@@ -623,126 +1016,70 @@ export default function DoorConfigurator() {
 
     const cutPieces = [];
 
+    // Helper to add pieces
+    const addPiece = (name, length, qty, color, isSplice = false) => {
+      cutPieces.push({ name, length, qty, color, isSplice });
+    };
+
+    // Stiles
     const stileLength = H;
     if (needSplice && stileLength > stockLength) {
-      const piece1Length = Math.ceil(stileLength / 2) + spliceOverlap / 2;
-      const piece2Length = Math.ceil(stileLength / 2) + spliceOverlap / 2;
-      cutPieces.push({
-        name: "โครงตั้ง (ท่อน 1)",
-        length: piece1Length,
-        qty: 2,
-        color: "#8d6e63",
-        isSplice: true,
-      });
-      cutPieces.push({
-        name: "โครงตั้ง (ท่อน 2)",
-        length: piece2Length,
-        qty: 2,
-        color: "#6d4c41",
-        isSplice: true,
-      });
+      const pieceLength = Math.ceil(stileLength / 2) + spliceOverlap / 2;
+      addPiece("โครงตั้ง (ท่อน 1)", pieceLength, 2, "#8d6e63", true);
+      addPiece("โครงตั้ง (ท่อน 2)", pieceLength, 2, "#6d4c41", true);
     } else {
-      cutPieces.push({
-        name: "โครงตั้ง",
-        length: stileLength,
-        qty: 2,
-        color: "#8d6e63",
-      });
+      addPiece("โครงตั้ง", stileLength, 2, "#8d6e63");
     }
 
-    const railLength = W - 2 * F;
-    cutPieces.push({
-      name: "โครงนอน",
-      length: railLength,
-      qty: 2,
-      color: "#a1887f",
-    });
+    // Rails
+    addPiece("โครงนอน", W - 2 * F, 2, "#a1887f");
 
+    // Double frame
     if (hasDoubleFrame) {
       const doubleStileLength = H - 2 * F;
       if (needSplice && doubleStileLength > stockLength) {
-        const piece1Length =
+        const pieceLength =
           Math.ceil(doubleStileLength / 2) + spliceOverlap / 2;
-        const piece2Length =
-          Math.ceil(doubleStileLength / 2) + spliceOverlap / 2;
-        cutPieces.push({
-          name: "เบิ้ลโครงตั้ง (ท่อน 1)",
-          length: piece1Length,
-          qty: 2,
-          color: "#ff8f00",
-          isSplice: true,
-        });
-        cutPieces.push({
-          name: "เบิ้ลโครงตั้ง (ท่อน 2)",
-          length: piece2Length,
-          qty: 2,
-          color: "#e65100",
-          isSplice: true,
-        });
+        addPiece("เบิ้ลโครงตั้ง (ท่อน 1)", pieceLength, 2, "#ff8f00", true);
+        addPiece("เบิ้ลโครงตั้ง (ท่อน 2)", pieceLength, 2, "#e65100", true);
       } else {
-        cutPieces.push({
-          name: "เบิ้ลโครงตั้ง",
-          length: doubleStileLength,
-          qty: 2,
-          color: "#ff8f00",
-        });
+        addPiece("เบิ้ลโครงตั้ง", doubleStileLength, 2, "#ff8f00");
       }
-
-      const doubleRailLength = W - 2 * totalFrameWidth;
-      cutPieces.push({
-        name: "เบิ้ลโครงนอน",
-        length: doubleRailLength,
-        qty: 2,
-        color: "#ffb74d",
-      });
+      addPiece("เบิ้ลโครงนอน", W - 2 * totalFrameWidth, 2, "#ffb74d");
     }
 
-    const horizontalRailLength = W - 2 * totalFrameWidth;
+    // Horizontal rails
     const railCount = railSections - 1;
     if (railCount > 0) {
-      cutPieces.push({
-        name: "ไม้ดาม",
-        length: horizontalRailLength,
-        qty: railCount,
-        color: "#a67c52",
-      });
+      addPiece("ไม้ดาม", W - 2 * totalFrameWidth, railCount, "#a67c52");
     }
 
+    // Lock blocks
     if (lockBlockCount > 0) {
-      cutPieces.push({
-        name: "Lock Block",
-        length: LOCK_BLOCK_HEIGHT,
-        qty: lockBlockCount,
-        color: "#c62828",
-      });
+      addPiece("Lock Block", LOCK_BLOCK_HEIGHT, lockBlockCount, "#c62828");
     }
 
-    const allPieces = [];
-    cutPieces.forEach((piece) => {
-      for (let i = 0; i < piece.qty; i++) {
-        allPieces.push({ ...piece, id: `${piece.name}-${i + 1}` });
-      }
-    });
+    // Flatten and sort pieces
+    const allPieces = cutPieces
+      .flatMap((piece) =>
+        Array.from({ length: piece.qty }, (_, i) => ({
+          ...piece,
+          id: `${piece.name}-${i + 1}`,
+        })),
+      )
+      .sort((a, b) => b.length - a.length);
 
-    allPieces.sort((a, b) => b.length - a.length);
-
+    // Bin packing
     const stocks = [];
-
     allPieces.forEach((piece) => {
       const pieceWithKerf = piece.length + sawKerf;
+      const availableStock = stocks.find((s) => s.remaining >= pieceWithKerf);
 
-      let placed = false;
-      for (let stock of stocks) {
-        if (stock.remaining >= pieceWithKerf) {
-          stock.pieces.push(piece);
-          stock.remaining -= pieceWithKerf;
-          stock.used += pieceWithKerf;
-          placed = true;
-          break;
-        }
-      }
-
-      if (!placed) {
+      if (availableStock) {
+        availableStock.pieces.push(piece);
+        availableStock.remaining -= pieceWithKerf;
+        availableStock.used += pieceWithKerf;
+      } else {
         stocks.push({
           length: stockLength,
           pieces: [piece],
@@ -753,12 +1090,10 @@ export default function DoorConfigurator() {
     });
 
     const totalStocks = stocks.length;
-    const totalUsed = stocks.reduce((sum, s) => sum + s.used, 0);
     const totalWaste = stocks.reduce((sum, s) => sum + s.remaining, 0);
     const totalStock = totalStocks * stockLength;
     const usedWithoutKerf = allPieces.reduce((sum, p) => sum + p.length, 0);
     const efficiency = ((usedWithoutKerf / totalStock) * 100).toFixed(1);
-
     const spliceCount =
       cutPieces.filter((p) => p.isSplice).reduce((sum, p) => sum + p.qty, 0) /
       2;
@@ -768,7 +1103,6 @@ export default function DoorConfigurator() {
       allPieces,
       stocks,
       totalStocks,
-      totalUsed,
       totalWaste,
       totalStock,
       efficiency,
@@ -779,1842 +1113,1507 @@ export default function DoorConfigurator() {
       spliceCount,
       spliceOverlap,
     };
-  }, [results, currentFrame, hasDoubleFrame, LOCK_BLOCK_HEIGHT]);
+  }, [results, currentFrame, hasDoubleFrame]);
+};
 
-  // ===== NEW Engineering Drawing Component - Layout ตาม PDF =====
-  // 1. บนขวา - Top View
-  // 2. ล่างซ้าย - Back View
-  // 3. กลางล่าง - Side View
-  // 4. ขวาล่าง - Front View
-  const EngineeringDrawing = ({ results }) => {
-    const {
-      W,
-      H,
-      T,
-      S,
-      F,
-      DF,
-      R,
-      totalFrameWidth,
-      railPositions,
-      railSections,
-      lockBlockTop,
-      lockBlockBottom,
-      lockBlockLeft,
-      lockBlockRight,
-      lockBlockPosition,
-      lockBlockCount,
-      currentFrame,
-    } = results;
+// ===== ENGINEERING DRAWING COMPONENT =====
+const EngineeringDrawing = ({ results }) => {
+  const {
+    W,
+    H,
+    T,
+    S,
+    F,
+    DF,
+    R,
+    totalFrameWidth,
+    railPositions,
+    railSections,
+    lockBlockTop,
+    lockBlockBottom,
+    lockBlockLeft,
+    lockBlockRight,
+    lockBlockPosition,
+    lockBlockCount,
+    currentFrame,
+  } = results;
 
-    const safeH = H > 0 ? H : 2000;
-    const safeW = W > 0 ? W : 800;
-    const safeT = T > 0 ? T : 35;
-    const safeS = S > 0 ? S : 4;
-    const safeF = F > 0 ? F : 50;
-    const safeR = R > 0 ? R : 27;
+  // Safe values
+  const safeH = H > 0 ? H : 2000;
+  const safeW = W > 0 ? W : 800;
+  const safeT = T > 0 ? T : 35;
+  const safeS = S > 0 ? S : 4;
+  const safeF = F > 0 ? F : 50;
+  const safeR = R > 0 ? R : 27;
 
-    const viewBoxWidth = 1200;
-    const viewBoxHeight = 970; // เพิ่มความสูงเพื่อรองรับ professional bottom bar
+  const viewBoxWidth = 1200;
+  const viewBoxHeight = 970;
 
-    // Dimension Line Component - ปรับปรุงให้ชัดเจนขึ้น
-    const DimLine = ({
-      x1,
-      y1,
-      x2,
-      y2,
-      value,
-      offset = 25,
-      vertical = false,
-      color = "#000",
-      fontSize = 9,
-      unit = "",
-    }) => {
-      const arrowSize = 3;
-      const displayValue = unit ? `${value}${unit}` : value;
+  // Scales
+  const frontScale = 200 / safeH;
+  const sideScale = 200 / safeH;
+  const topScaleW = 0.15;
+  const topScaleT = 2.5;
+  const backScale = 200 / safeH;
 
-      if (vertical) {
-        const lineX = x1 + offset;
-        const midY = (y1 + y2) / 2;
-        const textWidth = String(displayValue).length * 4 + 8;
-        return (
-          <g className="dimension">
-            <line
-              x1={x1 + 2}
-              y1={y1}
-              x2={lineX + 3}
-              y2={y1}
-              stroke={color}
-              strokeWidth="0.4"
-            />
-            <line
-              x1={x1 + 2}
-              y1={y2}
-              x2={lineX + 3}
-              y2={y2}
-              stroke={color}
-              strokeWidth="0.4"
-            />
-            <line
-              x1={lineX}
-              y1={y1}
-              x2={lineX}
-              y2={y2}
-              stroke={color}
-              strokeWidth="0.6"
-            />
-            <polygon
-              points={`${lineX},${y1} ${lineX - arrowSize},${y1 + arrowSize * 1.5} ${lineX + arrowSize},${y1 + arrowSize * 1.5}`}
-              fill={color}
-            />
-            <polygon
-              points={`${lineX},${y2} ${lineX - arrowSize},${y2 - arrowSize * 1.5} ${lineX + arrowSize},${y2 - arrowSize * 1.5}`}
-              fill={color}
-            />
-            <rect
-              x={lineX - textWidth / 2}
-              y={midY - 6}
-              width={textWidth}
-              height="12"
-              fill="white"
-            />
-            <text
-              x={lineX}
-              y={midY + 3}
-              textAnchor="middle"
-              fontSize={fontSize}
-              fontWeight="500"
-              fill={color}
-            >
-              {displayValue}
-            </text>
-          </g>
+  // Calculated dimensions for each view
+  const dims = {
+    front: {
+      W: safeW * frontScale,
+      H: safeH * frontScale,
+      F: safeF * frontScale,
+      DF: DF * frontScale,
+      totalFrame: totalFrameWidth * frontScale,
+      R: Math.max(safeR * frontScale, 2),
+      lockBlockW: safeF * frontScale,
+    },
+    side: {
+      T: Math.max(safeT * sideScale * 4, 25),
+      H: safeH * sideScale,
+      S: Math.max(safeS * sideScale * 4, 3),
+    },
+    top: {
+      W: safeW * topScaleW,
+      T: Math.max(safeT * topScaleT, 30),
+      F: safeF * topScaleW,
+      S: Math.max(safeS * topScaleT, 2),
+    },
+    back: {
+      W: safeW * backScale,
+      H: safeH * backScale,
+      F: safeF * backScale,
+    },
+  };
+
+  // Positions
+  const positions = {
+    top: { x: 600, y: 130 },
+    back: { x: 120, y: 370 },
+    side: { x: 480, y: 370 },
+    front: { x: 750, y: 370 },
+  };
+
+  const piecesPerSide =
+    parseInt(results.lockBlockCount / results.lockBlockSides) || 0;
+  const hasDoubleFrame = DF > 0;
+
+  // Render lock blocks helper
+  const renderLockBlocks = (
+    viewX,
+    viewY,
+    scale,
+    frameWidth,
+    isBack = false,
+  ) => {
+    const blocks = [];
+    const lockBlockH = LOCK_BLOCK_HEIGHT * scale;
+    const lockBlockY = viewY + dims.front.H - lockBlockBottom * scale;
+
+    if (lockBlockLeft) {
+      [...Array(piecesPerSide)].forEach((_, i) => {
+        const x = isBack
+          ? viewX +
+            dims.back.W -
+            frameWidth -
+            (hasDoubleFrame ? frameWidth : 0) -
+            frameWidth * (i + 1)
+          : viewX + dims.front.totalFrame + dims.front.lockBlockW * i;
+        blocks.push(
+          <LockBlockSVG
+            key={`lb-${isBack ? "back" : "front"}-left-${i}`}
+            x={x}
+            y={lockBlockY}
+            width={frameWidth}
+            height={lockBlockH}
+          />,
         );
-      } else {
-        const lineY = y1 + offset;
-        const midX = (x1 + x2) / 2;
-        const textWidth = String(displayValue).length * 4 + 8;
-        return (
-          <g className="dimension">
-            <line
-              x1={x1}
-              y1={y1 + 2}
-              x2={x1}
-              y2={lineY + 3}
-              stroke={color}
-              strokeWidth="0.4"
-            />
-            <line
-              x1={x2}
-              y1={y1 + 2}
-              x2={x2}
-              y2={lineY + 3}
-              stroke={color}
-              strokeWidth="0.4"
-            />
-            <line
-              x1={x1}
-              y1={lineY}
-              x2={x2}
-              y2={lineY}
-              stroke={color}
-              strokeWidth="0.6"
-            />
-            <polygon
-              points={`${x1},${lineY} ${x1 + arrowSize * 1.5},${lineY - arrowSize} ${x1 + arrowSize * 1.5},${lineY + arrowSize}`}
-              fill={color}
-            />
-            <polygon
-              points={`${x2},${lineY} ${x2 - arrowSize * 1.5},${lineY - arrowSize} ${x2 - arrowSize * 1.5},${lineY + arrowSize}`}
-              fill={color}
-            />
-            <rect
-              x={midX - textWidth / 2}
-              y={lineY - 6}
-              width={textWidth}
-              height="12"
-              fill="white"
-            />
-            <text
-              x={midX}
-              y={lineY + 3}
-              textAnchor="middle"
-              fontSize={fontSize}
-              fontWeight="500"
-              fill={color}
-            >
-              {displayValue}
-            </text>
-          </g>
+      });
+    }
+
+    if (lockBlockRight) {
+      [...Array(piecesPerSide)].forEach((_, i) => {
+        const x = isBack
+          ? viewX +
+            frameWidth +
+            (hasDoubleFrame ? frameWidth : 0) +
+            frameWidth * i
+          : viewX +
+            dims.front.W -
+            dims.front.totalFrame -
+            dims.front.lockBlockW * (i + 1);
+        blocks.push(
+          <LockBlockSVG
+            key={`lb-${isBack ? "back" : "front"}-right-${i}`}
+            x={x}
+            y={lockBlockY}
+            width={frameWidth}
+            height={lockBlockH}
+          />,
         );
-      }
-    };
+      });
+    }
 
-    // Scales for each view - adjusted for new layout
-    const frontScale = 200 / safeH;
-    const sideScale = 200 / safeH;
-    const topScaleW = 0.15;
-    const topScaleT = 2.5;
-    const backScale = 200 / safeH;
+    return blocks;
+  };
 
-    // Calculate dimensions for each view
-    // Front View
-    const fW = safeW * frontScale;
-    const fH = safeH * frontScale;
-    const fF = safeF * frontScale;
-    const fDF = DF * frontScale;
-    const fTotalFrame = totalFrameWidth * frontScale;
-    const fR = Math.max(safeR * frontScale, 2);
-    const fLockBlockW = safeF * frontScale;
+  return (
+    <svg
+      viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+      className="w-full h-auto bg-white"
+    >
+      {/* Border frames */}
+      <rect
+        x="8"
+        y="8"
+        width={viewBoxWidth - 16}
+        height={viewBoxHeight - 16}
+        fill="none"
+        stroke="#000"
+        strokeWidth="2"
+      />
+      <rect
+        x="12"
+        y="12"
+        width={viewBoxWidth - 24}
+        height={viewBoxHeight - 24}
+        fill="none"
+        stroke="#000"
+        strokeWidth="0.5"
+      />
 
-    // Side View
-    const sT = Math.max(safeT * sideScale * 4, 25);
-    const sH = safeH * sideScale;
-    const sS = Math.max(safeS * sideScale * 4, 3);
+      {/* Grid reference */}
+      <g id="grid-ref" fontSize="8" fill="#666">
+        {["A", "B", "C", "D", "E", "F"].map((letter, i) => (
+          <text
+            key={`grid-${letter}`}
+            x="20"
+            y={80 + i * 130}
+            textAnchor="middle"
+          >
+            {letter}
+          </text>
+        ))}
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((num, i) => (
+          <text key={`grid-${num}`} x={80 + i * 140} y="40" textAnchor="middle">
+            {num}
+          </text>
+        ))}
+      </g>
 
-    // Top View
-    const tW = safeW * topScaleW;
-    const tT = Math.max(safeT * topScaleT, 30);
-    const tF = safeF * topScaleW;
-    const tS = Math.max(safeS * topScaleT, 2);
-
-    // Back View
-    const bW = safeW * backScale;
-    const bH = safeH * backScale;
-    const bF = safeF * backScale;
-
-    // Positions - CENTERED LAYOUT
-    // Row 1: Isometric (left-center), Top (right-center)
-    // Row 2: Back (left), Side (center), Front (right)
-
-    const topRowY = 80;
-    const bottomRowY = 370;
-
-    // Center the views better
-    const isoX = 150;
-    const isoY = topRowY;
-
-    const topViewX = 600;
-    const topViewY = topRowY + 50;
-
-    const backViewX = 120;
-    const backViewY = bottomRowY;
-
-    const sideViewX = 480;
-    const sideViewY = bottomRowY;
-
-    const frontViewX = 750;
-    const frontViewY = bottomRowY;
-
-    return (
-      <svg
-        viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
-        className="w-full h-auto bg-white"
+      {/* Title */}
+      <text
+        x={viewBoxWidth / 2}
+        y="32"
+        textAnchor="middle"
+        fontSize="14"
+        fontWeight="bold"
       >
-        {/* Border frame */}
+        DOOR FRAME STRUCTURE DRAWING
+      </text>
+
+      {/* TOP VIEW */}
+      <g id="top-view">
+        <text
+          x={positions.top.x + dims.top.W / 2}
+          y={positions.top.y - 25}
+          textAnchor="middle"
+          fontSize="11"
+          fontWeight="bold"
+        >
+          Top View
+        </text>
+
+        {/* Main outline */}
         <rect
-          x="8"
-          y="8"
-          width={viewBoxWidth - 16}
-          height={viewBoxHeight - 16}
-          fill="none"
+          x={positions.top.x}
+          y={positions.top.y}
+          width={dims.top.W}
+          height={dims.top.T}
+          fill="#f5f5f5"
           stroke="#000"
-          strokeWidth="2"
+          strokeWidth="1.5"
+        />
+
+        {/* Surface layers */}
+        <rect
+          x={positions.top.x}
+          y={positions.top.y}
+          width={dims.top.W}
+          height={dims.top.S}
+          fill="#e8f5e9"
+          stroke="#000"
+          strokeWidth="0.5"
         />
         <rect
-          x="12"
-          y="12"
-          width={viewBoxWidth - 24}
-          height={viewBoxHeight - 24}
-          fill="none"
+          x={positions.top.x}
+          y={positions.top.y + dims.top.T - dims.top.S}
+          width={dims.top.W}
+          height={dims.top.S}
+          fill="#e8f5e9"
           stroke="#000"
           strokeWidth="0.5"
         />
 
-        {/* Grid reference */}
-        <g id="grid-ref" fontSize="8" fill="#666">
-          {["A", "B", "C", "D", "E", "F"].map((letter, i) => (
-            <text
-              key={`grid-${letter}`}
-              x="20"
-              y={80 + i * 130}
-              textAnchor="middle"
-            >
-              {letter}
-            </text>
-          ))}
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((num, i) => (
-            <text
-              key={`grid-${num}`}
-              x={80 + i * 140}
-              y="40"
-              textAnchor="middle"
-            >
-              {num}
-            </text>
-          ))}
-        </g>
+        {/* Frame sides */}
+        <rect
+          x={positions.top.x}
+          y={positions.top.y + dims.top.S}
+          width={dims.top.F}
+          height={dims.top.T - 2 * dims.top.S}
+          fill="#fff3e0"
+          stroke="#000"
+          strokeWidth="0.5"
+        />
+        <rect
+          x={positions.top.x + dims.top.W - dims.top.F}
+          y={positions.top.y + dims.top.S}
+          width={dims.top.F}
+          height={dims.top.T - 2 * dims.top.S}
+          fill="#fff3e0"
+          stroke="#000"
+          strokeWidth="0.5"
+        />
 
-        {/* Title */}
-        <text
-          x={viewBoxWidth / 2}
-          y="32"
-          textAnchor="middle"
-          fontSize="14"
-          fontWeight="bold"
-        >
-          DOOR FRAME STRUCTURE DRAWING
-        </text>
+        {/* Inner frame rails */}
+        <rect
+          x={positions.top.x + dims.top.F}
+          y={positions.top.y + dims.top.S}
+          width={dims.top.W - 2 * dims.top.F}
+          height={(dims.top.T - 2 * dims.top.S) * 0.2}
+          fill="#ffe0b2"
+          stroke="#000"
+          strokeWidth="0.3"
+        />
+        <rect
+          x={positions.top.x + dims.top.F}
+          y={
+            positions.top.y +
+            dims.top.T -
+            dims.top.S -
+            (dims.top.T - 2 * dims.top.S) * 0.2
+          }
+          width={dims.top.W - 2 * dims.top.F}
+          height={(dims.top.T - 2 * dims.top.S) * 0.2}
+          fill="#ffe0b2"
+          stroke="#000"
+          strokeWidth="0.3"
+        />
 
-        {/* ==================== 1. TOP VIEW (บนขวา) ==================== */}
-        <g id="top-view">
-          <text
-            x={topViewX + tW / 2}
-            y={topViewY - 25}
-            textAnchor="middle"
-            fontSize="11"
-            fontWeight="bold"
-          >
-            Top View
-          </text>
-
-          {/* Main outline */}
-          <rect
-            x={topViewX}
-            y={topViewY}
-            width={tW}
-            height={tT}
-            fill="#f5f5f5"
-            stroke="#000"
-            strokeWidth="1.5"
-          />
-
-          {/* Surface layers (top & bottom) */}
-          <rect
-            x={topViewX}
-            y={topViewY}
-            width={tW}
-            height={tS}
-            fill="#e8f5e9"
-            stroke="#000"
-            strokeWidth="0.5"
-          />
-          <rect
-            x={topViewX}
-            y={topViewY + tT - tS}
-            width={tW}
-            height={tS}
-            fill="#e8f5e9"
-            stroke="#000"
-            strokeWidth="0.5"
-          />
-
-          {/* Frame sides */}
-          <rect
-            x={topViewX}
-            y={topViewY + tS}
-            width={tF}
-            height={tT - 2 * tS}
-            fill="#fff3e0"
-            stroke="#000"
-            strokeWidth="0.5"
-          />
-          <rect
-            x={topViewX + tW - tF}
-            y={topViewY + tS}
-            width={tF}
-            height={tT - 2 * tS}
-            fill="#fff3e0"
-            stroke="#000"
-            strokeWidth="0.5"
-          />
-
-          {/* Inner frame rails */}
-          <rect
-            x={topViewX + tF}
-            y={topViewY + tS}
-            width={tW - 2 * tF}
-            height={(tT - 2 * tS) * 0.2}
-            fill="#ffe0b2"
-            stroke="#000"
-            strokeWidth="0.3"
-          />
-          <rect
-            x={topViewX + tF}
-            y={topViewY + tT - tS - (tT - 2 * tS) * 0.2}
-            width={tW - 2 * tF}
-            height={(tT - 2 * tS) * 0.2}
-            fill="#ffe0b2"
-            stroke="#000"
-            strokeWidth="0.3"
-          />
-
-          {/* Double frame if enabled */}
-          {hasDoubleFrame && (
-            <>
-              <rect
-                x={topViewX + tF}
-                y={topViewY + tS}
-                width={tF * 0.8}
-                height={tT - 2 * tS}
-                fill="none"
-                stroke="#ff8f00"
-                strokeWidth="0.4"
-                strokeDasharray="3,2"
-              />
-              <rect
-                x={topViewX + tW - tF - tF * 0.8}
-                y={topViewY + tS}
-                width={tF * 0.8}
-                height={tT - 2 * tS}
-                fill="none"
-                stroke="#ff8f00"
-                strokeWidth="0.4"
-                strokeDasharray="3,2"
-              />
-            </>
-          )}
-
-          {/* Center lines */}
-          <line
-            x1={topViewX + tW / 2}
-            y1={topViewY - 8}
-            x2={topViewX + tW / 2}
-            y2={topViewY + tT + 8}
-            stroke="#000"
-            strokeWidth="0.3"
-            strokeDasharray="10,3,2,3"
-          />
-          <line
-            x1={topViewX - 8}
-            y1={topViewY + tT / 2}
-            x2={topViewX + tW + 8}
-            y2={topViewY + tT / 2}
-            stroke="#000"
-            strokeWidth="0.3"
-            strokeDasharray="10,3,2,3"
-          />
-
-          {/* Hatch for frame */}
-          {[...Array(Math.floor(tW / 10))].map((_, i) => (
-            <line
-              key={`top-hatch-${i}`}
-              x1={topViewX + 2 + i * 10}
-              y1={topViewY + tS + 2}
-              x2={topViewX + 2 + i * 10 + 5}
-              y2={topViewY + tT - tS - 2}
-              stroke="#ccc"
-              strokeWidth="0.2"
-            />
-          ))}
-
-          {/* Dimensions for Top View */}
-          {/* Overall width */}
-          <DimLine
-            x1={topViewX}
-            y1={topViewY + tT}
-            x2={topViewX + tW}
-            y2={topViewY + tT}
-            value={W}
-            offset={35}
-          />
-
-          {/* Overall thickness */}
-          <DimLine
-            x1={topViewX + tW}
-            y1={topViewY}
-            x2={topViewX + tW}
-            y2={topViewY + tT}
-            value={T}
-            offset={30}
-            vertical
-          />
-
-          {/* Surface thickness (top) */}
-          <DimLine
-            x1={topViewX}
-            y1={topViewY}
-            x2={topViewX}
-            y2={topViewY + tS}
-            value={S}
-            offset={-25}
-            vertical
-            fontSize={7}
-          />
-
-          {/* Frame width (left) */}
-          <DimLine
-            x1={topViewX}
-            y1={topViewY}
-            x2={topViewX + tF}
-            y2={topViewY}
-            value={F}
-            offset={-18}
-            fontSize={7}
-          />
-
-          {/* Inner width */}
-          <DimLine
-            x1={topViewX + tF}
-            y1={topViewY}
-            x2={topViewX + tW - tF}
-            y2={topViewY}
-            value={W - 2 * F}
-            offset={-35}
-            fontSize={7}
-          />
-        </g>
-
-        {/* ==================== 2. BACK VIEW (ล่างซ้าย) ==================== */}
-        <g id="back-view">
-          <text
-            x={backViewX + bW / 2}
-            y={backViewY - 15}
-            textAnchor="middle"
-            fontSize="11"
-            fontWeight="bold"
-          >
-            Back View
-          </text>
-
-          {/* Main outline */}
-          <rect
-            x={backViewX}
-            y={backViewY}
-            width={bW}
-            height={bH}
-            fill="#fafafa"
-            stroke="#000"
-            strokeWidth="1.5"
-          />
-
-          {/* Frame - Stiles (vertical) - mirrored */}
-          <rect
-            x={backViewX}
-            y={backViewY}
-            width={bF}
-            height={bH}
-            fill="#fff3e0"
-            stroke="#000"
-            strokeWidth="0.8"
-          />
-          <rect
-            x={backViewX + bW - bF}
-            y={backViewY}
-            width={bF}
-            height={bH}
-            fill="#fff3e0"
-            stroke="#000"
-            strokeWidth="0.8"
-          />
-
-          {/* Frame - Rails (horizontal) */}
-          <rect
-            x={backViewX + bF}
-            y={backViewY}
-            width={bW - 2 * bF}
-            height={bF}
-            fill="#ffe0b2"
-            stroke="#000"
-            strokeWidth="0.8"
-          />
-          <rect
-            x={backViewX + bF}
-            y={backViewY + bH - bF}
-            width={bW - 2 * bF}
-            height={bF}
-            fill="#ffe0b2"
-            stroke="#000"
-            strokeWidth="0.8"
-          />
-
-          {/* Horizontal Rails */}
-          {railPositions.map((pos, idx) => {
-            const railY = backViewY + bH - pos * backScale;
-            const railH = Math.max(safeR * backScale, 2);
-            return (
-              <g key={`back-rail-${idx}`}>
-                <rect
-                  x={backViewX + bF + (hasDoubleFrame ? bF : 0)}
-                  y={railY - railH / 2}
-                  width={bW - 2 * bF - (hasDoubleFrame ? 2 * bF : 0)}
-                  height={railH}
-                  fill="#ffe0b2"
-                  stroke="#000"
-                  strokeWidth="0.6"
-                />
-              </g>
-            );
-          })}
-
-          {/* Lock Block - Right (mirrored from front) */}
-          {lockBlockRight &&
-            [...Array(lockBlockPiecesPerSide)].map((_, i) => (
-              <g key={`back-lb-right-${i}`}>
-                <rect
-                  x={backViewX + bF + (hasDoubleFrame ? bF : 0) + bF * i}
-                  y={backViewY + bH - lockBlockBottom * backScale}
-                  width={bF}
-                  height={LOCK_BLOCK_HEIGHT * backScale}
-                  fill="#ffcdd2"
-                  stroke="#c62828"
-                  strokeWidth="0.8"
-                />
-                <line
-                  x1={backViewX + bF + (hasDoubleFrame ? bF : 0) + bF * i}
-                  y1={backViewY + bH - lockBlockBottom * backScale}
-                  x2={backViewX + bF + (hasDoubleFrame ? bF : 0) + bF * (i + 1)}
-                  y2={backViewY + bH - lockBlockTop * backScale}
-                  stroke="#c62828"
-                  strokeWidth="0.4"
-                />
-                <line
-                  x1={backViewX + bF + (hasDoubleFrame ? bF : 0) + bF * (i + 1)}
-                  y1={backViewY + bH - lockBlockBottom * backScale}
-                  x2={backViewX + bF + (hasDoubleFrame ? bF : 0) + bF * i}
-                  y2={backViewY + bH - lockBlockTop * backScale}
-                  stroke="#c62828"
-                  strokeWidth="0.4"
-                />
-              </g>
-            ))}
-
-          {/* Lock Block - Left (mirrored from front) */}
-          {lockBlockLeft &&
-            [...Array(lockBlockPiecesPerSide)].map((_, i) => (
-              <g key={`back-lb-left-${i}`}>
-                <rect
-                  x={
-                    backViewX +
-                    bW -
-                    bF -
-                    (hasDoubleFrame ? bF : 0) -
-                    bF * (i + 1)
-                  }
-                  y={backViewY + bH - lockBlockBottom * backScale}
-                  width={bF}
-                  height={LOCK_BLOCK_HEIGHT * backScale}
-                  fill="#ffcdd2"
-                  stroke="#c62828"
-                  strokeWidth="0.8"
-                />
-                <line
-                  x1={
-                    backViewX +
-                    bW -
-                    bF -
-                    (hasDoubleFrame ? bF : 0) -
-                    bF * (i + 1)
-                  }
-                  y1={backViewY + bH - lockBlockBottom * backScale}
-                  x2={backViewX + bW - bF - (hasDoubleFrame ? bF : 0) - bF * i}
-                  y2={backViewY + bH - lockBlockTop * backScale}
-                  stroke="#c62828"
-                  strokeWidth="0.4"
-                />
-                <line
-                  x1={backViewX + bW - bF - (hasDoubleFrame ? bF : 0) - bF * i}
-                  y1={backViewY + bH - lockBlockBottom * backScale}
-                  x2={
-                    backViewX +
-                    bW -
-                    bF -
-                    (hasDoubleFrame ? bF : 0) -
-                    bF * (i + 1)
-                  }
-                  y2={backViewY + bH - lockBlockTop * backScale}
-                  stroke="#c62828"
-                  strokeWidth="0.4"
-                />
-              </g>
-            ))}
-
-          {/* Center lines */}
-          <line
-            x1={backViewX + bW / 2}
-            y1={backViewY - 10}
-            x2={backViewX + bW / 2}
-            y2={backViewY + bH + 10}
-            stroke="#000"
-            strokeWidth="0.3"
-            strokeDasharray="10,3,2,3"
-          />
-          <line
-            x1={backViewX - 10}
-            y1={backViewY + bH / 2}
-            x2={backViewX + bW + 10}
-            y2={backViewY + bH / 2}
-            stroke="#000"
-            strokeWidth="0.3"
-            strokeDasharray="10,3,2,3"
-          />
-
-          {/* Hatch pattern for frame */}
-          {[...Array(Math.floor(bH / 6))].map((_, i) => (
-            <React.Fragment key={`back-hatch-${i}`}>
-              <line
-                x1={backViewX + 1}
-                y1={backViewY + i * 6}
-                x2={backViewX + bF - 1}
-                y2={backViewY + i * 6 + 4}
-                stroke="#ddd"
-                strokeWidth="0.2"
-              />
-              <line
-                x1={backViewX + bW - bF + 1}
-                y1={backViewY + i * 6}
-                x2={backViewX + bW - 1}
-                y2={backViewY + i * 6 + 4}
-                stroke="#ddd"
-                strokeWidth="0.2"
-              />
-            </React.Fragment>
-          ))}
-
-          {/* Dimensions for Back View */}
-          {/* Overall width */}
-          <DimLine
-            x1={backViewX}
-            y1={backViewY + bH}
-            x2={backViewX + bW}
-            y2={backViewY + bH}
-            value={W}
-            offset={40}
-          />
-
-          {/* Overall height */}
-          <DimLine
-            x1={backViewX}
-            y1={backViewY}
-            x2={backViewX}
-            y2={backViewY + bH}
-            value={H}
-            offset={-50}
-            vertical
-          />
-
-          {/* Frame width (top) */}
-          <DimLine
-            x1={backViewX}
-            y1={backViewY}
-            x2={backViewX + bF}
-            y2={backViewY}
-            value={F}
-            offset={-20}
-            fontSize={7}
-          />
-
-          {/* Inner width */}
-          <DimLine
-            x1={backViewX + bF}
-            y1={backViewY + bH}
-            x2={backViewX + bW - bF}
-            y2={backViewY + bH}
-            value={W - 2 * F}
-            offset={20}
-            fontSize={7}
-          />
-
-          {/* Rail positions from bottom */}
-          {railPositions.map((pos, idx) => {
-            const railY = backViewY + bH - pos * backScale;
-            return (
-              <g key={`back-rail-dim-${idx}`}>
-                <line
-                  x1={backViewX - 30}
-                  y1={railY}
-                  x2={backViewX - 20}
-                  y2={railY}
-                  stroke="#666"
-                  strokeWidth="0.4"
-                />
-                <text
-                  x={backViewX - 33}
-                  y={railY + 3}
-                  fontSize="7"
-                  fill="#666"
-                  textAnchor="end"
-                >
-                  {pos}
-                </text>
-              </g>
-            );
-          })}
-
-          {/* Lock block position */}
-          {(lockBlockLeft || lockBlockRight) && (
-            <>
-              <DimLine
-                x1={backViewX + bW + 5}
-                y1={backViewY + bH}
-                x2={backViewX + bW + 5}
-                y2={backViewY + bH - lockBlockPosition * backScale}
-                value={lockBlockPosition}
-                offset={20}
-                vertical
-                fontSize={7}
-              />
-              <DimLine
-                x1={backViewX + bW + 5}
-                y1={backViewY + bH - lockBlockTop * backScale}
-                x2={backViewX + bW + 5}
-                y2={backViewY + bH - lockBlockBottom * backScale}
-                value={LOCK_BLOCK_HEIGHT}
-                offset={40}
-                vertical
-                fontSize={7}
-                color="#c62828"
-              />
-            </>
-          )}
-        </g>
-
-        {/* ==================== 3. SIDE VIEW (กลางล่าง) ==================== */}
-        <g id="side-view">
-          <text
-            x={sideViewX + sT / 2}
-            y={sideViewY - 15}
-            textAnchor="middle"
-            fontSize="11"
-            fontWeight="bold"
-          >
-            Side View
-          </text>
-
-          {/* Main outline */}
-          <rect
-            x={sideViewX}
-            y={sideViewY}
-            width={sT}
-            height={sH}
-            fill="#fafafa"
-            stroke="#000"
-            strokeWidth="1.5"
-          />
-
-          {/* Surface layers */}
-          <rect
-            x={sideViewX}
-            y={sideViewY}
-            width={sS}
-            height={sH}
-            fill="#e8f5e9"
-            stroke="#000"
-            strokeWidth="0.6"
-          />
-          <rect
-            x={sideViewX + sT - sS}
-            y={sideViewY}
-            width={sS}
-            height={sH}
-            fill="#e8f5e9"
-            stroke="#000"
-            strokeWidth="0.6"
-          />
-
-          {/* Frame layers - showing frame depth */}
-          <rect
-            x={sideViewX + sS}
-            y={sideViewY}
-            width={(sT - 2 * sS) * 0.25}
-            height={sH}
-            fill="#fff3e0"
-            stroke="#000"
-            strokeWidth="0.4"
-          />
-          <rect
-            x={sideViewX + sT - sS - (sT - 2 * sS) * 0.25}
-            y={sideViewY}
-            width={(sT - 2 * sS) * 0.25}
-            height={sH}
-            fill="#fff3e0"
-            stroke="#000"
-            strokeWidth="0.4"
-          />
-
-          {/* Core/honeycomb area indication */}
-          <rect
-            x={sideViewX + sS + (sT - 2 * sS) * 0.25}
-            y={sideViewY}
-            width={(sT - 2 * sS) * 0.5}
-            height={sH}
-            fill="#fce4ec"
-            stroke="#000"
-            strokeWidth="0.3"
-            strokeDasharray="2,2"
-          />
-
-          {/* Hatch for surface */}
-          {[...Array(Math.floor(sH / 5))].map((_, i) => (
-            <React.Fragment key={`side-hatch-${i}`}>
-              <line
-                x1={sideViewX + 1}
-                y1={sideViewY + i * 5}
-                x2={sideViewX + sS - 1}
-                y2={sideViewY + i * 5 + 3}
-                stroke="#a5d6a7"
-                strokeWidth="0.2"
-              />
-              <line
-                x1={sideViewX + sT - sS + 1}
-                y1={sideViewY + i * 5}
-                x2={sideViewX + sT - 1}
-                y2={sideViewY + i * 5 + 3}
-                stroke="#a5d6a7"
-                strokeWidth="0.2"
-              />
-            </React.Fragment>
-          ))}
-
-          {/* Center line */}
-          <line
-            x1={sideViewX + sT / 2}
-            y1={sideViewY - 8}
-            x2={sideViewX + sT / 2}
-            y2={sideViewY + sH + 8}
-            stroke="#000"
-            strokeWidth="0.3"
-            strokeDasharray="10,3,2,3"
-          />
-
-          {/* Rails in side view */}
-          {railPositions.map((pos, idx) => {
-            const railY = sideViewY + sH - pos * sideScale;
-            const railH = Math.max(safeR * sideScale * 0.5, 2);
-            return (
-              <rect
-                key={`side-rail-${idx}`}
-                x={sideViewX + sS}
-                y={railY - railH / 2}
-                width={sT - 2 * sS}
-                height={railH}
-                fill="#ffe0b2"
-                stroke="#000"
-                strokeWidth="0.5"
-              />
-            );
-          })}
-
-          {/* Lock block in side (dashed) */}
-          {(lockBlockLeft || lockBlockRight) && (
+        {/* Double frame indicator */}
+        {hasDoubleFrame && (
+          <>
             <rect
-              x={sideViewX + sS}
-              y={sideViewY + sH - lockBlockBottom * sideScale}
-              width={sT - 2 * sS}
-              height={LOCK_BLOCK_HEIGHT * sideScale}
+              x={positions.top.x + dims.top.F}
+              y={positions.top.y + dims.top.S}
+              width={dims.top.F * 0.8}
+              height={dims.top.T - 2 * dims.top.S}
               fill="none"
-              stroke="#c62828"
-              strokeWidth="0.6"
+              stroke="#ff8f00"
+              strokeWidth="0.4"
               strokeDasharray="3,2"
             />
-          )}
+            <rect
+              x={positions.top.x + dims.top.W - dims.top.F - dims.top.F * 0.8}
+              y={positions.top.y + dims.top.S}
+              width={dims.top.F * 0.8}
+              height={dims.top.T - 2 * dims.top.S}
+              fill="none"
+              stroke="#ff8f00"
+              strokeWidth="0.4"
+              strokeDasharray="3,2"
+            />
+          </>
+        )}
 
-          {/* Dimensions for Side View */}
-          {/* Overall thickness */}
-          <DimLine
-            x1={sideViewX}
-            y1={sideViewY + sH}
-            x2={sideViewX + sT}
-            y2={sideViewY + sH}
-            value={T}
-            offset={40}
+        {/* Center lines */}
+        <CenterLine
+          x1={positions.top.x + dims.top.W / 2}
+          y1={positions.top.y - 8}
+          x2={positions.top.x + dims.top.W / 2}
+          y2={positions.top.y + dims.top.T + 8}
+        />
+        <CenterLine
+          x1={positions.top.x - 8}
+          y1={positions.top.y + dims.top.T / 2}
+          x2={positions.top.x + dims.top.W + 8}
+          y2={positions.top.y + dims.top.T / 2}
+        />
+
+        {/* Dimensions */}
+        <DimLine
+          x1={positions.top.x}
+          y1={positions.top.y + dims.top.T}
+          x2={positions.top.x + dims.top.W}
+          y2={positions.top.y + dims.top.T}
+          value={W}
+          offset={35}
+        />
+        <DimLine
+          x1={positions.top.x + dims.top.W}
+          y1={positions.top.y}
+          x2={positions.top.x + dims.top.W}
+          y2={positions.top.y + dims.top.T}
+          value={T}
+          offset={30}
+          vertical
+        />
+        <DimLine
+          x1={positions.top.x}
+          y1={positions.top.y}
+          x2={positions.top.x}
+          y2={positions.top.y + dims.top.S}
+          value={S}
+          offset={-25}
+          vertical
+          fontSize={7}
+        />
+        <DimLine
+          x1={positions.top.x}
+          y1={positions.top.y}
+          x2={positions.top.x + dims.top.F}
+          y2={positions.top.y}
+          value={F}
+          offset={-18}
+          fontSize={7}
+        />
+        <DimLine
+          x1={positions.top.x + dims.top.F}
+          y1={positions.top.y}
+          x2={positions.top.x + dims.top.W - dims.top.F}
+          y2={positions.top.y}
+          value={W - 2 * F}
+          offset={-35}
+          fontSize={7}
+        />
+      </g>
+
+      {/* BACK VIEW */}
+      <g id="back-view">
+        <text
+          x={positions.back.x + dims.back.W / 2}
+          y={positions.back.y - 15}
+          textAnchor="middle"
+          fontSize="11"
+          fontWeight="bold"
+        >
+          Back View
+        </text>
+
+        {/* Main outline */}
+        <rect
+          x={positions.back.x}
+          y={positions.back.y}
+          width={dims.back.W}
+          height={dims.back.H}
+          fill="#fafafa"
+          stroke="#000"
+          strokeWidth="1.5"
+        />
+
+        {/* Stiles */}
+        <rect
+          x={positions.back.x}
+          y={positions.back.y}
+          width={dims.back.F}
+          height={dims.back.H}
+          fill="#fff3e0"
+          stroke="#000"
+          strokeWidth="0.8"
+        />
+        <rect
+          x={positions.back.x + dims.back.W - dims.back.F}
+          y={positions.back.y}
+          width={dims.back.F}
+          height={dims.back.H}
+          fill="#fff3e0"
+          stroke="#000"
+          strokeWidth="0.8"
+        />
+
+        {/* Top and bottom rails */}
+        <rect
+          x={positions.back.x + dims.back.F}
+          y={positions.back.y}
+          width={dims.back.W - 2 * dims.back.F}
+          height={dims.back.F}
+          fill="#ffe0b2"
+          stroke="#000"
+          strokeWidth="0.8"
+        />
+        <rect
+          x={positions.back.x + dims.back.F}
+          y={positions.back.y + dims.back.H - dims.back.F}
+          width={dims.back.W - 2 * dims.back.F}
+          height={dims.back.F}
+          fill="#ffe0b2"
+          stroke="#000"
+          strokeWidth="0.8"
+        />
+
+        {/* Horizontal rails */}
+        {railPositions.map((pos, idx) => {
+          const railY = positions.back.y + dims.back.H - pos * backScale;
+          const railH = Math.max(safeR * backScale, 2);
+          return (
+            <rect
+              key={`back-rail-${idx}`}
+              x={
+                positions.back.x +
+                dims.back.F +
+                (hasDoubleFrame ? dims.back.F : 0)
+              }
+              y={railY - railH / 2}
+              width={
+                dims.back.W -
+                2 * dims.back.F -
+                (hasDoubleFrame ? 2 * dims.back.F : 0)
+              }
+              height={railH}
+              fill="#ffe0b2"
+              stroke="#000"
+              strokeWidth="0.6"
+            />
+          );
+        })}
+
+        {/* Lock blocks (mirrored) */}
+        {renderLockBlocks(
+          positions.back.x,
+          positions.back.y,
+          backScale,
+          dims.back.F,
+          true,
+        )}
+
+        {/* Center lines */}
+        <CenterLine
+          x1={positions.back.x + dims.back.W / 2}
+          y1={positions.back.y - 10}
+          x2={positions.back.x + dims.back.W / 2}
+          y2={positions.back.y + dims.back.H + 10}
+        />
+        <CenterLine
+          x1={positions.back.x - 10}
+          y1={positions.back.y + dims.back.H / 2}
+          x2={positions.back.x + dims.back.W + 10}
+          y2={positions.back.y + dims.back.H / 2}
+        />
+
+        {/* Dimensions */}
+        <DimLine
+          x1={positions.back.x}
+          y1={positions.back.y + dims.back.H}
+          x2={positions.back.x + dims.back.W}
+          y2={positions.back.y + dims.back.H}
+          value={W}
+          offset={40}
+        />
+        <DimLine
+          x1={positions.back.x}
+          y1={positions.back.y}
+          x2={positions.back.x}
+          y2={positions.back.y + dims.back.H}
+          value={H}
+          offset={-50}
+          vertical
+        />
+        <DimLine
+          x1={positions.back.x}
+          y1={positions.back.y}
+          x2={positions.back.x + dims.back.F}
+          y2={positions.back.y}
+          value={F}
+          offset={-20}
+          fontSize={7}
+        />
+        <DimLine
+          x1={positions.back.x + dims.back.F}
+          y1={positions.back.y + dims.back.H}
+          x2={positions.back.x + dims.back.W - dims.back.F}
+          y2={positions.back.y + dims.back.H}
+          value={W - 2 * F}
+          offset={20}
+          fontSize={7}
+        />
+
+        {/* Rail position annotations */}
+        {railPositions.map((pos, idx) => (
+          <PositionAnnotation
+            key={`back-ann-${idx}`}
+            x={positions.back.x - 20}
+            y={positions.back.y + dims.back.H - pos * backScale}
+            value={pos}
           />
+        ))}
 
-          {/* Overall height */}
-          <DimLine
-            x1={sideViewX + sT}
-            y1={sideViewY}
-            x2={sideViewX + sT}
-            y2={sideViewY + sH}
-            value={H}
-            offset={35}
-            vertical
-          />
-
-          {/* Surface thickness */}
-          <DimLine
-            x1={sideViewX}
-            y1={sideViewY}
-            x2={sideViewX + sS}
-            y2={sideViewY}
-            value={S}
-            offset={-20}
-            fontSize={7}
-          />
-
-          {/* Frame thickness (core) */}
-          <DimLine
-            x1={sideViewX + sS}
-            y1={sideViewY}
-            x2={sideViewX + sT - sS}
-            y2={sideViewY}
-            value={T - 2 * S}
-            offset={-35}
-            fontSize={7}
-          />
-        </g>
-
-        {/* ==================== 4. FRONT VIEW (ขวาล่าง) ==================== */}
-        <g id="front-view">
-          <text
-            x={frontViewX + fW / 2}
-            y={frontViewY - 15}
-            textAnchor="middle"
-            fontSize="11"
-            fontWeight="bold"
-          >
-            Front View
-          </text>
-
-          {/* Main outline */}
-          <rect
-            x={frontViewX}
-            y={frontViewY}
-            width={fW}
-            height={fH}
-            fill="#fafafa"
-            stroke="#000"
-            strokeWidth="1.5"
-          />
-
-          {/* Frame - Stiles (vertical) */}
-          <rect
-            x={frontViewX}
-            y={frontViewY}
-            width={fF}
-            height={fH}
-            fill="#fff3e0"
-            stroke="#000"
-            strokeWidth="0.8"
-          />
-          <rect
-            x={frontViewX + fW - fF}
-            y={frontViewY}
-            width={fF}
-            height={fH}
-            fill="#fff3e0"
-            stroke="#000"
-            strokeWidth="0.8"
-          />
-
-          {/* Frame - Rails (horizontal) */}
-          <rect
-            x={frontViewX + fF}
-            y={frontViewY}
-            width={fW - 2 * fF}
-            height={fF}
-            fill="#ffe0b2"
-            stroke="#000"
-            strokeWidth="0.8"
-          />
-          <rect
-            x={frontViewX + fF}
-            y={frontViewY + fH - fF}
-            width={fW - 2 * fF}
-            height={fF}
-            fill="#ffe0b2"
-            stroke="#000"
-            strokeWidth="0.8"
-          />
-
-          {/* Hatch pattern for frame */}
-          {[...Array(Math.floor(fH / 6))].map((_, i) => (
-            <React.Fragment key={`front-hatch-${i}`}>
-              <line
-                x1={frontViewX + 1}
-                y1={frontViewY + i * 6}
-                x2={frontViewX + fF - 1}
-                y2={frontViewY + i * 6 + 4}
-                stroke="#ddd"
-                strokeWidth="0.2"
-              />
-              <line
-                x1={frontViewX + fW - fF + 1}
-                y1={frontViewY + i * 6}
-                x2={frontViewX + fW - 1}
-                y2={frontViewY + i * 6 + 4}
-                stroke="#ddd"
-                strokeWidth="0.2"
-              />
-            </React.Fragment>
-          ))}
-
-          {/* Double frame if enabled */}
-          {hasDoubleFrame && (
-            <>
-              <rect
-                x={frontViewX + fF}
-                y={frontViewY + fF}
-                width={fDF}
-                height={fH - 2 * fF}
-                fill="none"
-                stroke="#ff8f00"
-                strokeWidth="0.5"
-                strokeDasharray="4,2"
-              />
-              <rect
-                x={frontViewX + fW - fF - fDF}
-                y={frontViewY + fF}
-                width={fDF}
-                height={fH - 2 * fF}
-                fill="none"
-                stroke="#ff8f00"
-                strokeWidth="0.5"
-                strokeDasharray="4,2"
-              />
-            </>
-          )}
-
-          {/* Horizontal Rails */}
-          {railPositions.map((pos, idx) => {
-            const railY = frontViewY + fH - pos * frontScale;
-            return (
-              <g key={`front-rail-${idx}`}>
-                <rect
-                  x={frontViewX + fTotalFrame}
-                  y={railY - fR / 2}
-                  width={fW - 2 * fTotalFrame}
-                  height={fR}
-                  fill="#ffe0b2"
-                  stroke="#000"
-                  strokeWidth="0.6"
-                />
-                {/* Cross hatch for rail */}
-                <line
-                  x1={frontViewX + fTotalFrame}
-                  y1={railY - fR / 2}
-                  x2={frontViewX + fW - fTotalFrame}
-                  y2={railY + fR / 2}
-                  stroke="#d7ccc8"
-                  strokeWidth="0.3"
-                />
-              </g>
-            );
-          })}
-
-          {/* Lock Block - Left */}
-          {lockBlockLeft &&
-            [...Array(lockBlockPiecesPerSide)].map((_, i) => (
-              <g key={`front-lb-left-${i}`}>
-                <rect
-                  x={frontViewX + fTotalFrame + fLockBlockW * i}
-                  y={frontViewY + fH - lockBlockBottom * frontScale}
-                  width={fLockBlockW}
-                  height={LOCK_BLOCK_HEIGHT * frontScale}
-                  fill="#ffcdd2"
-                  stroke="#c62828"
-                  strokeWidth="0.8"
-                />
-                {/* X pattern */}
-                <line
-                  x1={frontViewX + fTotalFrame + fLockBlockW * i}
-                  y1={frontViewY + fH - lockBlockBottom * frontScale}
-                  x2={frontViewX + fTotalFrame + fLockBlockW * (i + 1)}
-                  y2={frontViewY + fH - lockBlockTop * frontScale}
-                  stroke="#c62828"
-                  strokeWidth="0.4"
-                />
-                <line
-                  x1={frontViewX + fTotalFrame + fLockBlockW * (i + 1)}
-                  y1={frontViewY + fH - lockBlockBottom * frontScale}
-                  x2={frontViewX + fTotalFrame + fLockBlockW * i}
-                  y2={frontViewY + fH - lockBlockTop * frontScale}
-                  stroke="#c62828"
-                  strokeWidth="0.4"
-                />
-              </g>
-            ))}
-
-          {/* Lock Block - Right */}
-          {lockBlockRight &&
-            [...Array(lockBlockPiecesPerSide)].map((_, i) => (
-              <g key={`front-lb-right-${i}`}>
-                <rect
-                  x={frontViewX + fW - fTotalFrame - fLockBlockW * (i + 1)}
-                  y={frontViewY + fH - lockBlockBottom * frontScale}
-                  width={fLockBlockW}
-                  height={LOCK_BLOCK_HEIGHT * frontScale}
-                  fill="#ffcdd2"
-                  stroke="#c62828"
-                  strokeWidth="0.8"
-                />
-                <line
-                  x1={frontViewX + fW - fTotalFrame - fLockBlockW * (i + 1)}
-                  y1={frontViewY + fH - lockBlockBottom * frontScale}
-                  x2={frontViewX + fW - fTotalFrame - fLockBlockW * i}
-                  y2={frontViewY + fH - lockBlockTop * frontScale}
-                  stroke="#c62828"
-                  strokeWidth="0.4"
-                />
-                <line
-                  x1={frontViewX + fW - fTotalFrame - fLockBlockW * i}
-                  y1={frontViewY + fH - lockBlockBottom * frontScale}
-                  x2={frontViewX + fW - fTotalFrame - fLockBlockW * (i + 1)}
-                  y2={frontViewY + fH - lockBlockTop * frontScale}
-                  stroke="#c62828"
-                  strokeWidth="0.4"
-                />
-              </g>
-            ))}
-
-          {/* Center lines */}
-          <line
-            x1={frontViewX + fW / 2}
-            y1={frontViewY - 10}
-            x2={frontViewX + fW / 2}
-            y2={frontViewY + fH + 10}
-            stroke="#000"
-            strokeWidth="0.3"
-            strokeDasharray="10,3,2,3"
-          />
-          <line
-            x1={frontViewX - 10}
-            y1={frontViewY + fH / 2}
-            x2={frontViewX + fW + 10}
-            y2={frontViewY + fH / 2}
-            stroke="#000"
-            strokeWidth="0.3"
-            strokeDasharray="10,3,2,3"
-          />
-
-          {/* Dimensions for Front View */}
-          {/* Overall width */}
-          <DimLine
-            x1={frontViewX}
-            y1={frontViewY + fH}
-            x2={frontViewX + fW}
-            y2={frontViewY + fH}
-            value={W}
-            offset={40}
-          />
-
-          {/* Overall height */}
-          <DimLine
-            x1={frontViewX + fW}
-            y1={frontViewY}
-            x2={frontViewX + fW}
-            y2={frontViewY + fH}
-            value={H}
-            offset={35}
-            vertical
-          />
-
-          {/* Frame width (top) */}
-          <DimLine
-            x1={frontViewX}
-            y1={frontViewY}
-            x2={frontViewX + fF}
-            y2={frontViewY}
-            value={F}
-            offset={-20}
-            fontSize={7}
-          />
-
-          {/* Inner width */}
-          <DimLine
-            x1={frontViewX + fF}
-            y1={frontViewY}
-            x2={frontViewX + fW - fF}
-            y2={frontViewY}
-            value={W - 2 * F}
-            offset={-35}
-            fontSize={7}
-          />
-
-          {/* Lock block position from bottom */}
-          {(lockBlockLeft || lockBlockRight) && (
+        {/* Lock block dimensions */}
+        {(lockBlockLeft || lockBlockRight) && (
+          <>
             <DimLine
-              x1={frontViewX}
-              y1={frontViewY + fH}
-              x2={frontViewX}
-              y2={frontViewY + fH - lockBlockPosition * frontScale}
+              x1={positions.back.x + dims.back.W + 5}
+              y1={positions.back.y + dims.back.H}
+              x2={positions.back.x + dims.back.W + 5}
+              y2={
+                positions.back.y + dims.back.H - lockBlockPosition * backScale
+              }
               value={lockBlockPosition}
-              offset={-35}
+              offset={20}
               vertical
               fontSize={7}
             />
-          )}
+            <DimLine
+              x1={positions.back.x + dims.back.W + 5}
+              y1={positions.back.y + dims.back.H - lockBlockTop * backScale}
+              x2={positions.back.x + dims.back.W + 5}
+              y2={positions.back.y + dims.back.H - lockBlockBottom * backScale}
+              value={LOCK_BLOCK_HEIGHT}
+              offset={40}
+              vertical
+              fontSize={7}
+              color="#c62828"
+            />
+          </>
+        )}
+      </g>
 
-          {/* Rail position annotations */}
-          {railPositions.map((pos, idx) => {
-            const railY = frontViewY + fH - pos * frontScale;
-            return (
-              <g key={`front-rail-ann-${idx}`}>
-                <line
-                  x1={frontViewX + fW + 50}
-                  y1={railY}
-                  x2={frontViewX + fW + 60}
-                  y2={railY}
-                  stroke="#666"
-                  strokeWidth="0.4"
-                />
-                <text
-                  x={frontViewX + fW + 63}
-                  y={railY + 3}
-                  fontSize="7"
-                  fill="#666"
-                >
-                  {pos}
-                </text>
-              </g>
-            );
-          })}
-        </g>
+      {/* SIDE VIEW */}
+      <g id="side-view">
+        <text
+          x={positions.side.x + dims.side.T / 2}
+          y={positions.side.y - 15}
+          textAnchor="middle"
+          fontSize="11"
+          fontWeight="bold"
+        >
+          Side View
+        </text>
 
-        {/* ==================== PROFESSIONAL BOTTOM INFO BAR ==================== */}
-        {/* Main container with shadow effect */}
+        {/* Main outline */}
         <rect
-          x="20"
-          y={viewBoxHeight - 145}
-          width={viewBoxWidth - 40}
-          height="130"
-          fill="#f8fafc"
-          stroke="#1e3a5f"
+          x={positions.side.x}
+          y={positions.side.y}
+          width={dims.side.T}
+          height={dims.side.H}
+          fill="#fafafa"
+          stroke="#000"
           strokeWidth="1.5"
-          rx="3"
         />
 
-        {/* SPECIFICATIONS SECTION */}
-        <g id="specs">
-          {/* Header */}
+        {/* Surface layers */}
+        <rect
+          x={positions.side.x}
+          y={positions.side.y}
+          width={dims.side.S}
+          height={dims.side.H}
+          fill="#e8f5e9"
+          stroke="#000"
+          strokeWidth="0.6"
+        />
+        <rect
+          x={positions.side.x + dims.side.T - dims.side.S}
+          y={positions.side.y}
+          width={dims.side.S}
+          height={dims.side.H}
+          fill="#e8f5e9"
+          stroke="#000"
+          strokeWidth="0.6"
+        />
+
+        {/* Frame layers */}
+        <rect
+          x={positions.side.x + dims.side.S}
+          y={positions.side.y}
+          width={(dims.side.T - 2 * dims.side.S) * 0.25}
+          height={dims.side.H}
+          fill="#fff3e0"
+          stroke="#000"
+          strokeWidth="0.4"
+        />
+        <rect
+          x={
+            positions.side.x +
+            dims.side.T -
+            dims.side.S -
+            (dims.side.T - 2 * dims.side.S) * 0.25
+          }
+          y={positions.side.y}
+          width={(dims.side.T - 2 * dims.side.S) * 0.25}
+          height={dims.side.H}
+          fill="#fff3e0"
+          stroke="#000"
+          strokeWidth="0.4"
+        />
+
+        {/* Core area */}
+        <rect
+          x={
+            positions.side.x +
+            dims.side.S +
+            (dims.side.T - 2 * dims.side.S) * 0.25
+          }
+          y={positions.side.y}
+          width={(dims.side.T - 2 * dims.side.S) * 0.5}
+          height={dims.side.H}
+          fill="#fce4ec"
+          stroke="#000"
+          strokeWidth="0.3"
+          strokeDasharray="2,2"
+        />
+
+        {/* Center line */}
+        <CenterLine
+          x1={positions.side.x + dims.side.T / 2}
+          y1={positions.side.y - 8}
+          x2={positions.side.x + dims.side.T / 2}
+          y2={positions.side.y + dims.side.H + 8}
+        />
+
+        {/* Rails in side view */}
+        {railPositions.map((pos, idx) => {
+          const railY = positions.side.y + dims.side.H - pos * sideScale;
+          const railH = Math.max(safeR * sideScale * 0.5, 2);
+          return (
+            <rect
+              key={`side-rail-${idx}`}
+              x={positions.side.x + dims.side.S}
+              y={railY - railH / 2}
+              width={dims.side.T - 2 * dims.side.S}
+              height={railH}
+              fill="#ffe0b2"
+              stroke="#000"
+              strokeWidth="0.5"
+            />
+          );
+        })}
+
+        {/* Lock block indicator */}
+        {(lockBlockLeft || lockBlockRight) && (
           <rect
-            x="25"
-            y={viewBoxHeight - 140}
-            width="370"
-            height="20"
-            fill="#1e3a5f"
-            rx="2"
-          />
-          <text
-            x="35"
-            y={viewBoxHeight - 126}
-            fontSize="10"
-            fontWeight="bold"
-            fill="white"
-          >
-            📋 SPECIFICATIONS
-          </text>
-
-          {/* Content area */}
-          <rect
-            x="25"
-            y={viewBoxHeight - 118}
-            width="370"
-            height="100"
-            fill="white"
-            stroke="#e2e8f0"
-            strokeWidth="0.5"
-          />
-
-          {/* Left column */}
-          <text x="35" y={viewBoxHeight - 100} fontSize="8" fill="#64748b">
-            Door Size:
-          </text>
-          <text
-            x="35"
-            y={viewBoxHeight - 88}
-            fontSize="11"
-            fontWeight="bold"
-            fill="#1e293b"
-          >
-            {T} × {W} × {H} mm
-          </text>
-
-          <text x="35" y={viewBoxHeight - 70} fontSize="8" fill="#64748b">
-            Surface Material:
-          </text>
-          <text
-            x="35"
-            y={viewBoxHeight - 58}
-            fontSize="9"
-            fontWeight="600"
-            fill="#059669"
-          >
-            {surfaceMaterial.toUpperCase()} {S}mm × 2
-          </text>
-
-          <text x="35" y={viewBoxHeight - 40} fontSize="8" fill="#64748b">
-            Frame:
-          </text>
-          <text
-            x="35"
-            y={viewBoxHeight - 28}
-            fontSize="9"
-            fontWeight="600"
-            fill="#d97706"
-          >
-            {R}×{F}mm {hasDoubleFrame ? "(Double)" : ""}
-          </text>
-
-          {/* Right column */}
-          <text x="200" y={viewBoxHeight - 100} fontSize="8" fill="#64748b">
-            Horizontal Rails:
-          </text>
-          <text
-            x="200"
-            y={viewBoxHeight - 88}
-            fontSize="9"
-            fontWeight="600"
-            fill="#ea580c"
-          >
-            {railSections - 1} pcs @ {railPositions.join(", ")} mm
-          </text>
-
-          <text x="200" y={viewBoxHeight - 70} fontSize="8" fill="#64748b">
-            Lock Block:
-          </text>
-          <text
-            x="200"
-            y={viewBoxHeight - 58}
-            fontSize="9"
-            fontWeight="600"
-            fill="#dc2626"
-          >
-            {lockBlockCount} pcs ({R}×{F}×{LOCK_BLOCK_HEIGHT}mm)
-          </text>
-
-          {currentFrame.code && (
-            <>
-              <text x="200" y={viewBoxHeight - 40} fontSize="8" fill="#64748b">
-                ERP Code:
-              </text>
-              <text
-                x="200"
-                y={viewBoxHeight - 28}
-                fontSize="8"
-                fontWeight="500"
-                fill="#6366f1"
-                fontFamily="monospace"
-              >
-                {currentFrame.code}
-              </text>
-            </>
-          )}
-        </g>
-
-        {/* LEGEND SECTION */}
-        <g id="legend">
-          {/* Header */}
-          <rect
-            x="405"
-            y={viewBoxHeight - 140}
-            width="280"
-            height="20"
-            fill="#1e3a5f"
-            rx="2"
-          />
-          <text
-            x="415"
-            y={viewBoxHeight - 126}
-            fontSize="10"
-            fontWeight="bold"
-            fill="white"
-          >
-            🎨 LEGEND
-          </text>
-
-          {/* Content area */}
-          <rect
-            x="405"
-            y={viewBoxHeight - 118}
-            width="280"
-            height="100"
-            fill="white"
-            stroke="#e2e8f0"
-            strokeWidth="0.5"
-          />
-
-          {/* Row 1 */}
-          <rect
-            x="415"
-            y={viewBoxHeight - 105}
-            width="16"
-            height="10"
-            fill="#e8f5e9"
-            stroke="#4caf50"
-            strokeWidth="0.8"
-            rx="1"
-          />
-          <text x="435" y={viewBoxHeight - 97} fontSize="7" fill="#374151">
-            Surface Material
-          </text>
-
-          <rect
-            x="525"
-            y={viewBoxHeight - 105}
-            width="16"
-            height="10"
-            fill="#fff3e0"
-            stroke="#ff9800"
-            strokeWidth="0.8"
-            rx="1"
-          />
-          <text x="545" y={viewBoxHeight - 97} fontSize="7" fill="#374151">
-            Frame (Stile)
-          </text>
-
-          {/* Row 2 */}
-          <rect
-            x="415"
-            y={viewBoxHeight - 88}
-            width="16"
-            height="10"
-            fill="#ffe0b2"
-            stroke="#f57c00"
-            strokeWidth="0.8"
-            rx="1"
-          />
-          <text x="435" y={viewBoxHeight - 80} fontSize="7" fill="#374151">
-            Frame (Rail)
-          </text>
-
-          <rect
-            x="525"
-            y={viewBoxHeight - 88}
-            width="16"
-            height="10"
-            fill="#ffcdd2"
-            stroke="#c62828"
-            strokeWidth="0.8"
-            rx="1"
-          />
-          <text x="545" y={viewBoxHeight - 80} fontSize="7" fill="#374151">
-            Lock Block
-          </text>
-
-          {/* Row 3 */}
-          <rect
-            x="415"
-            y={viewBoxHeight - 71}
-            width="16"
-            height="10"
-            fill="#fce4ec"
-            stroke="#9e9e9e"
-            strokeWidth="0.5"
-            strokeDasharray="2,1"
-            rx="1"
-          />
-          <text x="435" y={viewBoxHeight - 63} fontSize="7" fill="#374151">
-            Core (Honeycomb)
-          </text>
-
-          <rect
-            x="525"
-            y={viewBoxHeight - 71}
-            width="16"
-            height="10"
+            x={positions.side.x + dims.side.S}
+            y={positions.side.y + dims.side.H - lockBlockBottom * sideScale}
+            width={dims.side.T - 2 * dims.side.S}
+            height={LOCK_BLOCK_HEIGHT * sideScale}
             fill="none"
-            stroke="#ff8f00"
-            strokeWidth="1"
+            stroke="#c62828"
+            strokeWidth="0.6"
             strokeDasharray="3,2"
-            rx="1"
           />
-          <text x="545" y={viewBoxHeight - 63} fontSize="7" fill="#374151">
-            Double Frame
-          </text>
+        )}
 
-          {/* Row 4 - Lines */}
-          <line
-            x1="415"
-            y1={viewBoxHeight - 49}
-            x2="431"
-            y2={viewBoxHeight - 49}
-            stroke="#333"
-            strokeWidth="0.6"
-            strokeDasharray="8,2,2,2"
-          />
-          <text x="435" y={viewBoxHeight - 46} fontSize="7" fill="#374151">
-            Center Line
-          </text>
+        {/* Dimensions */}
+        <DimLine
+          x1={positions.side.x}
+          y1={positions.side.y + dims.side.H}
+          x2={positions.side.x + dims.side.T}
+          y2={positions.side.y + dims.side.H}
+          value={T}
+          offset={40}
+        />
+        <DimLine
+          x1={positions.side.x + dims.side.T}
+          y1={positions.side.y}
+          x2={positions.side.x + dims.side.T}
+          y2={positions.side.y + dims.side.H}
+          value={H}
+          offset={35}
+          vertical
+        />
+        <DimLine
+          x1={positions.side.x}
+          y1={positions.side.y}
+          x2={positions.side.x + dims.side.S}
+          y2={positions.side.y}
+          value={S}
+          offset={-20}
+          fontSize={7}
+        />
+        <DimLine
+          x1={positions.side.x + dims.side.S}
+          y1={positions.side.y}
+          x2={positions.side.x + dims.side.T - dims.side.S}
+          y2={positions.side.y}
+          value={T - 2 * S}
+          offset={-35}
+          fontSize={7}
+        />
+      </g>
 
-          <line
-            x1="525"
-            y1={viewBoxHeight - 49}
-            x2="541"
-            y2={viewBoxHeight - 49}
-            stroke="#333"
-            strokeWidth="0.6"
-            strokeDasharray="3,3"
-          />
-          <text x="545" y={viewBoxHeight - 46} fontSize="7" fill="#374151">
-            Hidden Line
-          </text>
-
-          {/* Dimension arrow example */}
-          <line
-            x1="415"
-            y1={viewBoxHeight - 32}
-            x2="431"
-            y2={viewBoxHeight - 32}
-            stroke="#333"
-            strokeWidth="0.6"
-          />
-          <polygon
-            points={`415,${viewBoxHeight - 32} 418,${viewBoxHeight - 34} 418,${viewBoxHeight - 30}`}
-            fill="#333"
-          />
-          <polygon
-            points={`431,${viewBoxHeight - 32} 428,${viewBoxHeight - 34} 428,${viewBoxHeight - 30}`}
-            fill="#333"
-          />
-          <text x="435" y={viewBoxHeight - 29} fontSize="7" fill="#374151">
-            Dimension Line
-          </text>
-        </g>
-
-        {/* TITLE BLOCK SECTION */}
-        <g id="title-block">
-          {/* Main border */}
-          <rect
-            x={viewBoxWidth - 305}
-            y={viewBoxHeight - 140}
-            width="280"
-            height="120"
-            fill="white"
-            stroke="#1e3a5f"
-            strokeWidth="1.5"
-            rx="2"
-          />
-
-          {/* Header with gradient effect */}
-          <rect
-            x={viewBoxWidth - 305}
-            y={viewBoxHeight - 140}
-            width="280"
-            height="28"
-            fill="#1e3a5f"
-            rx="2"
-          />
-          <rect
-            x={viewBoxWidth - 305}
-            y={viewBoxHeight - 115}
-            width="280"
-            height="3"
-            fill="#1e3a5f"
-          />
-          <text
-            x={viewBoxWidth - 165}
-            y={viewBoxHeight - 121}
-            textAnchor="middle"
-            fontSize="13"
-            fontWeight="bold"
-            fill="white"
-          >
-            DOOR FRAME ASSEMBLY
-          </text>
-
-          {/* Size row */}
-          <rect
-            x={viewBoxWidth - 300}
-            y={viewBoxHeight - 107}
-            width="270"
-            height="22"
-            fill="#f1f5f9"
-            rx="1"
-          />
-          <text
-            x={viewBoxWidth - 290}
-            y={viewBoxHeight - 92}
-            fontSize="8"
-            fill="#64748b"
-          >
-            Size:
-          </text>
-          <text
-            x={viewBoxWidth - 165}
-            y={viewBoxHeight - 91}
-            textAnchor="middle"
-            fontSize="14"
-            fontWeight="bold"
-            fill="#1e293b"
-          >
-            {T} × {W} × {H} mm
-          </text>
-
-          {/* Material row */}
-          <line
-            x1={viewBoxWidth - 300}
-            y1={viewBoxHeight - 82}
-            x2={viewBoxWidth - 30}
-            y2={viewBoxHeight - 82}
-            stroke="#e2e8f0"
-            strokeWidth="0.5"
-          />
-          <text
-            x={viewBoxWidth - 290}
-            y={viewBoxHeight - 68}
-            fontSize="8"
-            fill="#64748b"
-          >
-            Material:
-          </text>
-          <text
-            x={viewBoxWidth - 165}
-            y={viewBoxHeight - 68}
-            textAnchor="middle"
-            fontSize="10"
-            fontWeight="600"
-            fill="#059669"
-          >
-            {surfaceMaterial.toUpperCase()} + {frameType.toUpperCase()}
-          </text>
-
-          {/* Scale & Rev row */}
-          <line
-            x1={viewBoxWidth - 300}
-            y1={viewBoxHeight - 55}
-            x2={viewBoxWidth - 30}
-            y2={viewBoxHeight - 55}
-            stroke="#e2e8f0"
-            strokeWidth="0.5"
-          />
-          <line
-            x1={viewBoxWidth - 165}
-            y1={viewBoxHeight - 55}
-            x2={viewBoxWidth - 165}
-            y2={viewBoxHeight - 35}
-            stroke="#e2e8f0"
-            strokeWidth="0.5"
-          />
-
-          <text
-            x={viewBoxWidth - 290}
-            y={viewBoxHeight - 42}
-            fontSize="8"
-            fill="#64748b"
-          >
-            Scale:
-          </text>
-          <text
-            x={viewBoxWidth - 240}
-            y={viewBoxHeight - 42}
-            fontSize="10"
-            fontWeight="600"
-            fill="#1e293b"
-          >
-            NTS
-          </text>
-
-          <text
-            x={viewBoxWidth - 155}
-            y={viewBoxHeight - 42}
-            fontSize="8"
-            fill="#64748b"
-          >
-            Rev:
-          </text>
-          <text
-            x={viewBoxWidth - 120}
-            y={viewBoxHeight - 42}
-            fontSize="10"
-            fontWeight="600"
-            fill="#1e293b"
-          >
-            1.0
-          </text>
-
-          {/* Company footer */}
-          <rect
-            x={viewBoxWidth - 305}
-            y={viewBoxHeight - 35}
-            width="280"
-            height="15"
-            fill="#f8fafc"
-            rx="0 0 2 2"
-          />
-          <line
-            x1={viewBoxWidth - 300}
-            y1={viewBoxHeight - 35}
-            x2={viewBoxWidth - 30}
-            y2={viewBoxHeight - 35}
-            stroke="#e2e8f0"
-            strokeWidth="0.5"
-          />
-          <text
-            x={viewBoxWidth - 165}
-            y={viewBoxHeight - 24}
-            textAnchor="middle"
-            fontSize="9"
-            fontWeight="bold"
-            fill="#1e3a5f"
-          >
-            C.H.H INDUSTRY CO., LTD.
-          </text>
-        </g>
-      </svg>
-    );
-  };
-
-  // ===== UI Components =====
-  const SectionCard = ({ text, title, icon, children, color = "blue" }) => {
-    const colors = {
-      blue: "from-blue-600 to-blue-700",
-      green: "from-green-600 to-green-700",
-      amber: "from-amber-500 to-amber-600",
-      orange: "from-orange-500 to-orange-600",
-      red: "from-red-500 to-red-600",
-    };
-    return (
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className={`bg-gradient-to-r ${colors[color]} px-4 py-2.5`}>
-          <h3 className="text-base font-semibold text-white flex items-center gap-2">
-            <span className="bg-white text-gray-700 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">
-              {text}
-            </span>
-            <span>{icon}</span>
-            {title}
-          </h3>
-        </div>
-        <div className="p-4">{children}</div>
-      </div>
-    );
-  };
-
-  // ===== Drawing Modal Component =====
-  const DrawingModal = ({ isOpen, onClose, children }) => {
-    if (!isOpen) return null;
-
-    return (
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4"
-        onClick={onClose}
-      >
-        <div
-          className="relative bg-white rounded-lg shadow-2xl max-w-[95vw] max-h-[95vh] overflow-auto"
-          onClick={(e) => e.stopPropagation()}
+      {/* FRONT VIEW */}
+      <g id="front-view">
+        <text
+          x={positions.front.x + dims.front.W / 2}
+          y={positions.front.y - 15}
+          textAnchor="middle"
+          fontSize="11"
+          fontWeight="bold"
         >
-          <button
-            onClick={onClose}
-            className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold shadow-lg transition-colors"
+          Front View
+        </text>
+
+        {/* Main outline */}
+        <rect
+          x={positions.front.x}
+          y={positions.front.y}
+          width={dims.front.W}
+          height={dims.front.H}
+          fill="#fafafa"
+          stroke="#000"
+          strokeWidth="1.5"
+        />
+
+        {/* Stiles */}
+        <rect
+          x={positions.front.x}
+          y={positions.front.y}
+          width={dims.front.F}
+          height={dims.front.H}
+          fill="#fff3e0"
+          stroke="#000"
+          strokeWidth="0.8"
+        />
+        <rect
+          x={positions.front.x + dims.front.W - dims.front.F}
+          y={positions.front.y}
+          width={dims.front.F}
+          height={dims.front.H}
+          fill="#fff3e0"
+          stroke="#000"
+          strokeWidth="0.8"
+        />
+
+        {/* Top and bottom rails */}
+        <rect
+          x={positions.front.x + dims.front.F}
+          y={positions.front.y}
+          width={dims.front.W - 2 * dims.front.F}
+          height={dims.front.F}
+          fill="#ffe0b2"
+          stroke="#000"
+          strokeWidth="0.8"
+        />
+        <rect
+          x={positions.front.x + dims.front.F}
+          y={positions.front.y + dims.front.H - dims.front.F}
+          width={dims.front.W - 2 * dims.front.F}
+          height={dims.front.F}
+          fill="#ffe0b2"
+          stroke="#000"
+          strokeWidth="0.8"
+        />
+
+        {/* Double frame indicator */}
+        {hasDoubleFrame && (
+          <>
+            <rect
+              x={positions.front.x + dims.front.F}
+              y={positions.front.y + dims.front.F}
+              width={dims.front.DF}
+              height={dims.front.H - 2 * dims.front.F}
+              fill="none"
+              stroke="#ff8f00"
+              strokeWidth="0.5"
+              strokeDasharray="4,2"
+            />
+            <rect
+              x={
+                positions.front.x + dims.front.W - dims.front.F - dims.front.DF
+              }
+              y={positions.front.y + dims.front.F}
+              width={dims.front.DF}
+              height={dims.front.H - 2 * dims.front.F}
+              fill="none"
+              stroke="#ff8f00"
+              strokeWidth="0.5"
+              strokeDasharray="4,2"
+            />
+          </>
+        )}
+
+        {/* Horizontal rails */}
+        {railPositions.map((pos, idx) => {
+          const railY = positions.front.y + dims.front.H - pos * frontScale;
+          return (
+            <g key={`front-rail-${idx}`}>
+              <rect
+                x={positions.front.x + dims.front.totalFrame}
+                y={railY - dims.front.R / 2}
+                width={dims.front.W - 2 * dims.front.totalFrame}
+                height={dims.front.R}
+                fill="#ffe0b2"
+                stroke="#000"
+                strokeWidth="0.6"
+              />
+              <line
+                x1={positions.front.x + dims.front.totalFrame}
+                y1={railY - dims.front.R / 2}
+                x2={positions.front.x + dims.front.W - dims.front.totalFrame}
+                y2={railY + dims.front.R / 2}
+                stroke="#d7ccc8"
+                strokeWidth="0.3"
+              />
+            </g>
+          );
+        })}
+
+        {/* Lock blocks */}
+        {renderLockBlocks(
+          positions.front.x,
+          positions.front.y,
+          frontScale,
+          dims.front.lockBlockW,
+          false,
+        )}
+
+        {/* Center lines */}
+        <CenterLine
+          x1={positions.front.x + dims.front.W / 2}
+          y1={positions.front.y - 10}
+          x2={positions.front.x + dims.front.W / 2}
+          y2={positions.front.y + dims.front.H + 10}
+        />
+        <CenterLine
+          x1={positions.front.x - 10}
+          y1={positions.front.y + dims.front.H / 2}
+          x2={positions.front.x + dims.front.W + 10}
+          y2={positions.front.y + dims.front.H / 2}
+        />
+
+        {/* Dimensions */}
+        <DimLine
+          x1={positions.front.x}
+          y1={positions.front.y + dims.front.H}
+          x2={positions.front.x + dims.front.W}
+          y2={positions.front.y + dims.front.H}
+          value={W}
+          offset={40}
+        />
+        <DimLine
+          x1={positions.front.x + dims.front.W}
+          y1={positions.front.y}
+          x2={positions.front.x + dims.front.W}
+          y2={positions.front.y + dims.front.H}
+          value={H}
+          offset={35}
+          vertical
+        />
+        <DimLine
+          x1={positions.front.x}
+          y1={positions.front.y}
+          x2={positions.front.x + dims.front.F}
+          y2={positions.front.y}
+          value={F}
+          offset={-20}
+          fontSize={7}
+        />
+        <DimLine
+          x1={positions.front.x + dims.front.F}
+          y1={positions.front.y}
+          x2={positions.front.x + dims.front.W - dims.front.F}
+          y2={positions.front.y}
+          value={W - 2 * F}
+          offset={-35}
+          fontSize={7}
+        />
+
+        {/* Lock block position */}
+        {(lockBlockLeft || lockBlockRight) && (
+          <DimLine
+            x1={positions.front.x}
+            y1={positions.front.y + dims.front.H}
+            x2={positions.front.x}
+            y2={
+              positions.front.y + dims.front.H - lockBlockPosition * frontScale
+            }
+            value={lockBlockPosition}
+            offset={-35}
+            vertical
+            fontSize={7}
+          />
+        )}
+
+        {/* Rail position annotations */}
+        {railPositions.map((pos, idx) => (
+          <g key={`front-ann-${idx}`}>
+            <line
+              x1={positions.front.x + dims.front.W + 50}
+              y1={positions.front.y + dims.front.H - pos * frontScale}
+              x2={positions.front.x + dims.front.W + 60}
+              y2={positions.front.y + dims.front.H - pos * frontScale}
+              stroke="#666"
+              strokeWidth="0.4"
+            />
+            <text
+              x={positions.front.x + dims.front.W + 63}
+              y={positions.front.y + dims.front.H - pos * frontScale + 3}
+              fontSize="7"
+              fill="#666"
+            >
+              {pos}
+            </text>
+          </g>
+        ))}
+      </g>
+
+      {/* BOTTOM INFO BAR */}
+      <BottomInfoBar
+        viewBoxWidth={viewBoxWidth}
+        viewBoxHeight={viewBoxHeight}
+        T={T}
+        W={W}
+        H={H}
+        S={S}
+        F={F}
+        R={R}
+        surfaceMaterial={results.currentFrame.desc?.split(" ")[0] || "-"}
+        frameType={results.currentFrame.desc?.split(" ")[0] || "-"}
+        hasDoubleFrame={hasDoubleFrame}
+        railSections={railSections}
+        railPositions={railPositions}
+        lockBlockCount={lockBlockCount}
+        currentFrame={currentFrame}
+      />
+    </svg>
+  );
+};
+
+// Bottom info bar component for drawing
+const BottomInfoBar = ({
+  viewBoxWidth,
+  viewBoxHeight,
+  T,
+  W,
+  H,
+  S,
+  F,
+  R,
+  surfaceMaterial,
+  frameType,
+  hasDoubleFrame,
+  railSections,
+  railPositions,
+  lockBlockCount,
+  currentFrame,
+}) => (
+  <g id="bottom-info">
+    {/* Main container */}
+    <rect
+      x="20"
+      y={viewBoxHeight - 145}
+      width={viewBoxWidth - 40}
+      height="130"
+      fill="#f8fafc"
+      stroke="#1e3a5f"
+      strokeWidth="1.5"
+      rx="3"
+    />
+
+    {/* SPECIFICATIONS SECTION */}
+    <g id="specs">
+      <rect
+        x="25"
+        y={viewBoxHeight - 140}
+        width="370"
+        height="20"
+        fill="#1e3a5f"
+        rx="2"
+      />
+      <text
+        x="35"
+        y={viewBoxHeight - 126}
+        fontSize="10"
+        fontWeight="bold"
+        fill="white"
+      >
+        📋 SPECIFICATIONS
+      </text>
+      <rect
+        x="25"
+        y={viewBoxHeight - 118}
+        width="370"
+        height="100"
+        fill="white"
+        stroke="#e2e8f0"
+        strokeWidth="0.5"
+      />
+
+      <text x="35" y={viewBoxHeight - 100} fontSize="8" fill="#64748b">
+        Door Size:
+      </text>
+      <text
+        x="35"
+        y={viewBoxHeight - 88}
+        fontSize="11"
+        fontWeight="bold"
+        fill="#1e293b"
+      >
+        {T} × {W} × {H} mm
+      </text>
+
+      <text x="35" y={viewBoxHeight - 70} fontSize="8" fill="#64748b">
+        Surface Material:
+      </text>
+      <text
+        x="35"
+        y={viewBoxHeight - 58}
+        fontSize="9"
+        fontWeight="600"
+        fill="#059669"
+      >
+        {surfaceMaterial} {S || 0}mm × 2
+      </text>
+
+      <text x="35" y={viewBoxHeight - 40} fontSize="8" fill="#64748b">
+        Frame:
+      </text>
+      <text
+        x="35"
+        y={viewBoxHeight - 28}
+        fontSize="9"
+        fontWeight="600"
+        fill="#d97706"
+      >
+        {R || 0}×{F || 0}mm {hasDoubleFrame ? "(Double)" : ""}
+      </text>
+
+      <text x="200" y={viewBoxHeight - 100} fontSize="8" fill="#64748b">
+        Horizontal Rails:
+      </text>
+      <text
+        x="200"
+        y={viewBoxHeight - 88}
+        fontSize="9"
+        fontWeight="600"
+        fill="#ea580c"
+      >
+        {railSections - 1} pcs @ {railPositions.join(", ") || "-"} mm
+      </text>
+
+      <text x="200" y={viewBoxHeight - 70} fontSize="8" fill="#64748b">
+        Lock Block:
+      </text>
+      <text
+        x="200"
+        y={viewBoxHeight - 58}
+        fontSize="9"
+        fontWeight="600"
+        fill="#dc2626"
+      >
+        {lockBlockCount} pcs ({R || 0}×{F || 0}×{LOCK_BLOCK_HEIGHT}mm)
+      </text>
+
+      {currentFrame.code && (
+        <>
+          <text x="200" y={viewBoxHeight - 40} fontSize="8" fill="#64748b">
+            ERP Code:
+          </text>
+          <text
+            x="200"
+            y={viewBoxHeight - 28}
+            fontSize="8"
+            fontWeight="500"
+            fill="#6366f1"
+            fontFamily="monospace"
           >
-            ✕
-          </button>
-          <div className="p-4">{children}</div>
-        </div>
-      </div>
+            {currentFrame.code}
+          </text>
+        </>
+      )}
+    </g>
+
+    {/* LEGEND SECTION */}
+    <g id="legend">
+      <rect
+        x="405"
+        y={viewBoxHeight - 140}
+        width="280"
+        height="20"
+        fill="#1e3a5f"
+        rx="2"
+      />
+      <text
+        x="415"
+        y={viewBoxHeight - 126}
+        fontSize="10"
+        fontWeight="bold"
+        fill="white"
+      >
+        🎨 LEGEND
+      </text>
+      <rect
+        x="405"
+        y={viewBoxHeight - 118}
+        width="280"
+        height="100"
+        fill="white"
+        stroke="#e2e8f0"
+        strokeWidth="0.5"
+      />
+
+      {/* Legend items */}
+      {[
+        {
+          x: 415,
+          y: -105,
+          fill: "#e8f5e9",
+          stroke: "#4caf50",
+          label: "Surface Material",
+        },
+        {
+          x: 525,
+          y: -105,
+          fill: "#fff3e0",
+          stroke: "#ff9800",
+          label: "Frame (Stile)",
+        },
+        {
+          x: 415,
+          y: -88,
+          fill: "#ffe0b2",
+          stroke: "#f57c00",
+          label: "Frame (Rail)",
+        },
+        {
+          x: 525,
+          y: -88,
+          fill: "#ffcdd2",
+          stroke: "#c62828",
+          label: "Lock Block",
+        },
+        {
+          x: 415,
+          y: -71,
+          fill: "#fce4ec",
+          stroke: "#9e9e9e",
+          label: "Core (Honeycomb)",
+          dashed: true,
+        },
+        {
+          x: 525,
+          y: -71,
+          fill: "none",
+          stroke: "#ff8f00",
+          label: "Double Frame",
+          dashed: true,
+        },
+      ].map((item, i) => (
+        <g key={`legend-${i}`}>
+          <rect
+            x={item.x}
+            y={viewBoxHeight + item.y}
+            width="16"
+            height="10"
+            fill={item.fill}
+            stroke={item.stroke}
+            strokeWidth="0.8"
+            rx="1"
+            strokeDasharray={item.dashed ? "2,1" : undefined}
+          />
+          <text
+            x={item.x + 20}
+            y={viewBoxHeight + item.y + 8}
+            fontSize="7"
+            fill="#374151"
+          >
+            {item.label}
+          </text>
+        </g>
+      ))}
+
+      {/* Line legends */}
+      <line
+        x1="415"
+        y1={viewBoxHeight - 49}
+        x2="431"
+        y2={viewBoxHeight - 49}
+        stroke="#333"
+        strokeWidth="0.6"
+        strokeDasharray="8,2,2,2"
+      />
+      <text x="435" y={viewBoxHeight - 46} fontSize="7" fill="#374151">
+        Center Line
+      </text>
+
+      <line
+        x1="525"
+        y1={viewBoxHeight - 49}
+        x2="541"
+        y2={viewBoxHeight - 49}
+        stroke="#333"
+        strokeWidth="0.6"
+        strokeDasharray="3,3"
+      />
+      <text x="545" y={viewBoxHeight - 46} fontSize="7" fill="#374151">
+        Hidden Line
+      </text>
+
+      <line
+        x1="415"
+        y1={viewBoxHeight - 32}
+        x2="431"
+        y2={viewBoxHeight - 32}
+        stroke="#333"
+        strokeWidth="0.6"
+      />
+      <polygon
+        points={`415,${viewBoxHeight - 32} 418,${viewBoxHeight - 34} 418,${viewBoxHeight - 30}`}
+        fill="#333"
+      />
+      <polygon
+        points={`431,${viewBoxHeight - 32} 428,${viewBoxHeight - 34} 428,${viewBoxHeight - 30}`}
+        fill="#333"
+      />
+      <text x="435" y={viewBoxHeight - 29} fontSize="7" fill="#374151">
+        Dimension Line
+      </text>
+    </g>
+
+    {/* TITLE BLOCK */}
+    <g id="title-block">
+      <rect
+        x={viewBoxWidth - 305}
+        y={viewBoxHeight - 140}
+        width="280"
+        height="120"
+        fill="white"
+        stroke="#1e3a5f"
+        strokeWidth="1.5"
+        rx="2"
+      />
+      <rect
+        x={viewBoxWidth - 305}
+        y={viewBoxHeight - 140}
+        width="280"
+        height="28"
+        fill="#1e3a5f"
+        rx="2"
+      />
+      <rect
+        x={viewBoxWidth - 305}
+        y={viewBoxHeight - 115}
+        width="280"
+        height="3"
+        fill="#1e3a5f"
+      />
+      <text
+        x={viewBoxWidth - 165}
+        y={viewBoxHeight - 121}
+        textAnchor="middle"
+        fontSize="13"
+        fontWeight="bold"
+        fill="white"
+      >
+        DOOR FRAME ASSEMBLY
+      </text>
+
+      <rect
+        x={viewBoxWidth - 300}
+        y={viewBoxHeight - 107}
+        width="270"
+        height="22"
+        fill="#f1f5f9"
+        rx="1"
+      />
+      <text
+        x={viewBoxWidth - 290}
+        y={viewBoxHeight - 92}
+        fontSize="8"
+        fill="#64748b"
+      >
+        Size:
+      </text>
+      <text
+        x={viewBoxWidth - 165}
+        y={viewBoxHeight - 91}
+        textAnchor="middle"
+        fontSize="14"
+        fontWeight="bold"
+        fill="#1e293b"
+      >
+        {T} × {W} × {H} mm
+      </text>
+
+      <line
+        x1={viewBoxWidth - 300}
+        y1={viewBoxHeight - 82}
+        x2={viewBoxWidth - 30}
+        y2={viewBoxHeight - 82}
+        stroke="#e2e8f0"
+        strokeWidth="0.5"
+      />
+      <text
+        x={viewBoxWidth - 290}
+        y={viewBoxHeight - 68}
+        fontSize="8"
+        fill="#64748b"
+      >
+        Material:
+      </text>
+      <text
+        x={viewBoxWidth - 165}
+        y={viewBoxHeight - 68}
+        textAnchor="middle"
+        fontSize="10"
+        fontWeight="600"
+        fill="#059669"
+      >
+        {surfaceMaterial} + {frameType}
+      </text>
+
+      <line
+        x1={viewBoxWidth - 300}
+        y1={viewBoxHeight - 55}
+        x2={viewBoxWidth - 30}
+        y2={viewBoxHeight - 55}
+        stroke="#e2e8f0"
+        strokeWidth="0.5"
+      />
+      <line
+        x1={viewBoxWidth - 165}
+        y1={viewBoxHeight - 55}
+        x2={viewBoxWidth - 165}
+        y2={viewBoxHeight - 35}
+        stroke="#e2e8f0"
+        strokeWidth="0.5"
+      />
+
+      <text
+        x={viewBoxWidth - 290}
+        y={viewBoxHeight - 42}
+        fontSize="8"
+        fill="#64748b"
+      >
+        Scale:
+      </text>
+      <text
+        x={viewBoxWidth - 240}
+        y={viewBoxHeight - 42}
+        fontSize="10"
+        fontWeight="600"
+        fill="#1e293b"
+      >
+        NTS
+      </text>
+
+      <text
+        x={viewBoxWidth - 155}
+        y={viewBoxHeight - 42}
+        fontSize="8"
+        fill="#64748b"
+      >
+        Rev:
+      </text>
+      <text
+        x={viewBoxWidth - 120}
+        y={viewBoxHeight - 42}
+        fontSize="10"
+        fontWeight="600"
+        fill="#1e293b"
+      >
+        1.0
+      </text>
+
+      <rect
+        x={viewBoxWidth - 305}
+        y={viewBoxHeight - 35}
+        width="280"
+        height="15"
+        fill="#f8fafc"
+      />
+      <line
+        x1={viewBoxWidth - 300}
+        y1={viewBoxHeight - 35}
+        x2={viewBoxWidth - 30}
+        y2={viewBoxHeight - 35}
+        stroke="#e2e8f0"
+        strokeWidth="0.5"
+      />
+      <text
+        x={viewBoxWidth - 165}
+        y={viewBoxHeight - 24}
+        textAnchor="middle"
+        fontSize="9"
+        fontWeight="bold"
+        fill="#1e3a5f"
+      >
+        C.H.H INDUSTRY CO., LTD.
+      </text>
+    </g>
+  </g>
+);
+
+// ===== MAIN COMPONENT =====
+export default function DoorConfigurator() {
+  // State
+  const [doorThickness, setDoorThickness] = useState("");
+  const [doorWidth, setDoorWidth] = useState("");
+  const [doorHeight, setDoorHeight] = useState("");
+  const [isDrawingModalOpen, setIsDrawingModalOpen] = useState(false);
+  const [surfaceMaterial, setSurfaceMaterial] = useState("");
+  const [surfaceThickness, setSurfaceThickness] = useState("");
+  const [frameType, setFrameType] = useState("");
+  const [selectedFrameCode, setSelectedFrameCode] = useState("");
+  const [hasDoubleFrame, setHasDoubleFrame] = useState(false);
+  const [lockBlockLeft, setLockBlockLeft] = useState(false);
+  const [lockBlockRight, setLockBlockRight] = useState(false);
+  const [lockBlockPiecesPerSide, setLockBlockPiecesPerSide] = useState("");
+
+  // Computed values
+  const frameSelection = useFrameSelection(
+    frameType,
+    doorThickness,
+    surfaceThickness,
+    doorHeight,
+  );
+
+  const currentFrame = useMemo(() => {
+    if (frameSelection.frames.length === 0) {
+      return {
+        thickness: 0,
+        width: 0,
+        length: 0,
+        useThickness: 0,
+        useWidth: 0,
+        isFlipped: false,
+        planeAmount: 0,
+        code: "",
+        desc: "",
+      };
+    }
+    return (
+      frameSelection.frames.find((f) => f.code === selectedFrameCode) ||
+      frameSelection.frames[0]
     );
-  };
+  }, [frameSelection, selectedFrameCode]);
 
-  // ===== Check if data is complete =====
+  // Auto-select first frame when selection changes
+  useEffect(() => {
+    if (frameSelection.frames.length > 0) {
+      setSelectedFrameCode(frameSelection.frames[0].code);
+    }
+  }, [frameSelection]);
+
+  const results = useCalculations({
+    doorThickness,
+    doorWidth,
+    doorHeight,
+    surfaceThickness,
+    hasDoubleFrame,
+    currentFrame,
+    lockBlockLeft,
+    lockBlockRight,
+    lockBlockPiecesPerSide,
+  });
+
+  const cuttingPlan = useCuttingPlan(results, currentFrame, hasDoubleFrame);
+
   const isDataComplete = doorThickness && doorWidth && doorHeight;
+  const piecesPerSide = parseInt(lockBlockPiecesPerSide) || 0;
 
-  const standardWidths = [700, 800, 900, 1000];
-  const standardHeights = [2000, 2100, 2200, 2400, 2700, 3000];
-  const standardThickness = [33, 35, 40, 45];
-
-  const surfaceMaterials = [
-    { value: "upvc", label: "UPVC" },
-    { value: "wpc", label: "WPC" },
-    { value: "laminate", label: "ลามิเนต" },
-    { value: "plywood", label: "ไม้อัด" },
-    { value: "melamine", label: "เมลามีน" },
-  ];
-
-  const frameTypes = [
-    { value: "rubberwood", label: "ยางพารา" },
-    { value: "sadao", label: "สะเดา" },
-    { value: "lvl", label: "LVL" },
-  ];
+  // Lock block handler
+  const handleLockBlockChange = (left, right) => {
+    setLockBlockLeft(left);
+    setLockBlockRight(right);
+  };
 
   return (
     <div className="flex flex-col items-center justify-start w-full h-full p-4 gap-4 overflow-auto bg-gradient-to-br from-blue-50 to-gray-100">
@@ -2636,90 +2635,36 @@ export default function DoorConfigurator() {
               {/* 1. สเปคลูกค้า */}
               <SectionCard text="1" title="สเปคลูกค้า" icon="📝" color="blue">
                 <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      ความหนา (T)
-                    </label>
-                    <div className="flex flex-wrap gap-1 mb-1">
-                      {standardThickness.map((t) => (
-                        <button
-                          key={t}
-                          onClick={() => setDoorThickness(t)}
-                          className={`px-2 py-1 rounded text-xs font-medium transition-all ${doorThickness === t ? "bg-blue-600 text-white shadow-md" : "bg-gray-100 hover:bg-gray-200"}`}
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <NumberInput
-                        value={doorThickness}
-                        onChange={setDoorThickness}
-                        className="flex-1 px-2 py-1.5 border rounded text-center text-sm font-bold focus:ring-2 focus:ring-blue-500"
-                      />
-                      <span className="text-xs text-gray-500">mm</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      ความกว้าง (W)
-                    </label>
-                    <div className="flex gap-1 mb-1">
-                      {standardWidths.map((w) => (
-                        <button
-                          key={w}
-                          onClick={() => setDoorWidth(w)}
-                          className={`flex-1 py-1 rounded text-xs font-medium transition-all ${doorWidth === w ? "bg-blue-600 text-white shadow-md" : "bg-gray-100 hover:bg-gray-200"}`}
-                        >
-                          {w}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <NumberInput
-                        value={doorWidth}
-                        onChange={setDoorWidth}
-                        className="flex-1 px-2 py-1.5 border rounded text-center text-sm font-bold focus:ring-2 focus:ring-blue-500"
-                      />
-                      <span className="text-xs text-gray-500">mm</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      ความสูง (H)
-                    </label>
-                    <div className="flex flex-wrap gap-1 mb-1">
-                      {standardHeights.map((h) => (
-                        <button
-                          key={h}
-                          onClick={() => setDoorHeight(h)}
-                          className={`px-2 py-1 rounded text-xs font-medium transition-all ${doorHeight === h ? "bg-blue-600 text-white shadow-md" : "bg-gray-100 hover:bg-gray-200"}`}
-                        >
-                          {h}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <NumberInput
-                        value={doorHeight}
-                        onChange={setDoorHeight}
-                        className="flex-1 px-2 py-1.5 border rounded text-center text-sm font-bold focus:ring-2 focus:ring-blue-500"
-                      />
-                      <span className="text-xs text-gray-500">mm</span>
-                    </div>
-                  </div>
-
-                  <div className="p-2 bg-blue-50 rounded-lg border border-blue-200 text-center">
-                    <p className="text-xs text-blue-700">
+                  <QuickSelectWithInput
+                    label="ความหนา (T)"
+                    options={STANDARD_THICKNESS}
+                    value={doorThickness}
+                    onChange={setDoorThickness}
+                    themeColor="#2563eb"
+                  />
+                  <QuickSelectWithInput
+                    label="ความกว้าง (W)"
+                    options={STANDARD_WIDTHS}
+                    value={doorWidth}
+                    onChange={setDoorWidth}
+                    themeColor="#2563eb"
+                  />
+                  <QuickSelectWithInput
+                    label="ความสูง (H)"
+                    options={STANDARD_HEIGHTS}
+                    value={doorHeight}
+                    onChange={setDoorHeight}
+                    themeColor="#2563eb"
+                  />
+                  <InfoBox color="blue" className="text-center">
+                    <p>
                       สเปค:{" "}
                       <span className="font-bold">
-                        {doorThickness}×{doorWidth}×{doorHeight}
+                        {formatDimension(doorThickness, doorWidth, doorHeight)}
                       </span>{" "}
                       mm
                     </p>
-                  </div>
+                  </InfoBox>
                 </div>
               </SectionCard>
 
@@ -2731,11 +2676,15 @@ export default function DoorConfigurator() {
                       ประเภทวัสดุ
                     </label>
                     <div className="grid grid-cols-2 gap-1">
-                      {surfaceMaterials.map((mat) => (
+                      {SURFACE_MATERIALS.map((mat) => (
                         <button
                           key={mat.value}
                           onClick={() => setSurfaceMaterial(mat.value)}
-                          className={`py-1.5 px-2 rounded text-xs font-medium transition-all ${surfaceMaterial === mat.value ? "bg-green-600 text-white shadow-md" : "bg-gray-100 hover:bg-gray-200"}`}
+                          className={`py-1.5 px-2 rounded text-xs font-medium transition-all ${
+                            surfaceMaterial === mat.value
+                              ? "bg-green-600 text-white shadow-md"
+                              : "bg-gray-100 hover:bg-gray-200"
+                          }`}
                         >
                           {mat.label}
                         </button>
@@ -2743,56 +2692,48 @@ export default function DoorConfigurator() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      ความหนา/แผ่น
-                    </label>
-                    <div className="flex items-center gap-1">
-                      <NumberInput
-                        value={surfaceThickness}
-                        onChange={setSurfaceThickness}
-                        className="flex-1 px-2 py-1.5 border rounded text-center text-sm font-bold focus:ring-2 focus:ring-green-500"
-                      />
-                      <span className="text-xs text-gray-500">mm</span>
-                    </div>
-                  </div>
+                  <QuickSelectWithInput
+                    label="ความหนา/แผ่น"
+                    options={[]}
+                    value={surfaceThickness}
+                    onChange={setSurfaceThickness}
+                    themeColor="#16a34a"
+                  />
 
-                  <div className="p-2 bg-green-50 rounded-lg border border-green-200 text-xs">
-                    <div className="flex justify-between">
-                      <span>วัสดุ:</span>
-                      <span className="font-bold text-green-700">
-                        {
-                          surfaceMaterials.find(
-                            (m) => m.value === surfaceMaterial,
-                          )?.label
-                        }
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>วัสดุปิดผิว:</span>
-                      <span>
-                        {surfaceThickness} mm × 2 = {surfaceThickness * 2} mm
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>กาว:</span>
-                      <span>
-                        {GLUE_THICKNESS} mm × 2 = {GLUE_THICKNESS * 2} mm
-                      </span>
-                    </div>
-                    <div className="flex justify-between font-medium border-t border-green-200 pt-1 mt-1">
-                      <span>รวมทั้งหมด:</span>
-                      <span className="font-bold">
-                        {results.totalSurfaceThickness} mm
-                      </span>
-                    </div>
-                    <div className="flex justify-between pt-1 border-t border-green-200 mt-1">
-                      <span>ความหนาโครงที่ต้องการ:</span>
-                      <span className="font-bold text-green-700">
-                        {results.frameThickness} mm
-                      </span>
-                    </div>
-                  </div>
+                  <InfoBox color="green">
+                    <InfoRow
+                      label="วัสดุ:"
+                      value={
+                        <span className="text-green-700">
+                          {getMaterialLabel(SURFACE_MATERIALS, surfaceMaterial)}
+                        </span>
+                      }
+                    />
+                    <InfoRow
+                      label="วัสดุปิดผิว:"
+                      value={`${surfaceThickness || 0} mm × 2 = ${(parseFloat(surfaceThickness) || 0) * 2} mm`}
+                      className="text-gray-600"
+                    />
+                    <InfoRow
+                      label="กาว:"
+                      value={`${GLUE_THICKNESS} mm × 2 = ${GLUE_THICKNESS * 2} mm`}
+                      className="text-gray-600"
+                    />
+                    <InfoRow
+                      label="รวมทั้งหมด:"
+                      value={`${results.totalSurfaceThickness} mm`}
+                      className="font-medium border-t border-green-200 pt-1 mt-1"
+                    />
+                    <InfoRow
+                      label="ความหนาโครงที่ต้องการ:"
+                      value={
+                        <span className="text-green-700">
+                          {results.frameThickness} mm
+                        </span>
+                      }
+                      className="pt-1 border-t border-green-200 mt-1"
+                    />
+                  </InfoBox>
                 </div>
               </SectionCard>
 
@@ -2800,11 +2741,15 @@ export default function DoorConfigurator() {
               <SectionCard text="3" title="โครง (ERP)" icon="🪵" color="amber">
                 <div className="space-y-3">
                   <div className="grid grid-cols-3 gap-1">
-                    {frameTypes.map((opt) => (
+                    {FRAME_TYPES.map((opt) => (
                       <button
                         key={opt.value}
                         onClick={() => setFrameType(opt.value)}
-                        className={`py-1.5 rounded text-xs font-medium transition-all ${frameType === opt.value ? "bg-amber-500 text-white shadow-md" : "bg-gray-100 hover:bg-gray-200"}`}
+                        className={`py-1.5 rounded text-xs font-medium transition-all ${
+                          frameType === opt.value
+                            ? "bg-amber-500 text-white shadow-md"
+                            : "bg-gray-100 hover:bg-gray-200"
+                        }`}
                       >
                         {opt.label}
                       </button>
@@ -2815,10 +2760,10 @@ export default function DoorConfigurator() {
                     <label className="block text-xs font-medium text-gray-600 mb-1">
                       เลือกไม้โครง (จาก ERP)
                       <span className="text-gray-400 font-normal ml-1">
-                        ยาว≥{doorHeight}mm
+                        ยาว≥{doorHeight || 0}mm
                       </span>
                     </label>
-                    {frameSelection.frames.length > 0 ? (
+                    {frameType && frameSelection.frames.length > 0 ? (
                       <select
                         value={selectedFrameCode}
                         onChange={(e) => setSelectedFrameCode(e.target.value)}
@@ -2830,31 +2775,48 @@ export default function DoorConfigurator() {
                           </option>
                         ))}
                       </select>
-                    ) : (
-                      <div className="p-2 bg-red-50 rounded border border-red-200 text-xs text-red-600">
+                    ) : frameType ? (
+                      <InfoBox color="red">
                         ⚠️{" "}
                         {frameSelection.reason ||
                           `ไม่มีไม้ที่ใช้ได้สำหรับความหนา ${results.frameThickness}mm`}
-                      </div>
+                      </InfoBox>
+                    ) : (
+                      <InfoBox color="gray">
+                        กรุณาเลือกประเภทไม้โครงก่อน
+                      </InfoBox>
                     )}
                   </div>
 
-                  {frameSelection.frames.length > 0 && (
-                    <div
-                      className={`p-2 rounded-lg border text-xs ${currentFrame.needSplice ? "bg-purple-50 border-purple-300" : currentFrame.planeAmount > 0 || currentFrame.isFlipped ? "bg-orange-50 border-orange-300" : "bg-amber-50 border-amber-200"}`}
+                  {frameType && frameSelection.frames.length > 0 && (
+                    <InfoBox
+                      color={
+                        currentFrame.needSplice
+                          ? "purple"
+                          : currentFrame.planeAmount > 0 ||
+                              currentFrame.isFlipped
+                            ? "orange"
+                            : "amber"
+                      }
                     >
-                      <div className="flex justify-between">
-                        <span>ไม้โครงใช้จริง:</span>
-                        <span className="font-bold text-amber-700">
-                          {currentFrame.useThickness}×{currentFrame.useWidth} mm
-                        </span>
-                      </div>
-                      <div className="flex justify-between pt-1 border-t mt-1">
-                        <span>รหัส ERP:</span>
-                        <span className="font-mono text-[10px]">
-                          {selectedFrameCode}
-                        </span>
-                      </div>
+                      <InfoRow
+                        label="ไม้โครงใช้จริง:"
+                        value={
+                          <span className="text-amber-700">
+                            {currentFrame.useThickness}×{currentFrame.useWidth}{" "}
+                            mm
+                          </span>
+                        }
+                      />
+                      <InfoRow
+                        label="รหัส ERP:"
+                        value={
+                          <span className="font-mono text-[10px]">
+                            {selectedFrameCode}
+                          </span>
+                        }
+                        className="pt-1 border-t mt-1"
+                      />
                       {currentFrame.isFlipped && (
                         <div className="text-orange-600 mt-1 pt-1 border-t flex items-center gap-1">
                           <span>🔄</span>{" "}
@@ -2893,27 +2855,20 @@ export default function DoorConfigurator() {
                           </div>
                         </div>
                       )}
-                    </div>
+                    </InfoBox>
                   )}
 
-                  <label
-                    className={`flex items-center gap-2 p-2 rounded-lg border-2 cursor-pointer transition-all ${hasDoubleFrame ? "bg-yellow-50 border-yellow-400" : "bg-gray-50 border-gray-200"}`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={hasDoubleFrame}
-                      onChange={(e) => setHasDoubleFrame(e.target.checked)}
-                      className="w-4 h-4 text-yellow-500 rounded"
-                    />
-                    <div>
-                      <span className="text-xs font-medium">เบิ้ลโครง</span>
-                      {hasDoubleFrame && (
-                        <span className="text-xs text-yellow-600 ml-1">
-                          ({results.totalFrameWidth}mm/ด้าน)
-                        </span>
-                      )}
-                    </div>
-                  </label>
+                  <CheckboxOption
+                    checked={hasDoubleFrame}
+                    onChange={(e) => setHasDoubleFrame(e.target.checked)}
+                    label="เบิ้ลโครง"
+                    sublabel={
+                      hasDoubleFrame
+                        ? `(${results.totalFrameWidth}mm/ด้าน)`
+                        : null
+                    }
+                    isActive={hasDoubleFrame}
+                  />
                 </div>
               </SectionCard>
 
@@ -2924,46 +2879,51 @@ export default function DoorConfigurator() {
                 icon="➖"
                 color="orange"
               >
-                <div className="space-y-3">
-                  <div className="p-2 bg-orange-50 rounded-lg border border-orange-200 text-xs">
-                    <div className="flex justify-between mb-1">
-                      <span>จำนวนช่อง:</span>
-                      <span className="font-bold text-orange-700">
+                <InfoBox color="orange">
+                  <InfoRow
+                    label="จำนวนช่อง:"
+                    value={
+                      <span className="text-orange-700">
                         {results.railSections} ช่อง ({results.railSections - 1}{" "}
                         ไม้ดาม)
                       </span>
+                    }
+                    className="mb-1"
+                  />
+                  {doorHeight >= 2400 && (
+                    <div className="text-orange-600 text-[10px] mb-1">
+                      ⚡ ประตูสูงเกิน 2400mm → แบ่ง 4 ช่อง อัตโนมัติ
                     </div>
-                    {doorHeight >= 2400 && (
-                      <div className="text-orange-600 text-[10px] mb-1">
-                        ⚡ ประตูสูงเกิน 2400mm → แบ่ง 4 ช่อง อัตโนมัติ
-                      </div>
-                    )}
-                    {results.railsAdjusted && (
-                      <div className="text-amber-600 text-[10px] mb-1 p-1 bg-amber-50 rounded">
-                        🔄 ปรับตำแหน่งไม้ดามอัตโนมัติเพื่อหลบ Lock Block
-                      </div>
-                    )}
-                    <div className="flex justify-between mb-1">
-                      <span>ขนาดไม้ดาม:</span>
-                      <span className="font-bold text-orange-700">
-                        {currentFrame.useThickness}×{currentFrame.useWidth} mm
+                  )}
+                  {results.railsAdjusted && (
+                    <div className="text-amber-600 text-[10px] mb-1 p-1 bg-amber-50 rounded">
+                      🔄 ปรับตำแหน่งไม้ดามอัตโนมัติเพื่อหลบ Lock Block
+                    </div>
+                  )}
+                  <InfoRow
+                    label="ขนาดไม้ดาม:"
+                    value={
+                      <span className="text-orange-700">
+                        {currentFrame.useThickness || 0}×
+                        {currentFrame.useWidth || 0} mm
                       </span>
-                    </div>
-                    <div className="text-gray-500 text-[10px]">
-                      (ใช้ไม้เดียวกับโครง)
-                    </div>
-                    <div className="mt-2 pt-2 border-t border-orange-200">
-                      {results.railPositions.map((pos, idx) => {
-                        const wasAdjusted =
-                          results.railPositionsOriginal &&
-                          pos !== results.railPositionsOriginal[idx];
-                        return (
-                          <div
-                            key={idx}
-                            className={`flex justify-between ${wasAdjusted ? "text-amber-600" : "text-orange-700"}`}
-                          >
-                            <span>ตำแหน่งที่ {idx + 1}:</span>
-                            <span className="font-bold">
+                    }
+                    className="mb-1"
+                  />
+                  <div className="text-gray-500 text-[10px]">
+                    (ใช้ไม้เดียวกับโครง)
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-orange-200">
+                    {results.railPositions.map((pos, idx) => {
+                      const wasAdjusted =
+                        results.railPositionsOriginal &&
+                        pos !== results.railPositionsOriginal[idx];
+                      return (
+                        <InfoRow
+                          key={idx}
+                          label={`ตำแหน่งที่ ${idx + 1}:`}
+                          value={
+                            <span>
                               {pos} mm
                               {wasAdjusted && (
                                 <span className="text-[9px] ml-1">
@@ -2971,12 +2931,15 @@ export default function DoorConfigurator() {
                                 </span>
                               )}
                             </span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                          }
+                          className={
+                            wasAdjusted ? "text-amber-600" : "text-orange-700"
+                          }
+                        />
+                      );
+                    })}
                   </div>
-                </div>
+                </InfoBox>
               </SectionCard>
             </div>
 
@@ -2998,7 +2961,7 @@ export default function DoorConfigurator() {
                         key={n}
                         onClick={() => setLockBlockPiecesPerSide(n)}
                         className={`flex-1 py-2 rounded text-sm font-bold transition-all ${
-                          lockBlockPiecesPerSide === n
+                          piecesPerSide === n
                             ? "bg-red-500 text-white shadow-md"
                             : "bg-gray-100 hover:bg-gray-200"
                         }`}
@@ -3010,109 +2973,77 @@ export default function DoorConfigurator() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  <label
-                    className={`flex flex-col items-center gap-1 p-3 rounded-lg border-2 cursor-pointer transition-all ${lockBlockLeft && !lockBlockRight ? "bg-red-50 border-red-400" : "bg-gray-50 border-gray-200 hover:border-gray-300"}`}
-                  >
-                    <input
-                      type="radio"
-                      name="lockblock"
-                      checked={lockBlockLeft && !lockBlockRight}
-                      onChange={() => {
-                        setLockBlockLeft(true);
-                        setLockBlockRight(false);
-                      }}
-                      className="w-4 h-4 text-red-500"
-                    />
-                    <span className="text-xs font-medium">ซ้าย</span>
-                    <span className="text-[10px] text-red-500 font-bold">
-                      ({lockBlockPiecesPerSide} ชิ้น)
-                    </span>
-                  </label>
-
-                  <label
-                    className={`flex flex-col items-center gap-1 p-3 rounded-lg border-2 cursor-pointer transition-all ${!lockBlockLeft && lockBlockRight ? "bg-red-50 border-red-400" : "bg-gray-50 border-gray-200 hover:border-gray-300"}`}
-                  >
-                    <input
-                      type="radio"
-                      name="lockblock"
-                      checked={!lockBlockLeft && lockBlockRight}
-                      onChange={() => {
-                        setLockBlockLeft(false);
-                        setLockBlockRight(true);
-                      }}
-                      className="w-4 h-4 text-red-500"
-                    />
-                    <span className="text-xs font-medium">ขวา</span>
-                    <span className="text-[10px] text-red-500 font-bold">
-                      ({lockBlockPiecesPerSide} ชิ้น)
-                    </span>
-                  </label>
-
-                  <label
-                    className={`flex flex-col items-center gap-1 p-3 rounded-lg border-2 cursor-pointer transition-all ${lockBlockLeft && lockBlockRight ? "bg-red-50 border-red-400" : "bg-gray-50 border-gray-200 hover:border-gray-300"}`}
-                  >
-                    <input
-                      type="radio"
-                      name="lockblock"
-                      checked={lockBlockLeft && lockBlockRight}
-                      onChange={() => {
-                        setLockBlockLeft(true);
-                        setLockBlockRight(true);
-                      }}
-                      className="w-4 h-4 text-red-500"
-                    />
-                    <span className="text-xs font-medium">ทั้งสอง</span>
-                    <span className="text-[10px] text-red-500 font-bold">
-                      ({lockBlockPiecesPerSide * 2} ชิ้น)
-                    </span>
-                  </label>
+                  <RadioOptionCard
+                    name="lockblock"
+                    checked={lockBlockLeft && !lockBlockRight}
+                    onChange={() => handleLockBlockChange(true, false)}
+                    label="ซ้าย"
+                    sublabel={`(${piecesPerSide} ชิ้น)`}
+                    isActive={lockBlockLeft && !lockBlockRight}
+                  />
+                  <RadioOptionCard
+                    name="lockblock"
+                    checked={!lockBlockLeft && lockBlockRight}
+                    onChange={() => handleLockBlockChange(false, true)}
+                    label="ขวา"
+                    sublabel={`(${piecesPerSide} ชิ้น)`}
+                    isActive={!lockBlockLeft && lockBlockRight}
+                  />
+                  <RadioOptionCard
+                    name="lockblock"
+                    checked={lockBlockLeft && lockBlockRight}
+                    onChange={() => handleLockBlockChange(true, true)}
+                    label="ทั้งสอง"
+                    sublabel={`(${piecesPerSide * 2} ชิ้น)`}
+                    isActive={lockBlockLeft && lockBlockRight}
+                  />
                 </div>
 
-                {(lockBlockLeft || lockBlockRight) && (
-                  <div className="p-2 bg-red-50 rounded-lg border border-red-200 text-xs">
-                    <div className="flex justify-between mb-1">
-                      <span>จำนวนรวม:</span>
-                      <span className="font-bold text-red-700">
-                        {results.lockBlockCount} ชิ้น (
-                        {lockBlockLeft && lockBlockRight
-                          ? `ซ้าย ${lockBlockPiecesPerSide} + ขวา ${lockBlockPiecesPerSide}`
-                          : lockBlockLeft
-                            ? `ซ้าย ${lockBlockPiecesPerSide}`
-                            : `ขวา ${lockBlockPiecesPerSide}`}
-                        )
-                      </span>
-                    </div>
-                    <div className="flex justify-between mb-1">
-                      <span>ขนาด Lock Block:</span>
-                      <span className="font-bold text-red-700">
-                        {currentFrame.useThickness}×{currentFrame.useWidth}×
-                        {LOCK_BLOCK_HEIGHT} mm
-                      </span>
-                    </div>
+                {(lockBlockLeft || lockBlockRight) && piecesPerSide > 0 && (
+                  <InfoBox color="red">
+                    <InfoRow
+                      label="จำนวนรวม:"
+                      value={
+                        <span className="text-red-700">
+                          {results.lockBlockCount} ชิ้น (
+                          {lockBlockLeft && lockBlockRight
+                            ? `ซ้าย ${piecesPerSide} + ขวา ${piecesPerSide}`
+                            : lockBlockLeft
+                              ? `ซ้าย ${piecesPerSide}`
+                              : `ขวา ${piecesPerSide}`}
+                          )
+                        </span>
+                      }
+                      className="mb-1"
+                    />
+                    <InfoRow
+                      label="ขนาด Lock Block:"
+                      value={
+                        <span className="text-red-700">
+                          {currentFrame.useThickness || 0}×
+                          {currentFrame.useWidth || 0}×{LOCK_BLOCK_HEIGHT} mm
+                        </span>
+                      }
+                      className="mb-1"
+                    />
                     <div className="text-gray-500 text-[10px] mb-2">
                       (ใช้ไม้เดียวกับโครง)
                     </div>
                     <div className="pt-2 border-t border-red-200 text-red-700 space-y-1">
-                      <div className="flex justify-between">
-                        <span>ขอบบน:</span>
-                        <span className="font-bold">
-                          {results.lockBlockTop} mm จากพื้น
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>กึ่งกลาง:</span>
-                        <span className="font-bold">
-                          {results.lockBlockPosition} mm จากพื้น
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>ขอบล่าง:</span>
-                        <span className="font-bold">
-                          {results.lockBlockBottom} mm จากพื้น
-                        </span>
-                      </div>
+                      <InfoRow
+                        label="ขอบบน:"
+                        value={`${results.lockBlockTop} mm จากพื้น`}
+                      />
+                      <InfoRow
+                        label="กึ่งกลาง:"
+                        value={`${results.lockBlockPosition} mm จากพื้น`}
+                      />
+                      <InfoRow
+                        label="ขอบล่าง:"
+                        value={`${results.lockBlockBottom} mm จากพื้น`}
+                      />
                     </div>
-                  </div>
+                  </InfoBox>
                 )}
               </div>
             </SectionCard>
@@ -3126,17 +3057,14 @@ export default function DoorConfigurator() {
                 <div className="p-2 bg-gray-50 rounded-lg">
                   <span className="text-gray-500 block">สเปคประตู:</span>
                   <span className="font-bold">
-                    {doorThickness}×{doorWidth}×{doorHeight} mm
+                    {formatDimension(doorThickness, doorWidth, doorHeight)} mm
                   </span>
                 </div>
                 <div className="p-2 bg-gray-50 rounded-lg">
                   <span className="text-gray-500 block">ปิดผิว:</span>
                   <span className="font-bold text-green-600">
-                    {
-                      surfaceMaterials.find((m) => m.value === surfaceMaterial)
-                        ?.label
-                    }{" "}
-                    {surfaceThickness}mm + กาว {GLUE_THICKNESS}mm (×2)
+                    {getMaterialLabel(SURFACE_MATERIALS, surfaceMaterial)}{" "}
+                    {surfaceThickness || 0}mm + กาว {GLUE_THICKNESS}mm (×2)
                   </span>
                 </div>
                 <div
@@ -3144,7 +3072,8 @@ export default function DoorConfigurator() {
                 >
                   <span className="text-gray-500 block">โครงไม้:</span>
                   <span className="font-bold text-amber-600">
-                    {currentFrame.useThickness}×{currentFrame.useWidth} mm
+                    {currentFrame.useThickness || "-"}×
+                    {currentFrame.useWidth || "-"} mm
                   </span>
                   {currentFrame.isFlipped && (
                     <span className="block text-[10px] text-orange-600">
@@ -3168,39 +3097,39 @@ export default function DoorConfigurator() {
                   <span className="font-bold text-red-600">
                     {results.lockBlockCount} ชิ้น (
                     {lockBlockLeft && lockBlockRight
-                      ? `ซ้าย ${lockBlockPiecesPerSide} + ขวา ${lockBlockPiecesPerSide}`
+                      ? `ซ้าย ${piecesPerSide} + ขวา ${piecesPerSide}`
                       : lockBlockLeft
-                        ? `ซ้าย ${lockBlockPiecesPerSide}`
-                        : `ขวา ${lockBlockPiecesPerSide}`}
+                        ? `ซ้าย ${piecesPerSide}`
+                        : lockBlockRight
+                          ? `ขวา ${piecesPerSide}`
+                          : "-"}
                     )
                   </span>
                 </div>
               </div>
-              <div className="mt-3 p-2 bg-blue-50 rounded-lg text-xs">
-                <div className="font-medium text-blue-800">
-                  รหัส ERP: {selectedFrameCode}
+              {selectedFrameCode && (
+                <div className="mt-3 p-2 bg-blue-50 rounded-lg text-xs">
+                  <div className="font-medium text-blue-800">
+                    รหัส ERP: {selectedFrameCode}
+                  </div>
+                  <div className="text-blue-600 text-[10px]">
+                    {currentFrame.desc}
+                  </div>
                 </div>
-                <div className="text-blue-600 text-[10px]">
-                  {currentFrame.desc}
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* 6. Cutting Optimization - แสดงเฉพาะเมื่อกรอกข้อมูลครบ */}
+            {/* 6. Cutting Optimization */}
             {isDataComplete ? (
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 py-2.5">
-                  <h3 className="text-base font-semibold text-white flex items-center gap-2">
-                    <span className="bg-white text-gray-700 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">
-                      6
-                    </span>
-                    <span>✂️</span>
-                    แผนการตัดไม้ (Cutting Optimization)
-                  </h3>
-                </div>
-                <div className="p-4 space-y-4">
+              <SectionCard
+                text="6"
+                title="แผนการตัดไม้ (Cutting Optimization)"
+                icon="✂️"
+                color="indigo"
+              >
+                <div className="space-y-4">
                   {cuttingPlan.needSplice && (
-                    <div className="p-3 bg-purple-50 rounded-lg border border-purple-300 text-xs">
+                    <InfoBox color="purple">
                       <div className="flex items-center gap-2 text-purple-700 font-medium mb-1">
                         <span>🔗</span> <span>ต้องต่อไม้โครงตั้ง</span>
                       </div>
@@ -3215,36 +3144,37 @@ export default function DoorConfigurator() {
                           💡 ใช้กาว + ตะปูยึดบริเวณรอยต่อ
                         </div>
                       </div>
-                    </div>
+                    </InfoBox>
                   )}
 
                   <div className="grid grid-cols-4 gap-2 text-xs">
-                    <div className="p-2 bg-indigo-50 rounded-lg text-center">
-                      <div className="text-indigo-600 font-bold text-lg">
-                        {cuttingPlan.totalStocks}
-                      </div>
-                      <div className="text-gray-500">ไม้ที่ใช้ (ท่อน)</div>
-                    </div>
-                    <div className="p-2 bg-green-50 rounded-lg text-center">
-                      <div className="text-green-600 font-bold text-lg">
-                        {cuttingPlan.efficiency}%
-                      </div>
-                      <div className="text-gray-500">ประสิทธิภาพ</div>
-                    </div>
-                    <div className="p-2 bg-blue-50 rounded-lg text-center">
-                      <div className="text-blue-600 font-bold text-lg">
-                        {cuttingPlan.usedWithoutKerf}
-                      </div>
-                      <div className="text-gray-500">ใช้จริง (mm)</div>
-                    </div>
-                    <div className="p-2 bg-red-50 rounded-lg text-center">
-                      <div className="text-red-600 font-bold text-lg">
-                        {cuttingPlan.totalWaste}
-                      </div>
-                      <div className="text-gray-500">เศษเหลือ (mm)</div>
-                    </div>
+                    <StatCard
+                      value={cuttingPlan.totalStocks}
+                      label="ไม้ที่ใช้ (ท่อน)"
+                      bgColor="bg-indigo-50"
+                      textColor="text-indigo-600"
+                    />
+                    <StatCard
+                      value={`${cuttingPlan.efficiency}%`}
+                      label="ประสิทธิภาพ"
+                      bgColor="bg-green-50"
+                      textColor="text-green-600"
+                    />
+                    <StatCard
+                      value={cuttingPlan.usedWithoutKerf}
+                      label="ใช้จริง (mm)"
+                      bgColor="bg-blue-50"
+                      textColor="text-blue-600"
+                    />
+                    <StatCard
+                      value={cuttingPlan.totalWaste}
+                      label="เศษเหลือ (mm)"
+                      bgColor="bg-red-50"
+                      textColor="text-red-600"
+                    />
                   </div>
 
+                  {/* Piece list */}
                   <div className="border rounded-lg overflow-hidden">
                     <div className="bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-700">
                       📋 รายการชิ้นส่วน (เผื่อรอยเลื่อย {cuttingPlan.sawKerf}mm)
@@ -3278,6 +3208,7 @@ export default function DoorConfigurator() {
                     </div>
                   </div>
 
+                  {/* Stock visualization */}
                   <div className="border rounded-lg overflow-hidden">
                     <div className="bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-700">
                       🪵 แผนการตัด (ไม้ยาว {cuttingPlan.stockLength}mm ×{" "}
@@ -3347,20 +3278,21 @@ export default function DoorConfigurator() {
                     </div>
                   </div>
 
+                  {/* Efficiency bar */}
                   <div className="p-2 bg-gray-50 rounded-lg">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-gray-600">
                         ประสิทธิภาพการใช้ไม้
                       </span>
                       <span
-                        className={`font-bold ${parseFloat(cuttingPlan.efficiency) >= 80 ? "text-green-600" : parseFloat(cuttingPlan.efficiency) >= 60 ? "text-yellow-600" : "text-red-600"}`}
+                        className={`font-bold ${getEfficiencyColor(cuttingPlan.efficiency).text}`}
                       >
                         {cuttingPlan.efficiency}%
                       </span>
                     </div>
                     <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all ${parseFloat(cuttingPlan.efficiency) >= 80 ? "bg-green-500" : parseFloat(cuttingPlan.efficiency) >= 60 ? "bg-yellow-500" : "bg-red-500"}`}
+                        className={`h-full rounded-full transition-all ${getEfficiencyColor(cuttingPlan.efficiency).bg}`}
                         style={{ width: `${cuttingPlan.efficiency}%` }}
                       />
                     </div>
@@ -3371,40 +3303,38 @@ export default function DoorConfigurator() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </SectionCard>
             ) : (
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-gray-400 to-gray-500 px-4 py-2.5">
-                  <h3 className="text-base font-semibold text-white flex items-center gap-2">
-                    <span className="bg-white text-gray-400 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">
-                      6
-                    </span>
-                    <span>✂️</span>
-                    แผนการตัดไม้ (Cutting Optimization)
-                  </h3>
-                </div>
-                <div className="p-8 text-center text-gray-400">
-                  <svg
-                    className="w-16 h-16 mx-auto mb-3 opacity-30"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <p className="text-sm font-medium mb-1">
-                    กรุณากรอกข้อมูลสเปคประตูให้ครบ
-                  </p>
-                  <p className="text-xs">ระบบจะคำนวณแผนการตัดไม้ให้อัตโนมัติ</p>
-                </div>
-              </div>
+              <SectionCard
+                text="6"
+                title="แผนการตัดไม้ (Cutting Optimization)"
+                icon="✂️"
+                color="gray"
+              >
+                <EmptyState
+                  icon={
+                    <svg
+                      className="w-16 h-16 mx-auto mb-3 opacity-30"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1}
+                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                      />
+                    </svg>
+                  }
+                  title="กรุณากรอกข้อมูลสเปคประตูให้ครบ"
+                  subtitle="ระบบจะคำนวณแผนการตัดไม้ให้อัตโนมัติ"
+                />
+              </SectionCard>
             )}
           </div>
+
+          {/* Right Panel - Drawing */}
           <div className="lg:col-span-3">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-4">
               <div className="bg-gradient-to-r from-slate-700 to-slate-800 px-4 py-2.5 flex justify-between items-center">
@@ -3445,26 +3375,25 @@ export default function DoorConfigurator() {
                     </div>
                   </>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-96 text-gray-400">
-                    <svg
-                      className="w-24 h-24 mb-4 opacity-30"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1}
-                        d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
-                      />
-                    </svg>
-                    <p className="text-lg font-medium mb-2">
-                      กรุณากรอกข้อมูลสเปคประตู
-                    </p>
-                    <p className="text-sm">
-                      ระบุ ความหนา (T), ความกว้าง (W), ความสูง (H)
-                    </p>
+                  <EmptyState
+                    icon={
+                      <svg
+                        className="w-24 h-24 mb-4 opacity-30"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1}
+                          d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+                        />
+                      </svg>
+                    }
+                    title="กรุณากรอกข้อมูลสเปคประตู"
+                    subtitle="ระบุ ความหนา (T), ความกว้าง (W), ความสูง (H)"
+                  >
                     <div className="mt-4 flex gap-2 text-xs">
                       <span
                         className={`px-2 py-1 rounded ${doorThickness ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
@@ -3482,28 +3411,23 @@ export default function DoorConfigurator() {
                         H: {doorHeight || "—"}
                       </span>
                     </div>
-                  </div>
+                  </EmptyState>
                 )}
               </div>
             </div>
           </div>
         </div>
-
-        <div className="mt-4 text-center text-gray-500 text-xs">
-          C.H.H INDUSTRY CO., LTD. | Door Configuration System v43.0 -
-          Professional Drawing Layout
-        </div>
       </div>
 
       {/* Drawing Modal */}
-      <DrawingModal
+      <Modal
         isOpen={isDrawingModalOpen}
         onClose={() => setIsDrawingModalOpen(false)}
       >
         <div className="min-w-[90vw] max-w-[95vw]">
           <EngineeringDrawing results={results} />
         </div>
-      </DrawingModal>
+      </Modal>
     </div>
   );
 }
