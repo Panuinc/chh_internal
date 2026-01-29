@@ -617,7 +617,7 @@ export default function DoorConfigurator() {
     const { W, H, F, DF, totalFrameWidth, railSections, lockBlockCount } =
       results;
     const stockLength = currentFrame.length || 2040;
-    const sawKerf = 3;
+    const sawKerf = 5;
     const needSplice = currentFrame.needSplice || false;
     const spliceOverlap = currentFrame.spliceOverlap || 100;
 
@@ -1265,7 +1265,7 @@ export default function DoorConfigurator() {
           />
         </g>
 
-        {/* ==================== 3. BACK VIEW (ล่างซ้าย) ==================== */}
+        {/* ==================== 2. BACK VIEW (ล่างซ้าย) ==================== */}
         <g id="back-view">
           <text
             x={backViewX + bW / 2}
@@ -1569,7 +1569,7 @@ export default function DoorConfigurator() {
           )}
         </g>
 
-        {/* ==================== 4. SIDE VIEW (กลางล่าง) ==================== */}
+        {/* ==================== 3. SIDE VIEW (กลางล่าง) ==================== */}
         <g id="side-view">
           <text
             x={sideViewX + sT / 2}
@@ -1754,7 +1754,7 @@ export default function DoorConfigurator() {
           />
         </g>
 
-        {/* ==================== 5. FRONT VIEW (ขวาล่าง) ==================== */}
+        {/* ==================== 4. FRONT VIEW (ขวาล่าง) ==================== */}
         <g id="front-view">
           <text
             x={frontViewX + fW / 2}
