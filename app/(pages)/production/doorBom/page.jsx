@@ -596,8 +596,6 @@ CenterLine.displayName = "CenterLine";
 const LockBlockSVG = memo(({ x, y, width, height }) => (
   <g className="layer-lockblock">
     <rect x={x} y={y} width={width} height={height} fill="url(#hatch-lockblock)" stroke="#000000" strokeWidth="0.8" />
-    <line x1={x} y1={y} x2={x + width} y2={y + height} stroke="#000000" strokeWidth="0.4" />
-    <line x1={x + width} y1={y} x2={x} y2={y + height} stroke="#000000" strokeWidth="0.4" />
   </g>
 ));
 LockBlockSVG.displayName = "LockBlockSVG";
@@ -1202,7 +1200,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                     </pattern>
 
                     <pattern id="hatch-rails" patternUnits="userSpaceOnUse" width="4" height="4">
-                      <rect width="4" height="4" fill="#000000" opacity="0.1" />
+                      <path d="M0 2 L4 2" stroke="#000000" stroke-width="0.4" opacity="0.3" />
                     </pattern>
 
                     <pattern id="hatch-lockblock" patternUnits="userSpaceOnUse" width="4" height="4">
