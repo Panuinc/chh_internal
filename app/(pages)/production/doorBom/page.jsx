@@ -418,8 +418,10 @@ const useCuttingPlan = (results, currentFrame) => {
 
     if (doubleFrame?.hasAny && doubleFrame.count > 0) {
       const count = doubleFrame.count;
+
       const addDoubleVertical = (label, enabled) => {
         if (!enabled) return;
+
         if (needSplice && clearHeight > stockLength) {
           const pieceLength = Math.ceil(clearHeight / 2) + spliceOverlap / 2;
           addPiece(label + " (ท่อน 1)", pieceLength, count, "warning", true);
@@ -428,10 +430,25 @@ const useCuttingPlan = (results, currentFrame) => {
           addPiece(label, clearHeight, count, "warning");
         }
       };
+
       const addDoubleHorizontal = (label, enabled) => {
         if (!enabled) return;
-        addPiece(label, clearWidth, count, "secondary");
+
+        let length = clearWidth;
+
+        const activeVerticalSides = (doubleFrame.left ? 1 : 0) + (doubleFrame.right ? 1 : 0);
+
+        if (activeVerticalSides > 0) {
+          length -= F * activeVerticalSides * count;
+        }
+
+        if (length <= 0) {
+          length = clearWidth;
+        }
+
+        addPiece(label, length, count, "secondary");
       };
+
       addDoubleVertical("เบิ้ลโครงตั้งซ้าย", doubleFrame.left);
       addDoubleVertical("เบิ้ลโครงตั้งขวา", doubleFrame.right);
       addDoubleVertical("โครงกลาง", doubleFrame.center);
@@ -440,11 +457,18 @@ const useCuttingPlan = (results, currentFrame) => {
     }
 
     const railCount = railSections - 1;
-    if (railCount > 0) addPiece("ไม้ดาม", clearWidth, railCount, "primary");
-    if (lockBlockCount > 0) {
-      addPiece("Lock Block", LOCK_BLOCK_HEIGHT, lockBlockCount, "danger", false, false);
+    if (railCount > 0) {
+      addPiece("ไม้ดาม", clearWidth, railCount, "primary");
     }
-    const allPieces = cutPieces.flatMap((piece) => Array.from({ length: piece.qty }, (_, i) => ({ ...piece, id: `${piece.name}-${i + 1}` }))).sort((a, b) => (b.cutLength ?? b.length) - (a.cutLength ?? a.length));
+
+    const allPieces = cutPieces
+      .flatMap((piece) =>
+        Array.from({ length: piece.qty }, (_, i) => ({
+          ...piece,
+          id: `${piece.name}-${i + 1}`,
+        })),
+      )
+      .sort((a, b) => (b.cutLength ?? b.length) - (a.cutLength ?? a.length));
 
     const stocks = [];
     allPieces.forEach((piece) => {
@@ -465,12 +489,10 @@ const useCuttingPlan = (results, currentFrame) => {
       }
     });
 
-    const usedCutLength = allPieces.reduce((sum, p) => sum + (p.cutLength ?? p.length), 0);
-
+    const usedWithoutKerf = allPieces.reduce((sum, p) => sum + p.length, 0);
     const totalStocks = stocks.length;
     const totalWaste = stocks.reduce((sum, s) => sum + s.remaining, 0);
     const totalStock = totalStocks * stockLength;
-    const usedWithoutKerf = allPieces.reduce((sum, p) => sum + p.length, 0);
     const efficiency = totalStock ? ((usedWithoutKerf / totalStock) * 100).toFixed(1) : "0.0";
     const spliceCount = cutPieces.filter((p) => p.isSplice).reduce((sum, p) => sum + p.qty, 0) / 2;
 
