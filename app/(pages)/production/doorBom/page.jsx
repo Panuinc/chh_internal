@@ -1019,7 +1019,7 @@ export default function DoorConfigurator() {
                 <div className="flex items-center justify-center w-full h-full p-2 gap-2">
                   <Select name="lockBlockPosition" label="ตำแหน่ง Lock Block" labelPlacement="outside" placeholder="Please Select" color="default" variant="bordered" size="md" radius="md" selectedKeys={lockBlockPosition ? [lockBlockPosition] : []} onSelectionChange={(keys) => setLockBlockPosition([...keys][0] || "")}>
                     {LOCK_BLOCK_POSITIONS.map((pos) => (
-                      <SelectItem key={pos.value}>
+                      <SelectItem key={pos.value} textValue={`${pos.label} (${pos.value === "both" ? `${piecesPerSide * 2} ชิ้น` : `${piecesPerSide} ชิ้น`})`}>
                         {pos.label} ({pos.value === "both" ? `${piecesPerSide * 2} ชิ้น` : `${piecesPerSide} ชิ้น`})
                       </SelectItem>
                     ))}
