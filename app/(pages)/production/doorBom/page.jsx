@@ -804,7 +804,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
         H: safeH * DRAWING_SCALE,
         F: safeF * DRAWING_SCALE,
         DF: drawingDF * DRAWING_SCALE,
-        totalFrame: (totalFrameWidth || safeF) * DRAWING_SCALE,
+        totalFrame: safeF * DRAWING_SCALE,
         R: safeR * DRAWING_SCALE,
         lockBlockW: safeF * DRAWING_SCALE,
       },
@@ -814,7 +814,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
         S: safeS * DRAWING_SCALE,
       },
     }),
-    [safeW, safeH, safeT, safeS, safeF, safeR, drawingDF, totalFrameWidth],
+    [safeW, safeH, safeT, safeS, safeF, safeR, drawingDF],
   );
 
   const marginX = 150;
@@ -913,10 +913,19 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
     const lockBlockH = LOCK_BLOCK_HEIGHT * DRAWING_SCALE;
     const lockBlockY = positions.front.y + dims.front.H - lockBlockBottom * DRAWING_SCALE;
 
+    const getOffset = (isLeft) => {
+      const hasDoubleOnSide = hasDoubleFrame && doubleFrame && doubleFrame.count > 0 && (isLeft ? doubleFrame.left : doubleFrame.right);
+
+      return dims.front.F + (hasDoubleOnSide ? dims.front.DF : 0);
+    };
+
     const renderSide = (isLeft) => {
       if (!(isLeft ? lockBlockLeft : lockBlockRight)) return;
+
+      const offset = getOffset(isLeft);
+
       [...Array(piecesPerSide)].forEach((_, i) => {
-        const x = isLeft ? positions.front.x + dims.front.totalFrame + dims.front.lockBlockW * i : positions.front.x + dims.front.W - dims.front.totalFrame - dims.front.lockBlockW * (i + 1);
+        const x = isLeft ? positions.front.x + offset + dims.front.lockBlockW * i : positions.front.x + dims.front.W - offset - dims.front.lockBlockW * (i + 1);
 
         blocks.push(<LockBlockSVG key={`lb-${isLeft ? "left" : "right"}-${i}`} x={x} y={lockBlockY} width={dims.front.lockBlockW} height={lockBlockH} />);
       });
@@ -926,7 +935,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
     renderSide(false);
 
     return blocks;
-  }, [positions, dims, lockBlockLeft, lockBlockRight, piecesPerSide, lockBlockBottom]);
+  }, [positions, dims, lockBlockLeft, lockBlockRight, piecesPerSide, lockBlockBottom, hasDoubleFrame, doubleFrame]);
 
   const renderDoubleFrames = useCallback(() => {
     if (!hasDoubleFrame) return null;
@@ -1237,11 +1246,19 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                         let lockBlockLeftX = null;
                         let lockBlockRightX = null;
 
+                        const getOffset = (isLeft) => {
+                          const hasDoubleOnSide = hasDoubleFrame && doubleFrame && doubleFrame.count > 0 && (isLeft ? doubleFrame.left : doubleFrame.right);
+
+                          return dims.front.F + (hasDoubleOnSide ? dims.front.DF : 0);
+                        };
+
                         if (lockBlockLeft) {
-                          lockBlockLeftX = positions.front.x + dims.front.totalFrame;
+                          const offsetLeft = getOffset(true);
+                          lockBlockLeftX = positions.front.x + offsetLeft;
                           lockBlockRightX = lockBlockLeftX + dims.front.lockBlockW;
                         } else if (lockBlockRight) {
-                          lockBlockRightX = positions.front.x + dims.front.W - dims.front.totalFrame;
+                          const offsetRight = getOffset(false);
+                          lockBlockRightX = positions.front.x + dims.front.W - offsetRight;
                           lockBlockLeftX = lockBlockRightX - dims.front.lockBlockW;
                         }
 
