@@ -10,6 +10,7 @@ import * as htmlToImage from "html-to-image";
 const GLUE_THICKNESS = 1;
 const LOCK_BLOCK_HEIGHT = 400;
 const LOCK_BLOCK_POSITION = 1000;
+const CUT_ALLOWANCE = 10;
 
 const SURFACE_MATERIALS = [
   { value: "upvc", label: "UPVC" },
@@ -98,16 +99,6 @@ const LEGEND_ITEMS = [
 const GRID_LETTERS = ["A", "B", "C", "D", "E", "F"];
 const GRID_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8];
 
-const THEME = {
-  background: "#FFFFFF",
-  paper: "#FFFFFF",
-  stroke: "#000000",
-  text: "#000000",
-  gridText: "#DCDCDC",
-  border: "#000000",
-  accent: "#4456E9",
-};
-
 const LAYER_CONFIG = {
   grid: { id: "grid", label: "Grid Reference", color: "#DCDCDC", defaultVisible: true },
   title: { id: "title", label: "Title Block", color: "#4456E9", defaultVisible: true },
@@ -175,7 +166,14 @@ const useFrameSelection = (frameType, doorThickness, surfaceThickness, doorHeigh
         const spliceOverlap = 100;
         const totalLength = frame.length * 2 - spliceOverlap;
         if (totalLength >= requiredLength) {
-          return { frame, needSplice: true, spliceCount: 2, spliceOverlap, effectiveLength: totalLength, splicePosition: Math.round(requiredLength / 2) };
+          return {
+            frame,
+            needSplice: true,
+            spliceCount: 2,
+            spliceOverlap,
+            effectiveLength: totalLength,
+            splicePosition: Math.round(requiredLength / 2),
+          };
         }
       }
       return null;
@@ -198,10 +196,20 @@ const useFrameSelection = (frameType, doorThickness, surfaceThickness, doorHeigh
         isFlipped,
         planeAmount,
         needSplice,
-        ...(spliceInfo && { spliceCount: spliceInfo.spliceCount, spliceOverlap: spliceInfo.spliceOverlap, splicePosition: spliceInfo.splicePosition, effectiveLength: spliceInfo.effectiveLength }),
+        ...(spliceInfo && {
+          spliceCount: spliceInfo.spliceCount,
+          spliceOverlap: spliceInfo.spliceOverlap,
+          splicePosition: spliceInfo.splicePosition,
+          effectiveLength: spliceInfo.effectiveLength,
+        }),
         displaySize: createDisplaySize(f, isFlipped, planeAmount, needSplice),
       });
-      return { frames: needSplice ? [mapFrame(spliceInfo.frame)] : frameList.map(mapFrame), needFlip: isFlipped, needPlane: planeAmount > 0, needSplice };
+      return {
+        frames: needSplice ? [mapFrame(spliceInfo.frame)] : frameList.map(mapFrame),
+        needFlip: isFlipped,
+        needPlane: planeAmount > 0,
+        needSplice,
+      };
     };
 
     const strategies = [
@@ -246,7 +254,14 @@ const useFrameSelection = (frameType, doorThickness, surfaceThickness, doorHeigh
 
     const maxLength = Math.max(...frames.map((f) => f.length), 0);
     const maxSpliceLength = maxLength > 0 ? maxLength * 2 - 100 : 0;
-    return { frames: [], needFlip: false, needPlane: false, needSplice: false, noMatch: true, reason: maxLength > 0 ? `ไม่มีไม้ที่ใช้ได้ (ต้องการ ≥${requiredLength}mm, ต่อได้สูงสุด ${maxSpliceLength}mm)` : `ไม่มีไม้ความหนา ${requiredThickness}mm` };
+    return {
+      frames: [],
+      needFlip: false,
+      needPlane: false,
+      needSplice: false,
+      noMatch: true,
+      reason: maxLength > 0 ? `ไม่มีไม้ที่ใช้ได้ (ต้องการ ≥${requiredLength}mm, ต่อได้สูงสุด ${maxSpliceLength}mm)` : `ไม่มีไม้ความหนา ${requiredThickness}mm`,
+    };
   }, [frameType, doorThickness, surfaceThickness, doorHeight]);
 };
 
@@ -349,7 +364,21 @@ const useCalculations = (params) => {
 const useCuttingPlan = (results, currentFrame) => {
   return useMemo(() => {
     if (!results || !currentFrame) {
-      return { cutPieces: [], allPieces: [], stocks: [], totalStocks: 0, totalWaste: 0, totalStock: 0, efficiency: "0.0", stockLength: 2040, sawKerf: 5, usedWithoutKerf: 0, needSplice: false, spliceCount: 0, spliceOverlap: 100 };
+      return {
+        cutPieces: [],
+        allPieces: [],
+        stocks: [],
+        totalStocks: 0,
+        totalWaste: 0,
+        totalStock: 0,
+        efficiency: "0.0",
+        stockLength: 2040,
+        sawKerf: 5,
+        usedWithoutKerf: 0,
+        needSplice: false,
+        spliceCount: 0,
+        spliceOverlap: 100,
+      };
     }
 
     const { W, H, F, railSections, lockBlockCount, doubleFrame } = results;
@@ -359,9 +388,18 @@ const useCuttingPlan = (results, currentFrame) => {
     const spliceOverlap = currentFrame.spliceOverlap || 100;
     const cutPieces = [];
 
-    const addPiece = (name, length, qty, color, isSplice = false) => {
-      if (!length || !qty) return;
-      cutPieces.push({ name, length, qty, color, isSplice });
+    const addPiece = (name, finishedLength, qty, color, isSplice = false) => {
+      if (!finishedLength || !qty) return;
+
+      const cutLength = finishedLength + CUT_ALLOWANCE;
+      cutPieces.push({
+        name,
+        length: finishedLength,
+        cutLength,
+        qty,
+        color,
+        isSplice,
+      });
     };
 
     const stileLength = H;
@@ -405,20 +443,28 @@ const useCuttingPlan = (results, currentFrame) => {
     if (railCount > 0) addPiece("ไม้ดาม", clearWidth, railCount, "primary");
     if (lockBlockCount > 0) addPiece("Lock Block", LOCK_BLOCK_HEIGHT, lockBlockCount, "danger");
 
-    const allPieces = cutPieces.flatMap((piece) => Array.from({ length: piece.qty }, (_, i) => ({ ...piece, id: `${piece.name}-${i + 1}` }))).sort((a, b) => b.length - a.length);
+    const allPieces = cutPieces.flatMap((piece) => Array.from({ length: piece.qty }, (_, i) => ({ ...piece, id: `${piece.name}-${i + 1}` }))).sort((a, b) => (b.cutLength ?? b.length) - (a.cutLength ?? a.length));
 
     const stocks = [];
     allPieces.forEach((piece) => {
-      const pieceWithKerf = piece.length + sawKerf;
+      const pieceWithKerf = (piece.cutLength ?? piece.length) + sawKerf;
       const availableStock = stocks.find((s) => s.remaining >= pieceWithKerf);
+
       if (availableStock) {
         availableStock.pieces.push(piece);
         availableStock.remaining -= pieceWithKerf;
         availableStock.used += pieceWithKerf;
       } else {
-        stocks.push({ length: stockLength, pieces: [piece], remaining: stockLength - pieceWithKerf, used: pieceWithKerf });
+        stocks.push({
+          length: stockLength,
+          pieces: [piece],
+          remaining: stockLength - pieceWithKerf,
+          used: pieceWithKerf,
+        });
       }
     });
+
+    const usedCutLength = allPieces.reduce((sum, p) => sum + (p.cutLength ?? p.length), 0);
 
     const totalStocks = stocks.length;
     const totalWaste = stocks.reduce((sum, s) => sum + s.remaining, 0);
@@ -427,7 +473,21 @@ const useCuttingPlan = (results, currentFrame) => {
     const efficiency = totalStock ? ((usedWithoutKerf / totalStock) * 100).toFixed(1) : "0.0";
     const spliceCount = cutPieces.filter((p) => p.isSplice).reduce((sum, p) => sum + p.qty, 0) / 2;
 
-    return { cutPieces, allPieces, stocks, totalStocks, totalWaste, totalStock, efficiency, stockLength, sawKerf, usedWithoutKerf, needSplice, spliceCount, spliceOverlap };
+    return {
+      cutPieces,
+      allPieces,
+      stocks,
+      totalStocks,
+      totalWaste,
+      totalStock,
+      efficiency,
+      stockLength,
+      sawKerf,
+      usedWithoutKerf,
+      needSplice,
+      spliceCount,
+      spliceOverlap,
+    };
   }, [results, currentFrame]);
 };
 
@@ -493,13 +553,202 @@ const FilledRect = memo(({ x, y, width, height, color, strokeWidth = 1, strokeDa
 });
 FilledRect.displayName = "FilledRect";
 
+const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
+  const stroke = theme?.stroke || "#000";
+  const fill = theme?.text || "#000";
+  const font = "Arial, sans-serif";
+
+  const rows = [
+    { key: "logo", weight: 220 },
+    { key: "company", weight: 95 },
+    { key: "ownerH", weight: 110 },
+    { key: "ownerV", weight: 360 },
+    { key: "pcH", weight: 120 },
+    { key: "pcV", weight: 90 },
+    { key: "dimH", weight: 110 },
+    { key: "dimV", weight: 105 },
+    { key: "typeH", weight: 110 },
+    { key: "typeV", weight: 105 },
+    { key: "issueH", weight: 110 },
+    { key: "issueV", weight: 95 },
+    { key: "drawn", weight: 85 },
+    { key: "checked", weight: 85 },
+    { key: "sale", weight: 85 },
+    { key: "co", weight: 85 },
+    { key: "tol", weight: 235 },
+    { key: "qr", weight: 280 },
+    { key: "thai1", weight: 140 },
+    { key: "thai2", weight: 150 },
+    { key: "sig", weight: 120 },
+    { key: "app", weight: 110 },
+    { key: "footer", weight: 35 },
+  ];
+
+  const total = rows.reduce((s, r) => s + r.weight, 0);
+  const k = h / total;
+
+  const yMap = {};
+  let cy = y;
+  rows.forEach((r) => {
+    const rh = r.weight * k;
+    yMap[r.key] = { y: cy, h: rh };
+    cy += rh;
+  });
+
+  const midY = (key) => yMap[key].y + yMap[key].h / 2;
+
+  const line = (x1, y1, x2, y2, sw = 2) => <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={stroke} strokeWidth={sw} />;
+
+  const txt = (tx, ty, text, opt = {}) => (
+    <text x={tx} y={ty} fill={fill} fontFamily={font} fontSize={opt.size ?? 20} fontWeight={opt.weight ?? 700} textAnchor={opt.anchor ?? "middle"} dominantBaseline="middle" letterSpacing={opt.letterSpacing ?? 0}>
+      {text || ""}
+    </text>
+  );
+
+  const splitHalf = x + w * 0.5;
+  const splitIssue = x + w * 0.66;
+  const splitName = x + w * 0.36;
+  const pad = w * 0.04;
+
+  const owner = data?.projectOwner || "";
+  const projectCode = data?.projectCode || "";
+  const code = data?.code || "";
+  const dimText = data?.dimension || "-";
+  const type = data?.type || "";
+  const issueDate = data?.issueDate || "";
+  const revise = data?.revise ?? "";
+
+  const drawn = data?.drawn || "";
+  const checked = data?.checked || "";
+  const sale = data?.sale || "";
+  const coApproved = data?.coApproved || "";
+
+  return (
+    <g className="layer-title">
+      <rect x={x} y={y} width={w} height={h} fill="none" stroke={stroke} strokeWidth="3" />
+
+      {rows.map((r) => (
+        <React.Fragment key={`h-${r.key}`}>{line(x, yMap[r.key].y, x + w, yMap[r.key].y, 2)}</React.Fragment>
+      ))}
+      {line(x, y + h, x + w, y + h, 3)}
+
+      <rect x={x + pad} y={yMap.logo.y + pad * 0.5} width={w - pad * 2} height={yMap.logo.h - pad} fill="none" stroke={stroke} strokeWidth="2" />
+      {txt(x + w / 2, yMap.logo.y + yMap.logo.h * 0.62, "EVERGREEN", {
+        size: 34,
+        weight: 300,
+        letterSpacing: 8,
+      })}
+      {txt(x + w / 2, yMap.logo.y + yMap.logo.h * 0.8, "GREEN CONSTRUCTION MATERIALS", {
+        size: 16,
+        weight: 300,
+        letterSpacing: 2,
+      })}
+
+      {txt(x + w / 2, midY("company"), "C.H.H. INDUSTRY CO.,LTD .", {
+        size: 26,
+        weight: 600,
+        letterSpacing: 2,
+      })}
+
+      {txt(x + w / 2, midY("ownerH"), "PROJECT OWNER", { size: 38, weight: 900, })}
+      {txt(x + w / 2, midY("ownerV"), owner, { size: 28, weight: 600 })}
+
+      {line(splitHalf, yMap.pcH.y, splitHalf, yMap.pcH.y + yMap.pcH.h + yMap.pcV.h, 2)}
+      {txt(x + (splitHalf - x) / 2, midY("pcH"), "PROJECT CODE", {
+        size: 24,
+        weight: 900,
+      })}
+      {txt(splitHalf + (x + w - splitHalf) / 2, midY("pcH"), "CODE", {
+        size: 32,
+        weight: 900,
+      })}
+      {txt(x + (splitHalf - x) / 2, midY("pcV"), projectCode, { size: 28, weight: 600, })}
+      {txt(splitHalf + (x + w - splitHalf) / 2, midY("pcV"), code, {
+        size: 28,
+        weight: 600,
+      })}
+
+      {txt(x + w / 2, midY("dimH"), "DIMENSION", { size: 34, weight: 900 })}
+      {txt(x + w / 2, midY("dimV"), dimText, { size: 26, weight: 600, })}
+
+      {txt(x + w / 2, midY("typeH"), "TYPE", { size: 34, weight: 900 })}
+      {txt(x + w / 2, midY("typeV"), type, { size: 26, weight: 600, })}
+
+      {line(splitIssue, yMap.issueH.y, splitIssue, yMap.issueH.y + yMap.issueH.h + yMap.issueV.h, 2)}
+      {txt(x + (splitIssue - x) / 2, midY("issueH"), "ISSUE DATE", {
+        size: 30,
+        weight: 900,
+      })}
+      {txt(splitIssue + (x + w - splitIssue) / 2, midY("issueH"), "REVISE", {
+        size: 28,
+        weight: 900,
+      })}
+      {txt(x + (splitIssue - x) / 2, midY("issueV"), issueDate, { size: 26, weight: 600, })}
+      {txt(splitIssue + (x + w - splitIssue) / 2, midY("issueV"), String(revise), {
+        size: 26,
+        weight: 600,
+      })}
+
+      {["drawn", "checked", "sale", "co"].map((kRow) => {
+        const yy = yMap[kRow].y;
+        const hh = yMap[kRow].h;
+        const value = kRow === "drawn" ? drawn : kRow === "checked" ? checked : kRow === "sale" ? sale : coApproved;
+        const label = kRow === "drawn" ? "DRAWN" : kRow === "checked" ? "CHECKED" : kRow === "sale" ? "SALE" : "CO-APPROVED";
+
+        return (
+          <React.Fragment key={`ap-${kRow}`}>
+            {line(splitName, yy, splitName, yy + hh, 2)}
+            {txt(x + (splitName - x) / 2, yy + hh / 2, label, { size: 18, weight: 600, })}
+            <text x={splitName + pad} y={yy + hh / 2} fill={fill} fontFamily={font} fontSize={18} fontWeight={500} textAnchor="start" dominantBaseline="middle">
+              {value || ""}
+            </text>
+          </React.Fragment>
+        );
+      })}
+
+      <text x={x + pad * 2} y={yMap.tol.y + yMap.tol.h * 0.25} fill={fill} fontFamily={font} fontSize={18} fontWeight={500} textAnchor="start" dominantBaseline="middle">
+        Straightness ( ± 4 MM. )
+      </text>
+      <text x={x + pad * 2} y={yMap.tol.y + yMap.tol.h * 0.45} fill={fill} fontFamily={font} fontSize={18} fontWeight={500} textAnchor="start" dominantBaseline="middle">
+        Tolerance ( ± 3 MM. )
+      </text>
+      <text x={x + pad * 2} y={yMap.tol.y + yMap.tol.h * 0.65} fill={fill} fontFamily={font} fontSize={18} fontWeight={500} textAnchor="start" dominantBaseline="middle">
+        Thickness ( ± 1 MM. )
+      </text>
+      <text x={x + pad * 2} y={yMap.tol.y + yMap.tol.h * 0.85} fill={fill} fontFamily={font} fontSize={18} fontWeight={500} textAnchor="start" dominantBaseline="middle">
+        UNIT : Millimeters
+      </text>
+
+      <rect x={x + w * 0.25} y={yMap.qr.y + yMap.qr.h * 0.18} width={w * 0.5} height={yMap.qr.h * 0.55} fill="none" stroke={stroke} strokeWidth="2" />
+      {txt(x + w / 2, yMap.qr.y + yMap.qr.h * 0.48, "QR", { size: 28, weight: 900, })}
+
+      {txt(x + w / 2, midY("thai1"), "*เงื่อนไขการรับประกันสินค้า*", {
+        size: 20,
+        weight: 600,
+      })}
+      {txt(x + w / 2, midY("thai2"), "*ตรวจสอบยืนยันทุกครั้งก่อนเซ็นต์อนุมัติ*", {
+        size: 20,
+        weight: 600,
+      })}
+      {txt(x + w / 2, midY("sig"), "( Customer SIG.)", { size: 20, weight: 600, })}
+      {txt(x + w / 2, midY("app"), "( Approved date )", {
+        size: 20,
+        weight: 600,
+      })}
+
+      <text x={x + w - pad} y={midY("footer")} fill={fill} fontFamily={font} fontSize={18} fontWeight={500} textAnchor="end" dominantBaseline="middle">
+        FP-MR-02-02 Rev.00
+      </text>
+    </g>
+  );
+};
+
 const EnhancedEngineeringDrawing = memo(({ results }) => {
   const svgRef = useRef(null);
   const [visibleLayers, setVisibleLayers] = useState(() => Object.fromEntries(Object.entries(LAYER_CONFIG).map(([key, config]) => [key, config.defaultVisible])));
   const [isExporting, setIsExporting] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
 
-  // ใช้ theme ขาวดำ
   const theme = {
     background: "#FFFFFF",
     paper: "#FFFFFF",
@@ -512,6 +761,23 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
 
   const safeResults = results || {};
   const { W = 0, H = 0, T = 0, S = 0, F = 0, R = 0, totalFrameWidth = 0, railPositions = [], railSections = 3, lockBlockTop = 800, lockBlockBottom = 1200, lockBlockLeft = false, lockBlockRight = false, lockBlockPosition = 1000, lockBlockCount = 0, lockBlockSides = 1, currentFrame = {}, doubleFrame = {} } = safeResults;
+
+  const titleData = useMemo(
+    () => ({
+      projectOwner: safeResults.projectOwner || "",
+      projectCode: safeResults.projectCode || "0",
+      code: safeResults.code || "0",
+      dimension: `${T} × ${W} × ${H} mm`,
+      type: safeResults.type || "",
+      issueDate: safeResults.issueDate || "",
+      revise: safeResults.revise ?? "0",
+      drawn: safeResults.drawn || "",
+      checked: safeResults.checked || "",
+      sale: safeResults.sale || "",
+      coApproved: safeResults.coApproved || "",
+    }),
+    [safeResults, T, W, H],
+  );
 
   const safeH = H > 0 ? H : 2000;
   const safeW = W > 0 ? W : 800;
@@ -741,20 +1007,8 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
     return sides.length > 0 ? `(Double: ${sides.join(", ")} x${doubleFrame.count})` : "(Double)";
   };
 
-  const legendPositions = [
-    { x: 415, yOffset: -105 },
-    { x: 525, yOffset: -105 },
-    { x: 415, yOffset: -88 },
-    { x: 525, yOffset: -88 },
-    { x: 415, yOffset: -71 },
-    { x: 525, yOffset: -71 },
-  ];
-
-  const legendPatternIds = ["hatch-surface", "hatch-frame", "hatch-rails", "hatch-lockblock", "hatch-core", "hatch-doubleframe"];
-
   return (
     <div className="relative w-full h-full flex flex-col bg-default-100 rounded-xl overflow-hidden">
-      {/* Toolbar ด้านบนเดิม ใช้สี UI ของ NextUI ต่อได้ ไม่เกี่ยวกับตัว drawing */}
       <div className="flex items-center justify-between p-2 bg-default-50 border-b-2 border-default gap-2 flex-wrap">
         <div className="flex items-center gap-2">
           <Chip size="sm" variant="shadow">
@@ -857,45 +1111,36 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                 <svg ref={svgRef} viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} width="297mm" height="210mm" className="w-full h-auto" style={{ backgroundColor: theme.paper }}>
                   <style>{layerStyle}</style>
 
-                  {/* HATCH PATTERNS (AutoCAD style) */}
                   <defs>
-                    {/* Surface material: diagonal hatch ห่างๆ */}
                     <pattern id="hatch-surface" patternUnits="userSpaceOnUse" width="8" height="8">
                       <path d="M0 8 L8 0" stroke="#000000" strokeWidth="0.3" />
                     </pattern>
 
-                    {/* Frame: vertical line hatch */}
                     <pattern id="hatch-frame" patternUnits="userSpaceOnUse" width="4" height="4">
                       <path d="M2 0 L2 4" stroke="#000000" strokeWidth="0.4" />
                     </pattern>
 
-                    {/* Rails: fill เทาอ่อน */}
                     <pattern id="hatch-rails" patternUnits="userSpaceOnUse" width="4" height="4">
                       <rect width="4" height="4" fill="#000000" opacity="0.1" />
                     </pattern>
 
-                    {/* Lock block: diagonal hatch ถี่ขึ้น */}
                     <pattern id="hatch-lockblock" patternUnits="userSpaceOnUse" width="4" height="4">
                       <path d="M0 4 L4 0" stroke="#000000" strokeWidth="0.4" />
                     </pattern>
 
-                    {/* Core (Honeycomb): จุดๆ */}
                     <pattern id="hatch-core" patternUnits="userSpaceOnUse" width="6" height="6">
                       <circle cx="3" cy="3" r="0.5" fill="#000000" opacity="0.4" />
                     </pattern>
 
-                    {/* Double frame: cross-hatch */}
                     <pattern id="hatch-doubleframe" patternUnits="userSpaceOnUse" width="6" height="6">
                       <path d="M0 6 L6 0" stroke="#000000" strokeWidth="0.3" />
                       <path d="M0 0 L6 6" stroke="#000000" strokeWidth="0.3" />
                     </pattern>
                   </defs>
 
-                  {/* ขอบกระดาษ */}
                   <rect x="8" y="8" width={viewBoxWidth - 16} height={viewBoxHeight - 16} fill="none" stroke={theme.border} strokeWidth="2" />
                   <rect x="12" y="12" width={viewBoxWidth - 24} height={viewBoxHeight - 24} fill="none" stroke={theme.border} strokeWidth="0.5" />
 
-                  {/* Grid reference */}
                   <g className="layer-grid" fontSize="20" fill={theme.gridText}>
                     {GRID_LETTERS.map((letter, i) => (
                       <text key={`grid-${letter}`} x="40" y={200 + i * 400} textAnchor="middle">
@@ -909,42 +1154,31 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                     ))}
                   </g>
 
-                  {/* Title */}
                   <text x={viewBoxWidth / 2} y="80" textAnchor="middle" fontSize="40" fontWeight="bold" fill={theme.text}>
                     DOOR FRAME STRUCTURE DRAWING
                   </text>
 
-                  {/* SIDE VIEW */}
                   <g id="side-view">
                     <text x={positions.side.x + dims.side.T / 2} y={positions.side.y + dims.side.H + 70} textAnchor="middle" fontSize="28" fontWeight="bold" fill={theme.text}>
                       Side View
                     </text>
 
-                    {/* outline */}
-                    {/* <rect x={positions.side.x} y={positions.side.y} width={dims.side.T} height={dims.side.H} fill={theme.paper} stroke={theme.stroke} strokeWidth="3" /> */}
-
-                    {/* surface ล่าง/บน */}
                     <FilledRect className="layer-surface" x={positions.side.x} y={positions.side.y} width={dims.side.S} height={dims.side.H} patternId="hatch-surface" strokeWidth={0.8} />
                     <FilledRect className="layer-surface" x={positions.side.x + dims.side.T - dims.side.S} y={positions.side.y} width={dims.side.S} height={dims.side.H} patternId="hatch-surface" strokeWidth={0.8} />
 
-                    {/* frame สองฝั่ง */}
                     <FilledRect className="layer-frame" x={positions.side.x + dims.side.S} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} patternId="hatch-frame" />
                     <FilledRect className="layer-frame" x={positions.side.x + dims.side.T - dims.side.S - (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} patternId="hatch-frame" />
 
-                    {/* core */}
                     <FilledRect className="layer-core" x={positions.side.x + dims.side.S + (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.5} height={dims.side.H} patternId="hatch-core" strokeWidth={0.8} strokeDasharray="4,4" />
 
-                    {/* center line */}
                     <CenterLine x1={positions.side.x + dims.side.T / 2} y1={positions.side.y - 40} x2={positions.side.x + dims.side.T / 2} y2={positions.side.y + dims.side.H + 40} theme={theme} />
 
-                    {/* rails (cut section) */}
                     {railPositions.map((pos, idx) => {
                       const railY = positions.side.y + dims.side.H - pos * DRAWING_SCALE;
                       const railH = safeR * DRAWING_SCALE * 0.5;
                       return <FilledRect key={`side-rail-${idx}`} className="layer-rails" x={positions.side.x + dims.side.S} y={railY - railH / 2} width={dims.side.T - 2 * dims.side.S} height={railH} patternId="hatch-rails" />;
                     })}
 
-                    {/* lock block zone outline */}
                     {(lockBlockLeft || lockBlockRight) && <rect className="layer-lockblock" x={positions.side.x + dims.side.S} y={positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE} width={dims.side.T - 2 * dims.side.S} height={LOCK_BLOCK_HEIGHT * DRAWING_SCALE} fill="none" stroke="#000000" strokeWidth="1.4" strokeDasharray="6,4" />}
 
                     {(lockBlockLeft || lockBlockRight) &&
@@ -952,81 +1186,43 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                         const lockBlockTopY = positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE;
                         const lockBlockBottomY = lockBlockTopY + LOCK_BLOCK_HEIGHT * DRAWING_SCALE;
 
-                        // ใช้ขอบ "ซ้าย" เป็น reference แล้ว offset เป็นลบ ให้ออกไปนอกบานด้านซ้าย
-                        return (
-                          <DimLine
-                            x1={positions.side.x} // เดิมใช้ positions.side.x + dims.side.T
-                            y1={lockBlockTopY}
-                            x2={positions.side.x} // ให้ x2 เท่ากัน เพราะ vertical dim
-                            y2={lockBlockBottomY}
-                            value={LOCK_BLOCK_HEIGHT}
-                            offset={-60} // เดิม 60 → ให้ -60 เพื่อออกไปด้านซ้าย
-                            vertical
-                            fontSize={16}
-                            theme={theme}
-                          />
-                        );
+                        return <DimLine x1={positions.side.x} y1={lockBlockTopY} x2={positions.side.x} y2={lockBlockBottomY} value={LOCK_BLOCK_HEIGHT} offset={-60} vertical fontSize={16} theme={theme} />;
                       })()}
 
-                    {/* Dimensions side */}
                     <DimLine x1={positions.side.x} y1={positions.side.y} x2={positions.side.x + dims.side.T} y2={positions.side.y} value={T} offset={-160} fontSize={18} theme={theme} />
                     <DimLine x1={positions.side.x} y1={positions.side.y} x2={positions.side.x + dims.side.S} y2={positions.side.y} value={S} offset={-80} fontSize={18} theme={theme} />
                     <DimLine x1={positions.side.x + dims.side.S} y1={positions.side.y} x2={positions.side.x + dims.side.T - dims.side.S} y2={positions.side.y} value={T - 2 * S} offset={-120} fontSize={18} theme={theme} />
                     <DimLine x1={positions.side.x + dims.side.T} y1={positions.side.y} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={H} offset={100} vertical fontSize={18} theme={theme} />
                   </g>
 
-                  {/* FRONT VIEW */}
                   <g id="front-view">
                     <text x={positions.front.x + dims.front.W / 2} y={positions.front.y + dims.front.H + 70} textAnchor="middle" fontSize="28" fontWeight="bold" fill={theme.text}>
                       Front View
                     </text>
 
-                    {/* outline */}
-                    {/* <rect x={positions.front.x} y={positions.front.y} width={dims.front.W} height={dims.front.H} fill={theme.paper} stroke={theme.stroke} strokeWidth="3" /> */}
-
-                    {/* stiles */}
                     <FilledRect className="layer-frame" x={positions.front.x} y={positions.front.y} width={dims.front.F} height={dims.front.H} patternId="hatch-frame" strokeWidth={1.2} />
                     <FilledRect className="layer-frame" x={positions.front.x + dims.front.W - dims.front.F} y={positions.front.y} width={dims.front.F} height={dims.front.H} patternId="hatch-frame" strokeWidth={1.2} />
 
-                    {/* rails top/bottom */}
                     <FilledRect className="layer-rails" x={positions.front.x + dims.front.F} y={positions.front.y} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} patternId="hatch-rails" strokeWidth={1.2} />
                     <FilledRect className="layer-rails" x={positions.front.x + dims.front.F} y={positions.front.y + dims.front.H - dims.front.F} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} patternId="hatch-rails" strokeWidth={1.2} />
 
-                    {/* double frames */}
                     {renderDoubleFrames()}
 
-                    {/* inner rails */}
                     {railPositions.map((pos, idx) => {
                       const railY = positions.front.y + dims.front.H - pos * DRAWING_SCALE;
                       return <FilledRect key={`front-rail-${idx}`} className="layer-rails" x={positions.front.x + dims.front.F} y={railY - dims.front.R / 2} width={dims.front.W - 2 * dims.front.F} height={dims.front.R} patternId="hatch-rails" strokeWidth={1} />;
                     })}
 
-                    {/* lock blocks */}
                     {renderLockBlocks()}
 
-                    {/* center lines */}
                     <CenterLine x1={positions.front.x + dims.front.W / 2} y1={positions.front.y - 40} x2={positions.front.x + dims.front.W / 2} y2={positions.front.y + dims.front.H + 40} theme={theme} />
                     <CenterLine x1={positions.front.x - 40} y1={positions.front.y + dims.front.H / 2} x2={positions.front.x + dims.front.W + 40} y2={positions.front.y + dims.front.H / 2} theme={theme} />
 
-                    {/* Dimensions front */}
                     <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y} value={W} offset={-160} fontSize={18} theme={theme} />
                     <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x} y2={positions.front.y + dims.front.F} value={F} offset={-80} vertical fontSize={18} theme={theme} />
                     <DimLine x1={positions.front.x + dims.front.W} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={H} offset={100} vertical fontSize={18} theme={theme} />
 
-                    {/* lock block dims */}
-                    {(lockBlockLeft || lockBlockRight) && (
-                      <DimLine
-                        x1={positions.front.x}
-                        y1={positions.front.y + dims.front.H}
-                        x2={positions.front.x}
-                        y2={positions.front.y + dims.front.H - lockBlockPosition * DRAWING_SCALE}
-                        value={lockBlockPosition}
-                        offset={-100} // อันนี้เดิมถูกแล้ว อยู่ซ้ายล่าง
-                        vertical
-                        fontSize={18}
-                        theme={theme}
-                      />
-                    )}
+                    {(lockBlockLeft || lockBlockRight) && <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x} y2={positions.front.y + dims.front.H - lockBlockPosition * DRAWING_SCALE} value={lockBlockPosition} offset={-100} vertical fontSize={18} theme={theme} />}
 
                     {(lockBlockLeft || lockBlockRight) &&
                       (() => {
@@ -1046,36 +1242,13 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
 
                         return (
                           <>
-                            {/* เดิมอยู่ขวา → ย้ายมาอ้างฝั่งซ้าย + offset ติดลบให้หนีออกไปทางซ้าย */}
-                            <DimLine
-                              x1={positions.front.x} // 👈 แก้จาก positions.front.x + dims.front.W
-                              y1={lockBlockTopY}
-                              x2={positions.front.x} // 👈 ให้เท่ากันเพราะเป็นเส้นดิ่ง
-                              y2={lockBlockBottomY}
-                              value={LOCK_BLOCK_HEIGHT}
-                              offset={-60} // 👈 เดิม 60 (ไปขวา) → ใช้ -60 ให้ไปซ้าย
-                              vertical
-                              fontSize={16}
-                              theme={theme}
-                            />
+                            <DimLine x1={positions.front.x} y1={lockBlockTopY} x2={positions.front.x} y2={lockBlockBottomY} value={LOCK_BLOCK_HEIGHT} offset={-60} vertical fontSize={16} theme={theme} />
 
-                            {lockBlockLeftX !== null && lockBlockRightX !== null && (
-                              <DimLine
-                                x1={lockBlockLeftX}
-                                y1={lockBlockBottomY}
-                                x2={lockBlockRightX}
-                                y2={lockBlockBottomY}
-                                value={safeF}
-                                offset={40} // อันนี้เส้นนอนใต้บล็อก ปล่อยไว้ได้
-                                fontSize={16}
-                                theme={theme}
-                              />
-                            )}
+                            {lockBlockLeftX !== null && lockBlockRightX !== null && <DimLine x1={lockBlockLeftX} y1={lockBlockBottomY} x2={lockBlockRightX} y2={lockBlockBottomY} value={safeF} offset={40} fontSize={16} theme={theme} />}
                           </>
                         );
                       })()}
 
-                    {/* rail thickness dim (ตัวอย่างใช้ตัวแรก) */}
                     {railPositions.length > 0 &&
                       (() => {
                         const railPos = railPositions[0];
@@ -1087,7 +1260,6 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                         return <DimLine x1={dx} y1={top} x2={dx} y2={bottom} value={safeR} offset={40} vertical fontSize={16} theme={theme} />;
                       })()}
 
-                    {/* rail positions text */}
                     {railPositions.map((pos, idx) => (
                       <g key={`front-ann-${idx}`} className="layer-dimensions">
                         <line x1={positions.front.x + dims.front.W + 200} y1={positions.front.y + dims.front.H - pos * DRAWING_SCALE} x2={positions.front.x + dims.front.W + 240} y2={positions.front.y + dims.front.H - pos * DRAWING_SCALE} stroke={theme.stroke} strokeWidth="0.8" />
@@ -1098,147 +1270,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                     ))}
                   </g>
 
-                  {/* TITLE / LEGEND / SPEC */}
-                  <g className="layer-title">
-                    <rect x="20" y={viewBoxHeight - 145} width={viewBoxWidth - 40} height="130" fill={theme.paper} stroke={theme.accent} strokeWidth="1.5" rx="3" />
-
-                    {/* SPEC */}
-                    <g id="specs">
-                      <rect x="25" y={viewBoxHeight - 140} width="370" height="20" fill={theme.accent} rx="2" />
-                      <text x="35" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill="#FFFFFF">
-                        📋 SPECIFICATIONS
-                      </text>
-                      <rect x="25" y={viewBoxHeight - 118} width="370" height="100" fill={theme.paper} stroke={`${theme.text}22`} strokeWidth="0.5" />
-                      <text x="35" y={viewBoxHeight - 100} fontSize="8" fill={theme.text} opacity="0.7">
-                        Door Size:
-                      </text>
-                      <text x="35" y={viewBoxHeight - 88} fontSize="11" fontWeight="bold" fill={theme.text}>
-                        {T} × {W} × {H} mm
-                      </text>
-                      <text x="35" y={viewBoxHeight - 70} fontSize="8" fill={theme.text} opacity="0.7">
-                        Surface Material:
-                      </text>
-                      <text x="35" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill={theme.text}>
-                        {currentFrame?.desc?.split(" ")[0] || "-"} {S || 0}
-                        mm × 2
-                      </text>
-                      <text x="35" y={viewBoxHeight - 40} fontSize="8" fill={theme.text} opacity="0.7">
-                        Frame:
-                      </text>
-                      <text x="35" y={viewBoxHeight - 28} fontSize="9" fontWeight="600" fill={theme.text}>
-                        {R || 0}×{F || 0}mm {hasDoubleFrame ? getDoubleFrameDesc() : ""}
-                      </text>
-                      <text x="200" y={viewBoxHeight - 100} fontSize="8" fill={theme.text} opacity="0.7">
-                        Horizontal Rails:
-                      </text>
-                      <text x="200" y={viewBoxHeight - 88} fontSize="9" fontWeight="600" fill={theme.text}>
-                        {railSections - 1} pcs @ {railPositions.join(", ") || "-"} mm
-                      </text>
-                      <text x="200" y={viewBoxHeight - 70} fontSize="8" fill={theme.text} opacity="0.7">
-                        Lock Block:
-                      </text>
-                      <text x="200" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill={theme.text}>
-                        {lockBlockCount} pcs ({R || 0}×{F || 0}×{LOCK_BLOCK_HEIGHT}mm)
-                      </text>
-                      {currentFrame?.code && (
-                        <>
-                          <text x="200" y={viewBoxHeight - 40} fontSize="8" fill={theme.text} opacity="0.7">
-                            ERP Code:
-                          </text>
-                          <text x="200" y={viewBoxHeight - 28} fontSize="8" fontWeight="500" fill={theme.text} fontFamily="monospace">
-                            {currentFrame.code}
-                          </text>
-                        </>
-                      )}
-                    </g>
-
-                    {/* LEGEND */}
-                    <g id="legend">
-                      <rect x="405" y={viewBoxHeight - 140} width="280" height="20" fill={theme.accent} rx="2" />
-                      <text x="415" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill="#FFFFFF">
-                        🎨 LEGEND
-                      </text>
-                      <rect x="405" y={viewBoxHeight - 118} width="280" height="100" fill={theme.paper} stroke={`${theme.text}22`} strokeWidth="0.5" />
-                      {LEGEND_ITEMS.map((item, i) => (
-                        <g key={`legend-${i}`}>
-                          <rect x={legendPositions[i].x} y={viewBoxHeight + legendPositions[i].yOffset} width="16" height="10" fill={`url(#${legendPatternIds[i]})`} stroke="#000000" strokeWidth="0.8" />
-                          <text x={legendPositions[i].x + 20} y={viewBoxHeight + legendPositions[i].yOffset + 8} fontSize="7" fill={theme.text}>
-                            {item.label}
-                          </text>
-                        </g>
-                      ))}
-
-                      {/* center line */}
-                      <line x1="415" y1={viewBoxHeight - 49} x2="431" y2={viewBoxHeight - 49} stroke={theme.text} strokeWidth="0.6" strokeDasharray="10,3,2,3" />
-                      <text x="435" y={viewBoxHeight - 46} fontSize="7" fill={theme.text}>
-                        Center Line
-                      </text>
-
-                      {/* hidden line */}
-                      <line x1="525" y1={viewBoxHeight - 49} x2="541" y2={viewBoxHeight - 49} stroke={theme.text} strokeWidth="0.6" strokeDasharray="3,3" />
-                      <text x="545" y={viewBoxHeight - 46} fontSize="7" fill={theme.text}>
-                        Hidden Line
-                      </text>
-
-                      {/* dimension line */}
-                      <line x1="415" y1={viewBoxHeight - 32} x2="431" y2={viewBoxHeight - 32} stroke={theme.text} strokeWidth="0.6" />
-                      <polygon points={`415,${viewBoxHeight - 32} 418,${viewBoxHeight - 34} 418,${viewBoxHeight - 30}`} fill={theme.text} />
-                      <polygon points={`431,${viewBoxHeight - 32} 428,${viewBoxHeight - 34} 428,${viewBoxHeight - 30}`} fill={theme.text} />
-                      <text x="435" y={viewBoxHeight - 29} fontSize="7" fill={theme.text}>
-                        Dimension Line
-                      </text>
-                    </g>
-
-                    {/* TITLE BLOCK */}
-                    <g id="title-block">
-                      <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="120" fill={theme.paper} stroke={theme.accent} strokeWidth="1.5" rx="2" />
-                      <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="28" fill={theme.accent} rx="2" />
-                      <rect x={viewBoxWidth - 305} y={viewBoxHeight - 115} width="280" height="3" fill={theme.accent} />
-                      <text x={viewBoxWidth - 165} y={viewBoxHeight - 121} textAnchor="middle" fontSize="13" fontWeight="bold" fill="#FFFFFF">
-                        DOOR FRAME ASSEMBLY
-                      </text>
-
-                      <rect x={viewBoxWidth - 300} y={viewBoxHeight - 107} width="270" height="22" fill="#00000011" rx="1" />
-                      <text x={viewBoxWidth - 290} y={viewBoxHeight - 92} fontSize="8" fill={theme.text} opacity="0.7">
-                        Size:
-                      </text>
-                      <text x={viewBoxWidth - 165} y={viewBoxHeight - 91} textAnchor="middle" fontSize="14" fontWeight="bold" fill={theme.text}>
-                        {T} × {W} × {H} mm
-                      </text>
-
-                      <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 82} x2={viewBoxWidth - 30} y2={viewBoxHeight - 82} stroke={`${theme.text}33`} strokeWidth="0.5" />
-
-                      <text x={viewBoxWidth - 290} y={viewBoxHeight - 68} fontSize="8" fill={theme.text} opacity="0.7">
-                        Material:
-                      </text>
-                      <text x={viewBoxWidth - 165} y={viewBoxHeight - 68} textAnchor="middle" fontSize="10" fontWeight="600" fill={theme.text}>
-                        {currentFrame?.desc?.split(" ")[0] || "-"}
-                      </text>
-
-                      <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 55} x2={viewBoxWidth - 30} y2={viewBoxHeight - 55} stroke={`${theme.text}33`} strokeWidth="0.5" />
-                      <line x1={viewBoxWidth - 165} y1={viewBoxHeight - 55} x2={viewBoxWidth - 165} y2={viewBoxHeight - 35} stroke={`${theme.text}33`} strokeWidth="0.5" />
-
-                      <text x={viewBoxWidth - 290} y={viewBoxHeight - 42} fontSize="8" fill={theme.text} opacity="0.7">
-                        Scale:
-                      </text>
-                      <text x={viewBoxWidth - 240} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={theme.text}>
-                        1:25
-                      </text>
-
-                      <text x={viewBoxWidth - 155} y={viewBoxHeight - 42} fontSize="8" fill={theme.text} opacity="0.7">
-                        Rev:
-                      </text>
-                      <text x={viewBoxWidth - 120} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={theme.text}>
-                        1.0
-                      </text>
-
-                      <rect x={viewBoxWidth - 305} y={viewBoxHeight - 35} width="280" height="15" fill={theme.paper} />
-                      <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 35} x2={viewBoxWidth - 30} y2={viewBoxHeight - 35} stroke={`${theme.text}33`} strokeWidth="0.5" />
-                      <text x={viewBoxWidth - 165} y={viewBoxHeight - 24} textAnchor="middle" fontSize="9" fontWeight="bold" fill={theme.accent}>
-                        C.H.H INDUSTRY CO., LTD.
-                      </text>
-                    </g>
-                  </g>
+                  <TitleBlockSVG x={viewBoxWidth - 439} y={9} w={430} h={viewBoxHeight - 17} theme={theme} data={titleData} />
                 </svg>
               </TransformComponent>
             </>
@@ -1246,7 +1278,6 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
         </TransformWrapper>
       </div>
 
-      {/* status bar ล่าง */}
       <div className="flex items-center justify-between px-3 py-1.5 bg-default-50 border-t-2 border-default text-xs text-default-500">
         <div className="flex items-center gap-2">
           <span>
@@ -1279,7 +1310,14 @@ export default function DoorConfigurator() {
   const [selectedFrameCode, setSelectedFrameCode] = useState("");
   const [lockBlockPosition, setLockBlockPosition] = useState("");
   const [lockBlockPiecesPerSide, setLockBlockPiecesPerSide] = useState("");
-  const [doubleFrameSides, setDoubleFrameSides] = useState({ top: false, bottom: false, left: false, center: false, right: false, all: false });
+  const [doubleFrameSides, setDoubleFrameSides] = useState({
+    top: false,
+    bottom: false,
+    left: false,
+    center: false,
+    right: false,
+    all: false,
+  });
   const [doubleFrameCount, setDoubleFrameCount] = useState("");
 
   const lockBlockLeft = lockBlockPosition === "left" || lockBlockPosition === "both";
@@ -1288,7 +1326,18 @@ export default function DoorConfigurator() {
   const frameSelection = useFrameSelection(frameType, doorThickness, surfaceThickness, doorHeight);
 
   const currentFrame = useMemo(() => {
-    if (!frameSelection.frames?.length) return { thickness: 0, width: 0, length: 0, useThickness: 0, useWidth: 0, isFlipped: false, planeAmount: 0, code: "", desc: "" };
+    if (!frameSelection.frames?.length)
+      return {
+        thickness: 0,
+        width: 0,
+        length: 0,
+        useThickness: 0,
+        useWidth: 0,
+        isFlipped: false,
+        planeAmount: 0,
+        code: "",
+        desc: "",
+      };
     return frameSelection.frames.find((f) => f.code === selectedFrameCode) || frameSelection.frames[0];
   }, [frameSelection, selectedFrameCode]);
 
@@ -1298,7 +1347,18 @@ export default function DoorConfigurator() {
 
   const numericDoubleCount = parseInt(doubleFrameCount) || 0;
 
-  const results = useCalculations({ doorThickness, doorWidth, doorHeight, surfaceThickness, currentFrame, lockBlockLeft, lockBlockRight, lockBlockPiecesPerSide, doubleFrameSides, doubleFrameCount: numericDoubleCount });
+  const results = useCalculations({
+    doorThickness,
+    doorWidth,
+    doorHeight,
+    surfaceThickness,
+    currentFrame,
+    lockBlockLeft,
+    lockBlockRight,
+    lockBlockPiecesPerSide,
+    doubleFrameSides,
+    doubleFrameCount: numericDoubleCount,
+  });
   const cuttingPlan = useCuttingPlan(results, currentFrame);
 
   const isDataComplete = doorThickness && doorWidth && doorHeight;
@@ -1307,7 +1367,13 @@ export default function DoorConfigurator() {
   const doubleConfigSummary = useMemo(() => {
     const df = results.doubleFrame;
     if (!df?.hasAny || !df.count) return "";
-    const sideLabels = { top: "บน", bottom: "ล่าง", left: "ซ้าย", center: "กลาง", right: "ขวา" };
+    const sideLabels = {
+      top: "บน",
+      bottom: "ล่าง",
+      left: "ซ้าย",
+      center: "กลาง",
+      right: "ขวา",
+    };
     const sides = Object.entries(sideLabels)
       .filter(([key]) => df[key])
       .map(([_, label]) => label);
@@ -1318,7 +1384,14 @@ export default function DoorConfigurator() {
     setDoubleFrameSides((prev) => {
       if (side === "all") {
         const newValue = !prev.all;
-        return { top: newValue, bottom: newValue, left: newValue, center: newValue, right: newValue, all: newValue };
+        return {
+          top: newValue,
+          bottom: newValue,
+          left: newValue,
+          center: newValue,
+          right: newValue,
+          all: newValue,
+        };
       }
       return { ...prev, [side]: !prev[side], all: false };
     });
@@ -1711,7 +1784,10 @@ export default function DoorConfigurator() {
                   </div>
                 </div>
                 <div className="border-2 border-default rounded-xl overflow-hidden">
-                  <div className="px-3 py-2 text-xs font-semibold bg-default-100">📋 รายการชิ้นส่วน (เผื่อรอยเลื่อย {cuttingPlan.sawKerf}mm)</div>
+                  <div className="px-3 py-2 text-xs font-semibold bg-default-100">
+                    📋 รายการชิ้นส่วน (เผื่อรอยเลื่อย {cuttingPlan.sawKerf}
+                    mm)
+                  </div>
                   <div>
                     {cuttingPlan.cutPieces.map((piece, idx) => (
                       <div key={idx} className={`flex items-center justify-between px-3 py-2 text-xs ${piece.isSplice ? "bg-primary/5" : ""}`}>
@@ -1725,7 +1801,10 @@ export default function DoorConfigurator() {
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <span>{piece.length} mm</span>
+                          <span>
+                            {piece.length} mm <span className="text-foreground/60">(ตัด {piece.cutLength ?? piece.length} mm)</span>
+                          </span>
+
                           <span className="font-bold">×{piece.qty}</span>
                         </div>
                       </div>
@@ -1744,23 +1823,51 @@ export default function DoorConfigurator() {
                           {(() => {
                             let offset = 0;
                             return stock.pieces.map((piece, pieceIdx) => {
-                              const width = (piece.length / stock.length) * 100;
+                              const pieceCut = piece.cutLength ?? piece.length;
+                              const width = (pieceCut / stock.length) * 100;
                               const kerfWidth = (cuttingPlan.sawKerf / stock.length) * 100;
                               const left = offset;
                               offset += width + kerfWidth;
-                              const colorMap = { primary: "#4456E9", secondary: "#FF8A00", warning: "#FFB441", danger: "#FF0076", success: "#10B981" };
+                              const colorMap = {
+                                primary: "#4456E9",
+                                secondary: "#FF8A00",
+                                warning: "#FFB441",
+                                danger: "#FF0076",
+                                success: "#10B981",
+                              };
                               return (
                                 <React.Fragment key={pieceIdx}>
-                                  <div className="absolute h-full flex items-center justify-center text-[8px] font-medium overflow-hidden text-white" style={{ left: `${left}%`, width: `${width}%`, backgroundColor: colorMap[piece.color] || "#DCDCDC" }} title={`${piece.name}: ${piece.length}mm`}>
-                                    {width > 8 && <span className="truncate px-1">{piece.length}</span>}
+                                  <div
+                                    className="absolute h-full flex items-center justify-center text-[8px] font-medium overflow-hidden text-white"
+                                    style={{
+                                      left: `${left}%`,
+                                      width: `${width}%`,
+                                      backgroundColor: colorMap[piece.color] || "#DCDCDC",
+                                    }}
+                                    title={`${piece.name}: ตัด ${pieceCut}mm (ใช้ ${piece.length}mm)`}
+                                  >
+                                    {width > 8 && <span className="truncate px-1">{pieceCut}</span>}
                                   </div>
-                                  {pieceIdx < stock.pieces.length - 1 && <div className="absolute h-full bg-default" style={{ left: `${left + width}%`, width: `${kerfWidth}%` }} />}
+                                  {pieceIdx < stock.pieces.length - 1 && (
+                                    <div
+                                      className="absolute h-full bg-default"
+                                      style={{
+                                        left: `${left + width}%`,
+                                        width: `${kerfWidth}%`,
+                                      }}
+                                    />
+                                  )}
                                 </React.Fragment>
                               );
                             });
                           })()}
                           {stock.remaining > 0 && (
-                            <div className="absolute right-0 h-full flex items-center justify-center text-[8px] bg-white text-foreground/70" style={{ width: `${(stock.remaining / stock.length) * 100}%` }}>
+                            <div
+                              className="absolute right-0 h-full flex items-center justify-center text-[8px] bg-white text-foreground/70"
+                              style={{
+                                width: `${(stock.remaining / stock.length) * 100}%`,
+                              }}
+                            >
                               {stock.remaining > 100 && <span>เศษ {stock.remaining}</span>}
                             </div>
                           )}
