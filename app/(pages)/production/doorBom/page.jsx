@@ -650,7 +650,7 @@ const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
         letterSpacing: 2,
       })}
 
-      {txt(x + w / 2, midY("ownerH"), "PROJECT OWNER", { size: 38, weight: 900, })}
+      {txt(x + w / 2, midY("ownerH"), "PROJECT OWNER", { size: 38, weight: 900 })}
       {txt(x + w / 2, midY("ownerV"), owner, { size: 28, weight: 600 })}
 
       {line(splitHalf, yMap.pcH.y, splitHalf, yMap.pcH.y + yMap.pcH.h + yMap.pcV.h, 2)}
@@ -662,17 +662,17 @@ const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
         size: 32,
         weight: 900,
       })}
-      {txt(x + (splitHalf - x) / 2, midY("pcV"), projectCode, { size: 28, weight: 600, })}
+      {txt(x + (splitHalf - x) / 2, midY("pcV"), projectCode, { size: 28, weight: 600 })}
       {txt(splitHalf + (x + w - splitHalf) / 2, midY("pcV"), code, {
         size: 28,
         weight: 600,
       })}
 
       {txt(x + w / 2, midY("dimH"), "DIMENSION", { size: 34, weight: 900 })}
-      {txt(x + w / 2, midY("dimV"), dimText, { size: 26, weight: 600, })}
+      {txt(x + w / 2, midY("dimV"), dimText, { size: 26, weight: 600 })}
 
       {txt(x + w / 2, midY("typeH"), "TYPE", { size: 34, weight: 900 })}
-      {txt(x + w / 2, midY("typeV"), type, { size: 26, weight: 600, })}
+      {txt(x + w / 2, midY("typeV"), type, { size: 26, weight: 600 })}
 
       {line(splitIssue, yMap.issueH.y, splitIssue, yMap.issueH.y + yMap.issueH.h + yMap.issueV.h, 2)}
       {txt(x + (splitIssue - x) / 2, midY("issueH"), "ISSUE DATE", {
@@ -683,7 +683,7 @@ const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
         size: 28,
         weight: 900,
       })}
-      {txt(x + (splitIssue - x) / 2, midY("issueV"), issueDate, { size: 26, weight: 600, })}
+      {txt(x + (splitIssue - x) / 2, midY("issueV"), issueDate, { size: 26, weight: 600 })}
       {txt(splitIssue + (x + w - splitIssue) / 2, midY("issueV"), String(revise), {
         size: 26,
         weight: 600,
@@ -698,7 +698,7 @@ const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
         return (
           <React.Fragment key={`ap-${kRow}`}>
             {line(splitName, yy, splitName, yy + hh, 2)}
-            {txt(x + (splitName - x) / 2, yy + hh / 2, label, { size: 18, weight: 600, })}
+            {txt(x + (splitName - x) / 2, yy + hh / 2, label, { size: 18, weight: 600 })}
             <text x={splitName + pad} y={yy + hh / 2} fill={fill} fontFamily={font} fontSize={18} fontWeight={500} textAnchor="start" dominantBaseline="middle">
               {value || ""}
             </text>
@@ -720,7 +720,7 @@ const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
       </text>
 
       <rect x={x + w * 0.25} y={yMap.qr.y + yMap.qr.h * 0.18} width={w * 0.5} height={yMap.qr.h * 0.55} fill="none" stroke={stroke} strokeWidth="2" />
-      {txt(x + w / 2, yMap.qr.y + yMap.qr.h * 0.48, "QR", { size: 28, weight: 900, })}
+      {txt(x + w / 2, yMap.qr.y + yMap.qr.h * 0.48, "QR", { size: 28, weight: 900 })}
 
       {txt(x + w / 2, midY("thai1"), "*เงื่อนไขการรับประกันสินค้า*", {
         size: 20,
@@ -730,7 +730,7 @@ const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
         size: 20,
         weight: 600,
       })}
-      {txt(x + w / 2, midY("sig"), "( Customer SIG.)", { size: 20, weight: 600, })}
+      {txt(x + w / 2, midY("sig"), "( Customer SIG.)", { size: 20, weight: 600 })}
       {txt(x + w / 2, midY("app"), "( Approved date )", {
         size: 20,
         weight: 600,
@@ -1219,7 +1219,11 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                     <CenterLine x1={positions.front.x - 40} y1={positions.front.y + dims.front.H / 2} x2={positions.front.x + dims.front.W + 40} y2={positions.front.y + dims.front.H / 2} theme={theme} />
 
                     <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y} value={W} offset={-160} fontSize={18} theme={theme} />
+
+                    <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.F} y2={positions.front.y} value={F} offset={-80} fontSize={18} theme={theme} />
+
                     <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x} y2={positions.front.y + dims.front.F} value={F} offset={-80} vertical fontSize={18} theme={theme} />
+
                     <DimLine x1={positions.front.x + dims.front.W} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={H} offset={100} vertical fontSize={18} theme={theme} />
 
                     {(lockBlockLeft || lockBlockRight) && <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x} y2={positions.front.y + dims.front.H - lockBlockPosition * DRAWING_SCALE} value={lockBlockPosition} offset={-100} vertical fontSize={18} theme={theme} />}
@@ -1257,7 +1261,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                         const bottom = railCenter + dims.front.R / 2;
                         const dx = positions.front.x + dims.front.W + 120;
 
-                        return <DimLine x1={dx} y1={top} x2={dx} y2={bottom} value={safeR} offset={40} vertical fontSize={16} theme={theme} />;
+                        return <DimLine x1={dx} y1={top} x2={dx} y2={bottom} value={F} offset={40} vertical fontSize={16} theme={theme} />;
                       })()}
 
                     {railPositions.map((pos, idx) => (
@@ -1342,6 +1346,7 @@ export default function DoorConfigurator() {
   }, [frameSelection, selectedFrameCode]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (frameSelection.frames?.length > 0) setSelectedFrameCode(frameSelection.frames[0].code);
   }, [frameSelection]);
 
