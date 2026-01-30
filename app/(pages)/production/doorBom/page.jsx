@@ -1,7 +1,11 @@
 "use client";
-import { Calculator, RulerDimensionLine, ZoomIn } from "lucide-react";
-import React, { useState, useMemo, useRef, useEffect } from "react";
-import { Button, Input, Select, SelectItem, Card, CardHeader, CardBody, Chip, Divider, Progress } from "@heroui/react";
+import React, { useState, useMemo, useRef, useEffect, useCallback, memo } from "react";
+import { Calculator, RulerDimensionLine, ZoomIn, ZoomOut, Maximize2, RotateCcw, Download, Layers, FileImage, FileText, FileCode, Printer, ChevronDown, Copy } from "lucide-react";
+import { Button, Input, Select, SelectItem, Card, CardHeader, CardBody, Chip, Divider, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Switch, Tooltip, Popover, PopoverTrigger, PopoverContent } from "@heroui/react";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import jsPDF from "jspdf";
+import { svg2pdf } from "svg2pdf.js";
+import * as htmlToImage from "html-to-image";
 
 const GLUE_THICKNESS = 1;
 const LOCK_BLOCK_HEIGHT = 400;
@@ -94,6 +98,29 @@ const LEGEND_ITEMS = [
 const GRID_LETTERS = ["A", "B", "C", "D", "E", "F"];
 const GRID_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8];
 
+const THEME = {
+  background: "#FFFFFF",
+  paper: "#FFFFFF",
+  stroke: "#000000",
+  text: "#000000",
+  gridText: "#DCDCDC",
+  border: "#000000",
+  accent: "#4456E9",
+};
+
+const LAYER_CONFIG = {
+  grid: { id: "grid", label: "Grid Reference", color: "#DCDCDC", defaultVisible: true },
+  title: { id: "title", label: "Title Block", color: "#4456E9", defaultVisible: true },
+  dimensions: { id: "dimensions", label: "Dimensions", color: "#000000", defaultVisible: true },
+  centerlines: { id: "centerlines", label: "Center Lines", color: "#666666", defaultVisible: true },
+  surface: { id: "surface", label: "Surface Material", color: "#10B981", defaultVisible: true },
+  frame: { id: "frame", label: "Frame (Stile)", color: "#FFB441", defaultVisible: true },
+  rails: { id: "rails", label: "Frame (Rail)", color: "#FF8A00", defaultVisible: true },
+  lockblock: { id: "lockblock", label: "Lock Block", color: "#FF0076", defaultVisible: true },
+  core: { id: "core", label: "Core (Honeycomb)", color: "#4456E9", defaultVisible: true },
+  doubleframe: { id: "doubleframe", label: "Double Frame", color: "#FFB441", defaultVisible: true },
+};
+
 const formatDimension = (t, w, h, separator = "×") => `${t || "-"}${separator}${w || "-"}${separator}${h || "-"}`;
 const getMaterialLabel = (materials, value) => materials.find((m) => m.value === value)?.label || "-";
 
@@ -102,6 +129,35 @@ const getEfficiencyColor = (efficiency) => {
   if (val >= 80) return "success";
   if (val >= 60) return "warning";
   return "danger";
+};
+
+const generateDXF = (results) => {
+  if (!results) return "";
+  const { W = 0, H = 0, F = 0, railPositions = [] } = results;
+
+  let dxf = `0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n`;
+  const offsetX = 100;
+  const offsetY = 100;
+
+  const addLine = (x1, y1, x2, y2) => `0\nLINE\n8\n0\n10\n${x1}\n20\n${y1}\n30\n0\n11\n${x2}\n21\n${y2}\n31\n0\n`;
+
+  dxf += addLine(offsetX, offsetY, offsetX + W, offsetY);
+  dxf += addLine(offsetX + W, offsetY, offsetX + W, offsetY + H);
+  dxf += addLine(offsetX + W, offsetY + H, offsetX, offsetY + H);
+  dxf += addLine(offsetX, offsetY + H, offsetX, offsetY);
+
+  dxf += addLine(offsetX + F, offsetY, offsetX + F, offsetY + H);
+  dxf += addLine(offsetX + W - F, offsetY, offsetX + W - F, offsetY + H);
+  dxf += addLine(offsetX + F, offsetY + F, offsetX + W - F, offsetY + F);
+  dxf += addLine(offsetX + F, offsetY + H - F, offsetX + W - F, offsetY + H - F);
+
+  railPositions?.forEach((pos) => {
+    const railY = offsetY + H - pos;
+    dxf += addLine(offsetX + F, railY, offsetX + W - F, railY);
+  });
+
+  dxf += `0\nENDSEC\n0\nEOF`;
+  return dxf;
 };
 
 const useFrameSelection = (frameType, doorThickness, surfaceThickness, doorHeight) => {
@@ -204,8 +260,8 @@ const useCalculations = (params) => {
     const S = parseFloat(surfaceThickness) || 0;
     const totalSurfaceThickness = (S + GLUE_THICKNESS) * 2;
     const frameThickness = T - totalSurfaceThickness;
-    const F = currentFrame.useWidth || 0;
-    const R = currentFrame.useThickness || 0;
+    const F = currentFrame?.useWidth || 0;
+    const R = currentFrame?.useThickness || 0;
 
     const effectiveSides = {
       top: !!(doubleFrameSides?.all || doubleFrameSides?.top),
@@ -232,7 +288,7 @@ const useCalculations = (params) => {
 
     const railPositions = [];
     const railPositionsOriginal = [];
-    const railThickness = currentFrame.useWidth || 50;
+    const railThickness = currentFrame?.useWidth || 50;
     const hasLockBlock = lockBlockLeft || lockBlockRight;
 
     for (let i = 1; i < railSections; i++) {
@@ -257,12 +313,45 @@ const useCalculations = (params) => {
     const lockBlockCount = lockBlockSides * piecesPerSide;
     const railsAdjusted = railPositions.some((pos, idx) => pos !== railPositionsOriginal[idx]);
 
-    return { T, W, H, S, F, DF, R, totalSurfaceThickness, frameThickness, totalFrameWidth, innerWidth, innerHeight, doorArea, railPositions, railPositionsOriginal, railSections, railsAdjusted, lockBlockTop, lockBlockBottom, lockBlockHeight: LOCK_BLOCK_HEIGHT, lockBlockPosition: LOCK_BLOCK_POSITION, lockBlockWidth: F, lockBlockCount, lockBlockSides, lockBlockLeft, lockBlockRight, currentFrame, doubleFrame: { count: numericDoubleCount, ...effectiveSides, hasAny: hasDoubleFrame } };
+    return {
+      T,
+      W,
+      H,
+      S,
+      F,
+      DF,
+      R,
+      totalSurfaceThickness,
+      frameThickness,
+      totalFrameWidth,
+      innerWidth,
+      innerHeight,
+      doorArea,
+      railPositions,
+      railPositionsOriginal,
+      railSections,
+      railsAdjusted,
+      lockBlockTop,
+      lockBlockBottom,
+      lockBlockHeight: LOCK_BLOCK_HEIGHT,
+      lockBlockPosition: LOCK_BLOCK_POSITION,
+      lockBlockWidth: F,
+      lockBlockCount,
+      lockBlockSides,
+      lockBlockLeft,
+      lockBlockRight,
+      currentFrame,
+      doubleFrame: { count: numericDoubleCount, ...effectiveSides, hasAny: hasDoubleFrame },
+    };
   }, [doorThickness, doorWidth, doorHeight, surfaceThickness, currentFrame, lockBlockLeft, lockBlockRight, lockBlockPiecesPerSide, doubleFrameSides, doubleFrameCount]);
 };
 
 const useCuttingPlan = (results, currentFrame) => {
   return useMemo(() => {
+    if (!results || !currentFrame) {
+      return { cutPieces: [], allPieces: [], stocks: [], totalStocks: 0, totalWaste: 0, totalStock: 0, efficiency: "0.0", stockLength: 2040, sawKerf: 5, usedWithoutKerf: 0, needSplice: false, spliceCount: 0, spliceOverlap: 100 };
+    }
+
     const { W, H, F, railSections, lockBlockCount, doubleFrame } = results;
     const stockLength = currentFrame.length || 2040;
     const sawKerf = 5;
@@ -342,7 +431,9 @@ const useCuttingPlan = (results, currentFrame) => {
   }, [results, currentFrame]);
 };
 
-const DimLine = ({ x1, y1, x2, y2, value, offset = 25, vertical = false, color = "#000000", fontSize = 9, unit = "" }) => {
+const DimLine = memo(({ x1, y1, x2, y2, value, offset = 25, vertical = false, color = "#000000", fontSize = 9, unit = "", theme }) => {
+  const strokeColor = theme?.stroke || color;
+  const paperColor = theme?.paper || "#FFFFFF";
   const arrowSize = 3;
   const displayValue = unit ? `${value}${unit}` : value;
   const textWidth = String(displayValue).length * 4 + 8;
@@ -351,14 +442,14 @@ const DimLine = ({ x1, y1, x2, y2, value, offset = 25, vertical = false, color =
     const lineX = x1 + offset;
     const midY = (y1 + y2) / 2;
     return (
-      <g>
-        <line x1={x1 + 2} y1={y1} x2={lineX + 3} y2={y1} stroke={color} strokeWidth="0.4" />
-        <line x1={x1 + 2} y1={y2} x2={lineX + 3} y2={y2} stroke={color} strokeWidth="0.4" />
-        <line x1={lineX} y1={y1} x2={lineX} y2={y2} stroke={color} strokeWidth="0.6" />
-        <polygon points={`${lineX},${y1} ${lineX - arrowSize},${y1 + arrowSize * 1.5} ${lineX + arrowSize},${y1 + arrowSize * 1.5}`} fill={color} />
-        <polygon points={`${lineX},${y2} ${lineX - arrowSize},${y2 - arrowSize * 1.5} ${lineX + arrowSize},${y2 - arrowSize * 1.5}`} fill={color} />
-        <rect x={lineX - textWidth / 2} y={midY - 6} width={textWidth} height="12" fill="#FFFFFF" />
-        <text x={lineX} y={midY + 3} textAnchor="middle" fontSize={fontSize} fontWeight="500" fill={color}>
+      <g className="layer-dimensions">
+        <line x1={x1 + 2} y1={y1} x2={lineX + 3} y2={y1} stroke={strokeColor} strokeWidth="0.4" />
+        <line x1={x1 + 2} y1={y2} x2={lineX + 3} y2={y2} stroke={strokeColor} strokeWidth="0.4" />
+        <line x1={lineX} y1={y1} x2={lineX} y2={y2} stroke={strokeColor} strokeWidth="0.6" />
+        <polygon points={`${lineX},${y1} ${lineX - arrowSize},${y1 + arrowSize * 1.5} ${lineX + arrowSize},${y1 + arrowSize * 1.5}`} fill={strokeColor} />
+        <polygon points={`${lineX},${y2} ${lineX - arrowSize},${y2 - arrowSize * 1.5} ${lineX + arrowSize},${y2 - arrowSize * 1.5}`} fill={strokeColor} />
+        <rect x={lineX - textWidth / 2} y={midY - 6} width={textWidth} height="12" fill={paperColor} />
+        <text x={lineX} y={midY + 3} textAnchor="middle" fontSize={fontSize} fontWeight="500" fill={strokeColor}>
           {displayValue}
         </text>
       </g>
@@ -368,32 +459,36 @@ const DimLine = ({ x1, y1, x2, y2, value, offset = 25, vertical = false, color =
   const lineY = y1 + offset;
   const midX = (x1 + x2) / 2;
   return (
-    <g>
-      <line x1={x1} y1={y1 + 2} x2={x1} y2={lineY + 3} stroke={color} strokeWidth="0.4" />
-      <line x1={x2} y1={y1 + 2} x2={x2} y2={lineY + 3} stroke={color} strokeWidth="0.4" />
-      <line x1={x1} y1={lineY} x2={x2} y2={lineY} stroke={color} strokeWidth="0.6" />
-      <polygon points={`${x1},${lineY} ${x1 + arrowSize * 1.5},${lineY - arrowSize} ${x1 + arrowSize * 1.5},${lineY + arrowSize}`} fill={color} />
-      <polygon points={`${x2},${lineY} ${x2 - arrowSize * 1.5},${lineY - arrowSize} ${x2 - arrowSize * 1.5},${lineY + arrowSize}`} fill={color} />
-      <rect x={midX - textWidth / 2} y={lineY - 6} width={textWidth} height="12" fill="#FFFFFF" />
-      <text x={midX} y={lineY + 3} textAnchor="middle" fontSize={fontSize} fontWeight="500" fill={color}>
+    <g className="layer-dimensions">
+      <line x1={x1} y1={y1 + 2} x2={x1} y2={lineY + 3} stroke={strokeColor} strokeWidth="0.4" />
+      <line x1={x2} y1={y1 + 2} x2={x2} y2={lineY + 3} stroke={strokeColor} strokeWidth="0.4" />
+      <line x1={x1} y1={lineY} x2={x2} y2={lineY} stroke={strokeColor} strokeWidth="0.6" />
+      <polygon points={`${x1},${lineY} ${x1 + arrowSize * 1.5},${lineY - arrowSize} ${x1 + arrowSize * 1.5},${lineY + arrowSize}`} fill={strokeColor} />
+      <polygon points={`${x2},${lineY} ${x2 - arrowSize * 1.5},${lineY - arrowSize} ${x2 - arrowSize * 1.5},${lineY + arrowSize}`} fill={strokeColor} />
+      <rect x={midX - textWidth / 2} y={lineY - 6} width={textWidth} height="12" fill={paperColor} />
+      <text x={midX} y={lineY + 3} textAnchor="middle" fontSize={fontSize} fontWeight="500" fill={strokeColor}>
         {displayValue}
       </text>
     </g>
   );
-};
+});
+DimLine.displayName = "DimLine";
 
-const CenterLine = ({ x1, y1, x2, y2 }) => <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#000000" strokeWidth="0.3" strokeDasharray="10,3,2,3" />;
+const CenterLine = memo(({ x1, y1, x2, y2, theme }) => <line className="layer-centerlines" x1={x1} y1={y1} x2={x2} y2={y2} stroke={theme?.stroke || "#000000"} strokeWidth="0.3" strokeDasharray="10,3,2,3" />);
+CenterLine.displayName = "CenterLine";
 
-const LockBlockSVG = ({ x, y, width, height }) => (
-  <g>
+const LockBlockSVG = memo(({ x, y, width, height }) => (
+  <g className="layer-lockblock">
     <rect x={x} y={y} width={width} height={height} fill="#FF007644" stroke="#FF0076" strokeWidth="0.8" />
     <line x1={x} y1={y} x2={x + width} y2={y + height} stroke="#FF0076" strokeWidth="0.4" />
     <line x1={x + width} y1={y} x2={x} y2={y + height} stroke="#FF0076" strokeWidth="0.4" />
   </g>
-);
+));
+LockBlockSVG.displayName = "LockBlockSVG";
 
-const FilledRect = ({ x, y, width, height, color, strokeWidth = 1, opacity = 0.2, strokeDasharray }) => (
+const FilledRect = memo(({ x, y, width, height, color, strokeWidth = 1, opacity = 0.2, strokeDasharray, className }) => (
   <rect
+    className={className}
     x={x}
     y={y}
     width={width}
@@ -405,9 +500,182 @@ const FilledRect = ({ x, y, width, height, color, strokeWidth = 1, opacity = 0.2
     strokeWidth={strokeWidth}
     strokeDasharray={strokeDasharray}
   />
-);
+));
+FilledRect.displayName = "FilledRect";
 
-const BottomInfoBar = ({ viewBoxWidth, viewBoxHeight, T, W, H, S, F, R, surfaceMaterial, frameType, hasDoubleFrame, doubleFrame, railSections, railPositions, lockBlockCount, currentFrame }) => {
+const EnhancedEngineeringDrawing = memo(({ results }) => {
+  const svgRef = useRef(null);
+  const [visibleLayers, setVisibleLayers] = useState(() => Object.fromEntries(Object.entries(LAYER_CONFIG).map(([key, config]) => [key, config.defaultVisible])));
+  const [isExporting, setIsExporting] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
+
+  const theme = THEME;
+
+  const safeResults = results || {};
+  const { W = 0, H = 0, T = 0, S = 0, F = 0, R = 0, totalFrameWidth = 0, railPositions = [], railSections = 3, lockBlockTop = 800, lockBlockBottom = 1200, lockBlockLeft = false, lockBlockRight = false, lockBlockPosition = 1000, lockBlockCount = 0, lockBlockSides = 1, currentFrame = {}, doubleFrame = {} } = safeResults;
+
+  const safeH = H > 0 ? H : 2000;
+  const safeW = W > 0 ? W : 800;
+  const safeT = T > 0 ? T : 35;
+  const safeS = S > 0 ? S : 4;
+  const safeF = F > 0 ? F : 50;
+  const safeR = R > 0 ? R : 27;
+  const wrapperKey = useMemo(() => `drawing-${safeT}-${safeW}-${safeH}`, [safeT, safeW, safeH]);
+  const viewBoxWidth = 2970;
+  const viewBoxHeight = 2100;
+  const DRAWING_SCALE = 0.5;
+  const hasDoubleFrame = doubleFrame?.hasAny && doubleFrame.count > 0;
+  const drawingDF = hasDoubleFrame ? safeF * doubleFrame.count : 0;
+  const piecesPerSide = parseInt(lockBlockCount / (lockBlockSides || 1)) || 0;
+
+  const dims = useMemo(
+    () => ({
+      front: {
+        W: safeW * DRAWING_SCALE,
+        H: safeH * DRAWING_SCALE,
+        F: safeF * DRAWING_SCALE,
+        DF: drawingDF * DRAWING_SCALE,
+        totalFrame: (totalFrameWidth || safeF) * DRAWING_SCALE,
+        R: safeR * DRAWING_SCALE,
+        lockBlockW: safeF * DRAWING_SCALE,
+      },
+      side: { T: safeT * DRAWING_SCALE, H: safeH * DRAWING_SCALE, S: safeS * DRAWING_SCALE },
+    }),
+    [safeW, safeH, safeT, safeS, safeF, safeR, drawingDF, totalFrameWidth],
+  );
+
+  const marginX = 150;
+  const marginY = 200;
+  const positions = { side: { x: marginX, y: marginY + 200 }, front: { x: marginX + 700, y: marginY + 200 } };
+
+  const layerStyle = useMemo(() => {
+    let css = "";
+    Object.entries(visibleLayers).forEach(([layer, visible]) => {
+      if (!visible) css += `.layer-${layer} { display: none !important; }`;
+    });
+    return css;
+  }, [visibleLayers]);
+
+  const exportToPDF = useCallback(async () => {
+    if (!svgRef.current) return;
+    setIsExporting(true);
+    try {
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const svgElement = svgRef.current.cloneNode(true);
+      const styleTag = svgElement.querySelector("style");
+      if (styleTag) styleTag.remove();
+
+      await svg2pdf(svgElement, pdf, {
+        x: 0,
+        y: 0,
+        width: 297,
+        height: 210,
+      });
+
+      pdf.save(`door-drawing-${safeT}x${safeW}x${safeH}.pdf`);
+    } catch (error) {
+      console.error("PDF export error:", error);
+    }
+    setIsExporting(false);
+  }, [safeT, safeW, safeH]);
+
+  const exportToPNG = useCallback(
+    async (scale = 2) => {
+      if (!svgRef.current) return;
+      setIsExporting(true);
+      try {
+        const dataUrl = await htmlToImage.toPng(svgRef.current, { quality: 1, pixelRatio: scale, backgroundColor: THEME.background });
+        const link = document.createElement("a");
+        link.download = `door-drawing-${safeT}x${safeW}x${safeH}.png`;
+        link.href = dataUrl;
+        link.click();
+      } catch (error) {
+        console.error("PNG export error:", error);
+      }
+      setIsExporting(false);
+    },
+    [safeT, safeW, safeH],
+  );
+
+  const exportToDXF = useCallback(() => {
+    setIsExporting(true);
+    try {
+      const dxfContent = generateDXF(safeResults);
+      const blob = new Blob([dxfContent], { type: "application/dxf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = `door-drawing-${safeT}x${safeW}x${safeH}.dxf`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("DXF export error:", error);
+    }
+    setIsExporting(false);
+  }, [safeResults, safeT, safeW, safeH]);
+
+  const copyToClipboard = useCallback(async () => {
+    if (!svgRef.current) return;
+    try {
+      const dataUrl = await htmlToImage.toPng(svgRef.current, { quality: 1, pixelRatio: 2, backgroundColor: THEME.background });
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+    } catch (error) {
+      console.error("Copy error:", error);
+    }
+  }, []);
+
+  const toggleLayer = useCallback((layerId) => {
+    setVisibleLayers((prev) => ({ ...prev, [layerId]: !prev[layerId] }));
+  }, []);
+
+  const toggleAllLayers = useCallback((visible) => {
+    setVisibleLayers(Object.fromEntries(Object.keys(LAYER_CONFIG).map((key) => [key, visible])));
+  }, []);
+
+  const renderLockBlocks = useCallback(() => {
+    const blocks = [];
+    const lockBlockH = LOCK_BLOCK_HEIGHT * DRAWING_SCALE;
+    const lockBlockY = positions.front.y + dims.front.H - lockBlockBottom * DRAWING_SCALE;
+
+    const renderSide = (isLeft) => {
+      if (!(isLeft ? lockBlockLeft : lockBlockRight)) return;
+      [...Array(piecesPerSide)].forEach((_, i) => {
+        const x = isLeft ? positions.front.x + dims.front.totalFrame + dims.front.lockBlockW * i : positions.front.x + dims.front.W - dims.front.totalFrame - dims.front.lockBlockW * (i + 1);
+        blocks.push(<LockBlockSVG key={`lb-${isLeft ? "left" : "right"}-${i}`} x={x} y={lockBlockY} width={dims.front.lockBlockW} height={lockBlockH} />);
+      });
+    };
+    renderSide(true);
+    renderSide(false);
+    return blocks;
+  }, [positions, dims, lockBlockLeft, lockBlockRight, piecesPerSide, lockBlockBottom]);
+
+  const renderDoubleFrames = useCallback(() => {
+    if (!hasDoubleFrame) return null;
+    const elements = [];
+    const configs = [
+      { key: "left", getRect: (i) => ({ x: positions.front.x + dims.front.F + dims.front.F * i, y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F }) },
+      { key: "right", getRect: (i) => ({ x: positions.front.x + dims.front.W - dims.front.F - dims.front.F * (i + 1), y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F }) },
+      { key: "top", getRect: (i) => ({ x: positions.front.x + dims.front.F, y: positions.front.y + dims.front.F + dims.front.F * i, w: dims.front.W - 2 * dims.front.F, h: dims.front.F }) },
+      { key: "bottom", getRect: (i) => ({ x: positions.front.x + dims.front.F, y: positions.front.y + dims.front.H - dims.front.F - dims.front.F * (i + 1), w: dims.front.W - 2 * dims.front.F, h: dims.front.F }) },
+      { key: "center", getRect: (i) => ({ x: positions.front.x + dims.front.W / 2 - dims.front.F / 2 + (i - (doubleFrame.count - 1) / 2) * dims.front.F, y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F }) },
+    ];
+    configs.forEach(({ key, getRect }) => {
+      if (!doubleFrame[key]) return;
+      for (let i = 0; i < doubleFrame.count; i++) {
+        const r = getRect(i);
+        elements.push(<rect key={`df-${key}-${i}`} className="layer-doubleframe" x={r.x} y={r.y} width={r.w} height={r.h} fill="#FFB44122" stroke="#FFB441" strokeWidth="1.5" strokeDasharray="8,4" />);
+      }
+    });
+    return elements;
+  }, [hasDoubleFrame, positions, dims, doubleFrame]);
+
   const getDoubleFrameDesc = () => {
     if (!hasDoubleFrame || !doubleFrame) return "";
     const sideLabels = { top: "บน", bottom: "ล่าง", left: "ซ้าย", right: "ขวา", center: "กลาง" };
@@ -427,292 +695,344 @@ const BottomInfoBar = ({ viewBoxWidth, viewBoxHeight, T, W, H, S, F, R, surfaceM
   ];
 
   return (
-    <g id="bottom-info">
-      <rect x="20" y={viewBoxHeight - 145} width={viewBoxWidth - 40} height="130" fill="#FFFFFF" stroke="#4456E9" strokeWidth="1.5" rx="3" />
-      <g id="specs">
-        <rect x="25" y={viewBoxHeight - 140} width="370" height="20" fill="#4456E9" rx="2" />
-        <text x="35" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill="#FFFFFF">
-          📋 SPECIFICATIONS
-        </text>
-        <rect x="25" y={viewBoxHeight - 118} width="370" height="100" fill="#FFFFFF" stroke="#DCDCDC" strokeWidth="0.5" />
-        <text x="35" y={viewBoxHeight - 100} fontSize="8" fill="#000000" opacity="0.7">
-          Door Size:
-        </text>
-        <text x="35" y={viewBoxHeight - 88} fontSize="11" fontWeight="bold" fill="#000000">
-          {T} × {W} × {H} mm
-        </text>
-        <text x="35" y={viewBoxHeight - 70} fontSize="8" fill="#000000" opacity="0.7">
-          Surface Material:
-        </text>
-        <text x="35" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill="#10B981">
-          {surfaceMaterial} {S || 0}mm × 2
-        </text>
-        <text x="35" y={viewBoxHeight - 40} fontSize="8" fill="#000000" opacity="0.7">
-          Frame:
-        </text>
-        <text x="35" y={viewBoxHeight - 28} fontSize="9" fontWeight="600" fill="#FF8A00">
-          {R || 0}×{F || 0}mm {hasDoubleFrame ? getDoubleFrameDesc() : ""}
-        </text>
-        <text x="200" y={viewBoxHeight - 100} fontSize="8" fill="#000000" opacity="0.7">
-          Horizontal Rails:
-        </text>
-        <text x="200" y={viewBoxHeight - 88} fontSize="9" fontWeight="600" fill="#FF8A00">
-          {railSections - 1} pcs @ {railPositions.join(", ") || "-"} mm
-        </text>
-        <text x="200" y={viewBoxHeight - 70} fontSize="8" fill="#000000" opacity="0.7">
-          Lock Block:
-        </text>
-        <text x="200" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill="#FF0076">
-          {lockBlockCount} pcs ({R || 0}×{F || 0}×{LOCK_BLOCK_HEIGHT}mm)
-        </text>
-        {currentFrame.code && (
-          <>
-            <text x="200" y={viewBoxHeight - 40} fontSize="8" fill="#000000" opacity="0.7">
-              ERP Code:
-            </text>
-            <text x="200" y={viewBoxHeight - 28} fontSize="8" fontWeight="500" fill="#4456E9" fontFamily="monospace">
-              {currentFrame.code}
-            </text>
-          </>
-        )}
-      </g>
-      <g id="legend">
-        <rect x="405" y={viewBoxHeight - 140} width="280" height="20" fill="#4456E9" rx="2" />
-        <text x="415" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill="#FFFFFF">
-          🎨 LEGEND
-        </text>
-        <rect x="405" y={viewBoxHeight - 118} width="280" height="100" fill="#FFFFFF" stroke="#DCDCDC" strokeWidth="0.5" />
-        {LEGEND_ITEMS.map((item, i) => (
-          <g key={`legend-${i}`}>
-            <rect x={legendPositions[i].x} y={viewBoxHeight + legendPositions[i].yOffset} width="16" height="10" fill={item.fill} stroke={item.stroke} strokeWidth="0.8" rx="1" strokeDasharray={item.dashed ? "2,1" : undefined} />
-            <text x={legendPositions[i].x + 20} y={viewBoxHeight + legendPositions[i].yOffset + 8} fontSize="7" fill="#000000">
-              {item.label}
-            </text>
-          </g>
-        ))}
-        <line x1="415" y1={viewBoxHeight - 49} x2="431" y2={viewBoxHeight - 49} stroke="#000000" strokeWidth="0.6" strokeDasharray="8,2,2,2" />
-        <text x="435" y={viewBoxHeight - 46} fontSize="7" fill="#000000">
-          Center Line
-        </text>
-        <line x1="525" y1={viewBoxHeight - 49} x2="541" y2={viewBoxHeight - 49} stroke="#000000" strokeWidth="0.6" strokeDasharray="3,3" />
-        <text x="545" y={viewBoxHeight - 46} fontSize="7" fill="#000000">
-          Hidden Line
-        </text>
-        <line x1="415" y1={viewBoxHeight - 32} x2="431" y2={viewBoxHeight - 32} stroke="#000000" strokeWidth="0.6" />
-        <polygon points={`415,${viewBoxHeight - 32} 418,${viewBoxHeight - 34} 418,${viewBoxHeight - 30}`} fill="#000000" />
-        <polygon points={`431,${viewBoxHeight - 32} 428,${viewBoxHeight - 34} 428,${viewBoxHeight - 30}`} fill="#000000" />
-        <text x="435" y={viewBoxHeight - 29} fontSize="7" fill="#000000">
-          Dimension Line
-        </text>
-      </g>
-      <g id="title-block">
-        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="120" fill="#FFFFFF" stroke="#4456E9" strokeWidth="1.5" rx="2" />
-        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="28" fill="#4456E9" rx="2" />
-        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 115} width="280" height="3" fill="#4456E9" />
-        <text x={viewBoxWidth - 165} y={viewBoxHeight - 121} textAnchor="middle" fontSize="13" fontWeight="bold" fill="#FFFFFF">
-          DOOR FRAME ASSEMBLY
-        </text>
-        <rect x={viewBoxWidth - 300} y={viewBoxHeight - 107} width="270" height="22" fill="#DCDCDC33" rx="1" />
-        <text x={viewBoxWidth - 290} y={viewBoxHeight - 92} fontSize="8" fill="#000000" opacity="0.7">
-          Size:
-        </text>
-        <text x={viewBoxWidth - 165} y={viewBoxHeight - 91} textAnchor="middle" fontSize="14" fontWeight="bold" fill="#000000">
-          {T} × {W} × {H} mm
-        </text>
-        <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 82} x2={viewBoxWidth - 30} y2={viewBoxHeight - 82} stroke="#DCDCDC" strokeWidth="0.5" />
-        <text x={viewBoxWidth - 290} y={viewBoxHeight - 68} fontSize="8" fill="#000000" opacity="0.7">
-          Material:
-        </text>
-        <text x={viewBoxWidth - 165} y={viewBoxHeight - 68} textAnchor="middle" fontSize="10" fontWeight="600" fill="#10B981">
-          {surfaceMaterial} + {frameType}
-        </text>
-        <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 55} x2={viewBoxWidth - 30} y2={viewBoxHeight - 55} stroke="#DCDCDC" strokeWidth="0.5" />
-        <line x1={viewBoxWidth - 165} y1={viewBoxHeight - 55} x2={viewBoxWidth - 165} y2={viewBoxHeight - 35} stroke="#DCDCDC" strokeWidth="0.5" />
-        <text x={viewBoxWidth - 290} y={viewBoxHeight - 42} fontSize="8" fill="#000000" opacity="0.7">
-          Scale:
-        </text>
-        <text x={viewBoxWidth - 240} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill="#000000">
-          1:25
-        </text>
-        <text x={viewBoxWidth - 155} y={viewBoxHeight - 42} fontSize="8" fill="#000000" opacity="0.7">
-          Rev:
-        </text>
-        <text x={viewBoxWidth - 120} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill="#000000">
-          1.0
-        </text>
-        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 35} width="280" height="15" fill="#FFFFFF" />
-        <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 35} x2={viewBoxWidth - 30} y2={viewBoxHeight - 35} stroke="#DCDCDC" strokeWidth="0.5" />
-        <text x={viewBoxWidth - 165} y={viewBoxHeight - 24} textAnchor="middle" fontSize="9" fontWeight="bold" fill="#4456E9">
-          C.H.H INDUSTRY CO., LTD.
-        </text>
-      </g>
-    </g>
-  );
-};
+    <div className="relative w-full h-full flex flex-col bg-default-100 rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between p-2 bg-default-50 border-b border-default-200 gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          <Chip size="sm" variant="flat">
+            {Math.round(zoomLevel * 100)}%
+          </Chip>
+        </div>
+        <div className="flex items-center gap-2">
+          <Popover placement="bottom-end">
+            <PopoverTrigger>
+              <Button size="sm" variant="flat" startContent={<Layers className="w-4 h-4" />}>
+                Layers
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64">
+              <div className="p-2 space-y-2">
+                <div className="flex justify-between items-center pb-2 border-b">
+                  <span className="font-semibold text-sm">Layers</span>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="light" onPress={() => toggleAllLayers(true)}>
+                      All On
+                    </Button>
+                    <Button size="sm" variant="light" onPress={() => toggleAllLayers(false)}>
+                      All Off
+                    </Button>
+                  </div>
+                </div>
+                {Object.entries(LAYER_CONFIG).map(([key, config]) => (
+                  <div key={key} className="flex items-center justify-between py-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded" style={{ backgroundColor: config.color }} />
+                      <span className="text-sm">{config.label}</span>
+                    </div>
+                    <Switch size="sm" isSelected={visibleLayers[key]} onValueChange={() => toggleLayer(key)} />
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
 
-const EngineeringDrawing = ({ results }) => {
-  const { W, H, T, S, F, R, totalFrameWidth, railPositions, railSections, lockBlockTop, lockBlockBottom, lockBlockLeft, lockBlockRight, lockBlockPosition, lockBlockCount, currentFrame, doubleFrame } = results;
-  const safeH = H > 0 ? H : 2000;
-  const safeW = W > 0 ? W : 800;
-  const safeT = T > 0 ? T : 35;
-  const safeS = S > 0 ? S : 4;
-  const safeF = F > 0 ? F : 50;
-  const safeR = R > 0 ? R : 27;
-  const viewBoxWidth = 2100;
-  const viewBoxHeight = 2970;
-  const DRAWING_SCALE = 0.5;
-  const hasDoubleFrame = doubleFrame?.hasAny && doubleFrame.count > 0;
-  const drawingDF = hasDoubleFrame ? safeF * doubleFrame.count : 0;
+          <Divider orientation="vertical" className="h-6 mx-1" />
 
-  const dims = {
-    front: { W: safeW * DRAWING_SCALE, H: safeH * DRAWING_SCALE, F: safeF * DRAWING_SCALE, DF: drawingDF * DRAWING_SCALE, totalFrame: totalFrameWidth * DRAWING_SCALE, R: safeR * DRAWING_SCALE, lockBlockW: safeF * DRAWING_SCALE },
-    side: { T: safeT * DRAWING_SCALE, H: safeH * DRAWING_SCALE, S: safeS * DRAWING_SCALE },
-  };
+          <Dropdown>
+            <DropdownTrigger>
+              <Button size="sm" color="primary" variant="flat" startContent={<Download className="w-4 h-4" />} endContent={<ChevronDown className="w-3 h-3" />} isLoading={isExporting}>
+                Export
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Export options">
+              <DropdownItem key="pdf" startContent={<FileText className="w-4 h-4" />} description="Vector format, best for printing" onPress={exportToPDF}>
+                Export as PDF
+              </DropdownItem>
+              <DropdownItem key="png" startContent={<FileImage className="w-4 h-4" />} description="High resolution image" onPress={() => exportToPNG(2)}>
+                Export as PNG
+              </DropdownItem>
+              <DropdownItem key="png-hd" startContent={<FileImage className="w-4 h-4" />} description="4x resolution for large prints" onPress={() => exportToPNG(4)}>
+                Export as PNG (4K)
+              </DropdownItem>
+              <DropdownItem key="dxf" startContent={<FileCode className="w-4 h-4" />} description="For AutoCAD/CAD software" onPress={exportToDXF}>
+                Export as DXF
+              </DropdownItem>
+              <DropdownItem key="copy" startContent={<Copy className="w-4 h-4" />} description="Copy image to clipboard" onPress={copyToClipboard}>
+                Copy to Clipboard
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
 
-  const marginX = 150;
-  const marginY = 200;
-  const positions = { side: { x: marginX, y: marginY + 200 }, front: { x: marginX + 700, y: marginY + 200 } };
-  const piecesPerSide = parseInt(results.lockBlockCount / results.lockBlockSides) || 0;
+          <Tooltip content="Print">
+            <Button size="sm" variant="flat" isIconOnly onPress={() => window.print()}>
+              <Printer className="w-4 h-4" />
+            </Button>
+          </Tooltip>
+        </div>
+      </div>
 
-  const renderLockBlocks = (viewX, viewY, scale, frameWidth, isBack = false) => {
-    const blocks = [];
-    const lockBlockH = LOCK_BLOCK_HEIGHT * scale;
-    const lockBlockY = viewY + dims.front.H - lockBlockBottom * scale;
-    const renderSide = (isLeft, prefix) => {
-      if (!(isLeft ? lockBlockLeft : lockBlockRight)) return;
-      [...Array(piecesPerSide)].forEach((_, i) => {
-        const x = isBack ? (isLeft ? viewX + dims.front.W - frameWidth - (hasDoubleFrame ? frameWidth : 0) - frameWidth * (i + 1) : viewX + frameWidth + (hasDoubleFrame ? frameWidth : 0) + frameWidth * i) : isLeft ? viewX + dims.front.totalFrame + dims.front.lockBlockW * i : viewX + dims.front.W - dims.front.totalFrame - dims.front.lockBlockW * (i + 1);
-        blocks.push(<LockBlockSVG key={`lb-${prefix}-${isLeft ? "left" : "right"}-${i}`} x={x} y={lockBlockY} width={frameWidth} height={lockBlockH} />);
-      });
-    };
-    renderSide(true, isBack ? "back" : "front");
-    renderSide(false, isBack ? "back" : "front");
-    return blocks;
-  };
+      <div className="flex-1 relative overflow-hidden" style={{ backgroundColor: theme.background }}>
+        <TransformWrapper key={wrapperKey} initialScale={1} minScale={0.1} maxScale={5} centerOnInit onTransformed={(ref) => setZoomLevel(ref.state.scale)} wheel={{ step: 0.1 }}>
+          {({ zoomIn, zoomOut, resetTransform, centerView }) => (
+            <>
+              <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2 bg-default-50/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-default-200">
+                <Tooltip content="Zoom In" placement="left">
+                  <Button size="sm" variant="light" isIconOnly onPress={() => zoomIn()}>
+                    <ZoomIn className="w-4 h-4" />
+                  </Button>
+                </Tooltip>
+                <Tooltip content="Zoom Out" placement="left">
+                  <Button size="sm" variant="light" isIconOnly onPress={() => zoomOut()}>
+                    <ZoomOut className="w-4 h-4" />
+                  </Button>
+                </Tooltip>
+                <Divider className="my-1" />
+                <Tooltip content="Fit to View" placement="left">
+                  <Button size="sm" variant="light" isIconOnly onPress={() => centerView()}>
+                    <Maximize2 className="w-4 h-4" />
+                  </Button>
+                </Tooltip>
+                <Tooltip content="Reset Zoom" placement="left">
+                  <Button size="sm" variant="light" isIconOnly onPress={() => resetTransform()}>
+                    <RotateCcw className="w-4 h-4" />
+                  </Button>
+                </Tooltip>
+              </div>
 
-  const renderDoubleFrames = () => {
-    if (!hasDoubleFrame) return null;
-    const elements = [];
-    const doubleFrameConfigs = [
-      { key: "left", getRect: (i) => ({ x: positions.front.x + dims.front.F + dims.front.F * i, y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F }) },
-      { key: "right", getRect: (i) => ({ x: positions.front.x + dims.front.W - dims.front.F - dims.front.F * (i + 1), y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F }) },
-      { key: "top", getRect: (i) => ({ x: positions.front.x + dims.front.F, y: positions.front.y + dims.front.F + dims.front.F * i, w: dims.front.W - 2 * dims.front.F, h: dims.front.F }) },
-      { key: "bottom", getRect: (i) => ({ x: positions.front.x + dims.front.F, y: positions.front.y + dims.front.H - dims.front.F - dims.front.F * (i + 1), w: dims.front.W - 2 * dims.front.F, h: dims.front.F }) },
-      {
-        key: "center",
-        getRect: (i) => {
-          const offsetFromCenter = (i - (doubleFrame.count - 1) / 2) * dims.front.F;
-          return { x: positions.front.x + dims.front.W / 2 - dims.front.F / 2 + offsetFromCenter, y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F };
-        },
-      },
-    ];
-    doubleFrameConfigs.forEach(({ key, getRect }) => {
-      if (!doubleFrame[key]) return;
-      for (let i = 0; i < doubleFrame.count; i++) {
-        const r = getRect(i);
-        elements.push(<rect key={`df-${key}-${i}`} x={r.x} y={r.y} width={r.w} height={r.h} fill="#FFB44122" stroke="#FFB441" strokeWidth="1.5" strokeDasharray="8,4" />);
-      }
-    });
-    return elements;
-  };
+              <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }}>
+                <svg ref={svgRef} viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} width="297mm" height="210mm" className="w-full h-auto" style={{ backgroundColor: theme.paper }}>
+                  <style>{layerStyle}</style>
 
-  return (
-    <svg viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} width="210mm" height="297mm" className="w-full h-auto bg-white">
-      <rect x="8" y="8" width={viewBoxWidth - 16} height={viewBoxHeight - 16} fill="none" stroke="#000000" strokeWidth="2" />
-      <rect x="12" y="12" width={viewBoxWidth - 24} height={viewBoxHeight - 24} fill="none" stroke="#000000" strokeWidth="0.5" />
-      <g id="grid-ref" fontSize="20" fill="#DCDCDC">
-        {GRID_LETTERS.map((letter, i) => (
-          <text key={`grid-${letter}`} x="40" y={200 + i * 400} textAnchor="middle">
-            {letter}
-          </text>
-        ))}
-        {GRID_NUMBERS.map((num, i) => (
-          <text key={`grid-${num}`} x={250 + i * 200} y="120" textAnchor="middle">
-            {num}
-          </text>
-        ))}
-      </g>
-      <text x={viewBoxWidth / 2} y="80" textAnchor="middle" fontSize="40" fontWeight="bold" fill="#000000">
-        DOOR FRAME STRUCTURE DRAWING
-      </text>
-      <g id="side-view">
-        <text x={positions.side.x + dims.side.T / 2} y={positions.side.y + dims.side.H + 70} textAnchor="middle" fontSize="28" fontWeight="bold" fill="#000000">
-          Side View
-        </text>
-        <rect x={positions.side.x} y={positions.side.y} width={dims.side.T} height={dims.side.H} fill="#FFFFFF" stroke="#000000" strokeWidth="3" />
-        <FilledRect x={positions.side.x} y={positions.side.y} width={dims.side.S} height={dims.side.H} color="#10B981" strokeWidth={1.2} />
-        <FilledRect x={positions.side.x + dims.side.T - dims.side.S} y={positions.side.y} width={dims.side.S} height={dims.side.H} color="#10B981" strokeWidth={1.2} />
-        <FilledRect x={positions.side.x + dims.side.S} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} color="#FFB441" />
-        <FilledRect x={positions.side.x + dims.side.T - dims.side.S - (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} color="#FFB441" />
-        <FilledRect x={positions.side.x + dims.side.S + (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.5} height={dims.side.H} color="#4456E9" strokeWidth={0.8} opacity={0.07} strokeDasharray="4,4" />
-        <CenterLine x1={positions.side.x + dims.side.T / 2} y1={positions.side.y - 40} x2={positions.side.x + dims.side.T / 2} y2={positions.side.y + dims.side.H + 40} />
-        {railPositions.map((pos, idx) => {
-          const railY = positions.side.y + dims.side.H - pos * DRAWING_SCALE;
-          const railH = safeR * DRAWING_SCALE * 0.5;
-          return <FilledRect key={`side-rail-${idx}`} x={positions.side.x + dims.side.S} y={railY - railH / 2} width={dims.side.T - 2 * dims.side.S} height={railH} color="#FF8A00" />;
-        })}
-        {(lockBlockLeft || lockBlockRight) && <rect x={positions.side.x + dims.side.S} y={positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE} width={dims.side.T - 2 * dims.side.S} height={LOCK_BLOCK_HEIGHT * DRAWING_SCALE} fill="none" stroke="#FF0076" strokeWidth="1.4" strokeDasharray="6,4" />}
-        <DimLine x1={positions.side.x} y1={positions.side.y + dims.side.H} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={T} offset={120} />
-        <DimLine x1={positions.side.x + dims.side.T} y1={positions.side.y} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={H} offset={100} vertical />
-        <DimLine x1={positions.side.x} y1={positions.side.y} x2={positions.side.x + dims.side.S} y2={positions.side.y} value={S} offset={-60} fontSize={18} />
-        <DimLine x1={positions.side.x + dims.side.S} y1={positions.side.y} x2={positions.side.x + dims.side.T - dims.side.S} y2={positions.side.y} value={T - 2 * S} offset={-120} fontSize={18} />
-      </g>
-      <g id="front-view">
-        <text x={positions.front.x + dims.front.W / 2} y={positions.front.y + dims.front.H + 70} textAnchor="middle" fontSize="28" fontWeight="bold" fill="#000000">
-          Front View
-        </text>
-        <rect x={positions.front.x} y={positions.front.y} width={dims.front.W} height={dims.front.H} fill="#FFFFFF" stroke="#000000" strokeWidth="3" />
-        <FilledRect x={positions.front.x} y={positions.front.y} width={dims.front.F} height={dims.front.H} color="#FFB441" strokeWidth={1.6} />
-        <FilledRect x={positions.front.x + dims.front.W - dims.front.F} y={positions.front.y} width={dims.front.F} height={dims.front.H} color="#FFB441" strokeWidth={1.6} />
-        <FilledRect x={positions.front.x + dims.front.F} y={positions.front.y} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} color="#FF8A00" strokeWidth={1.6} />
-        <FilledRect x={positions.front.x + dims.front.F} y={positions.front.y + dims.front.H - dims.front.F} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} color="#FF8A00" strokeWidth={1.6} />
-        {renderDoubleFrames()}
-        {railPositions.map((pos, idx) => {
-          const railY = positions.front.y + dims.front.H - pos * DRAWING_SCALE;
-          return <FilledRect key={`front-rail-${idx}`} x={positions.front.x + dims.front.F} y={railY - dims.front.R / 2} width={dims.front.W - 2 * dims.front.F} height={dims.front.R} color="#FF8A00" strokeWidth={1.2} />;
-        })}
-        {renderLockBlocks(positions.front.x, positions.front.y, DRAWING_SCALE, dims.front.lockBlockW, false)}
-        <CenterLine x1={positions.front.x + dims.front.W / 2} y1={positions.front.y - 40} x2={positions.front.x + dims.front.W / 2} y2={positions.front.y + dims.front.H + 40} />
-        <CenterLine x1={positions.front.x - 40} y1={positions.front.y + dims.front.H / 2} x2={positions.front.x + dims.front.W + 40} y2={positions.front.y + dims.front.H / 2} />
-        <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={W} offset={120} />
-        <DimLine x1={positions.front.x + dims.front.W} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={H} offset={100} vertical />
-        <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.F} y2={positions.front.y} value={F} offset={-60} fontSize={18} />
-        <DimLine x1={positions.front.x + dims.front.F} y1={positions.front.y} x2={positions.front.x + dims.front.W - dims.front.F} y2={positions.front.y} value={W - 2 * F} offset={-120} fontSize={18} />
-        {(lockBlockLeft || lockBlockRight) && <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x} y2={positions.front.y + dims.front.H - lockBlockPosition * DRAWING_SCALE} value={lockBlockPosition} offset={-100} vertical fontSize={18} />}
-        {railPositions.map((pos, idx) => (
-          <g key={`front-ann-${idx}`}>
-            <line x1={positions.front.x + dims.front.W + 200} y1={positions.front.y + dims.front.H - pos * DRAWING_SCALE} x2={positions.front.x + dims.front.W + 240} y2={positions.front.y + dims.front.H - pos * DRAWING_SCALE} stroke="#000000" strokeWidth="0.8" />
-            <text x={positions.front.x + dims.front.W + 260} y={positions.front.y + dims.front.H - pos * DRAWING_SCALE + 10} fontSize="18" fill="#000000">
-              {pos}
-            </text>
-          </g>
-        ))}
-      </g>
-      <BottomInfoBar viewBoxWidth={viewBoxWidth} viewBoxHeight={viewBoxHeight} T={T} W={W} H={H} S={S} F={F} R={R} surfaceMaterial={results.currentFrame.desc?.split(" ")[0] || "-"} frameType={results.currentFrame.desc?.split(" ")[0] || "-"} hasDoubleFrame={hasDoubleFrame} doubleFrame={doubleFrame} railSections={railSections} railPositions={railPositions} lockBlockCount={lockBlockCount} currentFrame={currentFrame} />
-    </svg>
-  );
-};
+                  <rect x="8" y="8" width={viewBoxWidth - 16} height={viewBoxHeight - 16} fill="none" stroke={theme.border} strokeWidth="2" />
+                  <rect x="12" y="12" width={viewBoxWidth - 24} height={viewBoxHeight - 24} fill="none" stroke={theme.border} strokeWidth="0.5" />
 
-const Modal = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75" onClick={onClose}>
-      <div className="relative rounded-lg shadow-2xl max-w-[95vw] max-h-[95vh] overflow-auto bg-white" onClick={(e) => e.stopPropagation()}>
-        <Button color="danger" variant="solid" size="sm" radius="full" className="absolute top-2 right-2 z-10 min-w-10 h-10" onPress={onClose}>
-          ✕
-        </Button>
-        <div className="p-4">{children}</div>
+                  <g className="layer-grid" fontSize="20" fill={theme.gridText}>
+                    {GRID_LETTERS.map((letter, i) => (
+                      <text key={`grid-${letter}`} x="40" y={200 + i * 400} textAnchor="middle">
+                        {letter}
+                      </text>
+                    ))}
+                    {GRID_NUMBERS.map((num, i) => (
+                      <text key={`grid-${num}`} x={250 + i * 200} y="120" textAnchor="middle">
+                        {num}
+                      </text>
+                    ))}
+                  </g>
+
+                  <text x={viewBoxWidth / 2} y="80" textAnchor="middle" fontSize="40" fontWeight="bold" fill={theme.text}>
+                    DOOR FRAME STRUCTURE DRAWING
+                  </text>
+
+                  <g id="side-view">
+                    <text x={positions.side.x + dims.side.T / 2} y={positions.side.y + dims.side.H + 70} textAnchor="middle" fontSize="28" fontWeight="bold" fill={theme.text}>
+                      Side View
+                    </text>
+                    <rect x={positions.side.x} y={positions.side.y} width={dims.side.T} height={dims.side.H} fill={theme.paper} stroke={theme.stroke} strokeWidth="3" />
+                    <FilledRect className="layer-surface" x={positions.side.x} y={positions.side.y} width={dims.side.S} height={dims.side.H} color="#10B981" strokeWidth={1.2} />
+                    <FilledRect className="layer-surface" x={positions.side.x + dims.side.T - dims.side.S} y={positions.side.y} width={dims.side.S} height={dims.side.H} color="#10B981" strokeWidth={1.2} />
+                    <FilledRect className="layer-frame" x={positions.side.x + dims.side.S} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} color="#FFB441" />
+                    <FilledRect className="layer-frame" x={positions.side.x + dims.side.T - dims.side.S - (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} color="#FFB441" />
+                    <FilledRect className="layer-core" x={positions.side.x + dims.side.S + (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.5} height={dims.side.H} color="#4456E9" strokeWidth={0.8} opacity={0.07} strokeDasharray="4,4" />
+                    <CenterLine x1={positions.side.x + dims.side.T / 2} y1={positions.side.y - 40} x2={positions.side.x + dims.side.T / 2} y2={positions.side.y + dims.side.H + 40} theme={theme} />
+                    {railPositions.map((pos, idx) => {
+                      const railY = positions.side.y + dims.side.H - pos * DRAWING_SCALE;
+                      const railH = safeR * DRAWING_SCALE * 0.5;
+                      return <FilledRect key={`side-rail-${idx}`} className="layer-rails" x={positions.side.x + dims.side.S} y={railY - railH / 2} width={dims.side.T - 2 * dims.side.S} height={railH} color="#FF8A00" />;
+                    })}
+                    {(lockBlockLeft || lockBlockRight) && <rect className="layer-lockblock" x={positions.side.x + dims.side.S} y={positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE} width={dims.side.T - 2 * dims.side.S} height={LOCK_BLOCK_HEIGHT * DRAWING_SCALE} fill="none" stroke="#FF0076" strokeWidth="1.4" strokeDasharray="6,4" />}
+                    <DimLine x1={positions.side.x} y1={positions.side.y + dims.side.H} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={T} offset={120} theme={theme} />
+                    <DimLine x1={positions.side.x + dims.side.T} y1={positions.side.y} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={H} offset={100} vertical theme={theme} />
+                    <DimLine x1={positions.side.x} y1={positions.side.y} x2={positions.side.x + dims.side.S} y2={positions.side.y} value={S} offset={-60} fontSize={18} theme={theme} />
+                    <DimLine x1={positions.side.x + dims.side.S} y1={positions.side.y} x2={positions.side.x + dims.side.T - dims.side.S} y2={positions.side.y} value={T - 2 * S} offset={-120} fontSize={18} theme={theme} />
+                  </g>
+
+                  <g id="front-view">
+                    <text x={positions.front.x + dims.front.W / 2} y={positions.front.y + dims.front.H + 70} textAnchor="middle" fontSize="28" fontWeight="bold" fill={theme.text}>
+                      Front View
+                    </text>
+                    <rect x={positions.front.x} y={positions.front.y} width={dims.front.W} height={dims.front.H} fill={theme.paper} stroke={theme.stroke} strokeWidth="3" />
+                    <FilledRect className="layer-frame" x={positions.front.x} y={positions.front.y} width={dims.front.F} height={dims.front.H} color="#FFB441" strokeWidth={1.6} />
+                    <FilledRect className="layer-frame" x={positions.front.x + dims.front.W - dims.front.F} y={positions.front.y} width={dims.front.F} height={dims.front.H} color="#FFB441" strokeWidth={1.6} />
+                    <FilledRect className="layer-rails" x={positions.front.x + dims.front.F} y={positions.front.y} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} color="#FF8A00" strokeWidth={1.6} />
+                    <FilledRect className="layer-rails" x={positions.front.x + dims.front.F} y={positions.front.y + dims.front.H - dims.front.F} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} color="#FF8A00" strokeWidth={1.6} />
+                    {renderDoubleFrames()}
+                    {railPositions.map((pos, idx) => {
+                      const railY = positions.front.y + dims.front.H - pos * DRAWING_SCALE;
+                      return <FilledRect key={`front-rail-${idx}`} className="layer-rails" x={positions.front.x + dims.front.F} y={railY - dims.front.R / 2} width={dims.front.W - 2 * dims.front.F} height={dims.front.R} color="#FF8A00" strokeWidth={1.2} />;
+                    })}
+                    {renderLockBlocks()}
+                    <CenterLine x1={positions.front.x + dims.front.W / 2} y1={positions.front.y - 40} x2={positions.front.x + dims.front.W / 2} y2={positions.front.y + dims.front.H + 40} theme={theme} />
+                    <CenterLine x1={positions.front.x - 40} y1={positions.front.y + dims.front.H / 2} x2={positions.front.x + dims.front.W + 40} y2={positions.front.y + dims.front.H / 2} theme={theme} />
+                    <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={W} offset={120} theme={theme} />
+                    <DimLine x1={positions.front.x + dims.front.W} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={H} offset={100} vertical theme={theme} />
+                    <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.F} y2={positions.front.y} value={F} offset={-60} fontSize={18} theme={theme} />
+                    <DimLine x1={positions.front.x + dims.front.F} y1={positions.front.y} x2={positions.front.x + dims.front.W - dims.front.F} y2={positions.front.y} value={W - 2 * F} offset={-120} fontSize={18} theme={theme} />
+                    {(lockBlockLeft || lockBlockRight) && <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x} y2={positions.front.y + dims.front.H - lockBlockPosition * DRAWING_SCALE} value={lockBlockPosition} offset={-100} vertical fontSize={18} theme={theme} />}
+                    {railPositions.map((pos, idx) => (
+                      <g key={`front-ann-${idx}`} className="layer-dimensions">
+                        <line x1={positions.front.x + dims.front.W + 200} y1={positions.front.y + dims.front.H - pos * DRAWING_SCALE} x2={positions.front.x + dims.front.W + 240} y2={positions.front.y + dims.front.H - pos * DRAWING_SCALE} stroke={theme.stroke} strokeWidth="0.8" />
+                        <text x={positions.front.x + dims.front.W + 260} y={positions.front.y + dims.front.H - pos * DRAWING_SCALE + 10} fontSize="18" fill={theme.text}>
+                          {pos}
+                        </text>
+                      </g>
+                    ))}
+                  </g>
+
+                  <g className="layer-title">
+                    <rect x="20" y={viewBoxHeight - 145} width={viewBoxWidth - 40} height="130" fill={theme.paper} stroke={theme.accent} strokeWidth="1.5" rx="3" />
+
+                    <g id="specs">
+                      <rect x="25" y={viewBoxHeight - 140} width="370" height="20" fill={theme.accent} rx="2" />
+                      <text x="35" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill="#FFFFFF">
+                        📋 SPECIFICATIONS
+                      </text>
+                      <rect x="25" y={viewBoxHeight - 118} width="370" height="100" fill={theme.paper} stroke={`${theme.text}22`} strokeWidth="0.5" />
+                      <text x="35" y={viewBoxHeight - 100} fontSize="8" fill={theme.text} opacity="0.7">
+                        Door Size:
+                      </text>
+                      <text x="35" y={viewBoxHeight - 88} fontSize="11" fontWeight="bold" fill={theme.text}>
+                        {T} × {W} × {H} mm
+                      </text>
+                      <text x="35" y={viewBoxHeight - 70} fontSize="8" fill={theme.text} opacity="0.7">
+                        Surface Material:
+                      </text>
+                      <text x="35" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill="#10B981">
+                        {currentFrame?.desc?.split(" ")[0] || "-"} {S || 0}mm × 2
+                      </text>
+                      <text x="35" y={viewBoxHeight - 40} fontSize="8" fill={theme.text} opacity="0.7">
+                        Frame:
+                      </text>
+                      <text x="35" y={viewBoxHeight - 28} fontSize="9" fontWeight="600" fill="#FF8A00">
+                        {R || 0}×{F || 0}mm {hasDoubleFrame ? getDoubleFrameDesc() : ""}
+                      </text>
+                      <text x="200" y={viewBoxHeight - 100} fontSize="8" fill={theme.text} opacity="0.7">
+                        Horizontal Rails:
+                      </text>
+                      <text x="200" y={viewBoxHeight - 88} fontSize="9" fontWeight="600" fill="#FF8A00">
+                        {railSections - 1} pcs @ {railPositions.join(", ") || "-"} mm
+                      </text>
+                      <text x="200" y={viewBoxHeight - 70} fontSize="8" fill={theme.text} opacity="0.7">
+                        Lock Block:
+                      </text>
+                      <text x="200" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill="#FF0076">
+                        {lockBlockCount} pcs ({R || 0}×{F || 0}×{LOCK_BLOCK_HEIGHT}mm)
+                      </text>
+                      {currentFrame?.code && (
+                        <>
+                          <text x="200" y={viewBoxHeight - 40} fontSize="8" fill={theme.text} opacity="0.7">
+                            ERP Code:
+                          </text>
+                          <text x="200" y={viewBoxHeight - 28} fontSize="8" fontWeight="500" fill={theme.accent} fontFamily="monospace">
+                            {currentFrame.code}
+                          </text>
+                        </>
+                      )}
+                    </g>
+
+                    <g id="legend">
+                      <rect x="405" y={viewBoxHeight - 140} width="280" height="20" fill={theme.accent} rx="2" />
+                      <text x="415" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill="#FFFFFF">
+                        🎨 LEGEND
+                      </text>
+                      <rect x="405" y={viewBoxHeight - 118} width="280" height="100" fill={theme.paper} stroke={`${theme.text}22`} strokeWidth="0.5" />
+                      {LEGEND_ITEMS.map((item, i) => (
+                        <g key={`legend-${i}`}>
+                          <rect x={legendPositions[i].x} y={viewBoxHeight + legendPositions[i].yOffset} width="16" height="10" fill={item.fill} stroke={item.stroke} strokeWidth="0.8" rx="1" strokeDasharray={item.dashed ? "2,1" : undefined} />
+                          <text x={legendPositions[i].x + 20} y={viewBoxHeight + legendPositions[i].yOffset + 8} fontSize="7" fill={theme.text}>
+                            {item.label}
+                          </text>
+                        </g>
+                      ))}
+                      <line x1="415" y1={viewBoxHeight - 49} x2="431" y2={viewBoxHeight - 49} stroke={theme.text} strokeWidth="0.6" strokeDasharray="8,2,2,2" />
+                      <text x="435" y={viewBoxHeight - 46} fontSize="7" fill={theme.text}>
+                        Center Line
+                      </text>
+                      <line x1="525" y1={viewBoxHeight - 49} x2="541" y2={viewBoxHeight - 49} stroke={theme.text} strokeWidth="0.6" strokeDasharray="3,3" />
+                      <text x="545" y={viewBoxHeight - 46} fontSize="7" fill={theme.text}>
+                        Hidden Line
+                      </text>
+                      <line x1="415" y1={viewBoxHeight - 32} x2="431" y2={viewBoxHeight - 32} stroke={theme.text} strokeWidth="0.6" />
+                      <polygon points={`415,${viewBoxHeight - 32} 418,${viewBoxHeight - 34} 418,${viewBoxHeight - 30}`} fill={theme.text} />
+                      <polygon points={`431,${viewBoxHeight - 32} 428,${viewBoxHeight - 34} 428,${viewBoxHeight - 30}`} fill={theme.text} />
+                      <text x="435" y={viewBoxHeight - 29} fontSize="7" fill={theme.text}>
+                        Dimension Line
+                      </text>
+                    </g>
+
+                    <g id="title-block">
+                      <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="120" fill={theme.paper} stroke={theme.accent} strokeWidth="1.5" rx="2" />
+                      <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="28" fill={theme.accent} rx="2" />
+                      <rect x={viewBoxWidth - 305} y={viewBoxHeight - 115} width="280" height="3" fill={theme.accent} />
+                      <text x={viewBoxWidth - 165} y={viewBoxHeight - 121} textAnchor="middle" fontSize="13" fontWeight="bold" fill="#FFFFFF">
+                        DOOR FRAME ASSEMBLY
+                      </text>
+                      <rect x={viewBoxWidth - 300} y={viewBoxHeight - 107} width="270" height="22" fill={`${theme.accent}11`} rx="1" />
+                      <text x={viewBoxWidth - 290} y={viewBoxHeight - 92} fontSize="8" fill={theme.text} opacity="0.7">
+                        Size:
+                      </text>
+                      <text x={viewBoxWidth - 165} y={viewBoxHeight - 91} textAnchor="middle" fontSize="14" fontWeight="bold" fill={theme.text}>
+                        {T} × {W} × {H} mm
+                      </text>
+                      <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 82} x2={viewBoxWidth - 30} y2={viewBoxHeight - 82} stroke={`${theme.text}33`} strokeWidth="0.5" />
+                      <text x={viewBoxWidth - 290} y={viewBoxHeight - 68} fontSize="8" fill={theme.text} opacity="0.7">
+                        Material:
+                      </text>
+                      <text x={viewBoxWidth - 165} y={viewBoxHeight - 68} textAnchor="middle" fontSize="10" fontWeight="600" fill="#10B981">
+                        {currentFrame?.desc?.split(" ")[0] || "-"}
+                      </text>
+                      <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 55} x2={viewBoxWidth - 30} y2={viewBoxHeight - 55} stroke={`${theme.text}33`} strokeWidth="0.5" />
+                      <line x1={viewBoxWidth - 165} y1={viewBoxHeight - 55} x2={viewBoxWidth - 165} y2={viewBoxHeight - 35} stroke={`${theme.text}33`} strokeWidth="0.5" />
+                      <text x={viewBoxWidth - 290} y={viewBoxHeight - 42} fontSize="8" fill={theme.text} opacity="0.7">
+                        Scale:
+                      </text>
+                      <text x={viewBoxWidth - 240} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={theme.text}>
+                        1:25
+                      </text>
+                      <text x={viewBoxWidth - 155} y={viewBoxHeight - 42} fontSize="8" fill={theme.text} opacity="0.7">
+                        Rev:
+                      </text>
+                      <text x={viewBoxWidth - 120} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={theme.text}>
+                        1.0
+                      </text>
+                      <rect x={viewBoxWidth - 305} y={viewBoxHeight - 35} width="280" height="15" fill={theme.paper} />
+                      <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 35} x2={viewBoxWidth - 30} y2={viewBoxHeight - 35} stroke={`${theme.text}33`} strokeWidth="0.5" />
+                      <text x={viewBoxWidth - 165} y={viewBoxHeight - 24} textAnchor="middle" fontSize="9" fontWeight="bold" fill={theme.accent}>
+                        C.H.H INDUSTRY CO., LTD.
+                      </text>
+                    </g>
+                  </g>
+                </svg>
+              </TransformComponent>
+            </>
+          )}
+        </TransformWrapper>
+      </div>
+
+      <div className="flex items-center justify-between px-3 py-1.5 bg-default-50 border-t border-default-200 text-xs text-default-500">
+        <div className="flex items-center gap-2">
+          <span>
+            Door: {T}×{W}×{H} mm
+          </span>
+          <span>
+            Frame: {R}×{F} mm
+          </span>
+          <span>Rails: {railSections - 1}</span>
+          <span>Lock Blocks: {lockBlockCount}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span>Scale: 1:25</span>
+        </div>
       </div>
     </div>
   );
-};
+});
+
+EnhancedEngineeringDrawing.displayName = "EnhancedEngineeringDrawing";
 
 export default function DoorConfigurator() {
   const formRef = useRef(null);
   const [doorThickness, setDoorThickness] = useState("");
   const [doorWidth, setDoorWidth] = useState("");
   const [doorHeight, setDoorHeight] = useState("");
-  const [isDrawingModalOpen, setIsDrawingModalOpen] = useState(false);
   const [surfaceMaterial, setSurfaceMaterial] = useState("");
   const [surfaceThickness, setSurfaceThickness] = useState("");
   const [frameType, setFrameType] = useState("");
@@ -767,14 +1087,14 @@ export default function DoorConfigurator() {
   const lockBlockDesc = lockBlockLeft && lockBlockRight ? `ซ้าย ${piecesPerSide} + ขวา ${piecesPerSide}` : lockBlockLeft ? `ซ้าย ${piecesPerSide}` : lockBlockRight ? `ขวา ${piecesPerSide}` : "-";
 
   return (
-    <div ref={formRef} className="flex flex-col items-center justify-start w-full h-full p-4 gap-4 overflow-auto bg-background">
+    <div ref={formRef} className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 overflow-auto bg-background">
       <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
         <h1 className="text-3xl font-bold text-primary">🚪 Door Configuration System</h1>
         <p className="text-foreground/70">ระบบออกแบบโครงประตู - C.H.H INDUSTRY CO., LTD.</p>
       </div>
 
-      <div className="flex flex-col xl:flex-row items-start justify-center w-full h-fit gap-4">
-        <div className="flex flex-col items-center justify-start w-full xl:w-5/12 h-full gap-4">
+      <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
+        <div className="flex flex-col items-center justify-start w-full h-full xl:w-8/12 gap-2">
           <Card className="w-full">
             <CardHeader className="bg-primary text-white">
               <div className="flex items-center gap-2">
@@ -784,7 +1104,7 @@ export default function DoorConfigurator() {
                 <span className="font-semibold">📝 สเปคลูกค้า</span>
               </div>
             </CardHeader>
-            <CardBody className="gap-4">
+            <CardBody className="gap-2">
               <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit gap-2">
                 <div className="flex items-center justify-center w-full h-full p-2 gap-2">
                   <Input name="doorThickness" type="number" label="ความหนา (T) mm" labelPlacement="outside" placeholder="Enter Thickness" color="default" variant="bordered" size="md" radius="md" value={doorThickness} onChange={(e) => setDoorThickness(e.target.value)} />
@@ -813,7 +1133,7 @@ export default function DoorConfigurator() {
                 <span className="font-semibold">🎨 วัสดุปิดผิว</span>
               </div>
             </CardHeader>
-            <CardBody className="gap-4">
+            <CardBody className="gap-2">
               <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit gap-2">
                 <div className="flex items-center justify-center w-full h-full p-2 gap-2">
                   <Select name="surfaceMaterial" label="ประเภทวัสดุ" labelPlacement="outside" placeholder="Please Select" color="default" variant="bordered" size="md" radius="md" selectedKeys={surfaceMaterial ? [surfaceMaterial] : []} onSelectionChange={(keys) => setSurfaceMaterial([...keys][0] || "")}>
@@ -827,7 +1147,7 @@ export default function DoorConfigurator() {
                 </div>
               </div>
               <Divider />
-              <div className="flex flex-col gap-1 text-sm p-2">
+              <div className="flex flex-col gap-2 text-sm p-2">
                 <div className="flex justify-between">
                   <span>วัสดุ:</span>
                   <span className="font-bold text-success">{getMaterialLabel(SURFACE_MATERIALS, surfaceMaterial)}</span>
@@ -866,7 +1186,7 @@ export default function DoorConfigurator() {
                 <span className="font-semibold">🪵 โครง (ERP)</span>
               </div>
             </CardHeader>
-            <CardBody className="gap-4">
+            <CardBody className="gap-2">
               <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit gap-2">
                 <div className="flex items-center justify-center w-full h-full p-2 gap-2">
                   <Select name="frameType" label="ประเภทไม้โครง" labelPlacement="outside" placeholder="Please Select" color="default" variant="bordered" size="md" radius="md" selectedKeys={frameType ? [frameType] : []} onSelectionChange={(keys) => setFrameType([...keys][0] || "")}>
@@ -889,7 +1209,7 @@ export default function DoorConfigurator() {
                 </Chip>
               )}
               {frameType && frameSelection.frames.length > 0 && (
-                <div className="flex flex-col gap-1 text-sm p-2 bg-warning/10 rounded-lg">
+                <div className="flex flex-col gap-2 text-sm p-2 bg-warning/10 rounded-lg">
                   <div className="flex justify-between">
                     <span>ไม้โครงใช้จริง:</span>
                     <span className="font-bold text-secondary">
@@ -911,7 +1231,7 @@ export default function DoorConfigurator() {
                     </Chip>
                   )}
                   {currentFrame.needSplice && (
-                    <div className="flex flex-col gap-1 mt-2 p-2 bg-primary/10 rounded-lg">
+                    <div className="flex flex-col gap-2 mt-2 p-2 bg-primary/10 rounded-lg">
                       <Chip color="primary" variant="flat" size="sm">
                         🔗 ต่อไม้ {currentFrame.spliceCount} ท่อน
                       </Chip>
@@ -958,7 +1278,7 @@ export default function DoorConfigurator() {
               </div>
             </CardHeader>
             <CardBody className="gap-2">
-              <div className="flex flex-col gap-1 text-sm p-2 bg-secondary/10 rounded-lg">
+              <div className="flex flex-col gap-2 text-sm p-2 bg-secondary/10 rounded-lg">
                 <div className="flex justify-between">
                   <span>จำนวนช่อง:</span>
                   <span className="font-bold text-secondary">
@@ -1007,7 +1327,7 @@ export default function DoorConfigurator() {
                 <span className="font-semibold">🔒 Lock Block (รองลูกบิด)</span>
               </div>
             </CardHeader>
-            <CardBody className="gap-4">
+            <CardBody className="gap-2">
               <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit gap-2">
                 <div className="flex items-center justify-center w-full h-full p-2 gap-2">
                   <Select name="lockBlockPiecesPerSide" label="จำนวนต่อฝั่ง" labelPlacement="outside" placeholder="Please Select" color="default" variant="bordered" size="md" radius="md" selectedKeys={lockBlockPiecesPerSide ? [lockBlockPiecesPerSide] : []} onSelectionChange={(keys) => setLockBlockPiecesPerSide([...keys][0] || "")}>
@@ -1027,7 +1347,7 @@ export default function DoorConfigurator() {
                 </div>
               </div>
               {(lockBlockLeft || lockBlockRight) && piecesPerSide > 0 && (
-                <div className="flex flex-col gap-1 text-sm p-2 bg-danger/10 rounded-lg">
+                <div className="flex flex-col gap-2 text-sm p-2 bg-danger/10 rounded-lg">
                   <div className="flex justify-between">
                     <span>จำนวนรวม:</span>
                     <span className="font-bold text-danger">
@@ -1118,9 +1438,9 @@ export default function DoorConfigurator() {
                   <span className="font-semibold">✂️ แผนการตัดไม้ (Cutting Optimization)</span>
                 </div>
               </CardHeader>
-              <CardBody className="gap-4">
+              <CardBody className="gap-2">
                 {cuttingPlan.needSplice && (
-                  <div className="p-3 bg-primary/10 rounded-lg">
+                  <div className="p-2 bg-primary/10 rounded-lg">
                     <div className="flex items-center gap-2 font-medium text-primary mb-1">
                       <span>🔗</span>
                       <span>ต้องต่อไม้โครงตั้ง</span>
@@ -1164,7 +1484,7 @@ export default function DoorConfigurator() {
                             </Chip>
                           )}
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
                           <span>{piece.length} mm</span>
                           <span className="font-bold">×{piece.qty}</span>
                         </div>
@@ -1176,7 +1496,7 @@ export default function DoorConfigurator() {
                   <div className="px-3 py-2 text-xs font-semibold bg-default-100">
                     🪵 แผนการตัด (ไม้ยาว {cuttingPlan.stockLength}mm × {cuttingPlan.totalStocks} ท่อน)
                   </div>
-                  <div className="p-3 space-y-2">
+                  <div className="p-2 space-y-2">
                     {cuttingPlan.stocks.map((stock, stockIdx) => (
                       <div key={stockIdx} className="space-y-1">
                         <div className="text-xs text-foreground/70">ท่อนที่ {stockIdx + 1}</div>
@@ -1244,25 +1564,17 @@ export default function DoorConfigurator() {
           )}
         </div>
 
-        <div className="flex flex-col items-center justify-start w-full xl:w-7/12 h-full gap-4 sticky top-4">
+        <div className="flex flex-col items-center justify-start w-full h-full xl:w-8/12 gap-2 sticky top-2">
           <Card className="w-full">
             <CardHeader className="bg-primary text-white flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <span>📐</span>
                 <span className="font-semibold">Drawing</span>
               </div>
-              {isDataComplete && (
-                <Button color="default" variant="flat" size="sm" radius="md" onPress={() => setIsDrawingModalOpen(true)} startContent={<ZoomIn className="w-4 h-4" />}>
-                  ขยาย
-                </Button>
-              )}
             </CardHeader>
-            <CardBody className="bg-default-50 cursor-pointer" onClick={() => isDataComplete && setIsDrawingModalOpen(true)}>
+            <CardBody className="bg-default-50 p-0 min-h-[600px]">
               {isDataComplete ? (
-                <>
-                  <EngineeringDrawing results={results} />
-                  <p className="text-center mt-2 text-xs text-foreground/60">💡 คลิกที่รูปเพื่อขยาย</p>
-                </>
+                <EnhancedEngineeringDrawing results={results} />
               ) : (
                 <div className="flex flex-col items-center justify-center h-96 gap-2">
                   <RulerDimensionLine className="w-12 h-12 text-default-300" />
@@ -1285,12 +1597,6 @@ export default function DoorConfigurator() {
           </Card>
         </div>
       </div>
-
-      <Modal isOpen={isDrawingModalOpen} onClose={() => setIsDrawingModalOpen(false)}>
-        <div className="min-w-[90vw] max-w-[95vw]">
-          <EngineeringDrawing results={results} />
-        </div>
-      </Modal>
     </div>
   );
 }
