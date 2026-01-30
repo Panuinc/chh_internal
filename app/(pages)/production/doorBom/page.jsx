@@ -328,6 +328,9 @@ const useCalculations = (params) => {
     const lockBlockCount = lockBlockSides * piecesPerSide;
     const railsAdjusted = railPositions.some((pos, idx) => pos !== railPositionsOriginal[idx]);
 
+    const doubleFrameLeftWidth = effectiveSides.left ? F * numericDoubleCount : 0;
+    const doubleFrameRightWidth = effectiveSides.right ? F * numericDoubleCount : 0;
+
     return {
       T,
       W,
@@ -356,7 +359,13 @@ const useCalculations = (params) => {
       lockBlockLeft,
       lockBlockRight,
       currentFrame,
-      doubleFrame: { count: numericDoubleCount, ...effectiveSides, hasAny: hasDoubleFrame },
+      doubleFrame: {
+        count: numericDoubleCount,
+        ...effectiveSides,
+        hasAny: hasDoubleFrame,
+        leftWidth: doubleFrameLeftWidth,
+        rightWidth: doubleFrameRightWidth,
+      },
     };
   }, [doorThickness, doorWidth, doorHeight, surfaceThickness, currentFrame, lockBlockLeft, lockBlockRight, lockBlockPiecesPerSide, doubleFrameSides, doubleFrameCount]);
 };
@@ -374,7 +383,7 @@ const useCuttingPlan = (results, currentFrame) => {
         efficiency: "0.0",
         stockLength: 2040,
         sawKerf: 5,
-        usedWithoutKerf: 0,
+        usedLength: 0,
         needSplice: false,
         spliceCount: 0,
         spliceOverlap: 100,
@@ -389,7 +398,7 @@ const useCuttingPlan = (results, currentFrame) => {
     const cutPieces = [];
 
     const addPiece = (name, finishedLength, qty, color, isSplice = false, withAllowance = true) => {
-      if (!finishedLength || !qty) return;
+      if (!finishedLength || finishedLength <= 0 || !qty) return;
 
       const cutLength = finishedLength + (withAllowance ? CUT_ALLOWANCE : 0);
       cutPieces.push({
@@ -411,7 +420,8 @@ const useCuttingPlan = (results, currentFrame) => {
       addPiece("โครงตั้ง", stileLength, 2, "secondary");
     }
 
-    addPiece("โครงนอน", W - 2 * F, 2, "primary");
+    const railLength = W - 2 * F;
+    addPiece("โครงนอน", railLength, 2, "primary");
 
     const clearHeight = H - 2 * F;
     const clearWidth = W - 2 * F;
@@ -419,46 +429,63 @@ const useCuttingPlan = (results, currentFrame) => {
     if (doubleFrame?.hasAny && doubleFrame.count > 0) {
       const count = doubleFrame.count;
 
-      const addDoubleVertical = (label, enabled) => {
-        if (!enabled) return;
-
+      if (doubleFrame.left) {
         if (needSplice && clearHeight > stockLength) {
           const pieceLength = Math.ceil(clearHeight / 2) + spliceOverlap / 2;
-          addPiece(label + " (ท่อน 1)", pieceLength, count, "warning", true);
-          addPiece(label + " (ท่อน 2)", pieceLength, count, "secondary", true);
+          addPiece("เบิ้ลโครงตั้งซ้าย (ท่อน 1)", pieceLength, count, "warning", true);
+          addPiece("เบิ้ลโครงตั้งซ้าย (ท่อน 2)", pieceLength, count, "secondary", true);
         } else {
-          addPiece(label, clearHeight, count, "warning");
+          addPiece("เบิ้ลโครงตั้งซ้าย", clearHeight, count, "warning");
         }
-      };
+      }
 
-      const addDoubleHorizontal = (label, enabled) => {
-        if (!enabled) return;
-
-        let length = clearWidth;
-
-        const activeVerticalSides = (doubleFrame.left ? 1 : 0) + (doubleFrame.right ? 1 : 0);
-
-        if (activeVerticalSides > 0) {
-          length -= F * activeVerticalSides * count;
+      if (doubleFrame.right) {
+        if (needSplice && clearHeight > stockLength) {
+          const pieceLength = Math.ceil(clearHeight / 2) + spliceOverlap / 2;
+          addPiece("เบิ้ลโครงตั้งขวา (ท่อน 1)", pieceLength, count, "warning", true);
+          addPiece("เบิ้ลโครงตั้งขวา (ท่อน 2)", pieceLength, count, "secondary", true);
+        } else {
+          addPiece("เบิ้ลโครงตั้งขวา", clearHeight, count, "warning");
         }
+      }
 
-        if (length <= 0) {
-          length = clearWidth;
+      if (doubleFrame.center) {
+        if (needSplice && clearHeight > stockLength) {
+          const pieceLength = Math.ceil(clearHeight / 2) + spliceOverlap / 2;
+          addPiece("โครงกลาง (ท่อน 1)", pieceLength, count, "warning", true);
+          addPiece("โครงกลาง (ท่อน 2)", pieceLength, count, "secondary", true);
+        } else {
+          addPiece("โครงกลาง", clearHeight, count, "warning");
         }
+      }
 
-        addPiece(label, length, count, "secondary");
-      };
+      if (doubleFrame.top) {
+        let topLength = clearWidth;
+        if (doubleFrame.left) topLength -= F * count;
+        if (doubleFrame.right) topLength -= F * count;
+        addPiece("เบิ้ลโครงบน", topLength, count, "secondary");
+      }
 
-      addDoubleVertical("เบิ้ลโครงตั้งซ้าย", doubleFrame.left);
-      addDoubleVertical("เบิ้ลโครงตั้งขวา", doubleFrame.right);
-      addDoubleVertical("โครงกลาง", doubleFrame.center);
-      addDoubleHorizontal("เบิ้ลโครงบน", doubleFrame.top);
-      addDoubleHorizontal("เบิ้ลโครงล่าง", doubleFrame.bottom);
+      if (doubleFrame.bottom) {
+        let bottomLength = clearWidth;
+        if (doubleFrame.left) bottomLength -= F * count;
+        if (doubleFrame.right) bottomLength -= F * count;
+        addPiece("เบิ้ลโครงล่าง", bottomLength, count, "secondary");
+      }
     }
 
     const railCount = railSections - 1;
     if (railCount > 0) {
-      addPiece("ไม้ดาม", clearWidth, railCount, "primary");
+      let damLength = clearWidth;
+      if (doubleFrame?.hasAny && doubleFrame.count > 0) {
+        if (doubleFrame.left) damLength -= F * doubleFrame.count;
+        if (doubleFrame.right) damLength -= F * doubleFrame.count;
+      }
+      addPiece("ไม้ดาม", damLength, railCount, "primary");
+    }
+
+    if (lockBlockCount > 0) {
+      addPiece("Lock Block", LOCK_BLOCK_HEIGHT, lockBlockCount, "danger", false, false);
     }
 
     const allPieces = cutPieces
@@ -472,7 +499,8 @@ const useCuttingPlan = (results, currentFrame) => {
 
     const stocks = [];
     allPieces.forEach((piece) => {
-      const pieceWithKerf = (piece.cutLength ?? piece.length) + sawKerf;
+      const pieceCut = piece.cutLength ?? piece.length;
+      const pieceWithKerf = pieceCut + sawKerf;
       const availableStock = stocks.find((s) => s.remaining >= pieceWithKerf);
 
       if (availableStock) {
@@ -489,11 +517,16 @@ const useCuttingPlan = (results, currentFrame) => {
       }
     });
 
-    const usedWithoutKerf = allPieces.reduce((sum, p) => sum + p.length, 0);
+    stocks.forEach((s) => {
+      s.remaining += sawKerf;
+      s.used -= sawKerf;
+    });
+
     const totalStocks = stocks.length;
-    const totalWaste = stocks.reduce((sum, s) => sum + s.remaining, 0);
     const totalStock = totalStocks * stockLength;
-    const efficiency = totalStock ? ((usedWithoutKerf / totalStock) * 100).toFixed(1) : "0.0";
+    const totalWaste = stocks.reduce((sum, s) => sum + s.remaining, 0);
+    const usedLength = totalStock - totalWaste;
+    const efficiency = totalStock ? ((usedLength / totalStock) * 100).toFixed(1) : "0.0";
     const spliceCount = cutPieces.filter((p) => p.isSplice).reduce((sum, p) => sum + p.qty, 0) / 2;
 
     return {
@@ -506,7 +539,7 @@ const useCuttingPlan = (results, currentFrame) => {
       efficiency,
       stockLength,
       sawKerf,
-      usedWithoutKerf,
+      usedLength,
       needSplice,
       spliceCount,
       spliceOverlap,
@@ -937,7 +970,6 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
 
     const getOffset = (isLeft) => {
       const hasDoubleOnSide = hasDoubleFrame && doubleFrame && doubleFrame.count > 0 && (isLeft ? doubleFrame.left : doubleFrame.right);
-
       return dims.front.F + (hasDoubleOnSide ? dims.front.DF : 0);
     };
 
@@ -963,6 +995,9 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
     if (!hasDoubleFrame) return null;
 
     const elements = [];
+    const count = doubleFrame.count;
+    const leftOffset = doubleFrame.left ? dims.front.F * count : 0;
+    const rightOffset = doubleFrame.right ? dims.front.F * count : 0;
 
     const configs = [
       {
@@ -986,25 +1021,25 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
       {
         key: "top",
         getRect: (i) => ({
-          x: positions.front.x + dims.front.F,
+          x: positions.front.x + dims.front.F + leftOffset,
           y: positions.front.y + dims.front.F + dims.front.F * i,
-          w: dims.front.W - 2 * dims.front.F,
+          w: dims.front.W - 2 * dims.front.F - leftOffset - rightOffset,
           h: dims.front.F,
         }),
       },
       {
         key: "bottom",
         getRect: (i) => ({
-          x: positions.front.x + dims.front.F,
+          x: positions.front.x + dims.front.F + leftOffset,
           y: positions.front.y + dims.front.H - dims.front.F - dims.front.F * (i + 1),
-          w: dims.front.W - 2 * dims.front.F,
+          w: dims.front.W - 2 * dims.front.F - leftOffset - rightOffset,
           h: dims.front.F,
         }),
       },
       {
         key: "center",
         getRect: (i) => ({
-          x: positions.front.x + dims.front.W / 2 - dims.front.F / 2 + (i - (doubleFrame.count - 1) / 2) * dims.front.F,
+          x: positions.front.x + dims.front.W / 2 - dims.front.F / 2 + (i - (count - 1) / 2) * dims.front.F,
           y: positions.front.y + dims.front.F,
           w: dims.front.F,
           h: dims.front.H - 2 * dims.front.F,
@@ -1014,7 +1049,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
 
     configs.forEach(({ key, getRect }) => {
       if (!doubleFrame[key]) return;
-      for (let i = 0; i < doubleFrame.count; i++) {
+      for (let i = 0; i < count; i++) {
         const r = getRect(i);
         elements.push(<rect key={`df-${key}-${i}`} className="layer-doubleframe" x={r.x} y={r.y} width={r.w} height={r.h} fill="url(#hatch-doubleframe)" stroke="#000000" strokeWidth="1" strokeDasharray="8,4" />);
       }
@@ -1022,6 +1057,20 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
 
     return elements;
   }, [hasDoubleFrame, positions, dims, doubleFrame]);
+
+  const renderRails = useCallback(() => {
+    if (!railPositions || railPositions.length === 0) return null;
+
+    const leftOffset = hasDoubleFrame && doubleFrame.left ? dims.front.DF : 0;
+    const rightOffset = hasDoubleFrame && doubleFrame.right ? dims.front.DF : 0;
+    const railX = positions.front.x + dims.front.F + leftOffset;
+    const railWidth = dims.front.W - 2 * dims.front.F - leftOffset - rightOffset;
+
+    return railPositions.map((pos, idx) => {
+      const railY = positions.front.y + dims.front.H - pos * DRAWING_SCALE;
+      return <FilledRect key={`front-rail-${idx}`} className="layer-rails" x={railX} y={railY - dims.front.R / 2} width={railWidth} height={dims.front.R} patternId="hatch-rails" strokeWidth={1} />;
+    });
+  }, [railPositions, positions, dims, hasDoubleFrame, doubleFrame]);
 
   const getDoubleFrameDesc = () => {
     if (!hasDoubleFrame || !doubleFrame) return "";
@@ -1240,10 +1289,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
 
                     {renderDoubleFrames()}
 
-                    {railPositions.map((pos, idx) => {
-                      const railY = positions.front.y + dims.front.H - pos * DRAWING_SCALE;
-                      return <FilledRect key={`front-rail-${idx}`} className="layer-rails" x={positions.front.x + dims.front.F} y={railY - dims.front.R / 2} width={dims.front.W - 2 * dims.front.F} height={dims.front.R} patternId="hatch-rails" strokeWidth={1} />;
-                    })}
+                    {renderRails()}
 
                     {renderLockBlocks()}
 
@@ -1386,7 +1432,6 @@ export default function DoorConfigurator() {
   }, [frameSelection, selectedFrameCode]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (frameSelection.frames?.length > 0) setSelectedFrameCode(frameSelection.frames[0].code);
   }, [frameSelection]);
 
@@ -1820,7 +1865,7 @@ export default function DoorConfigurator() {
                     <div className="text-xs text-foreground/80">ประสิทธิภาพ</div>
                   </div>
                   <div className="p-2 rounded-xl text-center border-2 border-default">
-                    <div className="font-bold text-lg text-primary">{cuttingPlan.usedWithoutKerf}</div>
+                    <div className="font-bold text-lg text-primary">{cuttingPlan.usedLength}</div>
                     <div className="text-xs text-foreground/80">ใช้จริง (mm)</div>
                   </div>
                   <div className="p-2 rounded-xl text-center border-2 border-default">
