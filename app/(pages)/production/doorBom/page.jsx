@@ -1,5 +1,7 @@
 "use client";
+import { Calculator, RulerDimensionLine, ZoomIn } from "lucide-react";
 import React, { useState, useMemo, useRef, useEffect } from "react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 
 const THEME_COLORS = {
   background: "#FFFFFF",
@@ -225,18 +227,17 @@ const NumberInput = ({ value, onChange, className }) => {
   const handleKeyDown = (e) => e.key === "Enter" && e.target.blur();
 
   return (
-    <input
+    <Input
       ref={inputRef}
       type="text"
       inputMode="numeric"
       defaultValue={value}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
-      className={className}
-      style={{
-        borderColor: THEME_COLORS.default,
-        color: THEME_COLORS.foreground,
-        backgroundColor: THEME_COLORS.background,
+      size="sm"
+      variant="bordered"
+      classNames={{
+        inputWrapper: ["min-h-unit-8", "h-8", `border-[${THEME_COLORS.default}]`, `bg-[${THEME_COLORS.background}]`, `text-[${THEME_COLORS.foreground}]`],
       }}
     />
   );
@@ -984,7 +985,7 @@ const BottomInfoBar = ({ viewBoxWidth, viewBoxHeight, T, W, H, S, F, R, surfaceM
           Scale:
         </text>
         <text x={viewBoxWidth - 240} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={THEME_COLORS.foreground}>
-          NTS
+          1:25
         </text>
 
         <text x={viewBoxWidth - 155} y={viewBoxHeight - 42} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
@@ -1017,9 +1018,10 @@ const EngineeringDrawing = ({ results }) => {
   const viewBoxWidth = 2100;
   const viewBoxHeight = 2970;
 
-  const frontScale = 1;
-  const sideScale = 1;
-  const backScale = 1;
+  const DRAWING_SCALE = 0.5;
+  const frontScale = DRAWING_SCALE;
+  const sideScale = DRAWING_SCALE;
+  const backScale = DRAWING_SCALE;
 
   const drawingDF = doubleFrame && doubleFrame.hasAny && doubleFrame.count > 0 ? safeF * doubleFrame.count : 0;
 
@@ -1146,7 +1148,7 @@ const EngineeringDrawing = ({ results }) => {
       </text>
 
       <g id="side-view">
-        <text x={positions.side.x + dims.side.T / 2} y={positions.side.y - 60} textAnchor="middle" fontSize="32" fontWeight="bold" fill={THEME_COLORS.foreground}>
+        <text x={positions.side.x + dims.side.T / 2} y={positions.side.y + dims.side.H + 70} textAnchor="middle" fontSize="28" fontWeight="bold" fill={THEME_COLORS.foreground}>
           Side View
         </text>
 
@@ -1176,7 +1178,7 @@ const EngineeringDrawing = ({ results }) => {
       </g>
 
       <g id="front-view">
-        <text x={positions.front.x + dims.front.W / 2} y={positions.front.y - 60} textAnchor="middle" fontSize="32" fontWeight="bold" fill={THEME_COLORS.foreground}>
+        <text x={positions.front.x + dims.front.W / 2} y={positions.front.y + dims.front.H + 70} textAnchor="middle" fontSize="28" fontWeight="bold" fill={THEME_COLORS.foreground}>
           Front View
         </text>
 
@@ -2038,15 +2040,7 @@ export default function DoorConfigurator() {
               </SectionCard>
             ) : (
               <SectionCard text="6" title="แผนการตัดไม้ (Cutting Optimization)" icon="✂️" color="gray">
-                <EmptyState
-                  icon={
-                    <svg className="w-16 h-16 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: THEME_COLORS.default }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                  }
-                  title="กรุณากรอกข้อมูลสเปคประตูให้ครบ"
-                  subtitle="ระบบจะคำนวณแผนการตัดไม้ให้อัตโนมัติ"
-                />
+                <EmptyState icon={<Calculator />} title="กรุณากรอกข้อมูลสเปคประตูให้ครบ" subtitle="ระบบจะคำนวณแผนการตัดไม้ให้อัตโนมัติ" />
               </SectionCard>
             )}
           </div>
@@ -2061,7 +2055,7 @@ export default function DoorConfigurator() {
                 }}
               >
                 <h3 className="text-base font-semibold flex items-center gap-2">
-                  <span>📐</span> แบบสถาปนิก 5 มุมมอง (Engineering Drawing)
+                  <span>📐</span> Drawing
                 </h3>
                 {isDataComplete && (
                   <button
@@ -2072,9 +2066,7 @@ export default function DoorConfigurator() {
                       color: THEME_COLORS.background,
                     }}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                    </svg>
+                    <ZoomIn />
                     ขยาย
                   </button>
                 )}
@@ -2094,15 +2086,7 @@ export default function DoorConfigurator() {
                     </div>
                   </>
                 ) : (
-                  <EmptyState
-                    icon={
-                      <svg className="w-24 h-24 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: THEME_COLORS.default }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-                      </svg>
-                    }
-                    title="กรุณากรอกข้อมูลสเปคประตู"
-                    subtitle="ระบุ ความหนา (T), ความกว้าง (W), ความสูง (H)"
-                  >
+                  <EmptyState icon={<RulerDimensionLine />} title="กรุณากรอกข้อมูลสเปคประตู" subtitle="ระบุ ความหนา (T), ความกว้าง (W), ความสูง (H)">
                     <div className="mt-4 flex gap-2 text-xs">
                       <span
                         className="px-2 py-1 rounded"
