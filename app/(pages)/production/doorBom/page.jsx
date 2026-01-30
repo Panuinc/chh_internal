@@ -1,13 +1,12 @@
 "use client";
 import { Calculator, RulerDimensionLine, ZoomIn } from "lucide-react";
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { Input } from "@heroui/react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 
 const THEME_COLORS = {
   background: "#FFFFFF",
   foreground: "#000000",
   default: "#DCDCDC",
-
   primary: "#4456E9",
   secondary: "#FF8A00",
   danger: "#FF0076",
@@ -33,235 +32,86 @@ const FRAME_TYPES = [
   { value: "lvl", label: "LVL" },
 ];
 
+const DOUBLE_FRAME_SIDES = [
+  { key: "top", label: "บน" },
+  { key: "bottom", label: "ล่าง" },
+  { key: "left", label: "ซ้าย" },
+  { key: "center", label: "กลาง" },
+  { key: "right", label: "ขวา" },
+  { key: "all", label: "ทั้งหมด" },
+];
+
+const LOCK_BLOCK_PIECES_OPTIONS = [1, 2, 3, 4];
+
+const LOCK_BLOCK_POSITIONS = [
+  { key: "left-only", left: true, right: false, label: "ซ้าย" },
+  { key: "right-only", left: false, right: true, label: "ขวา" },
+  { key: "both", left: true, right: true, label: "ทั้งสอง" },
+];
+
 const ERP_FRAMES = {
   rubberwood: [
-    {
-      code: "RM-14-01-26-30-200",
-      desc: "ไม้ยางพาราจ๊อย 26x30x2040mm",
-      thickness: 26,
-      width: 30,
-      length: 2040,
-    },
-    {
-      code: "RM-14-01-26-30-230",
-      desc: "ไม้ยางพาราจ๊อย 26x30x2310mm",
-      thickness: 26,
-      width: 30,
-      length: 2310,
-    },
-    {
-      code: "RM-14-01-26-30-250",
-      desc: "ไม้ยางพาราจ๊อย 26x30x2510mm",
-      thickness: 26,
-      width: 30,
-      length: 2510,
-    },
-    {
-      code: "RM-14-01-26-32-200",
-      desc: "ไม้ยางพาราจ๊อย 26x32x2040mm",
-      thickness: 26,
-      width: 32,
-      length: 2040,
-    },
-    {
-      code: "RM-14-01-26-32-230",
-      desc: "ไม้ยางพาราจ๊อย 26x32x2310mm",
-      thickness: 26,
-      width: 32,
-      length: 2310,
-    },
-    {
-      code: "RM-14-01-26-32-250",
-      desc: "ไม้ยางพาราจ๊อย 26x32x2510mm",
-      thickness: 26,
-      width: 32,
-      length: 2510,
-    },
-    {
-      code: "RM-14-01-28-50-200",
-      desc: "ไม้ยางพาราจ๊อย 28x50x2040mm",
-      thickness: 28,
-      width: 50,
-      length: 2040,
-    },
-    {
-      code: "RM-14-01-28-50-230",
-      desc: "ไม้ยางพาราจ๊อย 28x50x2310mm",
-      thickness: 28,
-      width: 50,
-      length: 2310,
-    },
-    {
-      code: "RM-14-01-28-50-230B",
-      desc: "ไม้ยางพาราจ๊อยB 28x50x2310mm",
-      thickness: 28,
-      width: 50,
-      length: 2310,
-    },
-    {
-      code: "RM-14-01-28-50-250",
-      desc: "ไม้ยางพาราจ๊อย 28x50x2510mm",
-      thickness: 28,
-      width: 50,
-      length: 2510,
-    },
-    {
-      code: "RM-14-01-32-50-200",
-      desc: "ไม้ยางพาราจ๊อย 32x50x2040mm",
-      thickness: 32,
-      width: 50,
-      length: 2040,
-    },
-    {
-      code: "RM-14-01-32-50-230",
-      desc: "ไม้ยางพาราจ๊อย 32x50x2310mm",
-      thickness: 32,
-      width: 50,
-      length: 2310,
-    },
-    {
-      code: "RM-14-01-32-50-250",
-      desc: "ไม้ยางพาราจ๊อย 32x50x2510mm",
-      thickness: 32,
-      width: 50,
-      length: 2510,
-    },
+    { code: "RM-14-01-26-30-200", desc: "ไม้ยางพาราจ๊อย 26x30x2040mm", thickness: 26, width: 30, length: 2040 },
+    { code: "RM-14-01-26-30-230", desc: "ไม้ยางพาราจ๊อย 26x30x2310mm", thickness: 26, width: 30, length: 2310 },
+    { code: "RM-14-01-26-30-250", desc: "ไม้ยางพาราจ๊อย 26x30x2510mm", thickness: 26, width: 30, length: 2510 },
+    { code: "RM-14-01-26-32-200", desc: "ไม้ยางพาราจ๊อย 26x32x2040mm", thickness: 26, width: 32, length: 2040 },
+    { code: "RM-14-01-26-32-230", desc: "ไม้ยางพาราจ๊อย 26x32x2310mm", thickness: 26, width: 32, length: 2310 },
+    { code: "RM-14-01-26-32-250", desc: "ไม้ยางพาราจ๊อย 26x32x2510mm", thickness: 26, width: 32, length: 2510 },
+    { code: "RM-14-01-28-50-200", desc: "ไม้ยางพาราจ๊อย 28x50x2040mm", thickness: 28, width: 50, length: 2040 },
+    { code: "RM-14-01-28-50-230", desc: "ไม้ยางพาราจ๊อย 28x50x2310mm", thickness: 28, width: 50, length: 2310 },
+    { code: "RM-14-01-28-50-230B", desc: "ไม้ยางพาราจ๊อยB 28x50x2310mm", thickness: 28, width: 50, length: 2310 },
+    { code: "RM-14-01-28-50-250", desc: "ไม้ยางพาราจ๊อย 28x50x2510mm", thickness: 28, width: 50, length: 2510 },
+    { code: "RM-14-01-32-50-200", desc: "ไม้ยางพาราจ๊อย 32x50x2040mm", thickness: 32, width: 50, length: 2040 },
+    { code: "RM-14-01-32-50-230", desc: "ไม้ยางพาราจ๊อย 32x50x2310mm", thickness: 32, width: 50, length: 2310 },
+    { code: "RM-14-01-32-50-250", desc: "ไม้ยางพาราจ๊อย 32x50x2510mm", thickness: 32, width: 50, length: 2510 },
   ],
   sadao: [
-    {
-      code: "RM-14-04-32-50-200",
-      desc: "ไม้สะเดาจ๊อย 32x50x2040mm",
-      thickness: 32,
-      width: 50,
-      length: 2040,
-    },
-    {
-      code: "RM-14-04-32-50-225",
-      desc: "ไม้สะเดาจ๊อย 32x50x2250mm",
-      thickness: 32,
-      width: 50,
-      length: 2250,
-    },
-    {
-      code: "RM-14-04-32-50-230",
-      desc: "ไม้สะเดาจ๊อย 32x50x2300mm",
-      thickness: 32,
-      width: 50,
-      length: 2300,
-    },
-    {
-      code: "RM-14-04-32-50-250",
-      desc: "ไม้สะเดาจ๊อย 32x50x2500mm",
-      thickness: 32,
-      width: 50,
-      length: 2500,
-    },
+    { code: "RM-14-04-32-50-200", desc: "ไม้สะเดาจ๊อย 32x50x2040mm", thickness: 32, width: 50, length: 2040 },
+    { code: "RM-14-04-32-50-225", desc: "ไม้สะเดาจ๊อย 32x50x2250mm", thickness: 32, width: 50, length: 2250 },
+    { code: "RM-14-04-32-50-230", desc: "ไม้สะเดาจ๊อย 32x50x2300mm", thickness: 32, width: 50, length: 2300 },
+    { code: "RM-14-04-32-50-250", desc: "ไม้สะเดาจ๊อย 32x50x2500mm", thickness: 32, width: 50, length: 2500 },
   ],
   lvl: [
-    {
-      code: "RM-16-19-2.9-3.4-258",
-      desc: "ไม้อัด LVL 29x34x2580mm",
-      thickness: 29,
-      width: 34,
-      length: 2580,
-    },
-    {
-      code: "RM-16-19-2.9-3.5-202",
-      desc: "ไม้อัด LVL 29x35x2020mm",
-      thickness: 29,
-      width: 35,
-      length: 2020,
-    },
-    {
-      code: "RM-16-19-2.9-3.5-244",
-      desc: "ไม้อัด LVL 29x35x2440mm",
-      thickness: 29,
-      width: 35,
-      length: 2440,
-    },
-    {
-      code: "RM-16-19-2.9-3.5-258",
-      desc: "ไม้อัด LVL 29x35x2580mm",
-      thickness: 29,
-      width: 35,
-      length: 2580,
-    },
-    {
-      code: "RM-16-19-3.2-3.5-202",
-      desc: "ไม้อัด LVL 32x35x2020mm",
-      thickness: 32,
-      width: 35,
-      length: 2020,
-    },
-    {
-      code: "RM-16-19-3.2-3.5-244",
-      desc: "ไม้อัด LVL 32x35x2440mm",
-      thickness: 32,
-      width: 35,
-      length: 2440,
-    },
+    { code: "RM-16-19-2.9-3.4-258", desc: "ไม้อัด LVL 29x34x2580mm", thickness: 29, width: 34, length: 2580 },
+    { code: "RM-16-19-2.9-3.5-202", desc: "ไม้อัด LVL 29x35x2020mm", thickness: 29, width: 35, length: 2020 },
+    { code: "RM-16-19-2.9-3.5-244", desc: "ไม้อัด LVL 29x35x2440mm", thickness: 29, width: 35, length: 2440 },
+    { code: "RM-16-19-2.9-3.5-258", desc: "ไม้อัด LVL 29x35x2580mm", thickness: 29, width: 35, length: 2580 },
+    { code: "RM-16-19-3.2-3.5-202", desc: "ไม้อัด LVL 32x35x2020mm", thickness: 32, width: 35, length: 2020 },
+    { code: "RM-16-19-3.2-3.5-244", desc: "ไม้อัด LVL 32x35x2440mm", thickness: 32, width: 35, length: 2440 },
   ],
 };
 
-const GRID_LETTERS = ["A", "B", "C", "D", "E", "F"];
-const GRID_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8];
+const COLOR_MAP = {
+  blue: THEME_COLORS.primary,
+  indigo: THEME_COLORS.primary,
+  primary: THEME_COLORS.primary,
+  green: THEME_COLORS.success,
+  success: THEME_COLORS.success,
+  amber: THEME_COLORS.warning,
+  orange: THEME_COLORS.secondary,
+  warning: THEME_COLORS.warning,
+  secondary: THEME_COLORS.secondary,
+  red: THEME_COLORS.danger,
+  danger: THEME_COLORS.danger,
+  gray: THEME_COLORS.default,
+  slate: THEME_COLORS.default,
+  default: THEME_COLORS.default,
+  purple: THEME_COLORS.primary,
+};
 
-const LEGEND_ITEMS = [
-  {
-    key: "surface",
-    dx: 415,
-    dy: -105,
-    fill: `${THEME_COLORS.success}33`,
-    stroke: THEME_COLORS.success,
-    label: "Surface Material",
-  },
-  {
-    key: "frame-stile",
-    dx: 525,
-    dy: -105,
-    fill: `${THEME_COLORS.warning}33`,
-    stroke: THEME_COLORS.warning,
-    label: "Frame (Stile)",
-  },
-  {
-    key: "frame-rail",
-    dx: 415,
-    dy: -88,
-    fill: `${THEME_COLORS.secondary}33`,
-    stroke: THEME_COLORS.secondary,
-    label: "Frame (Rail)",
-  },
-  {
-    key: "lock-block",
-    dx: 525,
-    dy: -88,
-    fill: `${THEME_COLORS.danger}33`,
-    stroke: THEME_COLORS.danger,
-    label: "Lock Block",
-  },
-  {
-    key: "core",
-    dx: 415,
-    dy: -71,
-    fill: `${THEME_COLORS.primary}11`,
-    stroke: THEME_COLORS.default,
-    label: "Core (Honeycomb)",
-    dashed: true,
-  },
-  {
-    key: "double-frame",
-    dx: 525,
-    dy: -71,
-    fill: `${THEME_COLORS.warning}11`,
-    stroke: THEME_COLORS.warning,
-    label: "Double Frame",
-    dashed: true,
-  },
-];
+const STAT_VARIANT_MAP = {
+  default: THEME_COLORS.foreground,
+  primary: THEME_COLORS.primary,
+  success: THEME_COLORS.success,
+  danger: THEME_COLORS.danger,
+  warning: THEME_COLORS.warning,
+};
 
 const formatDimension = (t, w, h, separator = "×") => `${t || "-"}${separator}${w || "-"}${separator}${h || "-"}`;
 
 const getMaterialLabel = (materials, value) => materials.find((m) => m.value === value)?.label || "-";
+
+const getColor = (color) => COLOR_MAP[color] ?? THEME_COLORS.default;
 
 const getEfficiencyColor = (efficiency) => {
   const val = parseFloat(String(efficiency)) || 0;
@@ -270,7 +120,9 @@ const getEfficiencyColor = (efficiency) => {
   return THEME_COLORS.danger;
 };
 
-const NumberInput = React.memo(function NumberInput({ value, onChange }) {
+const createStyleObject = (styles) => Object.fromEntries(Object.entries(styles).filter(([_, v]) => v !== undefined));
+
+const NumberInput = ({ value, onChange }) => {
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -279,106 +131,49 @@ const NumberInput = React.memo(function NumberInput({ value, onChange }) {
     }
   }, [value]);
 
-  const handleBlur = (e) => {
-    const num = parseFloat(e.target.value);
-    if (onChange) onChange(Number.isNaN(num) ? 0 : num);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") e.target.blur();
-  };
+  const handleBlur = (e) => onChange(parseFloat(e.target.value) || 0);
+  const handleKeyDown = (e) => e.key === "Enter" && e.target.blur();
 
   return <Input ref={inputRef} type="text" inputMode="numeric" defaultValue={value} onBlur={handleBlur} onKeyDown={handleKeyDown} labelPlacement="outside" placeholder="Please Enter Number" color="default" variant="bordered" size="md" radius="md" />;
-});
+};
 
-const QuickSelectWithInput = React.memo(function QuickSelectWithInput({ label, value, onChange }) {
-  return (
-    <div>
-      <label className="block text-xs font-medium mb-1" style={{ color: THEME_COLORS.foreground }}>
-        {label}
-      </label>
-      <div className="flex items-center gap-1">
-        <NumberInput value={value} onChange={onChange} />
-      </div>
+const QuickSelectWithInput = ({ label, value, onChange }) => (
+  <div>
+    <label className="block text-xs font-medium mb-1" style={{ color: THEME_COLORS.foreground }}>
+      {label}
+    </label>
+    <div className="flex items-center gap-1">
+      <NumberInput value={value} onChange={onChange} className="flex-1 px-2 py-1.5 rounded text-center text-sm font-bold focus:outline-none focus:ring-2" />
     </div>
-  );
-});
+  </div>
+);
 
-const InfoRow = React.memo(function InfoRow({ label, value, className = "" }) {
-  return (
-    <div className={`flex justify-between ${className}`}>
-      <span style={{ color: THEME_COLORS.foreground }}>{label}</span>
-      <span className="font-bold" style={{ color: THEME_COLORS.foreground }}>
-        {value}
-      </span>
+const InfoRow = ({ label, value, className = "" }) => (
+  <div className={`flex justify-between ${className}`}>
+    <span style={{ color: THEME_COLORS.foreground }}>{label}</span>
+    <span className="font-bold" style={{ color: THEME_COLORS.foreground }}>
+      {value}
+    </span>
+  </div>
+);
+
+const StatCard = ({ value, label, variant = "default" }) => (
+  <div className="p-2 rounded-lg text-center border" style={{ backgroundColor: THEME_COLORS.background, borderColor: THEME_COLORS.default }}>
+    <div className="font-bold text-lg" style={{ color: STAT_VARIANT_MAP[variant] ?? THEME_COLORS.foreground }}>
+      {value}
     </div>
-  );
-});
-
-const StatCard = React.memo(function StatCard({ value, label, variant = "default" }) {
-  const colorMap = {
-    default: THEME_COLORS.foreground,
-    primary: THEME_COLORS.primary,
-    success: THEME_COLORS.success,
-    danger: THEME_COLORS.danger,
-    warning: THEME_COLORS.warning,
-  };
-  const valueColor = colorMap[variant] ?? THEME_COLORS.foreground;
-
-  return (
-    <div
-      className="p-2 rounded-lg text-center border"
-      style={{
-        backgroundColor: THEME_COLORS.background,
-        borderColor: THEME_COLORS.default,
-      }}
-    >
-      <div className="font-bold text-lg" style={{ color: valueColor }}>
-        {value}
-      </div>
-      <div className="text-xs" style={{ color: THEME_COLORS.foreground, opacity: 0.8 }}>
-        {label}
-      </div>
+    <div className="text-xs" style={{ color: THEME_COLORS.foreground, opacity: 0.8 }}>
+      {label}
     </div>
-  );
-});
+  </div>
+);
 
-const SectionCard = React.memo(function SectionCard({ text, title, icon, children, color = "primary" }) {
-  const colorMap = {
-    blue: THEME_COLORS.primary,
-    indigo: THEME_COLORS.primary,
-    primary: THEME_COLORS.primary,
-    green: THEME_COLORS.success,
-    success: THEME_COLORS.success,
-    amber: THEME_COLORS.warning,
-    orange: THEME_COLORS.secondary,
-    warning: THEME_COLORS.warning,
-    secondary: THEME_COLORS.secondary,
-    red: THEME_COLORS.danger,
-    danger: THEME_COLORS.danger,
-    gray: THEME_COLORS.default,
-    slate: THEME_COLORS.default,
-    default: THEME_COLORS.default,
-  };
-
-  const headerColor = colorMap[color] ?? THEME_COLORS.default;
-
+const SectionCard = ({ text, title, icon, children, color = "primary" }) => {
+  const headerColor = getColor(color);
   return (
-    <div
-      className="rounded-2xl shadow-lg overflow-hidden"
-      style={{
-        backgroundColor: THEME_COLORS.background,
-        border: `1px solid ${THEME_COLORS.default}`,
-      }}
-    >
+    <div className="rounded-2xl shadow-lg overflow-hidden" style={{ backgroundColor: THEME_COLORS.background, border: `1px solid ${THEME_COLORS.default}` }}>
       <div className="px-4 py-2.5 flex items-center gap-2" style={{ backgroundColor: headerColor, color: THEME_COLORS.background }}>
-        <span
-          className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold"
-          style={{
-            backgroundColor: THEME_COLORS.background,
-            color: headerColor,
-          }}
-        >
+        <span className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold" style={{ backgroundColor: THEME_COLORS.background, color: headerColor }}>
           {text}
         </span>
         <span>{icon}</span>
@@ -387,42 +182,57 @@ const SectionCard = React.memo(function SectionCard({ text, title, icon, childre
       <div className="p-4">{children}</div>
     </div>
   );
-});
+};
 
-const InfoBox = React.memo(function InfoBox({ children, color = "default", className = "" }) {
-  const colorMap = {
-    blue: THEME_COLORS.primary,
-    green: THEME_COLORS.success,
-    amber: THEME_COLORS.warning,
-    orange: THEME_COLORS.secondary,
-    red: THEME_COLORS.danger,
-    purple: THEME_COLORS.primary,
-    gray: THEME_COLORS.default,
-    default: THEME_COLORS.default,
-  };
-
-  const mainColor = colorMap[color] ?? THEME_COLORS.default;
+const InfoBox = ({ children, color = "default", className = "" }) => {
+  const mainColor = getColor(color);
   const textColor = color === "gray" || color === "default" ? THEME_COLORS.foreground : mainColor;
-
   return (
-    <div
-      className={`p-2 rounded-lg border text-xs ${className}`}
-      style={{
-        borderColor: mainColor,
-        backgroundColor: THEME_COLORS.background,
-        color: textColor,
-      }}
-    >
+    <div className={`p-2 rounded-lg border text-xs ${className}`} style={{ borderColor: mainColor, backgroundColor: THEME_COLORS.background, color: textColor }}>
       {children}
     </div>
   );
-});
+};
 
-const RadioOptionCard = React.memo(function RadioOptionCard({ name, checked, onChange, label, sublabel, isActive }) {
+const ToggleButton = ({ active, onClick, children, className = "" }) => (
+  <button
+    onClick={onClick}
+    className={`py-1.5 px-2 rounded text-xs font-medium transition-all ${className}`}
+    style={{
+      backgroundColor: active ? THEME_COLORS.success : THEME_COLORS.default,
+      color: active ? THEME_COLORS.background : THEME_COLORS.foreground,
+    }}
+  >
+    {children}
+  </button>
+);
+
+const ToggleButtonGroup = ({ options, value, onChange, getActiveColor = () => THEME_COLORS.success, className = "" }) => (
+  <div className={`grid gap-1 ${className}`}>
+    {options.map((opt) => {
+      const active = value === opt.value;
+      const activeColor = getActiveColor(opt);
+      return (
+        <button
+          key={opt.value}
+          onClick={() => onChange(opt.value)}
+          className="py-1.5 px-2 rounded text-xs font-medium transition-all"
+          style={{
+            backgroundColor: active ? activeColor : THEME_COLORS.default,
+            color: active ? THEME_COLORS.background : THEME_COLORS.foreground,
+          }}
+        >
+          {opt.label}
+        </button>
+      );
+    })}
+  </div>
+);
+
+const RadioOptionCard = ({ name, checked, onChange, label, sublabel, isActive }) => {
   const bg = isActive ? THEME_COLORS.danger : THEME_COLORS.background;
   const border = isActive ? THEME_COLORS.danger : THEME_COLORS.default;
   const text = isActive ? THEME_COLORS.background : THEME_COLORS.foreground;
-
   return (
     <label className="flex flex-col items-center gap-1 p-3 rounded-lg border-2 cursor-pointer transition-all" style={{ backgroundColor: bg, borderColor: border, color: text }}>
       <input type="radio" name={name} checked={checked} onChange={onChange} className="w-4 h-4" />
@@ -430,45 +240,36 @@ const RadioOptionCard = React.memo(function RadioOptionCard({ name, checked, onC
       {sublabel && <span className="text-[10px] font-bold">{sublabel}</span>}
     </label>
   );
-});
+};
 
-const Modal = React.memo(function Modal({ isOpen, onClose, children }) {
+const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose} style={{ backgroundColor: `${THEME_COLORS.foreground}BF` }}>
       <div className="relative rounded-lg shadow-2xl max-w-[95vw] max-h-[95vh] overflow-auto" style={{ backgroundColor: THEME_COLORS.background }} onClick={(e) => e.stopPropagation()}>
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 z-10 rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold shadow-lg transition-colors"
-          style={{
-            backgroundColor: THEME_COLORS.danger,
-            color: THEME_COLORS.background,
-          }}
-        >
+        <button onClick={onClose} className="absolute top-2 right-2 z-10 rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold shadow-lg transition-colors" style={{ backgroundColor: THEME_COLORS.danger, color: THEME_COLORS.background }}>
           ✕
         </button>
         <div className="p-4">{children}</div>
       </div>
     </div>
   );
-});
+};
 
-const EmptyState = React.memo(function EmptyState({ icon, title, subtitle, children }) {
-  return (
-    <div className="flex flex-col items-center justify-center h-96">
-      <div style={{ color: THEME_COLORS.default }}>{icon}</div>
-      <p className="text-lg font-medium mb-2" style={{ color: THEME_COLORS.foreground }}>
-        {title}
-      </p>
-      <p className="text-sm" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
-        {subtitle}
-      </p>
-      {children}
-    </div>
-  );
-});
+const EmptyState = ({ icon, title, subtitle, children }) => (
+  <div className="flex flex-col items-center justify-center h-96">
+    <div style={{ color: THEME_COLORS.default }}>{icon}</div>
+    <p className="text-lg font-medium mb-2" style={{ color: THEME_COLORS.foreground }}>
+      {title}
+    </p>
+    <p className="text-sm" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
+      {subtitle}
+    </p>
+    {children}
+  </div>
+);
 
-const DimLine = React.memo(function DimLine({ x1, y1, x2, y2, value, offset = 25, vertical = false, color = THEME_COLORS.foreground, fontSize = 9, unit = "" }) {
+const DimLine = ({ x1, y1, x2, y2, value, offset = 25, vertical = false, color = THEME_COLORS.foreground, fontSize = 9, unit = "" }) => {
   const arrowSize = 3;
   const displayValue = unit ? `${value}${unit}` : value;
   const textWidth = String(displayValue).length * 4 + 8;
@@ -506,181 +307,35 @@ const DimLine = React.memo(function DimLine({ x1, y1, x2, y2, value, offset = 25
       </text>
     </g>
   );
-});
-
-const CenterLine = React.memo(function CenterLine({ x1, y1, x2, y2 }) {
-  return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={THEME_COLORS.foreground} strokeWidth="0.3" strokeDasharray="10,3,2,3" />;
-});
-
-const LockBlockSVG = React.memo(function LockBlockSVG({ x, y, width, height }) {
-  return (
-    <g>
-      <rect x={x} y={y} width={width} height={height} fill={`${THEME_COLORS.danger}44`} stroke={THEME_COLORS.danger} strokeWidth="0.8" />
-      <line x1={x} y1={y} x2={x + width} y2={y + height} stroke={THEME_COLORS.danger} strokeWidth="0.4" />
-      <line x1={x + width} y1={y} x2={x} y2={y + height} stroke={THEME_COLORS.danger} strokeWidth="0.4" />
-    </g>
-  );
-});
-
-const getDoubleFrameDesc = (hasDoubleFrame, doubleFrame) => {
-  if (!hasDoubleFrame || !doubleFrame) return "";
-  const sides = [];
-  if (doubleFrame.top) sides.push("บน");
-  if (doubleFrame.bottom) sides.push("ล่าง");
-  if (doubleFrame.left) sides.push("ซ้าย");
-  if (doubleFrame.right) sides.push("ขวา");
-  if (doubleFrame.center) sides.push("กลาง");
-  return sides.length > 0 ? `(Double: ${sides.join(", ")} x${doubleFrame.count})` : "(Double)";
 };
 
-const BottomInfoBar = React.memo(function BottomInfoBar({ viewBoxWidth, viewBoxHeight, T, W, H, S, F, R, surfaceMaterial, frameType, hasDoubleFrame, doubleFrame, railSections, railPositions, lockBlockCount, currentFrame }) {
-  const doubleFrameDesc = getDoubleFrameDesc(hasDoubleFrame, doubleFrame);
+const CenterLine = ({ x1, y1, x2, y2 }) => <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={THEME_COLORS.foreground} strokeWidth="0.3" strokeDasharray="10,3,2,3" />;
 
-  return (
-    <g id="bottom-info">
-      <rect x="20" y={viewBoxHeight - 145} width={viewBoxWidth - 40} height="130" fill={THEME_COLORS.background} stroke={THEME_COLORS.primary} strokeWidth="1.5" rx="3" />
+const LockBlockSVG = ({ x, y, width, height }) => (
+  <g>
+    <rect x={x} y={y} width={width} height={height} fill={`${THEME_COLORS.danger}44`} stroke={THEME_COLORS.danger} strokeWidth="0.8" />
+    <line x1={x} y1={y} x2={x + width} y2={y + height} stroke={THEME_COLORS.danger} strokeWidth="0.4" />
+    <line x1={x + width} y1={y} x2={x} y2={y + height} stroke={THEME_COLORS.danger} strokeWidth="0.4" />
+  </g>
+);
 
-      <g id="specs">
-        <rect x="25" y={viewBoxHeight - 140} width="370" height="20" fill={THEME_COLORS.primary} rx="2" />
-        <text x="35" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill={THEME_COLORS.background}>
-          📋 SPECIFICATIONS
-        </text>
-        <rect x="25" y={viewBoxHeight - 118} width="370" height="100" fill={THEME_COLORS.background} stroke={THEME_COLORS.default} strokeWidth="0.5" />
+const FilledRect = ({ x, y, width, height, color, strokeWidth = 1, opacity = 0.2, strokeDasharray }) => (
+  <rect
+    x={x}
+    y={y}
+    width={width}
+    height={height}
+    fill={`${color}${Math.round(opacity * 255)
+      .toString(16)
+      .padStart(2, "0")}`}
+    stroke={color}
+    strokeWidth={strokeWidth}
+    strokeDasharray={strokeDasharray}
+  />
+);
 
-        <text x="35" y={viewBoxHeight - 100} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
-          Door Size:
-        </text>
-        <text x="35" y={viewBoxHeight - 88} fontSize="11" fontWeight="bold" fill={THEME_COLORS.foreground}>
-          {T} × {W} × {H} mm
-        </text>
-
-        <text x="35" y={viewBoxHeight - 70} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
-          Surface Material:
-        </text>
-        <text x="35" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill={THEME_COLORS.success}>
-          {surfaceMaterial} {S || 0}mm × 2
-        </text>
-
-        <text x="35" y={viewBoxHeight - 40} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
-          Frame:
-        </text>
-        <text x="35" y={viewBoxHeight - 28} fontSize="9" fontWeight="600" fill={THEME_COLORS.secondary}>
-          {R || 0}×{F || 0}mm {hasDoubleFrame ? doubleFrameDesc : ""}
-        </text>
-
-        <text x="200" y={viewBoxHeight - 100} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
-          Horizontal Rails:
-        </text>
-        <text x="200" y={viewBoxHeight - 88} fontSize="9" fontWeight="600" fill={THEME_COLORS.secondary}>
-          {railSections - 1} pcs @ {railPositions.join(", ") || "-"} mm
-        </text>
-
-        <text x="200" y={viewBoxHeight - 70} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
-          Lock Block:
-        </text>
-        <text x="200" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill={THEME_COLORS.danger}>
-          {lockBlockCount} pcs ({R || 0}×{F || 0}×{LOCK_BLOCK_HEIGHT}mm)
-        </text>
-
-        {currentFrame.code && (
-          <>
-            <text x="200" y={viewBoxHeight - 40} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
-              ERP Code:
-            </text>
-            <text x="200" y={viewBoxHeight - 28} fontSize="8" fontWeight="500" fill={THEME_COLORS.primary} fontFamily="monospace">
-              {currentFrame.code}
-            </text>
-          </>
-        )}
-      </g>
-
-      <g id="legend">
-        <rect x="405" y={viewBoxHeight - 140} width="280" height="20" fill={THEME_COLORS.primary} rx="2" />
-        <text x="415" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill={THEME_COLORS.background}>
-          🎨 LEGEND
-        </text>
-        <rect x="405" y={viewBoxHeight - 118} width="280" height="100" fill={THEME_COLORS.background} stroke={THEME_COLORS.default} strokeWidth="0.5" />
-
-        {LEGEND_ITEMS.map((item) => (
-          <g key={item.key}>
-            <rect x={item.dx} y={viewBoxHeight + item.dy} width="16" height="10" fill={item.fill} stroke={item.stroke} strokeWidth="0.8" rx="1" strokeDasharray={item.dashed ? "2,1" : undefined} />
-            <text x={item.dx + 20} y={viewBoxHeight + item.dy + 8} fontSize="7" fill={THEME_COLORS.foreground}>
-              {item.label}
-            </text>
-          </g>
-        ))}
-
-        <line x1="415" y1={viewBoxHeight - 49} x2="431" y2={viewBoxHeight - 49} stroke={THEME_COLORS.foreground} strokeWidth="0.6" strokeDasharray="8,2,2,2" />
-        <text x="435" y={viewBoxHeight - 46} fontSize="7" fill={THEME_COLORS.foreground}>
-          Center Line
-        </text>
-
-        <line x1="525" y1={viewBoxHeight - 49} x2="541" y2={viewBoxHeight - 49} stroke={THEME_COLORS.foreground} strokeWidth="0.6" strokeDasharray="3,3" />
-        <text x="545" y={viewBoxHeight - 46} fontSize="7" fill={THEME_COLORS.foreground}>
-          Hidden Line
-        </text>
-
-        <line x1="415" y1={viewBoxHeight - 32} x2="431" y2={viewBoxHeight - 32} stroke={THEME_COLORS.foreground} strokeWidth="0.6" />
-        <polygon points={`415,${viewBoxHeight - 32} 418,${viewBoxHeight - 34} 418,${viewBoxHeight - 30}`} fill={THEME_COLORS.foreground} />
-        <polygon points={`431,${viewBoxHeight - 32} 428,${viewBoxHeight - 34} 428,${viewBoxHeight - 30}`} fill={THEME_COLORS.foreground} />
-        <text x="435" y={viewBoxHeight - 29} fontSize="7" fill={THEME_COLORS.foreground}>
-          Dimension Line
-        </text>
-      </g>
-
-      <g id="title-block">
-        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="120" fill={THEME_COLORS.background} stroke={THEME_COLORS.primary} strokeWidth="1.5" rx="2" />
-        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="28" fill={THEME_COLORS.primary} rx="2" />
-        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 115} width="280" height="3" fill={THEME_COLORS.primary} />
-        <text x={viewBoxWidth - 165} y={viewBoxHeight - 121} textAnchor="middle" fontSize="13" fontWeight="bold" fill={THEME_COLORS.background}>
-          DOOR FRAME ASSEMBLY
-        </text>
-
-        <rect x={viewBoxWidth - 300} y={viewBoxHeight - 107} width="270" height="22" fill={`${THEME_COLORS.default}33`} rx="1" />
-        <text x={viewBoxWidth - 290} y={viewBoxHeight - 92} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
-          Size:
-        </text>
-        <text x={viewBoxWidth - 165} y={viewBoxHeight - 91} textAnchor="middle" fontSize="14" fontWeight="bold" fill={THEME_COLORS.foreground}>
-          {T} × {W} × {H} mm
-        </text>
-
-        <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 82} x2={viewBoxWidth - 30} y2={viewBoxHeight - 82} stroke={THEME_COLORS.default} strokeWidth="0.5" />
-        <text x={viewBoxWidth - 290} y={viewBoxHeight - 68} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
-          Material:
-        </text>
-        <text x={viewBoxWidth - 165} y={viewBoxHeight - 68} textAnchor="middle" fontSize="10" fontWeight="600" fill={THEME_COLORS.success}>
-          {surfaceMaterial} + {frameType}
-        </text>
-
-        <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 55} x2={viewBoxWidth - 30} y2={viewBoxHeight - 55} stroke={THEME_COLORS.default} strokeWidth="0.5" />
-        <line x1={viewBoxWidth - 165} y1={viewBoxHeight - 55} x2={viewBoxWidth - 165} y2={viewBoxHeight - 35} stroke={THEME_COLORS.default} strokeWidth="0.5" />
-
-        <text x={viewBoxWidth - 290} y={viewBoxHeight - 42} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
-          Scale:
-        </text>
-        <text x={viewBoxWidth - 240} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={THEME_COLORS.foreground}>
-          1:25
-        </text>
-
-        <text x={viewBoxWidth - 155} y={viewBoxHeight - 42} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
-          Rev:
-        </text>
-        <text x={viewBoxWidth - 120} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={THEME_COLORS.foreground}>
-          1.0
-        </text>
-
-        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 35} width="280" height="15" fill={THEME_COLORS.background} />
-        <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 35} x2={viewBoxWidth - 30} y2={viewBoxHeight - 35} stroke={THEME_COLORS.default} strokeWidth="0.5" />
-        <text x={viewBoxWidth - 165} y={viewBoxHeight - 24} textAnchor="middle" fontSize="9" fontWeight="bold" fill={THEME_COLORS.primary}>
-          C.H.H INDUSTRY CO., LTD.
-        </text>
-      </g>
-    </g>
-  );
-});
-
-const useFrameSelection = (frameType, doorThickness, surfaceThickness, doorHeight) =>
-  useMemo(() => {
+const useFrameSelection = (frameType, doorThickness, surfaceThickness, doorHeight) => {
+  return useMemo(() => {
     const S = parseFloat(surfaceThickness) || 0;
     const requiredThickness = doorThickness ? parseFloat(doorThickness) - (S + GLUE_THICKNESS) * 2 : 0;
     const requiredLength = doorHeight ? parseFloat(doorHeight) : 0;
@@ -792,11 +447,12 @@ const useFrameSelection = (frameType, doorThickness, surfaceThickness, doorHeigh
       reason: maxLength > 0 ? `ไม่มีไม้ที่ใช้ได้ (ต้องการ ≥${requiredLength}mm, ต่อได้สูงสุด ${maxSpliceLength}mm)` : `ไม่มีไม้ความหนา ${requiredThickness}mm`,
     };
   }, [frameType, doorThickness, surfaceThickness, doorHeight]);
+};
 
-const useCalculations = (params) =>
-  useMemo(() => {
-    const { doorThickness, doorWidth, doorHeight, surfaceThickness, currentFrame, lockBlockLeft, lockBlockRight, lockBlockPiecesPerSide, doubleFrameSides, doubleFrameCount } = params;
+const useCalculations = (params) => {
+  const { doorThickness, doorWidth, doorHeight, surfaceThickness, currentFrame, lockBlockLeft, lockBlockRight, lockBlockPiecesPerSide, doubleFrameSides, doubleFrameCount } = params;
 
+  return useMemo(() => {
     const T = parseFloat(doorThickness) || 0;
     const W = parseFloat(doorWidth) || 0;
     const H = parseFloat(doorHeight) || 0;
@@ -816,7 +472,7 @@ const useCalculations = (params) =>
     };
 
     const numericDoubleCount = parseInt(doubleFrameCount) || 0;
-    const hasDoubleFrame = numericDoubleCount > 0 && (effectiveSides.top || effectiveSides.bottom || effectiveSides.left || effectiveSides.right || effectiveSides.center);
+    const hasDoubleFrame = numericDoubleCount > 0 && Object.values(effectiveSides).some(Boolean);
 
     const DF = hasDoubleFrame ? F * numericDoubleCount : 0;
     const totalFrameWidth = F + (hasDoubleFrame ? DF : 0);
@@ -890,18 +546,15 @@ const useCalculations = (params) =>
       currentFrame,
       doubleFrame: {
         count: numericDoubleCount,
-        top: effectiveSides.top,
-        bottom: effectiveSides.bottom,
-        left: effectiveSides.left,
-        right: effectiveSides.right,
-        center: effectiveSides.center,
+        ...effectiveSides,
         hasAny: hasDoubleFrame,
       },
     };
-  }, [params]);
+  }, [doorThickness, doorWidth, doorHeight, surfaceThickness, currentFrame, lockBlockLeft, lockBlockRight, lockBlockPiecesPerSide, doubleFrameSides, doubleFrameCount]);
+};
 
-const useCuttingPlan = (results, currentFrame) =>
-  useMemo(() => {
+const useCuttingPlan = (results, currentFrame) => {
+  return useMemo(() => {
     const { W, H, F, railSections, lockBlockCount, doubleFrame } = results;
     const stockLength = currentFrame.length || 2040;
     const sawKerf = 5;
@@ -929,7 +582,7 @@ const useCuttingPlan = (results, currentFrame) =>
     const clearHeight = H - 2 * F;
     const clearWidth = W - 2 * F;
 
-    if (doubleFrame && doubleFrame.hasAny && doubleFrame.count > 0) {
+    if (doubleFrame?.hasAny && doubleFrame.count > 0) {
       const count = doubleFrame.count;
 
       const addDoubleVertical = (label, enabled) => {
@@ -964,14 +617,7 @@ const useCuttingPlan = (results, currentFrame) =>
       addPiece("Lock Block", LOCK_BLOCK_HEIGHT, lockBlockCount, THEME_COLORS.danger);
     }
 
-    const allPieces = cutPieces
-      .flatMap((piece) =>
-        Array.from({ length: piece.qty }, (_, i) => ({
-          ...piece,
-          id: `${piece.name}-${i + 1}`,
-        })),
-      )
-      .sort((a, b) => b.length - a.length);
+    const allPieces = cutPieces.flatMap((piece) => Array.from({ length: piece.qty }, (_, i) => ({ ...piece, id: `${piece.name}-${i + 1}` }))).sort((a, b) => b.length - a.length);
 
     const stocks = [];
     allPieces.forEach((piece) => {
@@ -1015,8 +661,189 @@ const useCuttingPlan = (results, currentFrame) =>
       spliceOverlap,
     };
   }, [results, currentFrame]);
+};
 
-const EngineeringDrawing = React.memo(function EngineeringDrawing({ results }) {
+const LEGEND_ITEMS = [
+  { fill: `${THEME_COLORS.success}33`, stroke: THEME_COLORS.success, label: "Surface Material" },
+  { fill: `${THEME_COLORS.warning}33`, stroke: THEME_COLORS.warning, label: "Frame (Stile)" },
+  { fill: `${THEME_COLORS.secondary}33`, stroke: THEME_COLORS.secondary, label: "Frame (Rail)" },
+  { fill: `${THEME_COLORS.danger}33`, stroke: THEME_COLORS.danger, label: "Lock Block" },
+  { fill: `${THEME_COLORS.primary}11`, stroke: THEME_COLORS.default, label: "Core (Honeycomb)", dashed: true },
+  { fill: `${THEME_COLORS.warning}11`, stroke: THEME_COLORS.warning, label: "Double Frame", dashed: true },
+];
+
+const LINE_LEGEND_ITEMS = [
+  { type: "centerline", label: "Center Line", dasharray: "8,2,2,2" },
+  { type: "hidden", label: "Hidden Line", dasharray: "3,3" },
+  { type: "dimension", label: "Dimension Line" },
+];
+
+const GRID_LETTERS = ["A", "B", "C", "D", "E", "F"];
+const GRID_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8];
+
+const BottomInfoBar = ({ viewBoxWidth, viewBoxHeight, T, W, H, S, F, R, surfaceMaterial, frameType, hasDoubleFrame, doubleFrame, railSections, railPositions, lockBlockCount, currentFrame }) => {
+  const getDoubleFrameDesc = () => {
+    if (!hasDoubleFrame || !doubleFrame) return "";
+    const sideLabels = { top: "บน", bottom: "ล่าง", left: "ซ้าย", right: "ขวา", center: "กลาง" };
+    const sides = Object.entries(sideLabels)
+      .filter(([key]) => doubleFrame[key])
+      .map(([_, label]) => label);
+    return sides.length > 0 ? `(Double: ${sides.join(", ")} x${doubleFrame.count})` : "(Double)";
+  };
+
+  const legendPositions = [
+    { x: 415, yOffset: -105 },
+    { x: 525, yOffset: -105 },
+    { x: 415, yOffset: -88 },
+    { x: 525, yOffset: -88 },
+    { x: 415, yOffset: -71 },
+    { x: 525, yOffset: -71 },
+  ];
+
+  return (
+    <g id="bottom-info">
+      <rect x="20" y={viewBoxHeight - 145} width={viewBoxWidth - 40} height="130" fill={THEME_COLORS.background} stroke={THEME_COLORS.primary} strokeWidth="1.5" rx="3" />
+
+      <g id="specs">
+        <rect x="25" y={viewBoxHeight - 140} width="370" height="20" fill={THEME_COLORS.primary} rx="2" />
+        <text x="35" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill={THEME_COLORS.background}>
+          📋 SPECIFICATIONS
+        </text>
+        <rect x="25" y={viewBoxHeight - 118} width="370" height="100" fill={THEME_COLORS.background} stroke={THEME_COLORS.default} strokeWidth="0.5" />
+
+        <text x="35" y={viewBoxHeight - 100} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
+          Door Size:
+        </text>
+        <text x="35" y={viewBoxHeight - 88} fontSize="11" fontWeight="bold" fill={THEME_COLORS.foreground}>
+          {T} × {W} × {H} mm
+        </text>
+
+        <text x="35" y={viewBoxHeight - 70} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
+          Surface Material:
+        </text>
+        <text x="35" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill={THEME_COLORS.success}>
+          {surfaceMaterial} {S || 0}mm × 2
+        </text>
+
+        <text x="35" y={viewBoxHeight - 40} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
+          Frame:
+        </text>
+        <text x="35" y={viewBoxHeight - 28} fontSize="9" fontWeight="600" fill={THEME_COLORS.secondary}>
+          {R || 0}×{F || 0}mm {hasDoubleFrame ? getDoubleFrameDesc() : ""}
+        </text>
+
+        <text x="200" y={viewBoxHeight - 100} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
+          Horizontal Rails:
+        </text>
+        <text x="200" y={viewBoxHeight - 88} fontSize="9" fontWeight="600" fill={THEME_COLORS.secondary}>
+          {railSections - 1} pcs @ {railPositions.join(", ") || "-"} mm
+        </text>
+
+        <text x="200" y={viewBoxHeight - 70} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
+          Lock Block:
+        </text>
+        <text x="200" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill={THEME_COLORS.danger}>
+          {lockBlockCount} pcs ({R || 0}×{F || 0}×{LOCK_BLOCK_HEIGHT}mm)
+        </text>
+
+        {currentFrame.code && (
+          <>
+            <text x="200" y={viewBoxHeight - 40} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
+              ERP Code:
+            </text>
+            <text x="200" y={viewBoxHeight - 28} fontSize="8" fontWeight="500" fill={THEME_COLORS.primary} fontFamily="monospace">
+              {currentFrame.code}
+            </text>
+          </>
+        )}
+      </g>
+
+      <g id="legend">
+        <rect x="405" y={viewBoxHeight - 140} width="280" height="20" fill={THEME_COLORS.primary} rx="2" />
+        <text x="415" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill={THEME_COLORS.background}>
+          🎨 LEGEND
+        </text>
+        <rect x="405" y={viewBoxHeight - 118} width="280" height="100" fill={THEME_COLORS.background} stroke={THEME_COLORS.default} strokeWidth="0.5" />
+
+        {LEGEND_ITEMS.map((item, i) => (
+          <g key={`legend-${i}`}>
+            <rect x={legendPositions[i].x} y={viewBoxHeight + legendPositions[i].yOffset} width="16" height="10" fill={item.fill} stroke={item.stroke} strokeWidth="0.8" rx="1" strokeDasharray={item.dashed ? "2,1" : undefined} />
+            <text x={legendPositions[i].x + 20} y={viewBoxHeight + legendPositions[i].yOffset + 8} fontSize="7" fill={THEME_COLORS.foreground}>
+              {item.label}
+            </text>
+          </g>
+        ))}
+
+        <line x1="415" y1={viewBoxHeight - 49} x2="431" y2={viewBoxHeight - 49} stroke={THEME_COLORS.foreground} strokeWidth="0.6" strokeDasharray="8,2,2,2" />
+        <text x="435" y={viewBoxHeight - 46} fontSize="7" fill={THEME_COLORS.foreground}>
+          Center Line
+        </text>
+
+        <line x1="525" y1={viewBoxHeight - 49} x2="541" y2={viewBoxHeight - 49} stroke={THEME_COLORS.foreground} strokeWidth="0.6" strokeDasharray="3,3" />
+        <text x="545" y={viewBoxHeight - 46} fontSize="7" fill={THEME_COLORS.foreground}>
+          Hidden Line
+        </text>
+
+        <line x1="415" y1={viewBoxHeight - 32} x2="431" y2={viewBoxHeight - 32} stroke={THEME_COLORS.foreground} strokeWidth="0.6" />
+        <polygon points={`415,${viewBoxHeight - 32} 418,${viewBoxHeight - 34} 418,${viewBoxHeight - 30}`} fill={THEME_COLORS.foreground} />
+        <polygon points={`431,${viewBoxHeight - 32} 428,${viewBoxHeight - 34} 428,${viewBoxHeight - 30}`} fill={THEME_COLORS.foreground} />
+        <text x="435" y={viewBoxHeight - 29} fontSize="7" fill={THEME_COLORS.foreground}>
+          Dimension Line
+        </text>
+      </g>
+
+      <g id="title-block">
+        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="120" fill={THEME_COLORS.background} stroke={THEME_COLORS.primary} strokeWidth="1.5" rx="2" />
+        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="28" fill={THEME_COLORS.primary} rx="2" />
+        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 115} width="280" height="3" fill={THEME_COLORS.primary} />
+        <text x={viewBoxWidth - 165} y={viewBoxHeight - 121} textAnchor="middle" fontSize="13" fontWeight="bold" fill={THEME_COLORS.background}>
+          DOOR FRAME ASSEMBLY
+        </text>
+
+        <rect x={viewBoxWidth - 300} y={viewBoxHeight - 107} width="270" height="22" fill={`${THEME_COLORS.default}33`} rx="1" />
+        <text x={viewBoxWidth - 290} y={viewBoxHeight - 92} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
+          Size:
+        </text>
+        <text x={viewBoxWidth - 165} y={viewBoxHeight - 91} textAnchor="middle" fontSize="14" fontWeight="bold" fill={THEME_COLORS.foreground}>
+          {T} × {W} × {H} mm
+        </text>
+
+        <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 82} x2={viewBoxWidth - 30} y2={viewBoxHeight - 82} stroke={THEME_COLORS.default} strokeWidth="0.5" />
+        <text x={viewBoxWidth - 290} y={viewBoxHeight - 68} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
+          Material:
+        </text>
+        <text x={viewBoxWidth - 165} y={viewBoxHeight - 68} textAnchor="middle" fontSize="10" fontWeight="600" fill={THEME_COLORS.success}>
+          {surfaceMaterial} + {frameType}
+        </text>
+
+        <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 55} x2={viewBoxWidth - 30} y2={viewBoxHeight - 55} stroke={THEME_COLORS.default} strokeWidth="0.5" />
+        <line x1={viewBoxWidth - 165} y1={viewBoxHeight - 55} x2={viewBoxWidth - 165} y2={viewBoxHeight - 35} stroke={THEME_COLORS.default} strokeWidth="0.5" />
+
+        <text x={viewBoxWidth - 290} y={viewBoxHeight - 42} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
+          Scale:
+        </text>
+        <text x={viewBoxWidth - 240} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={THEME_COLORS.foreground}>
+          1:25
+        </text>
+
+        <text x={viewBoxWidth - 155} y={viewBoxHeight - 42} fontSize="8" fill={THEME_COLORS.foreground} opacity="0.7">
+          Rev:
+        </text>
+        <text x={viewBoxWidth - 120} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={THEME_COLORS.foreground}>
+          1.0
+        </text>
+
+        <rect x={viewBoxWidth - 305} y={viewBoxHeight - 35} width="280" height="15" fill={THEME_COLORS.background} />
+        <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 35} x2={viewBoxWidth - 30} y2={viewBoxHeight - 35} stroke={THEME_COLORS.default} strokeWidth="0.5" />
+        <text x={viewBoxWidth - 165} y={viewBoxHeight - 24} textAnchor="middle" fontSize="9" fontWeight="bold" fill={THEME_COLORS.primary}>
+          C.H.H INDUSTRY CO., LTD.
+        </text>
+      </g>
+    </g>
+  );
+};
+
+const EngineeringDrawing = ({ results }) => {
   const { W, H, T, S, F, R, totalFrameWidth, railPositions, railSections, lockBlockTop, lockBlockBottom, lockBlockLeft, lockBlockRight, lockBlockPosition, lockBlockCount, currentFrame, doubleFrame } = results;
 
   const safeH = H > 0 ? H : 2000;
@@ -1028,34 +855,25 @@ const EngineeringDrawing = React.memo(function EngineeringDrawing({ results }) {
 
   const viewBoxWidth = 2100;
   const viewBoxHeight = 2970;
-
   const DRAWING_SCALE = 0.5;
-  const frontScale = DRAWING_SCALE;
-  const sideScale = DRAWING_SCALE;
-  const backScale = DRAWING_SCALE;
 
-  const hasDoubleFrame = doubleFrame && doubleFrame.hasAny && doubleFrame.count > 0;
+  const hasDoubleFrame = doubleFrame?.hasAny && doubleFrame.count > 0;
   const drawingDF = hasDoubleFrame ? safeF * doubleFrame.count : 0;
 
   const dims = {
     front: {
-      W: safeW * frontScale,
-      H: safeH * frontScale,
-      F: safeF * frontScale,
-      DF: drawingDF * frontScale,
-      totalFrame: totalFrameWidth * frontScale,
-      R: safeR * frontScale,
-      lockBlockW: safeF * frontScale,
+      W: safeW * DRAWING_SCALE,
+      H: safeH * DRAWING_SCALE,
+      F: safeF * DRAWING_SCALE,
+      DF: drawingDF * DRAWING_SCALE,
+      totalFrame: totalFrameWidth * DRAWING_SCALE,
+      R: safeR * DRAWING_SCALE,
+      lockBlockW: safeF * DRAWING_SCALE,
     },
     side: {
-      T: safeT * sideScale,
-      H: safeH * sideScale,
-      S: safeS * sideScale,
-    },
-    back: {
-      W: safeW * backScale,
-      H: safeH * backScale,
-      F: safeF * backScale,
+      T: safeT * DRAWING_SCALE,
+      H: safeH * DRAWING_SCALE,
+      S: safeS * DRAWING_SCALE,
     },
   };
 
@@ -1065,32 +883,26 @@ const EngineeringDrawing = React.memo(function EngineeringDrawing({ results }) {
   const positions = {
     side: { x: marginX, y: marginY + 200 },
     front: { x: marginX + 700, y: marginY + 200 },
-    back: { x: marginX + 400, y: marginY + 200 },
   };
 
-  const piecesPerSide = (results.lockBlockSides && results.lockBlockCount / results.lockBlockSides) || 0;
-  const intPiecesPerSide = parseInt(piecesPerSide) || 0;
+  const piecesPerSide = parseInt(results.lockBlockCount / results.lockBlockSides) || 0;
 
   const renderLockBlocks = (viewX, viewY, scale, frameWidth, isBack = false) => {
     const blocks = [];
     const lockBlockH = LOCK_BLOCK_HEIGHT * scale;
     const lockBlockY = viewY + dims.front.H - lockBlockBottom * scale;
 
-    if (lockBlockLeft) {
-      for (let i = 0; i < intPiecesPerSide; i++) {
-        const x = isBack ? viewX + dims.back.W - frameWidth - (hasDoubleFrame ? frameWidth : 0) - frameWidth * (i + 1) : viewX + dims.front.totalFrame + dims.front.lockBlockW * i;
+    const renderSide = (isLeft, prefix) => {
+      if (!(isLeft ? lockBlockLeft : lockBlockRight)) return;
+      [...Array(piecesPerSide)].forEach((_, i) => {
+        const x = isBack ? (isLeft ? viewX + dims.front.W - frameWidth - (hasDoubleFrame ? frameWidth : 0) - frameWidth * (i + 1) : viewX + frameWidth + (hasDoubleFrame ? frameWidth : 0) + frameWidth * i) : isLeft ? viewX + dims.front.totalFrame + dims.front.lockBlockW * i : viewX + dims.front.W - dims.front.totalFrame - dims.front.lockBlockW * (i + 1);
 
-        blocks.push(<LockBlockSVG key={`lb-${isBack ? "back" : "front"}-left-${i}`} x={x} y={lockBlockY} width={frameWidth} height={lockBlockH} />);
-      }
-    }
+        blocks.push(<LockBlockSVG key={`lb-${prefix}-${isLeft ? "left" : "right"}-${i}`} x={x} y={lockBlockY} width={frameWidth} height={lockBlockH} />);
+      });
+    };
 
-    if (lockBlockRight) {
-      for (let i = 0; i < intPiecesPerSide; i++) {
-        const x = isBack ? viewX + frameWidth + (hasDoubleFrame ? frameWidth : 0) + frameWidth * i : viewX + dims.front.W - dims.front.totalFrame - dims.front.lockBlockW * (i + 1);
-
-        blocks.push(<LockBlockSVG key={`lb-${isBack ? "back" : "front"}-right-${i}`} x={x} y={lockBlockY} width={frameWidth} height={lockBlockH} />);
-      }
-    }
+    renderSide(true, isBack ? "back" : "front");
+    renderSide(false, isBack ? "back" : "front");
 
     return blocks;
   };
@@ -1103,36 +915,27 @@ const EngineeringDrawing = React.memo(function EngineeringDrawing({ results }) {
     const strokeWidth = "1.5";
     const strokeDasharray = "8,4";
 
-    if (doubleFrame.left) {
-      for (let i = 0; i < doubleFrame.count; i++) {
-        elements.push(<rect key={`df-left-${i}`} x={positions.front.x + dims.front.F + dims.front.F * i} y={positions.front.y + dims.front.F} width={dims.front.F} height={dims.front.H - 2 * dims.front.F} fill={`${THEME_COLORS.warning}22`} stroke={strokeColor} strokeWidth={strokeWidth} strokeDasharray={strokeDasharray} />);
-      }
-    }
+    const doubleFrameConfigs = [
+      { key: "left", getRect: (i) => ({ x: positions.front.x + dims.front.F + dims.front.F * i, y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F }) },
+      { key: "right", getRect: (i) => ({ x: positions.front.x + dims.front.W - dims.front.F - dims.front.F * (i + 1), y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F }) },
+      { key: "top", getRect: (i) => ({ x: positions.front.x + dims.front.F, y: positions.front.y + dims.front.F + dims.front.F * i, w: dims.front.W - 2 * dims.front.F, h: dims.front.F }) },
+      { key: "bottom", getRect: (i) => ({ x: positions.front.x + dims.front.F, y: positions.front.y + dims.front.H - dims.front.F - dims.front.F * (i + 1), w: dims.front.W - 2 * dims.front.F, h: dims.front.F }) },
+      {
+        key: "center",
+        getRect: (i) => {
+          const offsetFromCenter = (i - (doubleFrame.count - 1) / 2) * dims.front.F;
+          return { x: positions.front.x + dims.front.W / 2 - dims.front.F / 2 + offsetFromCenter, y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F };
+        },
+      },
+    ];
 
-    if (doubleFrame.right) {
+    doubleFrameConfigs.forEach(({ key, getRect }) => {
+      if (!doubleFrame[key]) return;
       for (let i = 0; i < doubleFrame.count; i++) {
-        elements.push(<rect key={`df-right-${i}`} x={positions.front.x + dims.front.W - dims.front.F - dims.front.F * (i + 1)} y={positions.front.y + dims.front.F} width={dims.front.F} height={dims.front.H - 2 * dims.front.F} fill={`${THEME_COLORS.warning}22`} stroke={strokeColor} strokeWidth={strokeWidth} strokeDasharray={strokeDasharray} />);
+        const r = getRect(i);
+        elements.push(<rect key={`df-${key}-${i}`} x={r.x} y={r.y} width={r.w} height={r.h} fill={`${THEME_COLORS.warning}22`} stroke={strokeColor} strokeWidth={strokeWidth} strokeDasharray={strokeDasharray} />);
       }
-    }
-
-    if (doubleFrame.top) {
-      for (let i = 0; i < doubleFrame.count; i++) {
-        elements.push(<rect key={`df-top-${i}`} x={positions.front.x + dims.front.F} y={positions.front.y + dims.front.F + dims.front.F * i} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} fill={`${THEME_COLORS.warning}22`} stroke={strokeColor} strokeWidth={strokeWidth} strokeDasharray={strokeDasharray} />);
-      }
-    }
-
-    if (doubleFrame.bottom) {
-      for (let i = 0; i < doubleFrame.count; i++) {
-        elements.push(<rect key={`df-bottom-${i}`} x={positions.front.x + dims.front.F} y={positions.front.y + dims.front.H - dims.front.F - dims.front.F * (i + 1)} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} fill={`${THEME_COLORS.warning}22`} stroke={strokeColor} strokeWidth={strokeWidth} strokeDasharray={strokeDasharray} />);
-      }
-    }
-
-    if (doubleFrame.center) {
-      for (let i = 0; i < doubleFrame.count; i++) {
-        const offsetFromCenter = (i - (doubleFrame.count - 1) / 2) * dims.front.F;
-        elements.push(<rect key={`df-center-${i}`} x={positions.front.x + dims.front.W / 2 - dims.front.F / 2 + offsetFromCenter} y={positions.front.y + dims.front.F} width={dims.front.F} height={dims.front.H - 2 * dims.front.F} fill={`${THEME_COLORS.warning}22`} stroke={strokeColor} strokeWidth={strokeWidth} strokeDasharray={strokeDasharray} />);
-      }
-    }
+    });
 
     return elements;
   };
@@ -1166,22 +969,22 @@ const EngineeringDrawing = React.memo(function EngineeringDrawing({ results }) {
 
         <rect x={positions.side.x} y={positions.side.y} width={dims.side.T} height={dims.side.H} fill={THEME_COLORS.background} stroke={THEME_COLORS.foreground} strokeWidth="3" />
 
-        <rect x={positions.side.x} y={positions.side.y} width={dims.side.S} height={dims.side.H} fill={`${THEME_COLORS.success}33`} stroke={THEME_COLORS.success} strokeWidth="1.2" />
-        <rect x={positions.side.x + dims.side.T - dims.side.S} y={positions.side.y} width={dims.side.S} height={dims.side.H} fill={`${THEME_COLORS.success}33`} stroke={THEME_COLORS.success} strokeWidth="1.2" />
+        <FilledRect x={positions.side.x} y={positions.side.y} width={dims.side.S} height={dims.side.H} color={THEME_COLORS.success} strokeWidth={1.2} />
+        <FilledRect x={positions.side.x + dims.side.T - dims.side.S} y={positions.side.y} width={dims.side.S} height={dims.side.H} color={THEME_COLORS.success} strokeWidth={1.2} />
 
-        <rect x={positions.side.x + dims.side.S} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} fill={`${THEME_COLORS.warning}33`} stroke={THEME_COLORS.warning} strokeWidth="1" />
-        <rect x={positions.side.x + dims.side.T - dims.side.S - (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} fill={`${THEME_COLORS.warning}33`} stroke={THEME_COLORS.warning} strokeWidth="1" />
-        <rect x={positions.side.x + dims.side.S + (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.5} height={dims.side.H} fill={`${THEME_COLORS.primary}11`} stroke={THEME_COLORS.default} strokeWidth="0.8" strokeDasharray="4,4" />
+        <FilledRect x={positions.side.x + dims.side.S} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} color={THEME_COLORS.warning} />
+        <FilledRect x={positions.side.x + dims.side.T - dims.side.S - (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} color={THEME_COLORS.warning} />
+        <FilledRect x={positions.side.x + dims.side.S + (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.5} height={dims.side.H} color={THEME_COLORS.primary} strokeWidth={0.8} opacity={0.07} strokeDasharray="4,4" />
 
         <CenterLine x1={positions.side.x + dims.side.T / 2} y1={positions.side.y - 40} x2={positions.side.x + dims.side.T / 2} y2={positions.side.y + dims.side.H + 40} />
 
         {railPositions.map((pos, idx) => {
-          const railY = positions.side.y + dims.side.H - pos * sideScale;
-          const railH = safeR * sideScale * 0.5;
-          return <rect key={`side-rail-${idx}`} x={positions.side.x + dims.side.S} y={railY - railH / 2} width={dims.side.T - 2 * dims.side.S} height={railH} fill={`${THEME_COLORS.secondary}33`} stroke={THEME_COLORS.secondary} strokeWidth="1" />;
+          const railY = positions.side.y + dims.side.H - pos * DRAWING_SCALE;
+          const railH = safeR * DRAWING_SCALE * 0.5;
+          return <FilledRect key={`side-rail-${idx}`} x={positions.side.x + dims.side.S} y={railY - railH / 2} width={dims.side.T - 2 * dims.side.S} height={railH} color={THEME_COLORS.secondary} />;
         })}
 
-        {(lockBlockLeft || lockBlockRight) && <rect x={positions.side.x + dims.side.S} y={positions.side.y + dims.side.H - lockBlockBottom * sideScale} width={dims.side.T - 2 * dims.side.S} height={LOCK_BLOCK_HEIGHT * sideScale} fill="none" stroke={THEME_COLORS.danger} strokeWidth="1.4" strokeDasharray="6,4" />}
+        {(lockBlockLeft || lockBlockRight) && <rect x={positions.side.x + dims.side.S} y={positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE} width={dims.side.T - 2 * dims.side.S} height={LOCK_BLOCK_HEIGHT * DRAWING_SCALE} fill="none" stroke={THEME_COLORS.danger} strokeWidth="1.4" strokeDasharray="6,4" />}
 
         <DimLine x1={positions.side.x} y1={positions.side.y + dims.side.H} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={T} offset={120} />
         <DimLine x1={positions.side.x + dims.side.T} y1={positions.side.y} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={H} offset={100} vertical />
@@ -1196,23 +999,19 @@ const EngineeringDrawing = React.memo(function EngineeringDrawing({ results }) {
 
         <rect x={positions.front.x} y={positions.front.y} width={dims.front.W} height={dims.front.H} fill={THEME_COLORS.background} stroke={THEME_COLORS.foreground} strokeWidth="3" />
 
-        <rect x={positions.front.x} y={positions.front.y} width={dims.front.F} height={dims.front.H} fill={`${THEME_COLORS.warning}33`} stroke={THEME_COLORS.warning} strokeWidth="1.6" />
-        <rect x={positions.front.x + dims.front.W - dims.front.F} y={positions.front.y} width={dims.front.F} height={dims.front.H} fill={`${THEME_COLORS.warning}33`} stroke={THEME_COLORS.warning} strokeWidth="1.6" />
-        <rect x={positions.front.x + dims.front.F} y={positions.front.y} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} fill={`${THEME_COLORS.secondary}33`} stroke={THEME_COLORS.secondary} strokeWidth="1.6" />
-        <rect x={positions.front.x + dims.front.F} y={positions.front.y + dims.front.H - dims.front.F} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} fill={`${THEME_COLORS.secondary}33`} stroke={THEME_COLORS.secondary} strokeWidth="1.6" />
+        <FilledRect x={positions.front.x} y={positions.front.y} width={dims.front.F} height={dims.front.H} color={THEME_COLORS.warning} strokeWidth={1.6} />
+        <FilledRect x={positions.front.x + dims.front.W - dims.front.F} y={positions.front.y} width={dims.front.F} height={dims.front.H} color={THEME_COLORS.warning} strokeWidth={1.6} />
+        <FilledRect x={positions.front.x + dims.front.F} y={positions.front.y} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} color={THEME_COLORS.secondary} strokeWidth={1.6} />
+        <FilledRect x={positions.front.x + dims.front.F} y={positions.front.y + dims.front.H - dims.front.F} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} color={THEME_COLORS.secondary} strokeWidth={1.6} />
 
         {renderDoubleFrames()}
 
         {railPositions.map((pos, idx) => {
-          const railY = positions.front.y + dims.front.H - pos * frontScale;
-          return (
-            <g key={`front-rail-${idx}`}>
-              <rect x={positions.front.x + dims.front.F} y={railY - dims.front.R / 2} width={dims.front.W - 2 * dims.front.F} height={dims.front.R} fill={`${THEME_COLORS.secondary}33`} stroke={THEME_COLORS.secondary} strokeWidth="1.2" />
-            </g>
-          );
+          const railY = positions.front.y + dims.front.H - pos * DRAWING_SCALE;
+          return <FilledRect key={`front-rail-${idx}`} x={positions.front.x + dims.front.F} y={railY - dims.front.R / 2} width={dims.front.W - 2 * dims.front.F} height={dims.front.R} color={THEME_COLORS.secondary} strokeWidth={1.2} />;
         })}
 
-        {renderLockBlocks(positions.front.x, positions.front.y, frontScale, dims.front.lockBlockW, false)}
+        {renderLockBlocks(positions.front.x, positions.front.y, DRAWING_SCALE, dims.front.lockBlockW, false)}
 
         <CenterLine x1={positions.front.x + dims.front.W / 2} y1={positions.front.y - 40} x2={positions.front.x + dims.front.W / 2} y2={positions.front.y + dims.front.H + 40} />
         <CenterLine x1={positions.front.x - 40} y1={positions.front.y + dims.front.H / 2} x2={positions.front.x + dims.front.W + 40} y2={positions.front.y + dims.front.H / 2} />
@@ -1222,12 +1021,12 @@ const EngineeringDrawing = React.memo(function EngineeringDrawing({ results }) {
         <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.F} y2={positions.front.y} value={F} offset={-60} fontSize={18} />
         <DimLine x1={positions.front.x + dims.front.F} y1={positions.front.y} x2={positions.front.x + dims.front.W - dims.front.F} y2={positions.front.y} value={W - 2 * F} offset={-120} fontSize={18} />
 
-        {(lockBlockLeft || lockBlockRight) && <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x} y2={positions.front.y + dims.front.H - lockBlockPosition * frontScale} value={lockBlockPosition} offset={-100} vertical fontSize={18} />}
+        {(lockBlockLeft || lockBlockRight) && <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x} y2={positions.front.y + dims.front.H - lockBlockPosition * DRAWING_SCALE} value={lockBlockPosition} offset={-100} vertical fontSize={18} />}
 
         {railPositions.map((pos, idx) => (
           <g key={`front-ann-${idx}`}>
-            <line x1={positions.front.x + dims.front.W + 200} y1={positions.front.y + dims.front.H - pos * frontScale} x2={positions.front.x + dims.front.W + 240} y2={positions.front.y + dims.front.H - pos * frontScale} stroke={THEME_COLORS.foreground} strokeWidth="0.8" />
-            <text x={positions.front.x + dims.front.W + 260} y={positions.front.y + dims.front.H - pos * frontScale + 10} fontSize="18" fill={THEME_COLORS.foreground}>
+            <line x1={positions.front.x + dims.front.W + 200} y1={positions.front.y + dims.front.H - pos * DRAWING_SCALE} x2={positions.front.x + dims.front.W + 240} y2={positions.front.y + dims.front.H - pos * DRAWING_SCALE} stroke={THEME_COLORS.foreground} strokeWidth="0.8" />
+            <text x={positions.front.x + dims.front.W + 260} y={positions.front.y + dims.front.H - pos * DRAWING_SCALE + 10} fontSize="18" fill={THEME_COLORS.foreground}>
               {pos}
             </text>
           </g>
@@ -1237,7 +1036,198 @@ const EngineeringDrawing = React.memo(function EngineeringDrawing({ results }) {
       <BottomInfoBar viewBoxWidth={viewBoxWidth} viewBoxHeight={viewBoxHeight} T={T} W={W} H={H} S={S} F={F} R={R} surfaceMaterial={results.currentFrame.desc?.split(" ")[0] || "-"} frameType={results.currentFrame.desc?.split(" ")[0] || "-"} hasDoubleFrame={hasDoubleFrame} doubleFrame={doubleFrame} railSections={railSections} railPositions={railPositions} lockBlockCount={lockBlockCount} currentFrame={currentFrame} />
     </svg>
   );
-});
+};
+
+const CuttingPlanDisplay = ({ cuttingPlan, efficiencyColor }) => (
+  <div className="space-y-4">
+    {cuttingPlan.needSplice && (
+      <InfoBox color="purple">
+        <div className="flex items-center gap-2 font-medium mb-1" style={{ color: THEME_COLORS.primary }}>
+          <span>🔗</span> <span>ต้องต่อไม้โครงตั้ง</span>
+        </div>
+        <div className="space-y-0.5" style={{ color: THEME_COLORS.primary }}>
+          <div>• จำนวนชิ้นที่ต้องต่อ: {cuttingPlan.spliceCount} ชิ้น</div>
+          <div>• เผื่อซ้อนทับ: {cuttingPlan.spliceOverlap} mm ต่อจุด</div>
+          <div className="text-[10px] mt-1" style={{ opacity: 0.8 }}>
+            💡 ใช้กาว + ตะปูยึดบริเวณรอยต่อ
+          </div>
+        </div>
+      </InfoBox>
+    )}
+
+    <div className="grid grid-cols-4 gap-2 text-xs">
+      <StatCard value={cuttingPlan.totalStocks} label="ไม้ที่ใช้ (ท่อน)" variant="primary" />
+      <StatCard value={cuttingPlan.efficiency} label="ประสิทธิภาพ" variant="success" />
+      <StatCard value={cuttingPlan.usedWithoutKerf} label="ใช้จริง (mm)" variant="primary" />
+      <StatCard value={cuttingPlan.totalWaste} label="เศษเหลือ (mm)" variant="danger" />
+    </div>
+
+    <div className="border rounded-lg overflow-hidden" style={{ borderColor: THEME_COLORS.default }}>
+      <div className="px-3 py-2 text-xs font-semibold" style={{ backgroundColor: `${THEME_COLORS.default}33`, color: THEME_COLORS.foreground }}>
+        📋 รายการชิ้นส่วน (เผื่อรอยเลื่อย {cuttingPlan.sawKerf}mm)
+      </div>
+      <div>
+        {cuttingPlan.cutPieces.map((piece, idx) => (
+          <div key={idx} className="flex items-center justify-between px-3 py-2 text-xs" style={{ backgroundColor: piece.isSplice ? `${THEME_COLORS.primary}11` : THEME_COLORS.background }}>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: piece.color }}></div>
+              <span className="font-medium" style={{ color: THEME_COLORS.foreground }}>
+                {piece.name}
+              </span>
+              {piece.isSplice && (
+                <span className="text-[9px] px-1 rounded" style={{ color: THEME_COLORS.primary, backgroundColor: `${THEME_COLORS.primary}11` }}>
+                  ต่อ
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-4" style={{ color: THEME_COLORS.foreground }}>
+              <span>{piece.length} mm</span>
+              <span className="font-bold">×{piece.qty}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div className="border rounded-lg overflow-hidden" style={{ borderColor: THEME_COLORS.default }}>
+      <div className="px-3 py-2 text-xs font-semibold" style={{ backgroundColor: `${THEME_COLORS.default}33`, color: THEME_COLORS.foreground }}>
+        🪵 แผนการตัด (ไม้ยาว {cuttingPlan.stockLength}mm × {cuttingPlan.totalStocks} ท่อน)
+      </div>
+      <div className="p-3 space-y-2">
+        {cuttingPlan.stocks.map((stock, stockIdx) => (
+          <div key={stockIdx} className="space-y-1">
+            <div className="text-[10px]" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
+              ท่อนที่ {stockIdx + 1}
+            </div>
+            <div className="relative h-8 rounded border overflow-hidden" style={{ backgroundColor: `${THEME_COLORS.default}33`, borderColor: THEME_COLORS.default }}>
+              {(() => {
+                let offset = 0;
+                return stock.pieces.map((piece, pieceIdx) => {
+                  const width = (piece.length / stock.length) * 100;
+                  const kerfWidth = (cuttingPlan.sawKerf / stock.length) * 100;
+                  const left = offset;
+                  offset += width + kerfWidth;
+                  return (
+                    <React.Fragment key={pieceIdx}>
+                      <div className="absolute h-full flex items-center justify-center text-[8px] font-medium overflow-hidden" style={{ left: `${left}%`, width: `${width}%`, backgroundColor: piece.color, color: THEME_COLORS.background }} title={`${piece.name}: ${piece.length}mm`}>
+                        {width > 8 && <span className="truncate px-1">{piece.length}</span>}
+                      </div>
+                      {pieceIdx < stock.pieces.length - 1 && <div className="absolute h-full" style={{ left: `${left + width}%`, width: `${kerfWidth}%`, backgroundColor: THEME_COLORS.default }} />}
+                    </React.Fragment>
+                  );
+                });
+              })()}
+              {stock.remaining > 0 && (
+                <div className="absolute right-0 h-full flex items-center justify-center text-[8px]" style={{ width: `${(stock.remaining / stock.length) * 100}%`, backgroundColor: THEME_COLORS.background, color: THEME_COLORS.foreground, opacity: 0.7 }}>
+                  {stock.remaining > 100 && <span>เศษ {stock.remaining}</span>}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div className="p-2 rounded-lg" style={{ backgroundColor: THEME_COLORS.background, border: `1px solid ${THEME_COLORS.default}` }}>
+      <div className="flex justify-between text-xs mb-1">
+        <span style={{ color: THEME_COLORS.foreground }}>ประสิทธิภาพการใช้ไม้</span>
+        <span className="font-bold" style={{ color: efficiencyColor }}>
+          {cuttingPlan.efficiency}%
+        </span>
+      </div>
+      <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: THEME_COLORS.default }}>
+        <div className="h-full rounded-full transition-all" style={{ width: `${cuttingPlan.efficiency}%`, backgroundColor: efficiencyColor }} />
+      </div>
+      <div className="flex justify-between text-[10px] mt-1">
+        <span style={{ color: THEME_COLORS.foreground, opacity: 0.6 }}>0%</span>
+        <span style={{ color: THEME_COLORS.foreground, opacity: 0.6 }}>ดี: ≥80%</span>
+        <span style={{ color: THEME_COLORS.foreground, opacity: 0.6 }}>100%</span>
+      </div>
+    </div>
+  </div>
+);
+
+const SummaryDisplay = ({ results, doorThickness, doorWidth, doorHeight, surfaceMaterial, surfaceThickness, currentFrame, selectedFrameCode, doubleConfigSummary, lockBlockLeft, lockBlockRight, piecesPerSide }) => {
+  const summaryItems = [
+    { label: "สเปคประตู:", value: formatDimension(doorThickness, doorWidth, doorHeight) + " mm", bg: `${THEME_COLORS.default}33` },
+    { label: "ปิดผิว:", value: `${getMaterialLabel(SURFACE_MATERIALS, surfaceMaterial)} ${surfaceThickness || 0}mm + กาว ${GLUE_THICKNESS}mm (×2)`, color: THEME_COLORS.success, bg: `${THEME_COLORS.default}33` },
+  ];
+
+  const frameInfo = {
+    label: "โครงไม้:",
+    value: `${currentFrame.useThickness || "-"}×${currentFrame.useWidth || "-"} mm`,
+    color: THEME_COLORS.secondary,
+    bg: `${THEME_COLORS.warning}22`,
+    extras: [currentFrame.isFlipped && { icon: "🔄", text: "พลิกไม้" }, currentFrame.planeAmount > 0 && { icon: "🪚", text: `ไส ${currentFrame.planeAmount}mm` }].filter(Boolean),
+  };
+
+  const lockBlockDesc = lockBlockLeft && lockBlockRight ? `ซ้าย ${piecesPerSide} + ขวา ${piecesPerSide}` : lockBlockLeft ? `ซ้าย ${piecesPerSide}` : lockBlockRight ? `ขวา ${piecesPerSide}` : "-";
+
+  return (
+    <div className="rounded-xl shadow-lg p-4" style={{ backgroundColor: THEME_COLORS.background, border: `1px solid ${THEME_COLORS.default}` }}>
+      <h3 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: THEME_COLORS.foreground }}>
+        📋 สรุปโครงสร้าง
+      </h3>
+      <div className="grid grid-cols-2 gap-3 text-xs">
+        {summaryItems.map((item, idx) => (
+          <div key={idx} className="p-2 rounded-lg" style={{ backgroundColor: item.bg }}>
+            <span className="block" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
+              {item.label}
+            </span>
+            <span className="font-bold" style={{ color: item.color || THEME_COLORS.foreground }}>
+              {item.value}
+            </span>
+          </div>
+        ))}
+
+        <div className="p-2 rounded-lg" style={{ backgroundColor: frameInfo.bg }}>
+          <span className="block" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
+            {frameInfo.label}
+          </span>
+          <span className="font-bold" style={{ color: frameInfo.color }}>
+            {frameInfo.value}
+          </span>
+          {frameInfo.extras.map((extra, idx) => (
+            <span key={idx} className="block text-[10px]" style={{ color: frameInfo.color }}>
+              {extra.icon} {extra.text}
+            </span>
+          ))}
+        </div>
+
+        <div className="p-2 rounded-lg" style={{ backgroundColor: `${THEME_COLORS.secondary}22` }}>
+          <span className="block" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
+            ไม้ดาม:
+          </span>
+          <span className="font-bold" style={{ color: THEME_COLORS.secondary }}>
+            {results.railSections - 1} ตัว ({results.railSections} ช่อง)
+          </span>
+        </div>
+
+        <div className="p-2 rounded-lg col-span-2" style={{ backgroundColor: `${THEME_COLORS.danger}11` }}>
+          <span className="block" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
+            Lock Block:
+          </span>
+          <span className="font-bold" style={{ color: THEME_COLORS.danger }}>
+            {results.lockBlockCount} ชิ้น ({lockBlockDesc})
+          </span>
+        </div>
+      </div>
+
+      {doubleConfigSummary && (
+        <div className="mt-3 p-2 rounded-lg text-[11px]" style={{ backgroundColor: `${THEME_COLORS.warning}22`, color: THEME_COLORS.secondary }}>
+          {doubleConfigSummary}
+        </div>
+      )}
+
+      {selectedFrameCode && (
+        <div className="mt-3 p-2 rounded-lg text-xs" style={{ backgroundColor: `${THEME_COLORS.primary}11`, color: THEME_COLORS.primary }}>
+          <div className="font-medium">รหัส ERP: {selectedFrameCode}</div>
+          <div className="text-[10px]">{currentFrame.desc}</div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function DoorConfigurator() {
   const [doorThickness, setDoorThickness] = useState("");
@@ -1264,24 +1254,14 @@ export default function DoorConfigurator() {
   const frameSelection = useFrameSelection(frameType, doorThickness, surfaceThickness, doorHeight);
 
   const currentFrame = useMemo(() => {
-    if (!frameSelection.frames || frameSelection.frames.length === 0) {
-      return {
-        thickness: 0,
-        width: 0,
-        length: 0,
-        useThickness: 0,
-        useWidth: 0,
-        isFlipped: false,
-        planeAmount: 0,
-        code: "",
-        desc: "",
-      };
+    if (!frameSelection.frames?.length) {
+      return { thickness: 0, width: 0, length: 0, useThickness: 0, useWidth: 0, isFlipped: false, planeAmount: 0, code: "", desc: "" };
     }
     return frameSelection.frames.find((f) => f.code === selectedFrameCode) || frameSelection.frames[0];
   }, [frameSelection, selectedFrameCode]);
 
   useEffect(() => {
-    if (frameSelection.frames && frameSelection.frames.length > 0) {
+    if (frameSelection.frames?.length > 0) {
       setSelectedFrameCode(frameSelection.frames[0].code);
     }
   }, [frameSelection]);
@@ -1305,6 +1285,17 @@ export default function DoorConfigurator() {
 
   const isDataComplete = doorThickness && doorWidth && doorHeight;
   const piecesPerSide = parseInt(lockBlockPiecesPerSide) || 0;
+  const efficiencyColor = getEfficiencyColor(cuttingPlan.efficiency);
+
+  const doubleConfigSummary = useMemo(() => {
+    const df = results.doubleFrame;
+    if (!df?.hasAny || !df.count) return "";
+    const sideLabels = { top: "บน", bottom: "ล่าง", left: "ซ้าย", center: "กลาง", right: "ขวา" };
+    const sides = Object.entries(sideLabels)
+      .filter(([key]) => df[key])
+      .map(([_, label]) => label);
+    return sides.length ? `เบิ้ลโครงด้าน ${sides.join(", ")} จำนวน ${df.count} ชั้น/ด้าน` : "";
+  }, [results]);
 
   const handleLockBlockChange = (left, right) => {
     setLockBlockLeft(left);
@@ -1315,37 +1306,11 @@ export default function DoorConfigurator() {
     setDoubleFrameSides((prev) => {
       if (side === "all") {
         const newValue = !prev.all;
-        return {
-          top: newValue,
-          bottom: newValue,
-          left: newValue,
-          center: newValue,
-          right: newValue,
-          all: newValue,
-        };
+        return { top: newValue, bottom: newValue, left: newValue, center: newValue, right: newValue, all: newValue };
       }
-      return {
-        ...prev,
-        [side]: !prev[side],
-        all: false,
-      };
+      return { ...prev, [side]: !prev[side], all: false };
     });
   };
-
-  const doubleConfigSummary = useMemo(() => {
-    const df = results.doubleFrame;
-    if (!df || !df.hasAny || !df.count) return "";
-    const sides = [];
-    if (df.top) sides.push("บน");
-    if (df.bottom) sides.push("ล่าง");
-    if (df.left) sides.push("ซ้าย");
-    if (df.center) sides.push("กลาง");
-    if (df.right) sides.push("ขวา");
-    if (!sides.length) return "";
-    return `เบิ้ลโครงด้าน ${sides.join(", ")} จำนวน ${df.count} ชั้น/ด้าน`;
-  }, [results]);
-
-  const efficiencyColor = getEfficiencyColor(cuttingPlan.efficiency);
 
   return (
     <div className="flex flex-col items-center justify-start w-full h-full p-4 gap-4 overflow-auto" style={{ backgroundColor: THEME_COLORS.background }}>
@@ -1354,14 +1319,7 @@ export default function DoorConfigurator() {
           <h1 className="text-3xl font-bold mb-1" style={{ color: THEME_COLORS.primary }}>
             🚪 Door Configuration System
           </h1>
-          <p
-            style={{
-              color: THEME_COLORS.foreground,
-              opacity: 0.7,
-            }}
-          >
-            ระบบออกแบบโครงประตู - C.H.H INDUSTRY CO., LTD.
-          </p>
+          <p style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>ระบบออกแบบโครงประตู - C.H.H INDUSTRY CO., LTD.</p>
         </div>
 
         <div className="grid lg:grid-cols-5 gap-4">
@@ -1387,27 +1345,14 @@ export default function DoorConfigurator() {
                       ประเภทวัสดุ
                     </label>
                     <div className="grid grid-cols-2 gap-1">
-                      {SURFACE_MATERIALS.map((mat) => {
-                        const active = surfaceMaterial === mat.value;
-                        return (
-                          <button
-                            key={mat.value}
-                            onClick={() => setSurfaceMaterial(mat.value)}
-                            className="py-1.5 px-2 rounded text-xs font-medium transition-all"
-                            style={{
-                              backgroundColor: active ? THEME_COLORS.success : THEME_COLORS.default,
-                              color: active ? THEME_COLORS.background : THEME_COLORS.foreground,
-                            }}
-                          >
-                            {mat.label}
-                          </button>
-                        );
-                      })}
+                      {SURFACE_MATERIALS.map((mat) => (
+                        <ToggleButton key={mat.value} active={surfaceMaterial === mat.value} onClick={() => setSurfaceMaterial(mat.value)}>
+                          {mat.label}
+                        </ToggleButton>
+                      ))}
                     </div>
                   </div>
-
                   <QuickSelectWithInput label="ความหนา/แผ่น" value={surfaceThickness} onChange={setSurfaceThickness} />
-
                   <InfoBox color="green">
                     <InfoRow label="วัสดุ:" value={<span style={{ color: THEME_COLORS.success }}>{getMaterialLabel(SURFACE_MATERIALS, surfaceMaterial)}</span>} />
                     <InfoRow label="วัสดุปิดผิว:" value={`${surfaceThickness || 0} mm × 2 = ${(parseFloat(surfaceThickness) || 0) * 2} mm`} className="mt-1" />
@@ -1421,49 +1366,28 @@ export default function DoorConfigurator() {
               <SectionCard text="3" title="โครง (ERP)" icon="🪵" color="amber">
                 <div className="space-y-3">
                   <div className="grid grid-cols-3 gap-1">
-                    {FRAME_TYPES.map((opt) => {
-                      const active = frameType === opt.value;
-                      return (
-                        <button
-                          key={opt.value}
-                          onClick={() => setFrameType(opt.value)}
-                          className="py-1.5 rounded text-xs font-medium transition-all"
-                          style={{
-                            backgroundColor: active ? THEME_COLORS.warning : THEME_COLORS.default,
-                            color: active ? THEME_COLORS.background : THEME_COLORS.foreground,
-                          }}
-                        >
-                          {opt.label}
-                        </button>
-                      );
-                    })}
+                    {FRAME_TYPES.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setFrameType(opt.value)}
+                        className="py-1.5 rounded text-xs font-medium transition-all"
+                        style={{
+                          backgroundColor: frameType === opt.value ? THEME_COLORS.warning : THEME_COLORS.default,
+                          color: frameType === opt.value ? THEME_COLORS.background : THEME_COLORS.foreground,
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium mb-1" style={{ color: THEME_COLORS.foreground }}>
                       เลือกไม้โครง (จาก ERP)
-                      <span
-                        style={{
-                          color: THEME_COLORS.foreground,
-                          opacity: 0.6,
-                          marginLeft: 4,
-                          fontWeight: "normal",
-                        }}
-                      >
-                        ยาว≥{doorHeight || 0}mm
-                      </span>
+                      <span style={{ color: THEME_COLORS.foreground, opacity: 0.6, marginLeft: 4, fontWeight: "normal" }}>ยาว≥{doorHeight || 0}mm</span>
                     </label>
                     {frameType && frameSelection.frames.length > 0 ? (
-                      <select
-                        value={selectedFrameCode}
-                        onChange={(e) => setSelectedFrameCode(e.target.value)}
-                        className="w-full px-2 py-1.5 rounded text-xs focus:outline-none"
-                        style={{
-                          border: `1px solid ${THEME_COLORS.default}`,
-                          backgroundColor: THEME_COLORS.background,
-                          color: THEME_COLORS.foreground,
-                        }}
-                      >
+                      <select value={selectedFrameCode} onChange={(e) => setSelectedFrameCode(e.target.value)} className="w-full px-2 py-1.5 rounded text-xs focus:outline-none" style={{ border: `1px solid ${THEME_COLORS.default}`, backgroundColor: THEME_COLORS.background, color: THEME_COLORS.foreground }}>
                         {frameSelection.frames.map((frame) => (
                           <option key={frame.code} value={frame.code}>
                             {frame.displaySize}
@@ -1532,29 +1456,19 @@ export default function DoorConfigurator() {
                         ด้านที่ต้องการเบิ้ลโครง
                       </label>
                       <div className="grid grid-cols-3 gap-1">
-                        {[
-                          ["top", "บน"],
-                          ["bottom", "ล่าง"],
-                          ["left", "ซ้าย"],
-                          ["center", "กลาง"],
-                          ["right", "ขวา"],
-                          ["all", "ทั้งหมด"],
-                        ].map(([key, label]) => {
-                          const active = doubleFrameSides[key];
-                          return (
-                            <button
-                              key={key}
-                              onClick={() => handleToggleDoubleSide(key)}
-                              className="py-1.5 rounded text-xs font-medium transition-all"
-                              style={{
-                                backgroundColor: active ? THEME_COLORS.warning : THEME_COLORS.default,
-                                color: active ? THEME_COLORS.background : THEME_COLORS.foreground,
-                              }}
-                            >
-                              {label}
-                            </button>
-                          );
-                        })}
+                        {DOUBLE_FRAME_SIDES.map(({ key, label }) => (
+                          <button
+                            key={key}
+                            onClick={() => handleToggleDoubleSide(key)}
+                            className="py-1.5 rounded text-xs font-medium transition-all"
+                            style={{
+                              backgroundColor: doubleFrameSides[key] ? THEME_COLORS.warning : THEME_COLORS.default,
+                              color: doubleFrameSides[key] ? THEME_COLORS.background : THEME_COLORS.foreground,
+                            }}
+                          >
+                            {label}
+                          </button>
+                        ))}
                       </div>
                     </div>
 
@@ -1562,12 +1476,10 @@ export default function DoorConfigurator() {
                       <label className="block text-xs font-medium mb-1" style={{ color: THEME_COLORS.foreground }}>
                         จำนวนไม้เบิ้ลต่อด้าน
                       </label>
-
                       <div className="flex items-center gap-1">
                         <div className="flex-1">
-                          <NumberInput value={numericDoubleCount} onChange={(v) => setDoubleFrameCount(String(v || 0))} />
+                          <NumberInput value={numericDoubleCount} onChange={(v) => setDoubleFrameCount(String(v || 0))} className="w-full px-2 py-1.5 rounded text-center text-xs font-bold" />
                         </div>
-
                         <span className="text-xs" style={{ color: THEME_COLORS.foreground }}>
                           ชั้น/ด้าน
                         </span>
@@ -1602,13 +1514,7 @@ export default function DoorConfigurator() {
                     </div>
                   )}
                   {results.railsAdjusted && (
-                    <div
-                      className="text-[10px] mb-1 p-1 rounded"
-                      style={{
-                        backgroundColor: `${THEME_COLORS.warning}22`,
-                        color: THEME_COLORS.secondary,
-                      }}
-                    >
+                    <div className="text-[10px] mb-1 p-1 rounded" style={{ backgroundColor: `${THEME_COLORS.warning}22`, color: THEME_COLORS.secondary }}>
                       🔄 ปรับตำแหน่งไม้ดามอัตโนมัติเพื่อหลบ Lock Block
                     </div>
                   )}
@@ -1633,8 +1539,7 @@ export default function DoorConfigurator() {
                           label={`ตำแหน่งที่ ${idx + 1}:`}
                           value={
                             <span>
-                              {pos} mm
-                              {wasAdjusted && <span className="text-[9px] ml-1">(เดิม {results.railPositionsOriginal[idx]})</span>}
+                              {pos} mm{wasAdjusted && <span className="text-[9px] ml-1">(เดิม {results.railPositionsOriginal[idx]})</span>}
                             </span>
                           }
                         />
@@ -1652,29 +1557,28 @@ export default function DoorConfigurator() {
                     จำนวนต่อฝั่ง
                   </label>
                   <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((n) => {
-                      const active = piecesPerSide === n;
-                      return (
-                        <button
-                          key={n}
-                          onClick={() => setLockBlockPiecesPerSide(n)}
-                          className="flex-1 py-2 rounded text-sm font-bold transition-all"
-                          style={{
-                            backgroundColor: active ? THEME_COLORS.danger : THEME_COLORS.default,
-                            color: active ? THEME_COLORS.background : THEME_COLORS.foreground,
-                          }}
-                        >
-                          {n} ชิ้น
-                        </button>
-                      );
-                    })}
+                    {LOCK_BLOCK_PIECES_OPTIONS.map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => setLockBlockPiecesPerSide(n)}
+                        className="flex-1 py-2 rounded text-sm font-bold transition-all"
+                        style={{
+                          backgroundColor: piecesPerSide === n ? THEME_COLORS.danger : THEME_COLORS.default,
+                          color: piecesPerSide === n ? THEME_COLORS.background : THEME_COLORS.foreground,
+                        }}
+                      >
+                        {n} ชิ้น
+                      </button>
+                    ))}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  <RadioOptionCard name="lockblock" checked={lockBlockLeft && !lockBlockRight} onChange={() => handleLockBlockChange(true, false)} label="ซ้าย" sublabel={`(${piecesPerSide} ชิ้น)`} isActive={lockBlockLeft && !lockBlockRight} />
-                  <RadioOptionCard name="lockblock" checked={!lockBlockLeft && lockBlockRight} onChange={() => handleLockBlockChange(false, true)} label="ขวา" sublabel={`(${piecesPerSide} ชิ้น)`} isActive={!lockBlockLeft && lockBlockRight} />
-                  <RadioOptionCard name="lockblock" checked={lockBlockLeft && lockBlockRight} onChange={() => handleLockBlockChange(true, true)} label="ทั้งสอง" sublabel={`(${piecesPerSide * 2} ชิ้น)`} isActive={lockBlockLeft && lockBlockRight} />
+                  {LOCK_BLOCK_POSITIONS.map((pos) => {
+                    const isActive = lockBlockLeft === pos.left && lockBlockRight === pos.right;
+                    const sublabel = pos.key === "both" ? `(${piecesPerSide * 2} ชิ้น)` : `(${piecesPerSide} ชิ้น)`;
+                    return <RadioOptionCard key={pos.key} name="lockblock" checked={isActive} onChange={() => handleLockBlockChange(pos.left, pos.right)} label={pos.label} sublabel={sublabel} isActive={isActive} />;
+                  })}
                 </div>
 
                 {(lockBlockLeft || lockBlockRight) && piecesPerSide > 0 && (
@@ -1710,335 +1614,11 @@ export default function DoorConfigurator() {
               </div>
             </SectionCard>
 
-            <div
-              className="rounded-xl shadow-lg p-4"
-              style={{
-                backgroundColor: THEME_COLORS.background,
-                border: `1px solid ${THEME_COLORS.default}`,
-              }}
-            >
-              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: THEME_COLORS.foreground }}>
-                📋 สรุปโครงสร้าง
-              </h3>
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div
-                  className="p-2 rounded-lg"
-                  style={{
-                    backgroundColor: `${THEME_COLORS.default}33`,
-                  }}
-                >
-                  <span className="block" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
-                    สเปคประตู:
-                  </span>
-                  <span className="font-bold" style={{ color: THEME_COLORS.foreground }}>
-                    {formatDimension(doorThickness, doorWidth, doorHeight)} mm
-                  </span>
-                </div>
-                <div
-                  className="p-2 rounded-lg"
-                  style={{
-                    backgroundColor: `${THEME_COLORS.default}33`,
-                  }}
-                >
-                  <span className="block" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
-                    ปิดผิว:
-                  </span>
-                  <span className="font-bold" style={{ color: THEME_COLORS.success }}>
-                    {getMaterialLabel(SURFACE_MATERIALS, surfaceMaterial)} {surfaceThickness || 0}
-                    mm + กาว {GLUE_THICKNESS}mm (×2)
-                  </span>
-                </div>
-                <div
-                  className="p-2 rounded-lg"
-                  style={{
-                    backgroundColor: `${THEME_COLORS.warning}22`,
-                  }}
-                >
-                  <span className="block" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
-                    โครงไม้:
-                  </span>
-                  <span className="font-bold" style={{ color: THEME_COLORS.secondary }}>
-                    {currentFrame.useThickness || "-"}×{currentFrame.useWidth || "-"} mm
-                  </span>
-                  {currentFrame.isFlipped && (
-                    <span className="block text-[10px]" style={{ color: THEME_COLORS.secondary }}>
-                      🔄 พลิกไม้
-                    </span>
-                  )}
-                  {currentFrame.planeAmount > 0 && (
-                    <span className="block text-[10px]" style={{ color: THEME_COLORS.secondary }}>
-                      🪚 ไส {currentFrame.planeAmount}
-                      mm
-                    </span>
-                  )}
-                </div>
-                <div
-                  className="p-2 rounded-lg"
-                  style={{
-                    backgroundColor: `${THEME_COLORS.secondary}22`,
-                  }}
-                >
-                  <span className="block" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
-                    ไม้ดาม:
-                  </span>
-                  <span className="font-bold" style={{ color: THEME_COLORS.secondary }}>
-                    {results.railSections - 1} ตัว ({results.railSections} ช่อง)
-                  </span>
-                </div>
-                <div
-                  className="p-2 rounded-lg col-span-2"
-                  style={{
-                    backgroundColor: `${THEME_COLORS.danger}11`,
-                  }}
-                >
-                  <span className="block" style={{ color: THEME_COLORS.foreground, opacity: 0.7 }}>
-                    Lock Block:
-                  </span>
-                  <span className="font-bold" style={{ color: THEME_COLORS.danger }}>
-                    {results.lockBlockCount} ชิ้น ({lockBlockLeft && lockBlockRight ? `ซ้าย ${piecesPerSide} + ขวา ${piecesPerSide}` : lockBlockLeft ? `ซ้าย ${piecesPerSide}` : lockBlockRight ? `ขวา ${piecesPerSide}` : "-"})
-                  </span>
-                </div>
-              </div>
-              {doubleConfigSummary && (
-                <div
-                  className="mt-3 p-2 rounded-lg text-[11px]"
-                  style={{
-                    backgroundColor: `${THEME_COLORS.warning}22`,
-                    color: THEME_COLORS.secondary,
-                  }}
-                >
-                  {doubleConfigSummary}
-                </div>
-              )}
-              {selectedFrameCode && (
-                <div
-                  className="mt-3 p-2 rounded-lg text-xs"
-                  style={{
-                    backgroundColor: `${THEME_COLORS.primary}11`,
-                    color: THEME_COLORS.primary,
-                  }}
-                >
-                  <div className="font-medium">รหัส ERP: {selectedFrameCode}</div>
-                  <div className="text-[10px]">{currentFrame.desc}</div>
-                </div>
-              )}
-            </div>
+            <SummaryDisplay results={results} doorThickness={doorThickness} doorWidth={doorWidth} doorHeight={doorHeight} surfaceMaterial={surfaceMaterial} surfaceThickness={surfaceThickness} currentFrame={currentFrame} selectedFrameCode={selectedFrameCode} doubleConfigSummary={doubleConfigSummary} lockBlockLeft={lockBlockLeft} lockBlockRight={lockBlockRight} piecesPerSide={piecesPerSide} />
 
             {isDataComplete ? (
               <SectionCard text="6" title="แผนการตัดไม้ (Cutting Optimization)" icon="✂️" color="indigo">
-                <div className="space-y-4">
-                  {cuttingPlan.needSplice && (
-                    <InfoBox color="purple">
-                      <div className="flex items-center gap-2 font-medium mb-1" style={{ color: THEME_COLORS.primary }}>
-                        <span>🔗</span> <span>ต้องต่อไม้โครงตั้ง</span>
-                      </div>
-                      <div className="space-y-0.5" style={{ color: THEME_COLORS.primary }}>
-                        <div>• จำนวนชิ้นที่ต้องต่อ: {cuttingPlan.spliceCount} ชิ้น</div>
-                        <div>• เผื่อซ้อนทับ: {cuttingPlan.spliceOverlap} mm ต่อจุด</div>
-                        <div className="text-[10px] mt-1" style={{ opacity: 0.8 }}>
-                          💡 ใช้กาว + ตะปูยึดบริเวณรอยต่อ
-                        </div>
-                      </div>
-                    </InfoBox>
-                  )}
-
-                  <div className="grid grid-cols-4 gap-2 text-xs">
-                    <StatCard value={cuttingPlan.totalStocks} label="ไม้ที่ใช้ (ท่อน)" variant="primary" />
-                    <StatCard value={cuttingPlan.efficiency} label="ประสิทธิภาพ" variant="success" />
-                    <StatCard value={cuttingPlan.usedWithoutKerf} label="ใช้จริง (mm)" variant="primary" />
-                    <StatCard value={cuttingPlan.totalWaste} label="เศษเหลือ (mm)" variant="danger" />
-                  </div>
-
-                  <div className="border rounded-lg overflow-hidden" style={{ borderColor: THEME_COLORS.default }}>
-                    <div
-                      className="px-3 py-2 text-xs font-semibold"
-                      style={{
-                        backgroundColor: `${THEME_COLORS.default}33`,
-                        color: THEME_COLORS.foreground,
-                      }}
-                    >
-                      📋 รายการชิ้นส่วน (เผื่อรอยเลื่อย {cuttingPlan.sawKerf}
-                      mm)
-                    </div>
-                    <div>
-                      {cuttingPlan.cutPieces.map((piece, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between px-3 py-2 text-xs"
-                          style={{
-                            backgroundColor: piece.isSplice ? `${THEME_COLORS.primary}11` : THEME_COLORS.background,
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded" style={{ backgroundColor: piece.color }} />
-                            <span className="font-medium" style={{ color: THEME_COLORS.foreground }}>
-                              {piece.name}
-                            </span>
-                            {piece.isSplice && (
-                              <span
-                                className="text-[9px] px-1 rounded"
-                                style={{
-                                  color: THEME_COLORS.primary,
-                                  backgroundColor: `${THEME_COLORS.primary}11`,
-                                }}
-                              >
-                                ต่อ
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-4" style={{ color: THEME_COLORS.foreground }}>
-                            <span>{piece.length} mm</span>
-                            <span className="font-bold">×{piece.qty}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="border rounded-lg overflow-hidden" style={{ borderColor: THEME_COLORS.default }}>
-                    <div
-                      className="px-3 py-2 text-xs font-semibold"
-                      style={{
-                        backgroundColor: `${THEME_COLORS.default}33`,
-                        color: THEME_COLORS.foreground,
-                      }}
-                    >
-                      🪵 แผนการตัด (ไม้ยาว {cuttingPlan.stockLength}mm × {cuttingPlan.totalStocks} ท่อน)
-                    </div>
-                    <div className="p-3 space-y-2">
-                      {cuttingPlan.stocks.map((stock, stockIdx) => (
-                        <div key={stockIdx} className="space-y-1">
-                          <div
-                            className="text-[10px]"
-                            style={{
-                              color: THEME_COLORS.foreground,
-                              opacity: 0.7,
-                            }}
-                          >
-                            ท่อนที่ {stockIdx + 1}
-                          </div>
-                          <div
-                            className="relative h-8 rounded border overflow-hidden"
-                            style={{
-                              backgroundColor: `${THEME_COLORS.default}33`,
-                              borderColor: THEME_COLORS.default,
-                            }}
-                          >
-                            {(() => {
-                              let offset = 0;
-                              return stock.pieces.map((piece, pieceIdx) => {
-                                const width = (piece.length / stock.length) * 100;
-                                const kerfWidth = (cuttingPlan.sawKerf / stock.length) * 100;
-                                const left = offset;
-                                offset += width + kerfWidth;
-                                return (
-                                  <React.Fragment key={pieceIdx}>
-                                    <div
-                                      className="absolute h-full flex items-center justify-center text-[8px] font-medium overflow-hidden"
-                                      style={{
-                                        left: `${left}%`,
-                                        width: `${width}%`,
-                                        backgroundColor: piece.color,
-                                        color: THEME_COLORS.background,
-                                      }}
-                                      title={`${piece.name}: ${piece.length}mm`}
-                                    >
-                                      {width > 8 && <span className="truncate px-1">{piece.length}</span>}
-                                    </div>
-                                    {pieceIdx < stock.pieces.length - 1 && (
-                                      <div
-                                        className="absolute h-full"
-                                        style={{
-                                          left: `${left + width}%`,
-                                          width: `${kerfWidth}%`,
-                                          backgroundColor: THEME_COLORS.default,
-                                        }}
-                                      />
-                                    )}
-                                  </React.Fragment>
-                                );
-                              });
-                            })()}
-                            {stock.remaining > 0 && (
-                              <div
-                                className="absolute right-0 h-full flex items-center justify-center text-[8px]"
-                                style={{
-                                  width: `${(stock.remaining / stock.length) * 100}%`,
-                                  backgroundColor: THEME_COLORS.background,
-                                  color: THEME_COLORS.foreground,
-                                  opacity: 0.7,
-                                }}
-                              >
-                                {stock.remaining > 100 && <span>เศษ {stock.remaining}</span>}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div
-                    className="p-2 rounded-lg"
-                    style={{
-                      backgroundColor: THEME_COLORS.background,
-                      border: `1px solid ${THEME_COLORS.default}`,
-                    }}
-                  >
-                    <div className="flex justify-between text-xs mb-1">
-                      <span
-                        style={{
-                          color: THEME_COLORS.foreground,
-                        }}
-                      >
-                        ประสิทธิภาพการใช้ไม้
-                      </span>
-                      <span
-                        className="font-bold"
-                        style={{
-                          color: efficiencyColor,
-                        }}
-                      >
-                        {cuttingPlan.efficiency}%
-                      </span>
-                    </div>
-                    <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: THEME_COLORS.default }}>
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                          width: `${cuttingPlan.efficiency}%`,
-                          backgroundColor: efficiencyColor,
-                        }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-[10px] mt-1">
-                      <span
-                        style={{
-                          color: THEME_COLORS.foreground,
-                          opacity: 0.6,
-                        }}
-                      >
-                        0%
-                      </span>
-                      <span
-                        style={{
-                          color: THEME_COLORS.foreground,
-                          opacity: 0.6,
-                        }}
-                      >
-                        ดี: ≥80%
-                      </span>
-                      <span
-                        style={{
-                          color: THEME_COLORS.foreground,
-                          opacity: 0.6,
-                        }}
-                      >
-                        100%
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                <CuttingPlanDisplay cuttingPlan={cuttingPlan} efficiencyColor={efficiencyColor} />
               </SectionCard>
             ) : (
               <SectionCard text="6" title="แผนการตัดไม้ (Cutting Optimization)" icon="✂️" color="gray">
@@ -2049,25 +1629,12 @@ export default function DoorConfigurator() {
 
           <div className="lg:col-span-3">
             <div className="rounded-2xl shadow-lg overflow-hidden sticky top-4" style={{ backgroundColor: THEME_COLORS.background }}>
-              <div
-                className="px-4 py-2.5 flex justify-between items-center"
-                style={{
-                  backgroundColor: THEME_COLORS.primary,
-                  color: THEME_COLORS.background,
-                }}
-              >
+              <div className="px-4 py-2.5 flex justify-between items-center" style={{ backgroundColor: THEME_COLORS.primary, color: THEME_COLORS.background }}>
                 <h3 className="text-base font-semibold flex items-center gap-2">
                   <span>📐</span> Drawing
                 </h3>
                 {isDataComplete && (
-                  <button
-                    onClick={() => setIsDrawingModalOpen(true)}
-                    className="px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors"
-                    style={{
-                      backgroundColor: `${THEME_COLORS.background}33`,
-                      color: THEME_COLORS.background,
-                    }}
-                  >
+                  <button onClick={() => setIsDrawingModalOpen(true)} className="px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors" style={{ backgroundColor: `${THEME_COLORS.background}33`, color: THEME_COLORS.background }}>
                     <ZoomIn />
                     ขยาย
                   </button>
@@ -2077,46 +1644,22 @@ export default function DoorConfigurator() {
                 {isDataComplete ? (
                   <>
                     <EngineeringDrawing results={results} />
-                    <div
-                      className="text-center mt-2 text-xs"
-                      style={{
-                        color: THEME_COLORS.foreground,
-                        opacity: 0.6,
-                      }}
-                    >
+                    <div className="text-center mt-2 text-xs" style={{ color: THEME_COLORS.foreground, opacity: 0.6 }}>
                       💡 คลิกที่รูปเพื่อขยาย
                     </div>
                   </>
                 ) : (
                   <EmptyState icon={<RulerDimensionLine />} title="กรุณากรอกข้อมูลสเปคประตู" subtitle="ระบุ ความหนา (T), ความกว้าง (W), ความสูง (H)">
                     <div className="mt-4 flex gap-2 text-xs">
-                      <span
-                        className="px-2 py-1 rounded"
-                        style={{
-                          backgroundColor: doorThickness ? `${THEME_COLORS.success}22` : `${THEME_COLORS.danger}22`,
-                          color: THEME_COLORS.foreground,
-                        }}
-                      >
-                        T: {doorThickness || "—"}
-                      </span>
-                      <span
-                        className="px-2 py-1 rounded"
-                        style={{
-                          backgroundColor: doorWidth ? `${THEME_COLORS.success}22` : `${THEME_COLORS.danger}22`,
-                          color: THEME_COLORS.foreground,
-                        }}
-                      >
-                        W: {doorWidth || "—"}
-                      </span>
-                      <span
-                        className="px-2 py-1 rounded"
-                        style={{
-                          backgroundColor: doorHeight ? `${THEME_COLORS.success}22` : `${THEME_COLORS.danger}22`,
-                          color: THEME_COLORS.foreground,
-                        }}
-                      >
-                        H: {doorHeight || "—"}
-                      </span>
+                      {[
+                        { label: "T", value: doorThickness },
+                        { label: "W", value: doorWidth },
+                        { label: "H", value: doorHeight },
+                      ].map(({ label, value }) => (
+                        <span key={label} className="px-2 py-1 rounded" style={{ backgroundColor: value ? `${THEME_COLORS.success}22` : `${THEME_COLORS.danger}22`, color: THEME_COLORS.foreground }}>
+                          {label}: {value || "—"}
+                        </span>
+                      ))}
                     </div>
                   </EmptyState>
                 )}
