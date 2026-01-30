@@ -436,7 +436,7 @@ const DimLine = memo(({ x1, y1, x2, y2, value, offset = 25, vertical = false, co
   const paperColor = theme?.paper || "#FFFFFF";
   const arrowSize = 3;
   const displayValue = unit ? `${value}${unit}` : value;
-  const textWidth = String(displayValue).length * 4 + 8;
+  const textWidth = String(displayValue).length * 5.5 + 10;
 
   if (vertical) {
     const lineX = x1 + offset;
@@ -589,7 +589,11 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
       if (!svgRef.current) return;
       setIsExporting(true);
       try {
-        const dataUrl = await htmlToImage.toPng(svgRef.current, { quality: 1, pixelRatio: scale, backgroundColor: THEME.background });
+        const dataUrl = await htmlToImage.toPng(svgRef.current, {
+          quality: 1,
+          pixelRatio: scale,
+          backgroundColor: THEME.background,
+        });
         const link = document.createElement("a");
         link.download = `door-drawing-${safeT}x${safeW}x${safeH}.png`;
         link.href = dataUrl;
@@ -618,18 +622,6 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
     }
     setIsExporting(false);
   }, [safeResults, safeT, safeW, safeH]);
-
-  const copyToClipboard = useCallback(async () => {
-    if (!svgRef.current) return;
-    try {
-      const dataUrl = await htmlToImage.toPng(svgRef.current, { quality: 1, pixelRatio: 2, backgroundColor: THEME.background });
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
-      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-    } catch (error) {
-      console.error("Copy error:", error);
-    }
-  }, []);
 
   const toggleLayer = useCallback((layerId) => {
     setVisibleLayers((prev) => ({ ...prev, [layerId]: !prev[layerId] }));
@@ -660,11 +652,51 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
     if (!hasDoubleFrame) return null;
     const elements = [];
     const configs = [
-      { key: "left", getRect: (i) => ({ x: positions.front.x + dims.front.F + dims.front.F * i, y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F }) },
-      { key: "right", getRect: (i) => ({ x: positions.front.x + dims.front.W - dims.front.F - dims.front.F * (i + 1), y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F }) },
-      { key: "top", getRect: (i) => ({ x: positions.front.x + dims.front.F, y: positions.front.y + dims.front.F + dims.front.F * i, w: dims.front.W - 2 * dims.front.F, h: dims.front.F }) },
-      { key: "bottom", getRect: (i) => ({ x: positions.front.x + dims.front.F, y: positions.front.y + dims.front.H - dims.front.F - dims.front.F * (i + 1), w: dims.front.W - 2 * dims.front.F, h: dims.front.F }) },
-      { key: "center", getRect: (i) => ({ x: positions.front.x + dims.front.W / 2 - dims.front.F / 2 + (i - (doubleFrame.count - 1) / 2) * dims.front.F, y: positions.front.y + dims.front.F, w: dims.front.F, h: dims.front.H - 2 * dims.front.F }) },
+      {
+        key: "left",
+        getRect: (i) => ({
+          x: positions.front.x + dims.front.F + dims.front.F * i,
+          y: positions.front.y + dims.front.F,
+          w: dims.front.F,
+          h: dims.front.H - 2 * dims.front.F,
+        }),
+      },
+      {
+        key: "right",
+        getRect: (i) => ({
+          x: positions.front.x + dims.front.W - dims.front.F - dims.front.F * (i + 1),
+          y: positions.front.y + dims.front.F,
+          w: dims.front.F,
+          h: dims.front.H - 2 * dims.front.F,
+        }),
+      },
+      {
+        key: "top",
+        getRect: (i) => ({
+          x: positions.front.x + dims.front.F,
+          y: positions.front.y + dims.front.F + dims.front.F * i,
+          w: dims.front.W - 2 * dims.front.F,
+          h: dims.front.F,
+        }),
+      },
+      {
+        key: "bottom",
+        getRect: (i) => ({
+          x: positions.front.x + dims.front.F,
+          y: positions.front.y + dims.front.H - dims.front.F - dims.front.F * (i + 1),
+          w: dims.front.W - 2 * dims.front.F,
+          h: dims.front.F,
+        }),
+      },
+      {
+        key: "center",
+        getRect: (i) => ({
+          x: positions.front.x + dims.front.W / 2 - dims.front.F / 2 + (i - (doubleFrame.count - 1) / 2) * dims.front.F,
+          y: positions.front.y + dims.front.F,
+          w: dims.front.F,
+          h: dims.front.H - 2 * dims.front.F,
+        }),
+      },
     ];
     configs.forEach(({ key, getRect }) => {
       if (!doubleFrame[key]) return;
@@ -695,8 +727,8 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
   ];
 
   return (
-    <div className="relative w-full h-full flex flex-col bg-default-100 rounded-lg overflow-hidden">
-      <div className="flex items-center justify-between p-2 bg-default-50 border-b border-default-200 gap-2 flex-wrap">
+    <div className="relative w-full h-full flex flex-col bg-default-100 rounded-xl overflow-hidden">
+      <div className="flex items-center justify-between p-2 bg-default-50 border-b-2 border-default gap-2 flex-wrap">
         <div className="flex items-center gap-2">
           <Chip size="sm" variant="flat">
             {Math.round(zoomLevel * 100)}%
@@ -711,7 +743,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
             </PopoverTrigger>
             <PopoverContent className="w-64">
               <div className="p-2 space-y-2">
-                <div className="flex justify-between items-center pb-2 border-b">
+                <div className="flex justify-between items-center pb-2 border-b-2 border-default">
                   <span className="font-semibold text-sm">Layers</span>
                   <div className="flex gap-2">
                     <Button size="sm" variant="light" onPress={() => toggleAllLayers(true)}>
@@ -747,17 +779,12 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
               <DropdownItem key="pdf" startContent={<FileText className="w-4 h-4" />} description="Vector format, best for printing" onPress={exportToPDF}>
                 Export as PDF
               </DropdownItem>
-              <DropdownItem key="png" startContent={<FileImage className="w-4 h-4" />} description="High resolution image" onPress={() => exportToPNG(2)}>
-                Export as PNG
-              </DropdownItem>
+
               <DropdownItem key="png-hd" startContent={<FileImage className="w-4 h-4" />} description="4x resolution for large prints" onPress={() => exportToPNG(4)}>
                 Export as PNG (4K)
               </DropdownItem>
               <DropdownItem key="dxf" startContent={<FileCode className="w-4 h-4" />} description="For AutoCAD/CAD software" onPress={exportToDXF}>
                 Export as DXF
-              </DropdownItem>
-              <DropdownItem key="copy" startContent={<Copy className="w-4 h-4" />} description="Copy image to clipboard" onPress={copyToClipboard}>
-                Copy to Clipboard
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -774,7 +801,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
         <TransformWrapper key={wrapperKey} initialScale={1} minScale={0.1} maxScale={5} centerOnInit onTransformed={(ref) => setZoomLevel(ref.state.scale)} wheel={{ step: 0.1 }}>
           {({ zoomIn, zoomOut, resetTransform, centerView }) => (
             <>
-              <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2 bg-default-50/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-default-200">
+              <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2 bg-default-50/90 backdrop-blur-sm rounded-xl p-2 shadow-md border-2 border-default">
                 <Tooltip content="Zoom In" placement="left">
                   <Button size="sm" variant="light" isIconOnly onPress={() => zoomIn()}>
                     <ZoomIn className="w-4 h-4" />
@@ -839,10 +866,16 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                       return <FilledRect key={`side-rail-${idx}`} className="layer-rails" x={positions.side.x + dims.side.S} y={railY - railH / 2} width={dims.side.T - 2 * dims.side.S} height={railH} color="#FF8A00" />;
                     })}
                     {(lockBlockLeft || lockBlockRight) && <rect className="layer-lockblock" x={positions.side.x + dims.side.S} y={positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE} width={dims.side.T - 2 * dims.side.S} height={LOCK_BLOCK_HEIGHT * DRAWING_SCALE} fill="none" stroke="#FF0076" strokeWidth="1.4" strokeDasharray="6,4" />}
-                    <DimLine x1={positions.side.x} y1={positions.side.y + dims.side.H} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={T} offset={120} theme={theme} />
-                    <DimLine x1={positions.side.x + dims.side.T} y1={positions.side.y} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={H} offset={100} vertical theme={theme} />
-                    <DimLine x1={positions.side.x} y1={positions.side.y} x2={positions.side.x + dims.side.S} y2={positions.side.y} value={S} offset={-60} fontSize={18} theme={theme} />
+                    {(lockBlockLeft || lockBlockRight) &&
+                      (() => {
+                        const lockBlockTopY = positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE;
+                        const lockBlockBottomY = lockBlockTopY + LOCK_BLOCK_HEIGHT * DRAWING_SCALE;
+                        return <DimLine x1={positions.side.x + dims.side.T} y1={lockBlockTopY} x2={positions.side.x + dims.side.T} y2={lockBlockBottomY} value={LOCK_BLOCK_HEIGHT} offset={60} vertical fontSize={16} theme={theme} />;
+                      })()}
+                    <DimLine x1={positions.side.x} y1={positions.side.y} x2={positions.side.x + dims.side.T} y2={positions.side.y} value={T} offset={-160} fontSize={18} theme={theme} />
+                    <DimLine x1={positions.side.x} y1={positions.side.y} x2={positions.side.x + dims.side.S} y2={positions.side.y} value={S} offset={-80} fontSize={18} theme={theme} />
                     <DimLine x1={positions.side.x + dims.side.S} y1={positions.side.y} x2={positions.side.x + dims.side.T - dims.side.S} y2={positions.side.y} value={T - 2 * S} offset={-120} fontSize={18} theme={theme} />
+                    <DimLine x1={positions.side.x + dims.side.T} y1={positions.side.y} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={H} offset={100} vertical fontSize={18} theme={theme} />
                   </g>
 
                   <g id="front-view">
@@ -862,15 +895,47 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                     {renderLockBlocks()}
                     <CenterLine x1={positions.front.x + dims.front.W / 2} y1={positions.front.y - 40} x2={positions.front.x + dims.front.W / 2} y2={positions.front.y + dims.front.H + 40} theme={theme} />
                     <CenterLine x1={positions.front.x - 40} y1={positions.front.y + dims.front.H / 2} x2={positions.front.x + dims.front.W + 40} y2={positions.front.y + dims.front.H / 2} theme={theme} />
-                    <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={W} offset={120} theme={theme} />
-                    <DimLine x1={positions.front.x + dims.front.W} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={H} offset={100} vertical theme={theme} />
-                    <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.F} y2={positions.front.y} value={F} offset={-60} fontSize={18} theme={theme} />
-                    <DimLine x1={positions.front.x + dims.front.F} y1={positions.front.y} x2={positions.front.x + dims.front.W - dims.front.F} y2={positions.front.y} value={W - 2 * F} offset={-120} fontSize={18} theme={theme} />
+                    <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y} value={W} offset={-160} fontSize={18} theme={theme} />
+                    <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x} y2={positions.front.y + dims.front.F} value={F} offset={-80} vertical fontSize={18} theme={theme} />
+                    <DimLine x1={positions.front.x + dims.front.W} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={H} offset={100} vertical fontSize={18} theme={theme} />
                     {(lockBlockLeft || lockBlockRight) && <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x} y2={positions.front.y + dims.front.H - lockBlockPosition * DRAWING_SCALE} value={lockBlockPosition} offset={-100} vertical fontSize={18} theme={theme} />}
+                    {(lockBlockLeft || lockBlockRight) &&
+                      (() => {
+                        const lockBlockTopY = positions.front.y + dims.front.H - lockBlockBottom * DRAWING_SCALE;
+                        const lockBlockBottomY = lockBlockTopY + LOCK_BLOCK_HEIGHT * DRAWING_SCALE;
+
+                        let lockBlockLeftX = null;
+                        let lockBlockRightX = null;
+
+                        if (lockBlockLeft) {
+                          lockBlockLeftX = positions.front.x + dims.front.totalFrame;
+                          lockBlockRightX = lockBlockLeftX + dims.front.lockBlockW;
+                        } else if (lockBlockRight) {
+                          lockBlockRightX = positions.front.x + dims.front.W - dims.front.totalFrame;
+                          lockBlockLeftX = lockBlockRightX - dims.front.lockBlockW;
+                        }
+
+                        return (
+                          <>
+                            <DimLine x1={positions.front.x + dims.front.W} y1={lockBlockTopY} x2={positions.front.x + dims.front.W} y2={lockBlockBottomY} value={LOCK_BLOCK_HEIGHT} offset={60} vertical fontSize={16} theme={theme} />
+                            {lockBlockLeftX !== null && lockBlockRightX !== null && <DimLine x1={lockBlockLeftX} y1={lockBlockBottomY} x2={lockBlockRightX} y2={lockBlockBottomY} value={safeF} offset={40} fontSize={16} theme={theme} />}
+                          </>
+                        );
+                      })()}
+                    {railPositions.length > 0 &&
+                      (() => {
+                        const railPos = railPositions[0];
+                        const railCenter = positions.front.y + dims.front.H - railPos * DRAWING_SCALE;
+                        const top = railCenter - dims.front.R / 2;
+                        const bottom = railCenter + dims.front.R / 2;
+                        const dx = positions.front.x + dims.front.W + 120;
+
+                        return <DimLine x1={dx} y1={top} x2={dx} y2={bottom} value={safeR} offset={40} vertical fontSize={16} theme={theme} />;
+                      })()}
                     {railPositions.map((pos, idx) => (
                       <g key={`front-ann-${idx}`} className="layer-dimensions">
                         <line x1={positions.front.x + dims.front.W + 200} y1={positions.front.y + dims.front.H - pos * DRAWING_SCALE} x2={positions.front.x + dims.front.W + 240} y2={positions.front.y + dims.front.H - pos * DRAWING_SCALE} stroke={theme.stroke} strokeWidth="0.8" />
-                        <text x={positions.front.x + dims.front.W + 260} y={positions.front.y + dims.front.H - pos * DRAWING_SCALE + 10} fontSize="18" fill={theme.text}>
+                        <text x={positions.front.x + dims.front.W + 260} y={positions.front.y + dims.front.H - pos * DRAWING_SCALE + 10} fontSize="20" fill={theme.text}>
                           {pos}
                         </text>
                       </g>
@@ -1007,7 +1072,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
         </TransformWrapper>
       </div>
 
-      <div className="flex items-center justify-between px-3 py-1.5 bg-default-50 border-t border-default-200 text-xs text-default-500">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-default-50 border-t-2 border-default text-xs text-default-500">
         <div className="flex items-center gap-2">
           <span>
             Door: {T}×{W}×{H} mm
@@ -1209,7 +1274,7 @@ export default function DoorConfigurator() {
                 </Chip>
               )}
               {frameType && frameSelection.frames.length > 0 && (
-                <div className="flex flex-col gap-2 text-sm p-2 bg-warning/10 rounded-lg">
+                <div className="flex flex-col gap-2 text-sm p-2 bg-warning/10 rounded-xl">
                   <div className="flex justify-between">
                     <span>ไม้โครงใช้จริง:</span>
                     <span className="font-bold text-secondary">
@@ -1231,7 +1296,7 @@ export default function DoorConfigurator() {
                     </Chip>
                   )}
                   {currentFrame.needSplice && (
-                    <div className="flex flex-col gap-2 mt-2 p-2 bg-primary/10 rounded-lg">
+                    <div className="flex flex-col gap-2 mt-2 p-2 bg-primary/10 rounded-xl">
                       <Chip color="primary" variant="flat" size="sm">
                         🔗 ต่อไม้ {currentFrame.spliceCount} ท่อน
                       </Chip>
@@ -1278,7 +1343,7 @@ export default function DoorConfigurator() {
               </div>
             </CardHeader>
             <CardBody className="gap-2">
-              <div className="flex flex-col gap-2 text-sm p-2 bg-secondary/10 rounded-lg">
+              <div className="flex flex-col gap-2 text-sm p-2 bg-secondary/10 rounded-xl">
                 <div className="flex justify-between">
                   <span>จำนวนช่อง:</span>
                   <span className="font-bold text-secondary">
@@ -1347,7 +1412,7 @@ export default function DoorConfigurator() {
                 </div>
               </div>
               {(lockBlockLeft || lockBlockRight) && piecesPerSide > 0 && (
-                <div className="flex flex-col gap-2 text-sm p-2 bg-danger/10 rounded-lg">
+                <div className="flex flex-col gap-2 text-sm p-2 bg-danger/10 rounded-xl">
                   <div className="flex justify-between">
                     <span>จำนวนรวม:</span>
                     <span className="font-bold text-danger">
@@ -1387,17 +1452,17 @@ export default function DoorConfigurator() {
             </CardHeader>
             <CardBody className="gap-2">
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="p-2 bg-default-100 rounded-lg">
+                <div className="p-2 bg-default-100 rounded-xl">
                   <span className="block text-foreground/70">สเปคประตู:</span>
                   <span className="font-bold">{formatDimension(doorThickness, doorWidth, doorHeight)} mm</span>
                 </div>
-                <div className="p-2 bg-default-100 rounded-lg">
+                <div className="p-2 bg-default-100 rounded-xl">
                   <span className="block text-foreground/70">ปิดผิว:</span>
                   <span className="font-bold text-success">
                     {getMaterialLabel(SURFACE_MATERIALS, surfaceMaterial)} {surfaceThickness || 0}mm + กาว {GLUE_THICKNESS}mm (×2)
                   </span>
                 </div>
-                <div className="p-2 bg-warning/20 rounded-lg">
+                <div className="p-2 bg-warning/20 rounded-xl">
                   <span className="block text-foreground/70">โครงไม้:</span>
                   <span className="font-bold text-secondary">
                     {currentFrame.useThickness || "-"}×{currentFrame.useWidth || "-"} mm
@@ -1405,22 +1470,22 @@ export default function DoorConfigurator() {
                   {currentFrame.isFlipped && <span className="block text-xs text-secondary">🔄 พลิกไม้</span>}
                   {currentFrame.planeAmount > 0 && <span className="block text-xs text-secondary">🪚 ไส {currentFrame.planeAmount}mm</span>}
                 </div>
-                <div className="p-2 bg-secondary/20 rounded-lg">
+                <div className="p-2 bg-secondary/20 rounded-xl">
                   <span className="block text-foreground/70">ไม้ดาม:</span>
                   <span className="font-bold text-secondary">
                     {results.railSections - 1} ตัว ({results.railSections} ช่อง)
                   </span>
                 </div>
-                <div className="col-span-2 p-2 bg-danger/10 rounded-lg">
+                <div className="col-span-2 p-2 bg-danger/10 rounded-xl">
                   <span className="block text-foreground/70">Lock Block:</span>
                   <span className="font-bold text-danger">
                     {results.lockBlockCount} ชิ้น ({lockBlockDesc})
                   </span>
                 </div>
               </div>
-              {doubleConfigSummary && <div className="p-2 bg-warning/20 rounded-lg text-sm text-secondary">{doubleConfigSummary}</div>}
+              {doubleConfigSummary && <div className="p-2 bg-warning/20 rounded-xl text-sm text-secondary">{doubleConfigSummary}</div>}
               {selectedFrameCode && (
-                <div className="p-2 bg-primary/10 rounded-lg text-sm">
+                <div className="p-2 bg-primary/10 rounded-xl text-sm">
                   <span className="font-medium text-primary">รหัส ERP: {selectedFrameCode}</span>
                   <span className="block text-xs">{currentFrame.desc}</span>
                 </div>
@@ -1440,7 +1505,7 @@ export default function DoorConfigurator() {
               </CardHeader>
               <CardBody className="gap-2">
                 {cuttingPlan.needSplice && (
-                  <div className="p-2 bg-primary/10 rounded-lg">
+                  <div className="p-2 bg-primary/10 rounded-xl">
                     <div className="flex items-center gap-2 font-medium text-primary mb-1">
                       <span>🔗</span>
                       <span>ต้องต่อไม้โครงตั้ง</span>
@@ -1453,24 +1518,24 @@ export default function DoorConfigurator() {
                   </div>
                 )}
                 <div className="grid grid-cols-4 gap-2">
-                  <div className="p-2 rounded-lg text-center border">
+                  <div className="p-2 rounded-xl text-center border-2 border-default">
                     <div className="font-bold text-lg text-primary">{cuttingPlan.totalStocks}</div>
                     <div className="text-xs text-foreground/80">ไม้ที่ใช้ (ท่อน)</div>
                   </div>
-                  <div className="p-2 rounded-lg text-center border">
+                  <div className="p-2 rounded-xl text-center border-2 border-default">
                     <div className="font-bold text-lg text-success">{cuttingPlan.efficiency}</div>
                     <div className="text-xs text-foreground/80">ประสิทธิภาพ</div>
                   </div>
-                  <div className="p-2 rounded-lg text-center border">
+                  <div className="p-2 rounded-xl text-center border-2 border-default">
                     <div className="font-bold text-lg text-primary">{cuttingPlan.usedWithoutKerf}</div>
                     <div className="text-xs text-foreground/80">ใช้จริง (mm)</div>
                   </div>
-                  <div className="p-2 rounded-lg text-center border">
+                  <div className="p-2 rounded-xl text-center border-2 border-default">
                     <div className="font-bold text-lg text-danger">{cuttingPlan.totalWaste}</div>
                     <div className="text-xs text-foreground/80">เศษเหลือ (mm)</div>
                   </div>
                 </div>
-                <div className="border rounded-lg overflow-hidden">
+                <div className="border-2 border-default rounded-xl overflow-hidden">
                   <div className="px-3 py-2 text-xs font-semibold bg-default-100">📋 รายการชิ้นส่วน (เผื่อรอยเลื่อย {cuttingPlan.sawKerf}mm)</div>
                   <div>
                     {cuttingPlan.cutPieces.map((piece, idx) => (
@@ -1492,7 +1557,7 @@ export default function DoorConfigurator() {
                     ))}
                   </div>
                 </div>
-                <div className="border rounded-lg overflow-hidden">
+                <div className="border-2 border-default rounded-xl overflow-hidden">
                   <div className="px-3 py-2 text-xs font-semibold bg-default-100">
                     🪵 แผนการตัด (ไม้ยาว {cuttingPlan.stockLength}mm × {cuttingPlan.totalStocks} ท่อน)
                   </div>
@@ -1500,7 +1565,7 @@ export default function DoorConfigurator() {
                     {cuttingPlan.stocks.map((stock, stockIdx) => (
                       <div key={stockIdx} className="space-y-1">
                         <div className="text-xs text-foreground/70">ท่อนที่ {stockIdx + 1}</div>
-                        <div className="relative h-8 rounded border overflow-hidden bg-default-100">
+                        <div className="relative h-8 rounded border-2 border-default overflow-hidden bg-default-100">
                           {(() => {
                             let offset = 0;
                             return stock.pieces.map((piece, pieceIdx) => {
