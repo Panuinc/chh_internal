@@ -388,10 +388,10 @@ const useCuttingPlan = (results, currentFrame) => {
     const spliceOverlap = currentFrame.spliceOverlap || 100;
     const cutPieces = [];
 
-    const addPiece = (name, finishedLength, qty, color, isSplice = false) => {
+    const addPiece = (name, finishedLength, qty, color, isSplice = false, withAllowance = true) => {
       if (!finishedLength || !qty) return;
 
-      const cutLength = finishedLength + CUT_ALLOWANCE;
+      const cutLength = finishedLength + (withAllowance ? CUT_ALLOWANCE : 0);
       cutPieces.push({
         name,
         length: finishedLength,
@@ -441,8 +441,9 @@ const useCuttingPlan = (results, currentFrame) => {
 
     const railCount = railSections - 1;
     if (railCount > 0) addPiece("ไม้ดาม", clearWidth, railCount, "primary");
-    if (lockBlockCount > 0) addPiece("Lock Block", LOCK_BLOCK_HEIGHT, lockBlockCount, "danger");
-
+    if (lockBlockCount > 0) {
+      addPiece("Lock Block", LOCK_BLOCK_HEIGHT, lockBlockCount, "danger", false, false);
+    }
     const allPieces = cutPieces.flatMap((piece) => Array.from({ length: piece.qty }, (_, i) => ({ ...piece, id: `${piece.name}-${i + 1}` }))).sort((a, b) => (b.cutLength ?? b.length) - (a.cutLength ?? a.length));
 
     const stocks = [];
