@@ -479,28 +479,18 @@ CenterLine.displayName = "CenterLine";
 
 const LockBlockSVG = memo(({ x, y, width, height }) => (
   <g className="layer-lockblock">
-    <rect x={x} y={y} width={width} height={height} fill="#FF007644" stroke="#FF0076" strokeWidth="0.8" />
-    <line x1={x} y1={y} x2={x + width} y2={y + height} stroke="#FF0076" strokeWidth="0.4" />
-    <line x1={x + width} y1={y} x2={x} y2={y + height} stroke="#FF0076" strokeWidth="0.4" />
+    <rect x={x} y={y} width={width} height={height} fill="url(#hatch-lockblock)" stroke="#000000" strokeWidth="0.8" />
+    <line x1={x} y1={y} x2={x + width} y2={y + height} stroke="#000000" strokeWidth="0.4" />
+    <line x1={x + width} y1={y} x2={x} y2={y + height} stroke="#000000" strokeWidth="0.4" />
   </g>
 ));
 LockBlockSVG.displayName = "LockBlockSVG";
 
-const FilledRect = memo(({ x, y, width, height, color, strokeWidth = 1, opacity = 0.2, strokeDasharray, className }) => (
-  <rect
-    className={className}
-    x={x}
-    y={y}
-    width={width}
-    height={height}
-    fill={`${color}${Math.round(opacity * 255)
-      .toString(16)
-      .padStart(2, "0")}`}
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeDasharray={strokeDasharray}
-  />
-));
+const FilledRect = memo(({ x, y, width, height, color, strokeWidth = 1, strokeDasharray, className, patternId }) => {
+  const fill = patternId ? `url(#${patternId})` : "#FFFFFF";
+
+  return <rect className={className} x={x} y={y} width={width} height={height} fill={fill} stroke="#000000" strokeWidth={strokeWidth} strokeDasharray={strokeDasharray} />;
+});
 FilledRect.displayName = "FilledRect";
 
 const EnhancedEngineeringDrawing = memo(({ results }) => {
@@ -509,7 +499,16 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
 
-  const theme = THEME;
+  // ใช้ theme ขาวดำ
+  const theme = {
+    background: "#FFFFFF",
+    paper: "#FFFFFF",
+    stroke: "#000000",
+    text: "#000000",
+    gridText: "#000000",
+    border: "#000000",
+    accent: "#000000",
+  };
 
   const safeResults = results || {};
   const { W = 0, H = 0, T = 0, S = 0, F = 0, R = 0, totalFrameWidth = 0, railPositions = [], railSections = 3, lockBlockTop = 800, lockBlockBottom = 1200, lockBlockLeft = false, lockBlockRight = false, lockBlockPosition = 1000, lockBlockCount = 0, lockBlockSides = 1, currentFrame = {}, doubleFrame = {} } = safeResults;
@@ -520,10 +519,13 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
   const safeS = S > 0 ? S : 4;
   const safeF = F > 0 ? F : 50;
   const safeR = R > 0 ? R : 27;
+
   const wrapperKey = useMemo(() => `drawing-${safeT}-${safeW}-${safeH}`, [safeT, safeW, safeH]);
+
   const viewBoxWidth = 2970;
   const viewBoxHeight = 2100;
   const DRAWING_SCALE = 0.5;
+
   const hasDoubleFrame = doubleFrame?.hasAny && doubleFrame.count > 0;
   const drawingDF = hasDoubleFrame ? safeF * doubleFrame.count : 0;
   const piecesPerSide = parseInt(lockBlockCount / (lockBlockSides || 1)) || 0;
@@ -539,14 +541,22 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
         R: safeR * DRAWING_SCALE,
         lockBlockW: safeF * DRAWING_SCALE,
       },
-      side: { T: safeT * DRAWING_SCALE, H: safeH * DRAWING_SCALE, S: safeS * DRAWING_SCALE },
+      side: {
+        T: safeT * DRAWING_SCALE,
+        H: safeH * DRAWING_SCALE,
+        S: safeS * DRAWING_SCALE,
+      },
     }),
     [safeW, safeH, safeT, safeS, safeF, safeR, drawingDF, totalFrameWidth],
   );
 
   const marginX = 150;
   const marginY = 200;
-  const positions = { side: { x: marginX, y: marginY + 200 }, front: { x: marginX + 700, y: marginY + 200 } };
+
+  const positions = {
+    side: { x: marginX, y: marginY + 200 },
+    front: { x: marginX + 700, y: marginY + 200 },
+  };
 
   const layerStyle = useMemo(() => {
     let css = "";
@@ -592,7 +602,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
         const dataUrl = await htmlToImage.toPng(svgRef.current, {
           quality: 1,
           pixelRatio: scale,
-          backgroundColor: THEME.background,
+          backgroundColor: theme.background,
         });
         const link = document.createElement("a");
         link.download = `door-drawing-${safeT}x${safeW}x${safeH}.png`;
@@ -603,7 +613,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
       }
       setIsExporting(false);
     },
-    [safeT, safeW, safeH],
+    [safeT, safeW, safeH, theme.background],
   );
 
   const exportToDXF = useCallback(() => {
@@ -640,17 +650,22 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
       if (!(isLeft ? lockBlockLeft : lockBlockRight)) return;
       [...Array(piecesPerSide)].forEach((_, i) => {
         const x = isLeft ? positions.front.x + dims.front.totalFrame + dims.front.lockBlockW * i : positions.front.x + dims.front.W - dims.front.totalFrame - dims.front.lockBlockW * (i + 1);
+
         blocks.push(<LockBlockSVG key={`lb-${isLeft ? "left" : "right"}-${i}`} x={x} y={lockBlockY} width={dims.front.lockBlockW} height={lockBlockH} />);
       });
     };
+
     renderSide(true);
     renderSide(false);
+
     return blocks;
   }, [positions, dims, lockBlockLeft, lockBlockRight, piecesPerSide, lockBlockBottom]);
 
   const renderDoubleFrames = useCallback(() => {
     if (!hasDoubleFrame) return null;
+
     const elements = [];
+
     const configs = [
       {
         key: "left",
@@ -698,22 +713,31 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
         }),
       },
     ];
+
     configs.forEach(({ key, getRect }) => {
       if (!doubleFrame[key]) return;
       for (let i = 0; i < doubleFrame.count; i++) {
         const r = getRect(i);
-        elements.push(<rect key={`df-${key}-${i}`} className="layer-doubleframe" x={r.x} y={r.y} width={r.w} height={r.h} fill="#FFB44122" stroke="#FFB441" strokeWidth="1.5" strokeDasharray="8,4" />);
+        elements.push(<rect key={`df-${key}-${i}`} className="layer-doubleframe" x={r.x} y={r.y} width={r.w} height={r.h} fill="url(#hatch-doubleframe)" stroke="#000000" strokeWidth="1" strokeDasharray="8,4" />);
       }
     });
+
     return elements;
   }, [hasDoubleFrame, positions, dims, doubleFrame]);
 
   const getDoubleFrameDesc = () => {
     if (!hasDoubleFrame || !doubleFrame) return "";
-    const sideLabels = { top: "บน", bottom: "ล่าง", left: "ซ้าย", right: "ขวา", center: "กลาง" };
+    const sideLabels = {
+      top: "บน",
+      bottom: "ล่าง",
+      left: "ซ้าย",
+      right: "ขวา",
+      center: "กลาง",
+    };
     const sides = Object.entries(sideLabels)
       .filter(([key]) => doubleFrame[key])
       .map(([_, label]) => label);
+
     return sides.length > 0 ? `(Double: ${sides.join(", ")} x${doubleFrame.count})` : "(Double)";
   };
 
@@ -726,18 +750,21 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
     { x: 525, yOffset: -71 },
   ];
 
+  const legendPatternIds = ["hatch-surface", "hatch-frame", "hatch-rails", "hatch-lockblock", "hatch-core", "hatch-doubleframe"];
+
   return (
     <div className="relative w-full h-full flex flex-col bg-default-100 rounded-xl overflow-hidden">
+      {/* Toolbar ด้านบนเดิม ใช้สี UI ของ NextUI ต่อได้ ไม่เกี่ยวกับตัว drawing */}
       <div className="flex items-center justify-between p-2 bg-default-50 border-b-2 border-default gap-2 flex-wrap">
         <div className="flex items-center gap-2">
-          <Chip size="sm" variant="flat">
+          <Chip size="sm" variant="shadow">
             {Math.round(zoomLevel * 100)}%
           </Chip>
         </div>
         <div className="flex items-center gap-2">
           <Popover placement="bottom-end">
             <PopoverTrigger>
-              <Button size="sm" variant="flat" startContent={<Layers className="w-4 h-4" />}>
+              <Button size="sm" variant="shadow" startContent={<Layers className="w-4 h-4" />}>
                 Layers
               </Button>
             </PopoverTrigger>
@@ -771,7 +798,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
 
           <Dropdown>
             <DropdownTrigger>
-              <Button size="sm" color="primary" variant="flat" startContent={<Download className="w-4 h-4" />} endContent={<ChevronDown className="w-3 h-3" />} isLoading={isExporting}>
+              <Button size="sm" color="primary" variant="shadow" startContent={<Download className="w-4 h-4" />} endContent={<ChevronDown className="w-3 h-3" />} isLoading={isExporting}>
                 Export
               </Button>
             </DropdownTrigger>
@@ -783,6 +810,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
               <DropdownItem key="png-hd" startContent={<FileImage className="w-4 h-4" />} description="4x resolution for large prints" onPress={() => exportToPNG(4)}>
                 Export as PNG (4K)
               </DropdownItem>
+
               <DropdownItem key="dxf" startContent={<FileCode className="w-4 h-4" />} description="For AutoCAD/CAD software" onPress={exportToDXF}>
                 Export as DXF
               </DropdownItem>
@@ -790,7 +818,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
           </Dropdown>
 
           <Tooltip content="Print">
-            <Button size="sm" variant="flat" isIconOnly onPress={() => window.print()}>
+            <Button size="sm" variant="shadow" isIconOnly onPress={() => window.print()}>
               <Printer className="w-4 h-4" />
             </Button>
           </Tooltip>
@@ -829,9 +857,45 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                 <svg ref={svgRef} viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} width="297mm" height="210mm" className="w-full h-auto" style={{ backgroundColor: theme.paper }}>
                   <style>{layerStyle}</style>
 
+                  {/* HATCH PATTERNS (AutoCAD style) */}
+                  <defs>
+                    {/* Surface material: diagonal hatch ห่างๆ */}
+                    <pattern id="hatch-surface" patternUnits="userSpaceOnUse" width="8" height="8">
+                      <path d="M0 8 L8 0" stroke="#000000" strokeWidth="0.3" />
+                    </pattern>
+
+                    {/* Frame: vertical line hatch */}
+                    <pattern id="hatch-frame" patternUnits="userSpaceOnUse" width="4" height="4">
+                      <path d="M2 0 L2 4" stroke="#000000" strokeWidth="0.4" />
+                    </pattern>
+
+                    {/* Rails: fill เทาอ่อน */}
+                    <pattern id="hatch-rails" patternUnits="userSpaceOnUse" width="4" height="4">
+                      <rect width="4" height="4" fill="#000000" opacity="0.1" />
+                    </pattern>
+
+                    {/* Lock block: diagonal hatch ถี่ขึ้น */}
+                    <pattern id="hatch-lockblock" patternUnits="userSpaceOnUse" width="4" height="4">
+                      <path d="M0 4 L4 0" stroke="#000000" strokeWidth="0.4" />
+                    </pattern>
+
+                    {/* Core (Honeycomb): จุดๆ */}
+                    <pattern id="hatch-core" patternUnits="userSpaceOnUse" width="6" height="6">
+                      <circle cx="3" cy="3" r="0.5" fill="#000000" opacity="0.4" />
+                    </pattern>
+
+                    {/* Double frame: cross-hatch */}
+                    <pattern id="hatch-doubleframe" patternUnits="userSpaceOnUse" width="6" height="6">
+                      <path d="M0 6 L6 0" stroke="#000000" strokeWidth="0.3" />
+                      <path d="M0 0 L6 6" stroke="#000000" strokeWidth="0.3" />
+                    </pattern>
+                  </defs>
+
+                  {/* ขอบกระดาษ */}
                   <rect x="8" y="8" width={viewBoxWidth - 16} height={viewBoxHeight - 16} fill="none" stroke={theme.border} strokeWidth="2" />
                   <rect x="12" y="12" width={viewBoxWidth - 24} height={viewBoxHeight - 24} fill="none" stroke={theme.border} strokeWidth="0.5" />
 
+                  {/* Grid reference */}
                   <g className="layer-grid" fontSize="20" fill={theme.gridText}>
                     {GRID_LETTERS.map((letter, i) => (
                       <text key={`grid-${letter}`} x="40" y={200 + i * 400} textAnchor="middle">
@@ -845,60 +909,125 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                     ))}
                   </g>
 
+                  {/* Title */}
                   <text x={viewBoxWidth / 2} y="80" textAnchor="middle" fontSize="40" fontWeight="bold" fill={theme.text}>
                     DOOR FRAME STRUCTURE DRAWING
                   </text>
 
+                  {/* SIDE VIEW */}
                   <g id="side-view">
                     <text x={positions.side.x + dims.side.T / 2} y={positions.side.y + dims.side.H + 70} textAnchor="middle" fontSize="28" fontWeight="bold" fill={theme.text}>
                       Side View
                     </text>
-                    <rect x={positions.side.x} y={positions.side.y} width={dims.side.T} height={dims.side.H} fill={theme.paper} stroke={theme.stroke} strokeWidth="3" />
-                    <FilledRect className="layer-surface" x={positions.side.x} y={positions.side.y} width={dims.side.S} height={dims.side.H} color="#10B981" strokeWidth={1.2} />
-                    <FilledRect className="layer-surface" x={positions.side.x + dims.side.T - dims.side.S} y={positions.side.y} width={dims.side.S} height={dims.side.H} color="#10B981" strokeWidth={1.2} />
-                    <FilledRect className="layer-frame" x={positions.side.x + dims.side.S} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} color="#FFB441" />
-                    <FilledRect className="layer-frame" x={positions.side.x + dims.side.T - dims.side.S - (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} color="#FFB441" />
-                    <FilledRect className="layer-core" x={positions.side.x + dims.side.S + (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.5} height={dims.side.H} color="#4456E9" strokeWidth={0.8} opacity={0.07} strokeDasharray="4,4" />
+
+                    {/* outline */}
+                    {/* <rect x={positions.side.x} y={positions.side.y} width={dims.side.T} height={dims.side.H} fill={theme.paper} stroke={theme.stroke} strokeWidth="3" /> */}
+
+                    {/* surface ล่าง/บน */}
+                    <FilledRect className="layer-surface" x={positions.side.x} y={positions.side.y} width={dims.side.S} height={dims.side.H} patternId="hatch-surface" strokeWidth={0.8} />
+                    <FilledRect className="layer-surface" x={positions.side.x + dims.side.T - dims.side.S} y={positions.side.y} width={dims.side.S} height={dims.side.H} patternId="hatch-surface" strokeWidth={0.8} />
+
+                    {/* frame สองฝั่ง */}
+                    <FilledRect className="layer-frame" x={positions.side.x + dims.side.S} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} patternId="hatch-frame" />
+                    <FilledRect className="layer-frame" x={positions.side.x + dims.side.T - dims.side.S - (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} patternId="hatch-frame" />
+
+                    {/* core */}
+                    <FilledRect className="layer-core" x={positions.side.x + dims.side.S + (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.5} height={dims.side.H} patternId="hatch-core" strokeWidth={0.8} strokeDasharray="4,4" />
+
+                    {/* center line */}
                     <CenterLine x1={positions.side.x + dims.side.T / 2} y1={positions.side.y - 40} x2={positions.side.x + dims.side.T / 2} y2={positions.side.y + dims.side.H + 40} theme={theme} />
+
+                    {/* rails (cut section) */}
                     {railPositions.map((pos, idx) => {
                       const railY = positions.side.y + dims.side.H - pos * DRAWING_SCALE;
                       const railH = safeR * DRAWING_SCALE * 0.5;
-                      return <FilledRect key={`side-rail-${idx}`} className="layer-rails" x={positions.side.x + dims.side.S} y={railY - railH / 2} width={dims.side.T - 2 * dims.side.S} height={railH} color="#FF8A00" />;
+                      return <FilledRect key={`side-rail-${idx}`} className="layer-rails" x={positions.side.x + dims.side.S} y={railY - railH / 2} width={dims.side.T - 2 * dims.side.S} height={railH} patternId="hatch-rails" />;
                     })}
-                    {(lockBlockLeft || lockBlockRight) && <rect className="layer-lockblock" x={positions.side.x + dims.side.S} y={positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE} width={dims.side.T - 2 * dims.side.S} height={LOCK_BLOCK_HEIGHT * DRAWING_SCALE} fill="none" stroke="#FF0076" strokeWidth="1.4" strokeDasharray="6,4" />}
+
+                    {/* lock block zone outline */}
+                    {(lockBlockLeft || lockBlockRight) && <rect className="layer-lockblock" x={positions.side.x + dims.side.S} y={positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE} width={dims.side.T - 2 * dims.side.S} height={LOCK_BLOCK_HEIGHT * DRAWING_SCALE} fill="none" stroke="#000000" strokeWidth="1.4" strokeDasharray="6,4" />}
+
                     {(lockBlockLeft || lockBlockRight) &&
                       (() => {
                         const lockBlockTopY = positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE;
                         const lockBlockBottomY = lockBlockTopY + LOCK_BLOCK_HEIGHT * DRAWING_SCALE;
-                        return <DimLine x1={positions.side.x + dims.side.T} y1={lockBlockTopY} x2={positions.side.x + dims.side.T} y2={lockBlockBottomY} value={LOCK_BLOCK_HEIGHT} offset={60} vertical fontSize={16} theme={theme} />;
+
+                        // ใช้ขอบ "ซ้าย" เป็น reference แล้ว offset เป็นลบ ให้ออกไปนอกบานด้านซ้าย
+                        return (
+                          <DimLine
+                            x1={positions.side.x} // เดิมใช้ positions.side.x + dims.side.T
+                            y1={lockBlockTopY}
+                            x2={positions.side.x} // ให้ x2 เท่ากัน เพราะ vertical dim
+                            y2={lockBlockBottomY}
+                            value={LOCK_BLOCK_HEIGHT}
+                            offset={-60} // เดิม 60 → ให้ -60 เพื่อออกไปด้านซ้าย
+                            vertical
+                            fontSize={16}
+                            theme={theme}
+                          />
+                        );
                       })()}
+
+                    {/* Dimensions side */}
                     <DimLine x1={positions.side.x} y1={positions.side.y} x2={positions.side.x + dims.side.T} y2={positions.side.y} value={T} offset={-160} fontSize={18} theme={theme} />
                     <DimLine x1={positions.side.x} y1={positions.side.y} x2={positions.side.x + dims.side.S} y2={positions.side.y} value={S} offset={-80} fontSize={18} theme={theme} />
                     <DimLine x1={positions.side.x + dims.side.S} y1={positions.side.y} x2={positions.side.x + dims.side.T - dims.side.S} y2={positions.side.y} value={T - 2 * S} offset={-120} fontSize={18} theme={theme} />
                     <DimLine x1={positions.side.x + dims.side.T} y1={positions.side.y} x2={positions.side.x + dims.side.T} y2={positions.side.y + dims.side.H} value={H} offset={100} vertical fontSize={18} theme={theme} />
                   </g>
 
+                  {/* FRONT VIEW */}
                   <g id="front-view">
                     <text x={positions.front.x + dims.front.W / 2} y={positions.front.y + dims.front.H + 70} textAnchor="middle" fontSize="28" fontWeight="bold" fill={theme.text}>
                       Front View
                     </text>
-                    <rect x={positions.front.x} y={positions.front.y} width={dims.front.W} height={dims.front.H} fill={theme.paper} stroke={theme.stroke} strokeWidth="3" />
-                    <FilledRect className="layer-frame" x={positions.front.x} y={positions.front.y} width={dims.front.F} height={dims.front.H} color="#FFB441" strokeWidth={1.6} />
-                    <FilledRect className="layer-frame" x={positions.front.x + dims.front.W - dims.front.F} y={positions.front.y} width={dims.front.F} height={dims.front.H} color="#FFB441" strokeWidth={1.6} />
-                    <FilledRect className="layer-rails" x={positions.front.x + dims.front.F} y={positions.front.y} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} color="#FF8A00" strokeWidth={1.6} />
-                    <FilledRect className="layer-rails" x={positions.front.x + dims.front.F} y={positions.front.y + dims.front.H - dims.front.F} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} color="#FF8A00" strokeWidth={1.6} />
+
+                    {/* outline */}
+                    {/* <rect x={positions.front.x} y={positions.front.y} width={dims.front.W} height={dims.front.H} fill={theme.paper} stroke={theme.stroke} strokeWidth="3" /> */}
+
+                    {/* stiles */}
+                    <FilledRect className="layer-frame" x={positions.front.x} y={positions.front.y} width={dims.front.F} height={dims.front.H} patternId="hatch-frame" strokeWidth={1.2} />
+                    <FilledRect className="layer-frame" x={positions.front.x + dims.front.W - dims.front.F} y={positions.front.y} width={dims.front.F} height={dims.front.H} patternId="hatch-frame" strokeWidth={1.2} />
+
+                    {/* rails top/bottom */}
+                    <FilledRect className="layer-rails" x={positions.front.x + dims.front.F} y={positions.front.y} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} patternId="hatch-rails" strokeWidth={1.2} />
+                    <FilledRect className="layer-rails" x={positions.front.x + dims.front.F} y={positions.front.y + dims.front.H - dims.front.F} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} patternId="hatch-rails" strokeWidth={1.2} />
+
+                    {/* double frames */}
                     {renderDoubleFrames()}
+
+                    {/* inner rails */}
                     {railPositions.map((pos, idx) => {
                       const railY = positions.front.y + dims.front.H - pos * DRAWING_SCALE;
-                      return <FilledRect key={`front-rail-${idx}`} className="layer-rails" x={positions.front.x + dims.front.F} y={railY - dims.front.R / 2} width={dims.front.W - 2 * dims.front.F} height={dims.front.R} color="#FF8A00" strokeWidth={1.2} />;
+                      return <FilledRect key={`front-rail-${idx}`} className="layer-rails" x={positions.front.x + dims.front.F} y={railY - dims.front.R / 2} width={dims.front.W - 2 * dims.front.F} height={dims.front.R} patternId="hatch-rails" strokeWidth={1} />;
                     })}
+
+                    {/* lock blocks */}
                     {renderLockBlocks()}
+
+                    {/* center lines */}
                     <CenterLine x1={positions.front.x + dims.front.W / 2} y1={positions.front.y - 40} x2={positions.front.x + dims.front.W / 2} y2={positions.front.y + dims.front.H + 40} theme={theme} />
                     <CenterLine x1={positions.front.x - 40} y1={positions.front.y + dims.front.H / 2} x2={positions.front.x + dims.front.W + 40} y2={positions.front.y + dims.front.H / 2} theme={theme} />
+
+                    {/* Dimensions front */}
                     <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y} value={W} offset={-160} fontSize={18} theme={theme} />
                     <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x} y2={positions.front.y + dims.front.F} value={F} offset={-80} vertical fontSize={18} theme={theme} />
                     <DimLine x1={positions.front.x + dims.front.W} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={H} offset={100} vertical fontSize={18} theme={theme} />
-                    {(lockBlockLeft || lockBlockRight) && <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x} y2={positions.front.y + dims.front.H - lockBlockPosition * DRAWING_SCALE} value={lockBlockPosition} offset={-100} vertical fontSize={18} theme={theme} />}
+
+                    {/* lock block dims */}
+                    {(lockBlockLeft || lockBlockRight) && (
+                      <DimLine
+                        x1={positions.front.x}
+                        y1={positions.front.y + dims.front.H}
+                        x2={positions.front.x}
+                        y2={positions.front.y + dims.front.H - lockBlockPosition * DRAWING_SCALE}
+                        value={lockBlockPosition}
+                        offset={-100} // อันนี้เดิมถูกแล้ว อยู่ซ้ายล่าง
+                        vertical
+                        fontSize={18}
+                        theme={theme}
+                      />
+                    )}
+
                     {(lockBlockLeft || lockBlockRight) &&
                       (() => {
                         const lockBlockTopY = positions.front.y + dims.front.H - lockBlockBottom * DRAWING_SCALE;
@@ -917,11 +1046,36 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
 
                         return (
                           <>
-                            <DimLine x1={positions.front.x + dims.front.W} y1={lockBlockTopY} x2={positions.front.x + dims.front.W} y2={lockBlockBottomY} value={LOCK_BLOCK_HEIGHT} offset={60} vertical fontSize={16} theme={theme} />
-                            {lockBlockLeftX !== null && lockBlockRightX !== null && <DimLine x1={lockBlockLeftX} y1={lockBlockBottomY} x2={lockBlockRightX} y2={lockBlockBottomY} value={safeF} offset={40} fontSize={16} theme={theme} />}
+                            {/* เดิมอยู่ขวา → ย้ายมาอ้างฝั่งซ้าย + offset ติดลบให้หนีออกไปทางซ้าย */}
+                            <DimLine
+                              x1={positions.front.x} // 👈 แก้จาก positions.front.x + dims.front.W
+                              y1={lockBlockTopY}
+                              x2={positions.front.x} // 👈 ให้เท่ากันเพราะเป็นเส้นดิ่ง
+                              y2={lockBlockBottomY}
+                              value={LOCK_BLOCK_HEIGHT}
+                              offset={-60} // 👈 เดิม 60 (ไปขวา) → ใช้ -60 ให้ไปซ้าย
+                              vertical
+                              fontSize={16}
+                              theme={theme}
+                            />
+
+                            {lockBlockLeftX !== null && lockBlockRightX !== null && (
+                              <DimLine
+                                x1={lockBlockLeftX}
+                                y1={lockBlockBottomY}
+                                x2={lockBlockRightX}
+                                y2={lockBlockBottomY}
+                                value={safeF}
+                                offset={40} // อันนี้เส้นนอนใต้บล็อก ปล่อยไว้ได้
+                                fontSize={16}
+                                theme={theme}
+                              />
+                            )}
                           </>
                         );
                       })()}
+
+                    {/* rail thickness dim (ตัวอย่างใช้ตัวแรก) */}
                     {railPositions.length > 0 &&
                       (() => {
                         const railPos = railPositions[0];
@@ -932,6 +1086,8 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
 
                         return <DimLine x1={dx} y1={top} x2={dx} y2={bottom} value={safeR} offset={40} vertical fontSize={16} theme={theme} />;
                       })()}
+
+                    {/* rail positions text */}
                     {railPositions.map((pos, idx) => (
                       <g key={`front-ann-${idx}`} className="layer-dimensions">
                         <line x1={positions.front.x + dims.front.W + 200} y1={positions.front.y + dims.front.H - pos * DRAWING_SCALE} x2={positions.front.x + dims.front.W + 240} y2={positions.front.y + dims.front.H - pos * DRAWING_SCALE} stroke={theme.stroke} strokeWidth="0.8" />
@@ -942,9 +1098,11 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                     ))}
                   </g>
 
+                  {/* TITLE / LEGEND / SPEC */}
                   <g className="layer-title">
                     <rect x="20" y={viewBoxHeight - 145} width={viewBoxWidth - 40} height="130" fill={theme.paper} stroke={theme.accent} strokeWidth="1.5" rx="3" />
 
+                    {/* SPEC */}
                     <g id="specs">
                       <rect x="25" y={viewBoxHeight - 140} width="370" height="20" fill={theme.accent} rx="2" />
                       <text x="35" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill="#FFFFFF">
@@ -960,25 +1118,26 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                       <text x="35" y={viewBoxHeight - 70} fontSize="8" fill={theme.text} opacity="0.7">
                         Surface Material:
                       </text>
-                      <text x="35" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill="#10B981">
-                        {currentFrame?.desc?.split(" ")[0] || "-"} {S || 0}mm × 2
+                      <text x="35" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill={theme.text}>
+                        {currentFrame?.desc?.split(" ")[0] || "-"} {S || 0}
+                        mm × 2
                       </text>
                       <text x="35" y={viewBoxHeight - 40} fontSize="8" fill={theme.text} opacity="0.7">
                         Frame:
                       </text>
-                      <text x="35" y={viewBoxHeight - 28} fontSize="9" fontWeight="600" fill="#FF8A00">
+                      <text x="35" y={viewBoxHeight - 28} fontSize="9" fontWeight="600" fill={theme.text}>
                         {R || 0}×{F || 0}mm {hasDoubleFrame ? getDoubleFrameDesc() : ""}
                       </text>
                       <text x="200" y={viewBoxHeight - 100} fontSize="8" fill={theme.text} opacity="0.7">
                         Horizontal Rails:
                       </text>
-                      <text x="200" y={viewBoxHeight - 88} fontSize="9" fontWeight="600" fill="#FF8A00">
+                      <text x="200" y={viewBoxHeight - 88} fontSize="9" fontWeight="600" fill={theme.text}>
                         {railSections - 1} pcs @ {railPositions.join(", ") || "-"} mm
                       </text>
                       <text x="200" y={viewBoxHeight - 70} fontSize="8" fill={theme.text} opacity="0.7">
                         Lock Block:
                       </text>
-                      <text x="200" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill="#FF0076">
+                      <text x="200" y={viewBoxHeight - 58} fontSize="9" fontWeight="600" fill={theme.text}>
                         {lockBlockCount} pcs ({R || 0}×{F || 0}×{LOCK_BLOCK_HEIGHT}mm)
                       </text>
                       {currentFrame?.code && (
@@ -986,13 +1145,14 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                           <text x="200" y={viewBoxHeight - 40} fontSize="8" fill={theme.text} opacity="0.7">
                             ERP Code:
                           </text>
-                          <text x="200" y={viewBoxHeight - 28} fontSize="8" fontWeight="500" fill={theme.accent} fontFamily="monospace">
+                          <text x="200" y={viewBoxHeight - 28} fontSize="8" fontWeight="500" fill={theme.text} fontFamily="monospace">
                             {currentFrame.code}
                           </text>
                         </>
                       )}
                     </g>
 
+                    {/* LEGEND */}
                     <g id="legend">
                       <rect x="405" y={viewBoxHeight - 140} width="280" height="20" fill={theme.accent} rx="2" />
                       <text x="415" y={viewBoxHeight - 126} fontSize="10" fontWeight="bold" fill="#FFFFFF">
@@ -1001,20 +1161,26 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                       <rect x="405" y={viewBoxHeight - 118} width="280" height="100" fill={theme.paper} stroke={`${theme.text}22`} strokeWidth="0.5" />
                       {LEGEND_ITEMS.map((item, i) => (
                         <g key={`legend-${i}`}>
-                          <rect x={legendPositions[i].x} y={viewBoxHeight + legendPositions[i].yOffset} width="16" height="10" fill={item.fill} stroke={item.stroke} strokeWidth="0.8" rx="1" strokeDasharray={item.dashed ? "2,1" : undefined} />
+                          <rect x={legendPositions[i].x} y={viewBoxHeight + legendPositions[i].yOffset} width="16" height="10" fill={`url(#${legendPatternIds[i]})`} stroke="#000000" strokeWidth="0.8" />
                           <text x={legendPositions[i].x + 20} y={viewBoxHeight + legendPositions[i].yOffset + 8} fontSize="7" fill={theme.text}>
                             {item.label}
                           </text>
                         </g>
                       ))}
-                      <line x1="415" y1={viewBoxHeight - 49} x2="431" y2={viewBoxHeight - 49} stroke={theme.text} strokeWidth="0.6" strokeDasharray="8,2,2,2" />
+
+                      {/* center line */}
+                      <line x1="415" y1={viewBoxHeight - 49} x2="431" y2={viewBoxHeight - 49} stroke={theme.text} strokeWidth="0.6" strokeDasharray="10,3,2,3" />
                       <text x="435" y={viewBoxHeight - 46} fontSize="7" fill={theme.text}>
                         Center Line
                       </text>
+
+                      {/* hidden line */}
                       <line x1="525" y1={viewBoxHeight - 49} x2="541" y2={viewBoxHeight - 49} stroke={theme.text} strokeWidth="0.6" strokeDasharray="3,3" />
                       <text x="545" y={viewBoxHeight - 46} fontSize="7" fill={theme.text}>
                         Hidden Line
                       </text>
+
+                      {/* dimension line */}
                       <line x1="415" y1={viewBoxHeight - 32} x2="431" y2={viewBoxHeight - 32} stroke={theme.text} strokeWidth="0.6" />
                       <polygon points={`415,${viewBoxHeight - 32} 418,${viewBoxHeight - 34} 418,${viewBoxHeight - 30}`} fill={theme.text} />
                       <polygon points={`431,${viewBoxHeight - 32} 428,${viewBoxHeight - 34} 428,${viewBoxHeight - 30}`} fill={theme.text} />
@@ -1023,6 +1189,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                       </text>
                     </g>
 
+                    {/* TITLE BLOCK */}
                     <g id="title-block">
                       <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="120" fill={theme.paper} stroke={theme.accent} strokeWidth="1.5" rx="2" />
                       <rect x={viewBoxWidth - 305} y={viewBoxHeight - 140} width="280" height="28" fill={theme.accent} rx="2" />
@@ -1030,34 +1197,41 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                       <text x={viewBoxWidth - 165} y={viewBoxHeight - 121} textAnchor="middle" fontSize="13" fontWeight="bold" fill="#FFFFFF">
                         DOOR FRAME ASSEMBLY
                       </text>
-                      <rect x={viewBoxWidth - 300} y={viewBoxHeight - 107} width="270" height="22" fill={`${theme.accent}11`} rx="1" />
+
+                      <rect x={viewBoxWidth - 300} y={viewBoxHeight - 107} width="270" height="22" fill="#00000011" rx="1" />
                       <text x={viewBoxWidth - 290} y={viewBoxHeight - 92} fontSize="8" fill={theme.text} opacity="0.7">
                         Size:
                       </text>
                       <text x={viewBoxWidth - 165} y={viewBoxHeight - 91} textAnchor="middle" fontSize="14" fontWeight="bold" fill={theme.text}>
                         {T} × {W} × {H} mm
                       </text>
+
                       <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 82} x2={viewBoxWidth - 30} y2={viewBoxHeight - 82} stroke={`${theme.text}33`} strokeWidth="0.5" />
+
                       <text x={viewBoxWidth - 290} y={viewBoxHeight - 68} fontSize="8" fill={theme.text} opacity="0.7">
                         Material:
                       </text>
-                      <text x={viewBoxWidth - 165} y={viewBoxHeight - 68} textAnchor="middle" fontSize="10" fontWeight="600" fill="#10B981">
+                      <text x={viewBoxWidth - 165} y={viewBoxHeight - 68} textAnchor="middle" fontSize="10" fontWeight="600" fill={theme.text}>
                         {currentFrame?.desc?.split(" ")[0] || "-"}
                       </text>
+
                       <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 55} x2={viewBoxWidth - 30} y2={viewBoxHeight - 55} stroke={`${theme.text}33`} strokeWidth="0.5" />
                       <line x1={viewBoxWidth - 165} y1={viewBoxHeight - 55} x2={viewBoxWidth - 165} y2={viewBoxHeight - 35} stroke={`${theme.text}33`} strokeWidth="0.5" />
+
                       <text x={viewBoxWidth - 290} y={viewBoxHeight - 42} fontSize="8" fill={theme.text} opacity="0.7">
                         Scale:
                       </text>
                       <text x={viewBoxWidth - 240} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={theme.text}>
                         1:25
                       </text>
+
                       <text x={viewBoxWidth - 155} y={viewBoxHeight - 42} fontSize="8" fill={theme.text} opacity="0.7">
                         Rev:
                       </text>
                       <text x={viewBoxWidth - 120} y={viewBoxHeight - 42} fontSize="10" fontWeight="600" fill={theme.text}>
                         1.0
                       </text>
+
                       <rect x={viewBoxWidth - 305} y={viewBoxHeight - 35} width="280" height="15" fill={theme.paper} />
                       <line x1={viewBoxWidth - 300} y1={viewBoxHeight - 35} x2={viewBoxWidth - 30} y2={viewBoxHeight - 35} stroke={`${theme.text}33`} strokeWidth="0.5" />
                       <text x={viewBoxWidth - 165} y={viewBoxHeight - 24} textAnchor="middle" fontSize="9" fontWeight="bold" fill={theme.accent}>
@@ -1072,6 +1246,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
         </TransformWrapper>
       </div>
 
+      {/* status bar ล่าง */}
       <div className="flex items-center justify-between px-3 py-1.5 bg-default-50 border-t-2 border-default text-xs text-default-500">
         <div className="flex items-center gap-2">
           <span>
@@ -1163,7 +1338,7 @@ export default function DoorConfigurator() {
           <Card className="w-full">
             <CardHeader className="bg-primary text-white">
               <div className="flex items-center gap-2">
-                <Chip color="default" variant="solid" size="sm">
+                <Chip color="default" variant="solid" size="md">
                   1
                 </Chip>
                 <span className="font-semibold">📝 สเปคลูกค้า</span>
@@ -1182,7 +1357,7 @@ export default function DoorConfigurator() {
                 </div>
               </div>
               <div className="flex items-center justify-center w-full p-2">
-                <Chip color="primary" variant="flat" size="lg">
+                <Chip color="primary" variant="shadow" size="lg">
                   สเปค: {formatDimension(doorThickness, doorWidth, doorHeight)} mm
                 </Chip>
               </div>
@@ -1192,7 +1367,7 @@ export default function DoorConfigurator() {
           <Card className="w-full">
             <CardHeader className="bg-success text-white">
               <div className="flex items-center gap-2">
-                <Chip color="default" variant="solid" size="sm">
+                <Chip color="default" variant="solid" size="md">
                   2
                 </Chip>
                 <span className="font-semibold">🎨 วัสดุปิดผิว</span>
@@ -1245,7 +1420,7 @@ export default function DoorConfigurator() {
           <Card className="w-full">
             <CardHeader className="bg-warning text-white">
               <div className="flex items-center gap-2">
-                <Chip color="default" variant="solid" size="sm">
+                <Chip color="default" variant="solid" size="md">
                   3
                 </Chip>
                 <span className="font-semibold">🪵 โครง (ERP)</span>
@@ -1269,7 +1444,7 @@ export default function DoorConfigurator() {
                 </div>
               </div>
               {frameType && frameSelection.frames.length === 0 && (
-                <Chip color="danger" variant="flat" className="w-full">
+                <Chip color="danger" variant="shadow" className="w-full">
                   ⚠️ {frameSelection.reason || `ไม่มีไม้ที่ใช้ได้สำหรับความหนา ${results.frameThickness}mm`}
                 </Chip>
               )}
@@ -1286,18 +1461,18 @@ export default function DoorConfigurator() {
                     <span className="font-mono text-xs">{selectedFrameCode}</span>
                   </div>
                   {currentFrame.isFlipped && (
-                    <Chip color="secondary" variant="flat" size="sm">
+                    <Chip color="secondary" variant="shadow" size="md">
                       🔄 พลิกไม้ {currentFrame.thickness}×{currentFrame.width} → {currentFrame.width}×{currentFrame.thickness}
                     </Chip>
                   )}
                   {currentFrame.planeAmount > 0 && (
-                    <Chip color="secondary" variant="flat" size="sm">
+                    <Chip color="secondary" variant="shadow" size="md">
                       🪚 ต้องไสเนื้อออก {currentFrame.planeAmount} mm
                     </Chip>
                   )}
                   {currentFrame.needSplice && (
                     <div className="flex flex-col gap-2 mt-2 p-2 bg-primary/10 rounded-xl">
-                      <Chip color="primary" variant="flat" size="sm">
+                      <Chip color="primary" variant="shadow" size="md">
                         🔗 ต่อไม้ {currentFrame.spliceCount} ท่อน
                       </Chip>
                       <span className="text-xs">• ตำแหน่งต่อ: {currentFrame.splicePosition} mm จากปลาย</span>
@@ -1312,7 +1487,7 @@ export default function DoorConfigurator() {
                 <span className="text-sm font-medium">ด้านที่ต้องการเบิ้ลโครง</span>
                 <div className="flex flex-wrap gap-2">
                   {DOUBLE_FRAME_SIDES.map(({ key, label }) => (
-                    <Button key={key} color={doubleFrameSides[key] ? "warning" : "default"} variant={doubleFrameSides[key] ? "solid" : "bordered"} size="sm" radius="md" onPress={() => handleToggleDoubleSide(key)}>
+                    <Button key={key} color={doubleFrameSides[key] ? "warning" : "default"} variant={doubleFrameSides[key] ? "solid" : "bordered"} size="md" radius="md" onPress={() => handleToggleDoubleSide(key)}>
                       {label}
                     </Button>
                   ))}
@@ -1326,7 +1501,7 @@ export default function DoorConfigurator() {
                 </Select>
               </div>
               {doubleConfigSummary && (
-                <Chip color="warning" variant="flat" className="w-full">
+                <Chip color="warning" variant="shadow" className="w-full">
                   {doubleConfigSummary}
                 </Chip>
               )}
@@ -1336,7 +1511,7 @@ export default function DoorConfigurator() {
           <Card className="w-full">
             <CardHeader className="bg-secondary text-white">
               <div className="flex items-center gap-2">
-                <Chip color="default" variant="solid" size="sm">
+                <Chip color="default" variant="solid" size="md">
                   4
                 </Chip>
                 <span className="font-semibold">➖ ไม้ดามแนวนอน</span>
@@ -1351,12 +1526,12 @@ export default function DoorConfigurator() {
                   </span>
                 </div>
                 {doorHeight && parseFloat(doorHeight) >= 2400 && (
-                  <Chip color="secondary" variant="flat" size="sm">
+                  <Chip color="secondary" variant="shadow" size="md">
                     ⚡ ประตูสูงเกิน 2400mm → แบ่ง 4 ช่อง อัตโนมัติ
                   </Chip>
                 )}
                 {results.railsAdjusted && (
-                  <Chip color="warning" variant="flat" size="sm">
+                  <Chip color="warning" variant="shadow" size="md">
                     🔄 ปรับตำแหน่งไม้ดามอัตโนมัติเพื่อหลบ Lock Block
                   </Chip>
                 )}
@@ -1386,7 +1561,7 @@ export default function DoorConfigurator() {
           <Card className="w-full">
             <CardHeader className="bg-danger text-white">
               <div className="flex items-center gap-2">
-                <Chip color="default" variant="solid" size="sm">
+                <Chip color="default" variant="solid" size="md">
                   5
                 </Chip>
                 <span className="font-semibold">🔒 Lock Block (รองลูกบิด)</span>
@@ -1497,7 +1672,7 @@ export default function DoorConfigurator() {
             <Card className="w-full">
               <CardHeader className="bg-primary text-white">
                 <div className="flex items-center gap-2">
-                  <Chip color="default" variant="solid" size="sm">
+                  <Chip color="default" variant="solid" size="md">
                     6
                   </Chip>
                   <span className="font-semibold">✂️ แผนการตัดไม้ (Cutting Optimization)</span>
@@ -1541,10 +1716,10 @@ export default function DoorConfigurator() {
                     {cuttingPlan.cutPieces.map((piece, idx) => (
                       <div key={idx} className={`flex items-center justify-between px-3 py-2 text-xs ${piece.isSplice ? "bg-primary/5" : ""}`}>
                         <div className="flex items-center gap-2">
-                          <Chip color={piece.color} variant="flat" size="sm" className="min-w-3 h-3 p-0" />
+                          <Chip color={piece.color} variant="shadow" size="md" className="min-w-3 h-3 p-0" />
                           <span className="font-medium">{piece.name}</span>
                           {piece.isSplice && (
-                            <Chip color="primary" variant="flat" size="sm">
+                            <Chip color="primary" variant="shadow" size="md">
                               ต่อ
                             </Chip>
                           )}
@@ -1599,7 +1774,7 @@ export default function DoorConfigurator() {
                     <span>ประสิทธิภาพการใช้ไม้</span>
                     <span className={`font-bold text-${getEfficiencyColor(cuttingPlan.efficiency)}`}>{cuttingPlan.efficiency}%</span>
                   </div>
-                  <Progress value={parseFloat(cuttingPlan.efficiency)} color={getEfficiencyColor(cuttingPlan.efficiency)} size="sm" />
+                  <Progress value={parseFloat(cuttingPlan.efficiency)} color={getEfficiencyColor(cuttingPlan.efficiency)} size="md" />
                   <div className="flex justify-between text-[10px] mt-1 text-foreground/60">
                     <span>0%</span>
                     <span>ดี: ≥80%</span>
@@ -1612,7 +1787,7 @@ export default function DoorConfigurator() {
             <Card className="w-full">
               <CardHeader className="bg-default-200">
                 <div className="flex items-center gap-2">
-                  <Chip color="default" variant="solid" size="sm">
+                  <Chip color="default" variant="solid" size="md">
                     6
                   </Chip>
                   <span className="font-semibold">✂️ แผนการตัดไม้ (Cutting Optimization)</span>
@@ -1646,13 +1821,13 @@ export default function DoorConfigurator() {
                   <p className="text-lg font-medium">กรุณากรอกข้อมูลสเปคประตู</p>
                   <p className="text-sm text-foreground/70">ระบุ ความหนา (T), ความกว้าง (W), ความสูง (H)</p>
                   <div className="flex gap-2 mt-4">
-                    <Chip color={doorThickness ? "success" : "danger"} variant="flat">
+                    <Chip color={doorThickness ? "success" : "danger"} variant="shadow">
                       T: {doorThickness || "—"}
                     </Chip>
-                    <Chip color={doorWidth ? "success" : "danger"} variant="flat">
+                    <Chip color={doorWidth ? "success" : "danger"} variant="shadow">
                       W: {doorWidth || "—"}
                     </Chip>
-                    <Chip color={doorHeight ? "success" : "danger"} variant="flat">
+                    <Chip color={doorHeight ? "success" : "danger"} variant="shadow">
                       H: {doorHeight || "—"}
                     </Chip>
                   </div>
