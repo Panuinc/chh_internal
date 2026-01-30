@@ -1200,7 +1200,7 @@ const EnhancedEngineeringDrawing = memo(({ results }) => {
                     </pattern>
 
                     <pattern id="hatch-rails" patternUnits="userSpaceOnUse" width="4" height="4">
-                      <path d="M0 2 L4 2" stroke="#000000" stroke-width="0.4" opacity="0.3" />
+                      <path d="M0 2 L4 2" stroke="#000000" strokeWidth={0.4} opacity={0.3} />
                     </pattern>
 
                     <pattern id="hatch-lockblock" patternUnits="userSpaceOnUse" width="4" height="4">
