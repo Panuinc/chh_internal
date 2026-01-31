@@ -697,7 +697,7 @@ const useCoreCalculation = (results, coreType) => {
 
     if (coreConfig.value === "particle_strips") {
       // Particle strips: fixed column count = (W/10) + 1, then calculate spacing
-      columnCount = Math.round(W / 10) + 1;
+      columnCount = Math.round(W / 100) + 1;
       // Calculate spacing to fit all columns evenly
       actualSpacing = (stripAreaWidth - columnCount * stripThickness) / (columnCount - 1 || 1);
     } else {
@@ -863,8 +863,6 @@ CenterLine.displayName = "CenterLine";
 const LockBlockSVG = memo(({ x, y, width, height }) => (
   <g className="layer-lockblock">
     <rect x={x} y={y} width={width} height={height} fill="url(#hatch-lockblock)" stroke="#000000" strokeWidth="0.8" />
-    <line x1={x} y1={y} x2={x + width} y2={y + height} stroke="#000000" strokeWidth="0.4" />
-    <line x1={x + width} y1={y} x2={x} y2={y + height} stroke="#000000" strokeWidth="0.4" />
   </g>
 ));
 LockBlockSVG.displayName = "LockBlockSVG";
