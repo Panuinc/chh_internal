@@ -1,6 +1,7 @@
 "use client";
+
 import React, { useState, useMemo, useRef, useEffect, useCallback, memo } from "react";
-import { Calculator, RulerDimensionLine, ZoomIn, ZoomOut, Maximize2, RotateCcw, Download, Layers, FileImage, FileText, FileCode, Printer, ChevronDown, Copy } from "lucide-react";
+import { Calculator, RulerDimensionLine, ZoomIn, ZoomOut, Maximize2, RotateCcw, Download, Layers, FileImage, FileText, FileCode, Printer, ChevronDown } from "lucide-react";
 import { Button, Input, Select, SelectItem, Card, CardHeader, CardBody, Chip, Divider, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Switch, Tooltip, Popover, PopoverTrigger, PopoverContent } from "@heroui/react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import jsPDF from "jspdf";
@@ -61,7 +62,6 @@ const CORE_TYPES = [
   { value: "particle_solid", label: "Particle Board (ปาติเกิ้ลตัน)", type: "solid", thickness: null, spacing: null },
   { value: "rockwool", label: "Rockwool (ใยแก้ว)", type: "solid", thickness: null, spacing: null },
   { value: "honeycomb", label: "Honeycomb (รังผึ้ง)", type: "solid", thickness: null, spacing: null },
-  { value: "hdf_strips", label: "HDF Strips (มอก)", type: "strips", thickness: 4, spacing: 40 },
   { value: "particle_strips", label: "Particle Strips (ปาติเกิ้ลซี่)", type: "strips", thickness: 12, spacing: null },
 ];
 
@@ -97,15 +97,6 @@ const ERP_FRAMES = {
   ],
 };
 
-const LEGEND_ITEMS = [
-  { fill: "#10B98150", stroke: "#10B981", label: "Surface Material" },
-  { fill: "#FFB44150", stroke: "#FFB441", label: "Frame (Stile)" },
-  { fill: "#FF8A0050", stroke: "#FF8A00", label: "Frame (Rail)" },
-  { fill: "#FF007650", stroke: "#FF0076", label: "Lock Block" },
-  { fill: "#4456E950", stroke: "#DCDCDC", label: "Core (Honeycomb)", dashed: true },
-  { fill: "#FFB44150", stroke: "#FFB441", label: "Double Frame", dashed: true },
-];
-
 const GRID_LETTERS = ["A", "B", "C", "D", "E", "F"];
 const GRID_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -118,7 +109,7 @@ const LAYER_CONFIG = {
   frame: { id: "frame", label: "Frame (Stile)", color: "#FFB441", defaultVisible: true },
   rails: { id: "rails", label: "Frame (Rail)", color: "#FF8A00", defaultVisible: true },
   lockblock: { id: "lockblock", label: "Lock Block", color: "#FF0076", defaultVisible: true },
-  core: { id: "core", label: "Core (Honeycomb)", color: "#4456E9", defaultVisible: true },
+  core: { id: "core", label: "Core", color: "#4456E9", defaultVisible: true },
   doubleframe: { id: "doubleframe", label: "Double Frame", color: "#FFB441", defaultVisible: true },
 };
 
@@ -380,7 +371,7 @@ const useCalculations = (params) => {
   }, [doorThickness, doorWidth, doorHeight, surfaceThickness, currentFrame, lockBlockLeft, lockBlockRight, lockBlockPiecesPerSide, doubleFrameSides, doubleFrameCount]);
 };
 
-const useCuttingPlan = (results, currentFrame) => {
+const useCuttingPlan = (results, currentFrame, coreType) => {
   return useMemo(() => {
     if (!results || !currentFrame) {
       return {
@@ -409,16 +400,8 @@ const useCuttingPlan = (results, currentFrame) => {
 
     const addPiece = (name, finishedLength, qty, color, isSplice = false, withAllowance = true) => {
       if (!finishedLength || finishedLength <= 0 || !qty) return;
-
       const cutLength = finishedLength + (withAllowance ? CUT_ALLOWANCE : 0);
-      cutPieces.push({
-        name,
-        length: finishedLength,
-        cutLength,
-        qty,
-        color,
-        isSplice,
-      });
+      cutPieces.push({ name, length: finishedLength, cutLength, qty, color, isSplice });
     };
 
     const stileLength = H;
@@ -485,7 +468,7 @@ const useCuttingPlan = (results, currentFrame) => {
     }
 
     const railCount = railSections - 1;
-    if (railCount > 0) {
+    if (railCount > 0 && coreType !== "particle_strips") {
       let damLength = clearWidth;
       if (doubleFrame?.hasAny && doubleFrame.count > 0) {
         if (doubleFrame.left) damLength -= F * doubleFrame.count;
@@ -554,7 +537,7 @@ const useCuttingPlan = (results, currentFrame) => {
       spliceCount,
       spliceOverlap,
     };
-  }, [results, currentFrame]);
+  }, [results, currentFrame, coreType]);
 };
 
 const useCoreCalculation = (results, coreType) => {
@@ -563,6 +546,7 @@ const useCoreCalculation = (results, coreType) => {
       return {
         coreType: null,
         pieces: [],
+        damPieces: [],
         totalPieces: 0,
         columns: 0,
         rows: 0,
@@ -574,7 +558,9 @@ const useCoreCalculation = (results, coreType) => {
 
     const { W, H, F, railPositions, lockBlockLeft, lockBlockRight, lockBlockTop, lockBlockBottom, doubleFrame } = results;
     const coreConfig = CORE_TYPES.find((c) => c.value === coreType);
-    if (!coreConfig) return { coreType: null, pieces: [], totalPieces: 0, columns: 0, rows: 0, stripThickness: 0, stripSpacing: 0, isSolid: true };
+    if (!coreConfig) {
+      return { coreType: null, pieces: [], damPieces: [], totalPieces: 0, columns: 0, rows: 0, stripThickness: 0, stripSpacing: 0, isSolid: true };
+    }
 
     const leftOffset = F + (doubleFrame?.left ? F * doubleFrame.count : 0);
     const rightOffset = F + (doubleFrame?.right ? F * doubleFrame.count : 0);
@@ -588,42 +574,36 @@ const useCoreCalculation = (results, coreType) => {
     const lockBlockZoneStart = hasLockBlock ? lockBlockTop : null;
     const lockBlockZoneEnd = hasLockBlock ? lockBlockBottom : null;
 
-    const rowBoundaries = [topOffset];
-    if (railPositions && railPositions.length > 0) {
-      railPositions.forEach((pos) => {
-        rowBoundaries.push(H - pos - F / 2);
-        rowBoundaries.push(H - pos + F / 2);
-      });
-    }
-    rowBoundaries.push(H - bottomOffset);
-    rowBoundaries.sort((a, b) => a - b);
-
-    const rows = [];
-    for (let i = 0; i < rowBoundaries.length - 1; i += 2) {
-      const rowTop = rowBoundaries[i];
-      const rowBottom = rowBoundaries[i + 1];
-      if (rowBottom > rowTop) {
-        rows.push({ top: rowTop, bottom: rowBottom, height: rowBottom - rowTop });
-      }
-    }
-
     if (coreConfig.type === "solid") {
-      // Calculate pieces per side for Lock Block extent (for solid types)
       const solidLockBlockSides = (lockBlockLeft ? 1 : 0) + (lockBlockRight ? 1 : 0);
       const solidLockBlockCount = results.lockBlockCount || 0;
       const solidPiecesPerSide = solidLockBlockSides > 0 ? Math.max(1, Math.ceil(solidLockBlockCount / solidLockBlockSides)) : 0;
       const solidLockBlockWidth = F * solidPiecesPerSide;
+
+      const rowBoundaries = [topOffset];
+      if (railPositions && railPositions.length > 0) {
+        railPositions.forEach((pos) => {
+          rowBoundaries.push(H - pos - F / 2);
+          rowBoundaries.push(H - pos + F / 2);
+        });
+      }
+      rowBoundaries.push(H - bottomOffset);
+      rowBoundaries.sort((a, b) => a - b);
+
+      const rows = [];
+      for (let i = 0; i < rowBoundaries.length - 1; i += 2) {
+        const rowTop = rowBoundaries[i];
+        const rowBottom = rowBoundaries[i + 1];
+        if (rowBottom > rowTop) rows.push({ top: rowTop, bottom: rowBottom, height: rowBottom - rowTop });
+      }
 
       const pieces = [];
       rows.forEach((row, rowIdx) => {
         const rowTopFromBottom = H - row.bottom;
         const rowBottomFromBottom = H - row.top;
 
-        // Check if this row overlaps with Lock Block Y zone
         if (hasLockBlock && lockBlockZoneStart < rowBottomFromBottom && lockBlockZoneEnd > rowTopFromBottom) {
           if (lockBlockLeft && lockBlockRight) {
-            // Both sides have Lock Block - create 3 pieces (left edge, middle, right edge)
-            // Left piece (beside left Lock Block)
             pieces.push({
               name: `ไส้แถว ${rowIdx + 1} (ซ้าย)`,
               x: leftOffset + solidLockBlockWidth,
@@ -631,7 +611,6 @@ const useCoreCalculation = (results, coreType) => {
               width: (coreWidth - solidLockBlockWidth * 2) / 2,
               height: row.height,
             });
-            // Right piece (beside right Lock Block)
             pieces.push({
               name: `ไส้แถว ${rowIdx + 1} (ขวา)`,
               x: W - rightOffset - solidLockBlockWidth - (coreWidth - solidLockBlockWidth * 2) / 2,
@@ -640,36 +619,19 @@ const useCoreCalculation = (results, coreType) => {
               height: row.height,
             });
           } else if (lockBlockLeft) {
-            pieces.push({
-              name: `ไส้แถว ${rowIdx + 1}`,
-              x: leftOffset + solidLockBlockWidth,
-              y: row.top,
-              width: coreWidth - solidLockBlockWidth,
-              height: row.height,
-            });
+            pieces.push({ name: `ไส้แถว ${rowIdx + 1}`, x: leftOffset + solidLockBlockWidth, y: row.top, width: coreWidth - solidLockBlockWidth, height: row.height });
           } else if (lockBlockRight) {
-            pieces.push({
-              name: `ไส้แถว ${rowIdx + 1}`,
-              x: leftOffset,
-              y: row.top,
-              width: coreWidth - solidLockBlockWidth,
-              height: row.height,
-            });
+            pieces.push({ name: `ไส้แถว ${rowIdx + 1}`, x: leftOffset, y: row.top, width: coreWidth - solidLockBlockWidth, height: row.height });
           }
         } else {
-          pieces.push({
-            name: `ไส้แถว ${rowIdx + 1}`,
-            x: leftOffset,
-            y: row.top,
-            width: coreWidth,
-            height: row.height,
-          });
+          pieces.push({ name: `ไส้แถว ${rowIdx + 1}`, x: leftOffset, y: row.top, width: coreWidth, height: row.height });
         }
       });
 
       return {
         coreType: coreConfig,
         pieces,
+        damPieces: [],
         totalPieces: pieces.length,
         columns: 1,
         rows: rows.length,
@@ -686,117 +648,101 @@ const useCoreCalculation = (results, coreType) => {
     }
 
     const stripThickness = coreConfig.thickness || 4;
-
-    // Edge padding - strips should not touch the frame edge
     const edgePadding = 40;
-    const stripAreaWidth = coreWidth - edgePadding * 2; // Available width for strips
-    const stripStartX = leftOffset + edgePadding; // Start 40mm from left edge
+    const stripAreaWidth = coreWidth - edgePadding * 2;
+    const stripStartX = leftOffset + edgePadding;
 
     let columnCount;
     let actualSpacing;
 
     if (coreConfig.value === "particle_strips") {
-      // Particle strips: fixed column count = (W/10) + 1, then calculate spacing
-      columnCount = Math.round(W / 10) + 1;
-      // Calculate spacing to fit all columns evenly
+      columnCount = Math.round(W / 100) + 1;
       actualSpacing = (stripAreaWidth - columnCount * stripThickness) / (columnCount - 1 || 1);
     } else {
-      // Other strip types: use fixed spacing, calculate column count
       const stripSpacing = coreConfig.spacing || 40;
       columnCount = Math.floor(stripAreaWidth / (stripThickness + stripSpacing)) + 1;
       actualSpacing = (stripAreaWidth - columnCount * stripThickness) / (columnCount - 1 || 1);
     }
 
-    const pieces = [];
-    let pieceId = 0;
+    const rows =
+      coreConfig.value === "particle_strips"
+        ? [{ top: topOffset, bottom: H - bottomOffset, height: coreHeight }]
+        : (() => {
+            const rowBoundaries = [topOffset];
+            if (railPositions && railPositions.length > 0) {
+              railPositions.forEach((pos) => {
+                rowBoundaries.push(H - pos - F / 2);
+                rowBoundaries.push(H - pos + F / 2);
+              });
+            }
+            rowBoundaries.push(H - bottomOffset);
+            rowBoundaries.sort((a, b) => a - b);
 
-    // Calculate pieces per side for Lock Block extent
+            const out = [];
+            for (let i = 0; i < rowBoundaries.length - 1; i += 2) {
+              const rowTop = rowBoundaries[i];
+              const rowBottom = rowBoundaries[i + 1];
+              if (rowBottom > rowTop) out.push({ top: rowTop, bottom: rowBottom, height: rowBottom - rowTop });
+            }
+            return out;
+          })();
+
     const lockBlockSides = (lockBlockLeft ? 1 : 0) + (lockBlockRight ? 1 : 0);
     const lockBlockCount = results.lockBlockCount || 0;
-    // Ensure at least 1 piece per side if Lock Block is enabled
     const piecesPerSide = lockBlockSides > 0 ? Math.max(1, Math.ceil(lockBlockCount / lockBlockSides)) : 0;
 
-    // Lock Block boundaries - account for multiple pieces per side
-    const lockBlockWidth = F * piecesPerSide; // Total width of all Lock Blocks on one side
+    const lockBlockWidth = F * piecesPerSide;
     const lockBlockLeftStart = lockBlockLeft ? leftOffset : null;
     const lockBlockLeftEnd = lockBlockLeft ? leftOffset + lockBlockWidth : null;
     const lockBlockRightStart = lockBlockRight ? W - rightOffset - lockBlockWidth : null;
     const lockBlockRightEnd = lockBlockRight ? W - rightOffset : null;
 
-    // Lock Block Y boundaries (from bottom of door)
-    const lockBlockYTop = H - lockBlockZoneEnd; // Top edge of Lock Block (in SVG Y)
-    const lockBlockYBottom = H - lockBlockZoneStart; // Bottom edge of Lock Block (in SVG Y)
+    const lockBlockYTop = H - (lockBlockZoneEnd ?? 0);
+    const lockBlockYBottom = H - (lockBlockZoneStart ?? 0);
+
+    const pieces = [];
+    let pieceId = 0;
 
     for (let col = 0; col < columnCount; col++) {
       const stripX = stripStartX + col * (stripThickness + actualSpacing);
       const stripXEnd = stripX + stripThickness;
 
-      // Check if strip overlaps with Lock Block X position
-      const overlapsLeftLockBlock = lockBlockLeft && stripXEnd > lockBlockLeftStart && stripX < lockBlockLeftEnd;
-      const overlapsRightLockBlock = lockBlockRight && stripXEnd > lockBlockRightStart && stripX < lockBlockRightEnd;
+      const overlapsLeftLockBlock = lockBlockLeft && lockBlockLeftStart !== null && lockBlockLeftEnd !== null && stripXEnd > lockBlockLeftStart && stripX < lockBlockLeftEnd;
+      const overlapsRightLockBlock = lockBlockRight && lockBlockRightStart !== null && lockBlockRightEnd !== null && stripXEnd > lockBlockRightStart && stripX < lockBlockRightEnd;
       const overlapsAnyLockBlockX = overlapsLeftLockBlock || overlapsRightLockBlock;
 
       rows.forEach((row, rowIdx) => {
-        // Check if this row overlaps with Lock Block Y range
         const rowOverlapsLockBlockY = hasLockBlock && row.top < lockBlockYBottom && row.bottom > lockBlockYTop;
-
-        // Strip should be split if it overlaps Lock Block in BOTH X and Y
         const stripHitsLockBlock = overlapsAnyLockBlockX && rowOverlapsLockBlockY;
 
         if (stripHitsLockBlock) {
-          // Piece above Lock Block (from row.top to lockBlockYTop)
           if (lockBlockYTop > row.top) {
             const pieceHeight = lockBlockYTop - row.top;
-            if (pieceHeight > 5) {
-              pieces.push({
-                id: pieceId++,
-                col,
-                row: rowIdx,
-                x: stripX,
-                y: row.top,
-                width: stripThickness,
-                height: pieceHeight,
-                name: `ซี่ C${col + 1}-R${rowIdx + 1}a`,
-              });
-            }
+            if (pieceHeight > 5) pieces.push({ id: pieceId++, col, row: rowIdx, x: stripX, y: row.top, width: stripThickness, height: pieceHeight, name: `ซี่ C${col + 1}-R${rowIdx + 1}a` });
           }
-
-          // Piece below Lock Block (from lockBlockYBottom to row.bottom)
           if (lockBlockYBottom < row.bottom) {
             const pieceHeight = row.bottom - lockBlockYBottom;
-            if (pieceHeight > 5) {
-              pieces.push({
-                id: pieceId++,
-                col,
-                row: rowIdx,
-                x: stripX,
-                y: lockBlockYBottom,
-                width: stripThickness,
-                height: pieceHeight,
-                name: `ซี่ C${col + 1}-R${rowIdx + 1}b`,
-              });
-            }
+            if (pieceHeight > 5) pieces.push({ id: pieceId++, col, row: rowIdx, x: stripX, y: lockBlockYBottom, width: stripThickness, height: pieceHeight, name: `ซี่ C${col + 1}-R${rowIdx + 1}b` });
           }
         } else {
-          // No Lock Block collision - draw full strip
-          pieces.push({
-            id: pieceId++,
-            col,
-            row: rowIdx,
-            x: stripX,
-            y: row.top,
-            width: stripThickness,
-            height: row.height,
-            name: `ซี่ C${col + 1}-R${rowIdx + 1}`,
-          });
+          pieces.push({ id: pieceId++, col, row: rowIdx, x: stripX, y: row.top, width: stripThickness, height: row.height, name: `ซี่ C${col + 1}-R${rowIdx + 1}` });
         }
       });
     }
 
+    const damPieces =
+      coreConfig.value === "particle_strips" && railPositions?.length
+        ? railPositions.map((pos, idx) => {
+            const yCenter = H - pos;
+            return { id: `dam-${idx}`, x: leftOffset, y: yCenter - stripThickness / 2, width: coreWidth, height: stripThickness, name: `ไม้ดามปาติเกิ้ล ${idx + 1}` };
+          })
+        : [];
+
     return {
       coreType: coreConfig,
       pieces,
-      totalPieces: pieces.length,
+      damPieces,
+      totalPieces: pieces.length + damPieces.length,
       columns: columnCount,
       rows: rows.length,
       stripThickness,
@@ -863,15 +809,12 @@ CenterLine.displayName = "CenterLine";
 const LockBlockSVG = memo(({ x, y, width, height }) => (
   <g className="layer-lockblock">
     <rect x={x} y={y} width={width} height={height} fill="url(#hatch-lockblock)" stroke="#000000" strokeWidth="0.8" />
-    <line x1={x} y1={y} x2={x + width} y2={y + height} stroke="#000000" strokeWidth="0.4" />
-    <line x1={x + width} y1={y} x2={x} y2={y + height} stroke="#000000" strokeWidth="0.4" />
   </g>
 ));
 LockBlockSVG.displayName = "LockBlockSVG";
 
-const FilledRect = memo(({ x, y, width, height, color, strokeWidth = 1, strokeDasharray, className, patternId }) => {
+const FilledRect = memo(({ x, y, width, height, strokeWidth = 1, strokeDasharray, className, patternId }) => {
   const fill = patternId ? `url(#${patternId})` : "#FFFFFF";
-
   return <rect className={className} x={x} y={y} width={width} height={height} fill={fill} stroke="#000000" strokeWidth={strokeWidth} strokeDasharray={strokeDasharray} />;
 });
 FilledRect.displayName = "FilledRect";
@@ -956,40 +899,19 @@ const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
       {line(x, y + h, x + w, y + h, 3)}
 
       <rect x={x + pad} y={yMap.logo.y + pad * 0.5} width={w - pad * 2} height={yMap.logo.h - pad} fill="none" stroke={stroke} strokeWidth="2" />
-      {txt(x + w / 2, yMap.logo.y + yMap.logo.h * 0.62, "EVERGREEN", {
-        size: 34,
-        weight: 300,
-        letterSpacing: 8,
-      })}
-      {txt(x + w / 2, yMap.logo.y + yMap.logo.h * 0.8, "GREEN CONSTRUCTION MATERIALS", {
-        size: 16,
-        weight: 300,
-        letterSpacing: 2,
-      })}
+      {txt(x + w / 2, yMap.logo.y + yMap.logo.h * 0.62, "EVERGREEN", { size: 34, weight: 300, letterSpacing: 8 })}
+      {txt(x + w / 2, yMap.logo.y + yMap.logo.h * 0.8, "GREEN CONSTRUCTION MATERIALS", { size: 16, weight: 300, letterSpacing: 2 })}
 
-      {txt(x + w / 2, midY("company"), "C.H.H. INDUSTRY CO.,LTD .", {
-        size: 26,
-        weight: 600,
-        letterSpacing: 2,
-      })}
+      {txt(x + w / 2, midY("company"), "C.H.H. INDUSTRY CO.,LTD .", { size: 26, weight: 600, letterSpacing: 2 })}
 
       {txt(x + w / 2, midY("ownerH"), "PROJECT OWNER", { size: 38, weight: 900 })}
       {txt(x + w / 2, midY("ownerV"), owner, { size: 28, weight: 600 })}
 
       {line(splitHalf, yMap.pcH.y, splitHalf, yMap.pcH.y + yMap.pcH.h + yMap.pcV.h, 2)}
-      {txt(x + (splitHalf - x) / 2, midY("pcH"), "PROJECT CODE", {
-        size: 24,
-        weight: 900,
-      })}
-      {txt(splitHalf + (x + w - splitHalf) / 2, midY("pcH"), "CODE", {
-        size: 32,
-        weight: 900,
-      })}
+      {txt(x + (splitHalf - x) / 2, midY("pcH"), "PROJECT CODE", { size: 24, weight: 900 })}
+      {txt(splitHalf + (x + w - splitHalf) / 2, midY("pcH"), "CODE", { size: 32, weight: 900 })}
       {txt(x + (splitHalf - x) / 2, midY("pcV"), projectCode, { size: 28, weight: 600 })}
-      {txt(splitHalf + (x + w - splitHalf) / 2, midY("pcV"), code, {
-        size: 28,
-        weight: 600,
-      })}
+      {txt(splitHalf + (x + w - splitHalf) / 2, midY("pcV"), code, { size: 28, weight: 600 })}
 
       {txt(x + w / 2, midY("dimH"), "DIMENSION", { size: 34, weight: 900 })}
       {txt(x + w / 2, midY("dimV"), dimText, { size: 26, weight: 600 })}
@@ -998,19 +920,10 @@ const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
       {txt(x + w / 2, midY("typeV"), type, { size: 26, weight: 600 })}
 
       {line(splitIssue, yMap.issueH.y, splitIssue, yMap.issueH.y + yMap.issueH.h + yMap.issueV.h, 2)}
-      {txt(x + (splitIssue - x) / 2, midY("issueH"), "ISSUE DATE", {
-        size: 30,
-        weight: 900,
-      })}
-      {txt(splitIssue + (x + w - splitIssue) / 2, midY("issueH"), "REVISE", {
-        size: 28,
-        weight: 900,
-      })}
+      {txt(x + (splitIssue - x) / 2, midY("issueH"), "ISSUE DATE", { size: 30, weight: 900 })}
+      {txt(splitIssue + (x + w - splitIssue) / 2, midY("issueH"), "REVISE", { size: 28, weight: 900 })}
       {txt(x + (splitIssue - x) / 2, midY("issueV"), issueDate, { size: 26, weight: 600 })}
-      {txt(splitIssue + (x + w - splitIssue) / 2, midY("issueV"), String(revise), {
-        size: 26,
-        weight: 600,
-      })}
+      {txt(splitIssue + (x + w - splitIssue) / 2, midY("issueV"), String(revise), { size: 26, weight: 600 })}
 
       {["drawn", "checked", "sale", "co"].map((kRow) => {
         const yy = yMap[kRow].y;
@@ -1045,19 +958,10 @@ const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
       <rect x={x + w * 0.25} y={yMap.qr.y + yMap.qr.h * 0.18} width={w * 0.5} height={yMap.qr.h * 0.55} fill="none" stroke={stroke} strokeWidth="2" />
       {txt(x + w / 2, yMap.qr.y + yMap.qr.h * 0.48, "QR", { size: 28, weight: 900 })}
 
-      {txt(x + w / 2, midY("thai1"), "*เงื่อนไขการรับประกันสินค้า*", {
-        size: 20,
-        weight: 600,
-      })}
-      {txt(x + w / 2, midY("thai2"), "*ตรวจสอบยืนยันทุกครั้งก่อนเซ็นต์อนุมัติ*", {
-        size: 20,
-        weight: 600,
-      })}
+      {txt(x + w / 2, midY("thai1"), "*เงื่อนไขการรับประกันสินค้า*", { size: 20, weight: 600 })}
+      {txt(x + w / 2, midY("thai2"), "*ตรวจสอบยืนยันทุกครั้งก่อนเซ็นต์อนุมัติ*", { size: 20, weight: 600 })}
       {txt(x + w / 2, midY("sig"), "( Customer SIG.)", { size: 20, weight: 600 })}
-      {txt(x + w / 2, midY("app"), "( Approved date )", {
-        size: 20,
-        weight: 600,
-      })}
+      {txt(x + w / 2, midY("app"), "( Approved date )", { size: 20, weight: 600 })}
 
       <text x={x + w - pad} y={midY("footer")} fill={fill} fontFamily={font} fontSize={18} fontWeight={500} textAnchor="end" dominantBaseline="middle">
         FP-MR-02-02 Rev.00
@@ -1083,7 +987,7 @@ const EnhancedEngineeringDrawing = memo(({ results, coreCalculation }) => {
   };
 
   const safeResults = results || {};
-  const { W = 0, H = 0, T = 0, S = 0, F = 0, R = 0, totalFrameWidth = 0, railPositions = [], railSections = 3, lockBlockTop = 800, lockBlockBottom = 1200, lockBlockLeft = false, lockBlockRight = false, lockBlockPosition = 1000, lockBlockCount = 0, lockBlockSides = 1, currentFrame = {}, doubleFrame = {} } = safeResults;
+  const { W = 0, H = 0, T = 0, S = 0, F = 0, R = 0, railPositions = [], railSections = 3, lockBlockBottom = 1200, lockBlockLeft = false, lockBlockRight = false, lockBlockPosition = 1000, lockBlockCount = 0, lockBlockSides = 1, doubleFrame = {} } = safeResults;
 
   const titleData = useMemo(
     () => ({
@@ -1230,6 +1134,17 @@ const EnhancedEngineeringDrawing = memo(({ results, coreCalculation }) => {
     setVisibleLayers(Object.fromEntries(Object.keys(LAYER_CONFIG).map((key) => [key, visible])));
   }, []);
 
+  const getCorePatternId = (value) => {
+    if (value === "honeycomb") return "hatch-core";
+    if (value === "foam") return "hatch-foam";
+    if (value === "rockwool") return "hatch-rockwool";
+    if (value === "particle_solid" || value === "particle_strips") return "hatch-particle";
+    if (value === "plywood_strips") return "hatch-plywood";
+    return "hatch-core";
+  };
+
+  const corePatternId = useMemo(() => getCorePatternId(coreCalculation?.coreType?.value), [coreCalculation?.coreType?.value]);
+
   const renderLockBlocks = useCallback(() => {
     const blocks = [];
     const lockBlockH = LOCK_BLOCK_HEIGHT * DRAWING_SCALE;
@@ -1247,7 +1162,6 @@ const EnhancedEngineeringDrawing = memo(({ results, coreCalculation }) => {
 
       [...Array(piecesPerSide)].forEach((_, i) => {
         const x = isLeft ? positions.front.x + offset + dims.front.lockBlockW * i : positions.front.x + dims.front.W - offset - dims.front.lockBlockW * (i + 1);
-
         blocks.push(<LockBlockSVG key={`lb-${isLeft ? "left" : "right"}-${i}`} x={x} y={lockBlockY} width={dims.front.lockBlockW} height={lockBlockH} />);
       });
     };
@@ -1327,6 +1241,7 @@ const EnhancedEngineeringDrawing = memo(({ results, coreCalculation }) => {
 
   const renderRails = useCallback(() => {
     if (!railPositions || railPositions.length === 0) return null;
+    if (coreCalculation?.coreType?.value === "particle_strips") return null;
 
     const leftOffset = hasDoubleFrame && doubleFrame.left ? dims.front.DF : 0;
     const rightOffset = hasDoubleFrame && doubleFrame.right ? dims.front.DF : 0;
@@ -1337,52 +1252,44 @@ const EnhancedEngineeringDrawing = memo(({ results, coreCalculation }) => {
       const railY = positions.front.y + dims.front.H - pos * DRAWING_SCALE;
       return <FilledRect key={`front-rail-${idx}`} className="layer-rails" x={railX} y={railY - dims.front.R / 2} width={railWidth} height={dims.front.R} patternId="hatch-rails" strokeWidth={1} />;
     });
-  }, [railPositions, positions, dims, hasDoubleFrame, doubleFrame]);
+  }, [railPositions, positions, dims, hasDoubleFrame, doubleFrame, coreCalculation]);
 
   const renderCore = useCallback(() => {
     if (!coreCalculation || !coreCalculation.coreType || coreCalculation.totalPieces === 0) return null;
 
     const elements = [];
+    const pid = getCorePatternId(coreCalculation.coreType.value);
 
     if (coreCalculation.isSolid) {
       coreCalculation.pieces.forEach((piece, idx) => {
-        elements.push(<rect key={`core-solid-${idx}`} className="layer-core" x={positions.front.x + piece.x * DRAWING_SCALE} y={positions.front.y + piece.y * DRAWING_SCALE} width={piece.width * DRAWING_SCALE} height={piece.height * DRAWING_SCALE} fill="url(#hatch-core)" stroke="#000000" strokeWidth="0.5" strokeDasharray="4,4" />);
+        elements.push(<rect key={`core-solid-${idx}`} className="layer-core" x={positions.front.x + piece.x * DRAWING_SCALE} y={positions.front.y + piece.y * DRAWING_SCALE} width={piece.width * DRAWING_SCALE} height={piece.height * DRAWING_SCALE} fill={`url(#${pid})`} stroke="#000000" strokeWidth="0.5" strokeDasharray="4,4" />);
       });
-    } else {
-      const maxPiecesToDraw = 200;
-      const piecesToDraw = coreCalculation.pieces.slice(0, maxPiecesToDraw);
+      return elements;
+    }
 
-      piecesToDraw.forEach((piece, idx) => {
-        elements.push(<rect key={`core-strip-${idx}`} className="layer-core" x={positions.front.x + piece.x * DRAWING_SCALE} y={positions.front.y + piece.y * DRAWING_SCALE} width={piece.width * DRAWING_SCALE} height={piece.height * DRAWING_SCALE} fill="#4456E920" stroke="#4456E9" strokeWidth="0.3" />);
+    const maxPiecesToDraw = 200;
+    const piecesToDraw = coreCalculation.pieces.slice(0, maxPiecesToDraw);
+
+    piecesToDraw.forEach((piece, idx) => {
+      elements.push(<rect key={`core-strip-${idx}`} className="layer-core" x={positions.front.x + piece.x * DRAWING_SCALE} y={positions.front.y + piece.y * DRAWING_SCALE} width={piece.width * DRAWING_SCALE} height={piece.height * DRAWING_SCALE} fill={`url(#${pid})`} stroke="#000000" strokeWidth="0.25" opacity="0.95" />);
+    });
+
+    if (coreCalculation.damPieces?.length) {
+      coreCalculation.damPieces.forEach((p) => {
+        elements.push(<rect key={p.id} className="layer-core" x={positions.front.x + p.x * DRAWING_SCALE} y={positions.front.y + p.y * DRAWING_SCALE} width={p.width * DRAWING_SCALE} height={p.height * DRAWING_SCALE} fill={`url(#${pid})`} stroke="#000000" strokeWidth="0.35" />);
       });
+    }
 
-      if (coreCalculation.pieces.length > maxPiecesToDraw) {
-        elements.push(
-          <text key="core-overflow-text" x={positions.front.x + dims.front.W / 2} y={positions.front.y + dims.front.H / 2} textAnchor="middle" fontSize="14" fill="#4456E9">
-            +{coreCalculation.pieces.length - maxPiecesToDraw} more strips
-          </text>,
-        );
-      }
+    if (coreCalculation.pieces.length > maxPiecesToDraw) {
+      elements.push(
+        <text key="core-overflow-text" x={positions.front.x + dims.front.W / 2} y={positions.front.y + dims.front.H / 2} textAnchor="middle" fontSize="14" fill="#4456E9">
+          +{coreCalculation.pieces.length - maxPiecesToDraw} more strips
+        </text>,
+      );
     }
 
     return elements;
   }, [coreCalculation, positions, dims]);
-
-  const getDoubleFrameDesc = () => {
-    if (!hasDoubleFrame || !doubleFrame) return "";
-    const sideLabels = {
-      top: "บน",
-      bottom: "ล่าง",
-      left: "ซ้าย",
-      right: "ขวา",
-      center: "กลาง",
-    };
-    const sides = Object.entries(sideLabels)
-      .filter(([key]) => doubleFrame[key])
-      .map(([_, label]) => label);
-
-    return sides.length > 0 ? `(Double: ${sides.join(", ")} x${doubleFrame.count})` : "(Double)";
-  };
 
   return (
     <div className="relative w-full h-full flex flex-col bg-default-100 rounded-xl overflow-hidden">
@@ -1498,18 +1405,41 @@ const EnhancedEngineeringDrawing = memo(({ results, coreCalculation }) => {
                     </pattern>
 
                     <pattern id="hatch-rails" patternUnits="userSpaceOnUse" width="4" height="4">
-                      <rect width="4" height="4" fill="#000000" opacity="0.1" />
+                      <path d="M0 2 L4 2" stroke="#000000" strokeWidth="0.4" />
                     </pattern>
 
                     <pattern id="hatch-lockblock" patternUnits="userSpaceOnUse" width="4" height="4">
-                      <path d="M0 4 L4 0" stroke="#000000" strokeWidth="0.4" />
+                      <path d="M2 0 L2 4" stroke="#000000" strokeWidth="0.4" />
                     </pattern>
 
                     <pattern id="hatch-core" patternUnits="userSpaceOnUse" width="17.32" height="20">
-                      {/* Honeycomb - row 1 */}
                       <polygon points="8.66,0 17.32,5 17.32,15 8.66,20 0,15 0,5" fill="none" stroke="#555555" strokeWidth="0.6" />
-                      {/* Honeycomb - row 2 offset */}
                       <polygon points="17.32,10 25.98,15 25.98,25 17.32,30 8.66,25 8.66,15" fill="none" stroke="#555555" strokeWidth="0.6" />
+                    </pattern>
+
+                    <pattern id="hatch-particle" patternUnits="userSpaceOnUse" width="10" height="10">
+                      <circle cx="2" cy="3" r="0.6" fill="#000000" opacity="0.35" />
+                      <circle cx="7" cy="2" r="0.5" fill="#000000" opacity="0.25" />
+                      <circle cx="5" cy="7" r="0.7" fill="#000000" opacity="0.3" />
+                      <circle cx="9" cy="8" r="0.4" fill="#000000" opacity="0.22" />
+                      <circle cx="1" cy="9" r="0.45" fill="#000000" opacity="0.2" />
+                    </pattern>
+
+                    <pattern id="hatch-foam" patternUnits="userSpaceOnUse" width="12" height="12">
+                      <circle cx="3" cy="3" r="0.7" fill="#000000" opacity="0.18" />
+                      <circle cx="9" cy="4" r="0.6" fill="#000000" opacity="0.14" />
+                      <circle cx="6" cy="9" r="0.8" fill="#000000" opacity="0.16" />
+                    </pattern>
+
+                    <pattern id="hatch-rockwool" patternUnits="userSpaceOnUse" width="18" height="12">
+                      <path d="M0 3 C4 0, 8 6, 12 3 S20 6, 24 3" stroke="#000000" strokeWidth="0.35" opacity="0.25" fill="none" />
+                      <path d="M0 9 C4 6, 8 12, 12 9 S20 12, 24 9" stroke="#000000" strokeWidth="0.35" opacity="0.2" fill="none" />
+                    </pattern>
+
+                    <pattern id="hatch-plywood" patternUnits="userSpaceOnUse" width="12" height="12">
+                      <path d="M0 10 L10 0" stroke="#000000" strokeWidth="0.35" opacity="0.25" />
+                      <path d="M2 12 L12 2" stroke="#000000" strokeWidth="0.35" opacity="0.18" />
+                      <path d="M0 6 L6 0" stroke="#000000" strokeWidth="0.25" opacity="0.15" />
                     </pattern>
 
                     <pattern id="hatch-doubleframe" patternUnits="userSpaceOnUse" width="6" height="6">
@@ -1549,7 +1479,7 @@ const EnhancedEngineeringDrawing = memo(({ results, coreCalculation }) => {
                     <FilledRect className="layer-frame" x={positions.side.x + dims.side.S} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} patternId="hatch-frame" />
                     <FilledRect className="layer-frame" x={positions.side.x + dims.side.T - dims.side.S - (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.25} height={dims.side.H} patternId="hatch-frame" />
 
-                    <FilledRect className="layer-core" x={positions.side.x + dims.side.S + (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.5} height={dims.side.H} patternId="hatch-core" strokeWidth={0.8} strokeDasharray="4,4" />
+                    <FilledRect className="layer-core" x={positions.side.x + dims.side.S + (dims.side.T - 2 * dims.side.S) * 0.25} y={positions.side.y} width={(dims.side.T - 2 * dims.side.S) * 0.5} height={dims.side.H} patternId={corePatternId} strokeWidth={0.8} strokeDasharray="4,4" />
 
                     <CenterLine x1={positions.side.x + dims.side.T / 2} y1={positions.side.y - 40} x2={positions.side.x + dims.side.T / 2} y2={positions.side.y + dims.side.H + 40} theme={theme} />
 
@@ -1565,7 +1495,6 @@ const EnhancedEngineeringDrawing = memo(({ results, coreCalculation }) => {
                       (() => {
                         const lockBlockTopY = positions.side.y + dims.side.H - lockBlockBottom * DRAWING_SCALE;
                         const lockBlockBottomY = lockBlockTopY + LOCK_BLOCK_HEIGHT * DRAWING_SCALE;
-
                         return <DimLine x1={positions.side.x} y1={lockBlockTopY} x2={positions.side.x} y2={lockBlockBottomY} value={LOCK_BLOCK_HEIGHT} offset={-60} vertical fontSize={16} theme={theme} />;
                       })()}
 
@@ -1587,58 +1516,19 @@ const EnhancedEngineeringDrawing = memo(({ results, coreCalculation }) => {
                     <FilledRect className="layer-rails" x={positions.front.x + dims.front.F} y={positions.front.y + dims.front.H - dims.front.F} width={dims.front.W - 2 * dims.front.F} height={dims.front.F} patternId="hatch-rails" strokeWidth={1.2} />
 
                     {renderCore()}
-
                     {renderDoubleFrames()}
-
                     {renderRails()}
-
                     {renderLockBlocks()}
 
                     <CenterLine x1={positions.front.x + dims.front.W / 2} y1={positions.front.y - 40} x2={positions.front.x + dims.front.W / 2} y2={positions.front.y + dims.front.H + 40} theme={theme} />
                     <CenterLine x1={positions.front.x - 40} y1={positions.front.y + dims.front.H / 2} x2={positions.front.x + dims.front.W + 40} y2={positions.front.y + dims.front.H / 2} theme={theme} />
 
                     <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y} value={W} offset={-160} fontSize={18} theme={theme} />
-
                     <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x + dims.front.F} y2={positions.front.y} value={F} offset={-80} fontSize={18} theme={theme} />
-
                     <DimLine x1={positions.front.x} y1={positions.front.y} x2={positions.front.x} y2={positions.front.y + dims.front.F} value={F} offset={-80} vertical fontSize={18} theme={theme} />
-
                     <DimLine x1={positions.front.x + dims.front.W} y1={positions.front.y} x2={positions.front.x + dims.front.W} y2={positions.front.y + dims.front.H} value={H} offset={100} vertical fontSize={18} theme={theme} />
 
                     {(lockBlockLeft || lockBlockRight) && <DimLine x1={positions.front.x} y1={positions.front.y + dims.front.H} x2={positions.front.x} y2={positions.front.y + dims.front.H - lockBlockPosition * DRAWING_SCALE} value={lockBlockPosition} offset={-100} vertical fontSize={18} theme={theme} />}
-
-                    {(lockBlockLeft || lockBlockRight) &&
-                      (() => {
-                        const lockBlockTopY = positions.front.y + dims.front.H - lockBlockBottom * DRAWING_SCALE;
-                        const lockBlockBottomY = lockBlockTopY + LOCK_BLOCK_HEIGHT * DRAWING_SCALE;
-
-                        let lockBlockLeftX = null;
-                        let lockBlockRightX = null;
-
-                        const getOffset = (isLeft) => {
-                          const hasDoubleOnSide = hasDoubleFrame && doubleFrame && doubleFrame.count > 0 && (isLeft ? doubleFrame.left : doubleFrame.right);
-
-                          return dims.front.F + (hasDoubleOnSide ? dims.front.DF : 0);
-                        };
-
-                        if (lockBlockLeft) {
-                          const offsetLeft = getOffset(true);
-                          lockBlockLeftX = positions.front.x + offsetLeft;
-                          lockBlockRightX = lockBlockLeftX + dims.front.lockBlockW;
-                        } else if (lockBlockRight) {
-                          const offsetRight = getOffset(false);
-                          lockBlockRightX = positions.front.x + dims.front.W - offsetRight;
-                          lockBlockLeftX = lockBlockRightX - dims.front.lockBlockW;
-                        }
-
-                        return (
-                          <>
-                            <DimLine x1={positions.front.x} y1={lockBlockTopY} x2={positions.front.x} y2={lockBlockBottomY} value={LOCK_BLOCK_HEIGHT} offset={-60} vertical fontSize={16} theme={theme} />
-
-                            {lockBlockLeftX !== null && lockBlockRightX !== null && <DimLine x1={lockBlockLeftX} y1={lockBlockBottomY} x2={lockBlockRightX} y2={lockBlockBottomY} value={safeF} offset={40} fontSize={16} theme={theme} />}
-                          </>
-                        );
-                      })()}
 
                     {railPositions.length > 0 &&
                       (() => {
@@ -1647,7 +1537,6 @@ const EnhancedEngineeringDrawing = memo(({ results, coreCalculation }) => {
                         const top = railCenter - dims.front.R / 2;
                         const bottom = railCenter + dims.front.R / 2;
                         const dx = positions.front.x + dims.front.W + 120;
-
                         return <DimLine x1={dx} y1={top} x2={dx} y2={bottom} value={F} offset={40} vertical fontSize={16} theme={theme} />;
                       })()}
 
@@ -1751,7 +1640,8 @@ export default function DoorConfigurator() {
     doubleFrameSides,
     doubleFrameCount: numericDoubleCount,
   });
-  const cuttingPlan = useCuttingPlan(results, currentFrame);
+
+  const cuttingPlan = useCuttingPlan(results, currentFrame, coreType);
   const coreCalculation = useCoreCalculation(results, coreType);
 
   const isDataComplete = doorThickness && doorWidth && doorHeight;
@@ -1760,13 +1650,7 @@ export default function DoorConfigurator() {
   const doubleConfigSummary = useMemo(() => {
     const df = results.doubleFrame;
     if (!df?.hasAny || !df.count) return "";
-    const sideLabels = {
-      top: "บน",
-      bottom: "ล่าง",
-      left: "ซ้าย",
-      center: "กลาง",
-      right: "ขวา",
-    };
+    const sideLabels = { top: "บน", bottom: "ล่าง", left: "ซ้าย", center: "กลาง", right: "ขวา" };
     const sides = Object.entries(sideLabels)
       .filter(([key]) => df[key])
       .map(([_, label]) => label);
@@ -1777,14 +1661,7 @@ export default function DoorConfigurator() {
     setDoubleFrameSides((prev) => {
       if (side === "all") {
         const newValue = !prev.all;
-        return {
-          top: newValue,
-          bottom: newValue,
-          left: newValue,
-          center: newValue,
-          right: newValue,
-          all: newValue,
-        };
+        return { top: newValue, bottom: newValue, left: newValue, center: newValue, right: newValue, all: newValue };
       }
       return { ...prev, [side]: !prev[side], all: false };
     });
@@ -1909,11 +1786,13 @@ export default function DoorConfigurator() {
                   </Select>
                 </div>
               </div>
+
               {frameType && frameSelection.frames.length === 0 && (
                 <Chip color="danger" variant="shadow" className="w-full">
                   ⚠️ {frameSelection.reason || `ไม่มีไม้ที่ใช้ได้สำหรับความหนา ${results.frameThickness}mm`}
                 </Chip>
               )}
+
               {frameType && frameSelection.frames.length > 0 && (
                 <div className="flex flex-col gap-2 text-sm p-2 bg-warning/10 rounded-xl">
                   <div className="flex justify-between">
@@ -1948,7 +1827,9 @@ export default function DoorConfigurator() {
                   )}
                 </div>
               )}
+
               <Divider />
+
               <div className="flex flex-col gap-2">
                 <span className="text-sm font-medium">ด้านที่ต้องการเบิ้ลโครง</span>
                 <div className="flex flex-wrap gap-2">
@@ -1959,6 +1840,7 @@ export default function DoorConfigurator() {
                   ))}
                 </div>
               </div>
+
               <div className="flex items-center justify-center w-full h-full p-2 gap-2">
                 <Select name="doubleFrameCount" label="จำนวนไม้เบิ้ลต่อด้าน" labelPlacement="outside" placeholder="Please Select" color="default" variant="bordered" size="md" radius="md" selectedKeys={doubleFrameCount ? [doubleFrameCount] : []} onSelectionChange={(keys) => setDoubleFrameCount([...keys][0] || "")}>
                   {DOUBLE_FRAME_COUNT_OPTIONS.map((opt) => (
@@ -1966,6 +1848,7 @@ export default function DoorConfigurator() {
                   ))}
                 </Select>
               </div>
+
               {doubleConfigSummary && (
                 <Chip color="warning" variant="shadow" className="w-full">
                   {doubleConfigSummary}
@@ -1991,24 +1874,29 @@ export default function DoorConfigurator() {
                     {results.railSections} ช่อง ({results.railSections - 1} ไม้ดาม)
                   </span>
                 </div>
+
                 {doorHeight && parseFloat(doorHeight) >= 2400 && (
                   <Chip color="secondary" variant="shadow" size="md">
                     ⚡ ประตูสูงเกิน 2400mm → แบ่ง 4 ช่อง อัตโนมัติ
                   </Chip>
                 )}
+
                 {results.railsAdjusted && (
                   <Chip color="warning" variant="shadow" size="md">
                     🔄 ปรับตำแหน่งไม้ดามอัตโนมัติเพื่อหลบ Lock Block
                   </Chip>
                 )}
+
                 <div className="flex justify-between">
                   <span>ขนาดไม้ดาม:</span>
-                  <span className="font-bold text-secondary">
-                    {currentFrame.useThickness || 0}×{currentFrame.useWidth || 0} mm
-                  </span>
+                  <span className="font-bold text-secondary">{coreType === "particle_strips" ? `${coreCalculation.stripThickness || 12} mm (ปาติเกิ้ลซี่ตัดซอย)` : `${currentFrame.useThickness || 0}×${currentFrame.useWidth || 0} mm`}</span>
                 </div>
-                <span className="text-xs text-foreground/60">(ใช้ไม้เดียวกับโครง)</span>
+
+                {coreType !== "particle_strips" && <span className="text-xs text-foreground/60">(ใช้ไม้เดียวกับโครง)</span>}
+                {coreType === "particle_strips" && <span className="text-xs text-foreground/60">(ใช้ปาติเกิ้ลซี่ทำเป็นไม้ดามแทน)</span>}
+
                 <Divider className="my-1" />
+
                 {results.railPositions.map((pos, idx) => {
                   const wasAdjusted = results.railPositionsOriginal && pos !== results.railPositionsOriginal[idx];
                   return (
@@ -2052,6 +1940,7 @@ export default function DoorConfigurator() {
                   </Select>
                 </div>
               </div>
+
               {(lockBlockLeft || lockBlockRight) && piecesPerSide > 0 && (
                 <div className="flex flex-col gap-2 text-sm p-2 bg-danger/10 rounded-xl">
                   <div className="flex justify-between">
@@ -2102,6 +1991,7 @@ export default function DoorConfigurator() {
                   ))}
                 </Select>
               </div>
+
               {coreType && coreCalculation.coreType && (
                 <div className="flex flex-col gap-2 text-sm p-2 bg-primary/10 rounded-xl">
                   <div className="flex justify-between">
@@ -2112,6 +2002,7 @@ export default function DoorConfigurator() {
                     <span>รูปแบบ:</span>
                     <span className="font-bold">{coreCalculation.isSolid ? "เต็มแผ่น" : "ซี่"}</span>
                   </div>
+
                   {!coreCalculation.isSolid && (
                     <>
                       <Divider className="my-1" />
@@ -2138,8 +2029,16 @@ export default function DoorConfigurator() {
                         <span>จำนวนชั้น (rows):</span>
                         <span>{coreCalculation.rows} ชั้น</span>
                       </div>
+
+                      {coreCalculation.coreType?.value === "particle_strips" && coreCalculation.damPieces?.length > 0 && (
+                        <div className="flex justify-between">
+                          <span>ไม้ดามจากปาติเกิ้ล:</span>
+                          <span className="font-bold text-primary">{coreCalculation.damPieces.length} ชิ้น</span>
+                        </div>
+                      )}
                     </>
                   )}
+
                   <Divider className="my-1" />
                   <div className="flex justify-between font-bold">
                     <span>จำนวนชิ้นทั้งหมด:</span>
@@ -2187,6 +2086,7 @@ export default function DoorConfigurator() {
                   <span className="font-bold text-secondary">
                     {results.railSections - 1} ตัว ({results.railSections} ช่อง)
                   </span>
+                  {coreType === "particle_strips" && <span className="block text-xs text-secondary">ใช้ปาติเกิ้ลซี่ทำไม้ดามแทน</span>}
                 </div>
                 <div className="col-span-2 p-2 bg-danger/10 rounded-xl">
                   <span className="block text-foreground/70">Lock Block:</span>
@@ -2229,6 +2129,12 @@ export default function DoorConfigurator() {
                 </div>
               </CardHeader>
               <CardBody className="gap-2">
+                {coreType === "particle_strips" && (
+                  <Chip color="warning" variant="shadow" className="w-full">
+                    ไม้ดาม: ใช้ปาติเกิ้ลซี่ตัดซอยทำแทน (ไม่รวมในแผนตัดไม้โครง)
+                  </Chip>
+                )}
+
                 {cuttingPlan.needSplice && (
                   <div className="p-2 bg-primary/10 rounded-xl">
                     <div className="flex items-center gap-2 font-medium text-primary mb-1">
@@ -2238,10 +2144,11 @@ export default function DoorConfigurator() {
                     <div className="text-sm text-primary">
                       <div>• จำนวนชิ้นที่ต้องต่อ: {cuttingPlan.spliceCount} ชิ้น</div>
                       <div>• เผื่อซ้อนทับ: {cuttingPlan.spliceOverlap} mm ต่อจุด</div>
-                      <div className="text-xs mt-1 opacity-80">💡 ใช้กาว + ตะปูยึดบริเวณรอยต่อ</div>
+                      <div className="text-xs mt-1 opacity-80">ใช้กาว + ตะปูยึดบริเวณรอยต่อ</div>
                     </div>
                   </div>
                 )}
+
                 <div className="grid grid-cols-4 gap-2">
                   <div className="p-2 rounded-xl text-center border-2 border-default">
                     <div className="font-bold text-lg text-primary">{cuttingPlan.totalStocks}</div>
@@ -2260,11 +2167,9 @@ export default function DoorConfigurator() {
                     <div className="text-xs text-foreground/80">เศษเหลือ (mm)</div>
                   </div>
                 </div>
+
                 <div className="border-2 border-default rounded-xl overflow-hidden">
-                  <div className="px-3 py-2 text-xs font-semibold bg-default-100">
-                    📋 รายการชิ้นส่วน (เผื่อรอยเลื่อย {cuttingPlan.sawKerf}
-                    mm)
-                  </div>
+                  <div className="px-3 py-2 text-xs font-semibold bg-default-100">📋 รายการชิ้นส่วน (เผื่อรอยเลื่อย {cuttingPlan.sawKerf} mm)</div>
                   <div>
                     {cuttingPlan.cutPieces.map((piece, idx) => (
                       <div key={idx} className={`flex items-center justify-between px-3 py-2 text-xs ${piece.isSplice ? "bg-primary/5" : ""}`}>
@@ -2281,13 +2186,13 @@ export default function DoorConfigurator() {
                           <span>
                             {piece.length} mm <span className="text-foreground/60">(ตัด {piece.cutLength ?? piece.length} mm)</span>
                           </span>
-
                           <span className="font-bold">×{piece.qty}</span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
+
                 <div className="border-2 border-default rounded-xl overflow-hidden">
                   <div className="px-3 py-2 text-xs font-semibold bg-default-100">
                     🪵 แผนการตัด (ไม้ยาว {cuttingPlan.stockLength}mm × {cuttingPlan.totalStocks} ท่อน)
@@ -2305,46 +2210,19 @@ export default function DoorConfigurator() {
                               const kerfWidth = (cuttingPlan.sawKerf / stock.length) * 100;
                               const left = offset;
                               offset += width + kerfWidth;
-                              const colorMap = {
-                                primary: "#4456E9",
-                                secondary: "#FF8A00",
-                                warning: "#FFB441",
-                                danger: "#FF0076",
-                                success: "#10B981",
-                              };
+                              const colorMap = { primary: "#4456E9", secondary: "#FF8A00", warning: "#FFB441", danger: "#FF0076", success: "#10B981" };
                               return (
                                 <React.Fragment key={pieceIdx}>
-                                  <div
-                                    className="absolute h-full flex items-center justify-center text-[8px] font-medium overflow-hidden text-white"
-                                    style={{
-                                      left: `${left}%`,
-                                      width: `${width}%`,
-                                      backgroundColor: colorMap[piece.color] || "#DCDCDC",
-                                    }}
-                                    title={`${piece.name}: ตัด ${pieceCut}mm (ใช้ ${piece.length}mm)`}
-                                  >
+                                  <div className="absolute h-full flex items-center justify-center text-[8px] font-medium overflow-hidden text-white" style={{ left: `${left}%`, width: `${width}%`, backgroundColor: colorMap[piece.color] || "#DCDCDC" }} title={`${piece.name}: ตัด ${pieceCut}mm (ใช้ ${piece.length}mm)`}>
                                     {width > 8 && <span className="truncate px-1">{pieceCut}</span>}
                                   </div>
-                                  {pieceIdx < stock.pieces.length - 1 && (
-                                    <div
-                                      className="absolute h-full bg-default"
-                                      style={{
-                                        left: `${left + width}%`,
-                                        width: `${kerfWidth}%`,
-                                      }}
-                                    />
-                                  )}
+                                  {pieceIdx < stock.pieces.length - 1 && <div className="absolute h-full bg-default" style={{ left: `${left + width}%`, width: `${kerfWidth}%` }} />}
                                 </React.Fragment>
                               );
                             });
                           })()}
                           {stock.remaining > 0 && (
-                            <div
-                              className="absolute right-0 h-full flex items-center justify-center text-[8px] bg-white text-foreground/70"
-                              style={{
-                                width: `${(stock.remaining / stock.length) * 100}%`,
-                              }}
-                            >
+                            <div className="absolute right-0 h-full flex items-center justify-center text-[8px] bg-white text-foreground/70" style={{ width: `${(stock.remaining / stock.length) * 100}%` }}>
                               {stock.remaining > 100 && <span>เศษ {stock.remaining}</span>}
                             </div>
                           )}
@@ -2353,6 +2231,7 @@ export default function DoorConfigurator() {
                     ))}
                   </div>
                 </div>
+
                 <div className="p-2">
                   <div className="flex justify-between text-xs mb-1">
                     <span>ประสิทธิภาพการใช้ไม้</span>
