@@ -1101,7 +1101,7 @@ export const EnhancedEngineeringDrawing = memo(
       <div className="relative w-full h-full flex flex-col bg-default-100 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between p-2 bg-default-50 border-b-2 border-default gap-2 flex-wrap">
           <div className="flex items-center gap-2">
-            <Chip size="sm" variant="shadow">
+            <Chip size="md" variant="shadow">
               {Math.round(zoomLevel * 100)}%
             </Chip>
           </div>
@@ -1109,28 +1109,37 @@ export const EnhancedEngineeringDrawing = memo(
             <Popover placement="bottom-end">
               <PopoverTrigger>
                 <Button
-                  size="sm"
+                  color="secondary"
                   variant="shadow"
-                  startContent={<Layers className="w-4 h-4" />}
+                  size="md"
+                  radius="md"
+                  className="w-full text-background"
+                  startContent={<Layers />}
                 >
                   Layers
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-64">
                 <div className="p-2 space-y-2">
-                  <div className="flex justify-between items-center pb-2 border-b-2 border-default">
+                  <div className="flex justify-between items-center pb-2 border-b-2 border-default gap-4">
                     <span className="font-semibold text-sm">Layers</span>
                     <div className="flex gap-2">
                       <Button
-                        size="sm"
+                        color="success"
                         variant="light"
+                        size="md"
+                        radius="md"
+                        className="w-full text-foreground"
                         onPress={() => toggleAllLayers(true)}
                       >
                         All On
                       </Button>
                       <Button
-                        size="sm"
+                        color="danger"
                         variant="light"
+                        size="md"
+                        radius="md"
+                        className="w-full text-foreground"
                         onPress={() => toggleAllLayers(false)}
                       >
                         All Off
@@ -1150,7 +1159,7 @@ export const EnhancedEngineeringDrawing = memo(
                         <span className="text-sm">{config.label}</span>
                       </div>
                       <Switch
-                        size="sm"
+                        size="md"
                         isSelected={visibleLayers[key]}
                         onValueChange={() => toggleLayer(key)}
                       />
@@ -1165,11 +1174,13 @@ export const EnhancedEngineeringDrawing = memo(
             <Dropdown>
               <DropdownTrigger>
                 <Button
-                  size="sm"
                   color="primary"
                   variant="shadow"
-                  startContent={<Download className="w-4 h-4" />}
-                  endContent={<ChevronDown className="w-3 h-3" />}
+                  size="md"
+                  radius="md"
+                  className="w-full text-background"
+                  startContent={<Download />}
+                  endContent={<ChevronDown />}
                   isLoading={isExporting}
                 >
                   Export
@@ -1178,7 +1189,7 @@ export const EnhancedEngineeringDrawing = memo(
               <DropdownMenu aria-label="Export options">
                 <DropdownItem
                   key="pdf"
-                  startContent={<FileText className="w-4 h-4" />}
+                  startContent={<FileText />}
                   description="Vector format, best for printing"
                   onPress={exportToPDF}
                 >
@@ -1187,7 +1198,7 @@ export const EnhancedEngineeringDrawing = memo(
 
                 <DropdownItem
                   key="png-hd"
-                  startContent={<FileImage className="w-4 h-4" />}
+                  startContent={<FileImage />}
                   description="4x resolution for large prints"
                   onPress={() => exportToPNG(4)}
                 >
@@ -1196,7 +1207,7 @@ export const EnhancedEngineeringDrawing = memo(
 
                 <DropdownItem
                   key="dxf"
-                  startContent={<FileCode className="w-4 h-4" />}
+                  startContent={<FileCode />}
                   description="For AutoCAD/CAD software"
                   onPress={exportToDXF}
                 >
@@ -1207,12 +1218,15 @@ export const EnhancedEngineeringDrawing = memo(
 
             <Tooltip content="Print">
               <Button
-                size="sm"
+                color="primary"
                 variant="shadow"
+                size="md"
+                radius="md"
+                className="w-fit text-background"
                 isIconOnly
                 onPress={() => window.print()}
               >
-                <Printer className="w-4 h-4" />
+                <Printer />
               </Button>
             </Tooltip>
           </div>
@@ -1236,43 +1250,55 @@ export const EnhancedEngineeringDrawing = memo(
                 <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2 bg-default-50/90 backdrop-blur-sm rounded-xl p-2 shadow-md border-2 border-default">
                   <Tooltip content="Zoom In" placement="left">
                     <Button
-                      size="sm"
+                      color="default"
                       variant="light"
+                      size="md"
+                      radius="md"
+                      className="w-full text-foreground"
                       isIconOnly
                       onPress={() => zoomIn()}
                     >
-                      <ZoomIn className="w-4 h-4" />
+                      <ZoomIn />
                     </Button>
                   </Tooltip>
                   <Tooltip content="Zoom Out" placement="left">
                     <Button
-                      size="sm"
+                      color="default"
                       variant="light"
+                      size="md"
+                      radius="md"
+                      className="w-full text-foreground"
                       isIconOnly
                       onPress={() => zoomOut()}
                     >
-                      <ZoomOut className="w-4 h-4" />
+                      <ZoomOut />
                     </Button>
                   </Tooltip>
                   <Divider className="my-1" />
                   <Tooltip content="Fit to View" placement="left">
                     <Button
-                      size="sm"
+                      color="default"
                       variant="light"
+                      size="md"
+                      radius="md"
+                      className="w-full text-foreground"
                       isIconOnly
                       onPress={() => centerView()}
                     >
-                      <Maximize2 className="w-4 h-4" />
+                      <Maximize2 />
                     </Button>
                   </Tooltip>
                   <Tooltip content="Reset Zoom" placement="left">
                     <Button
-                      size="sm"
+                      color="default"
                       variant="light"
+                      size="md"
+                      radius="md"
+                      className="w-full text-foreground"
                       isIconOnly
                       onPress={() => resetTransform()}
                     >
-                      <RotateCcw className="w-4 h-4" />
+                      <RotateCcw />
                     </Button>
                   </Tooltip>
                 </div>
@@ -2141,7 +2167,7 @@ export const UIDoorBom = ({
                 </div>
               </div>
               <div className="flex items-center justify-center w-full p-2">
-                <Chip color="primary" variant="shadow" size="lg">
+                <Chip color="primary" variant="shadow" size="md">
                   สเปค: {formatDimension(doorThickness, doorWidth, doorHeight)}{" "}
                   mm
                 </Chip>
@@ -2353,7 +2379,7 @@ export const UIDoorBom = ({
                     <Button
                       key={key}
                       color={doubleFrameSides[key] ? "warning" : "default"}
-                      variant={doubleFrameSides[key] ? "solid" : "bordered"}
+                      variant={doubleFrameSides[key] ? "shadow" : "bordered"}
                       size="md"
                       radius="md"
                       onPress={() => handleToggleDoubleSide(key)}
@@ -2889,7 +2915,7 @@ export const UIDoorBom = ({
                             color={piece.color}
                             variant="shadow"
                             size="md"
-                            className="min-w-3 h-3 p-0"
+                            className="w-4 h-4 p-0"
                           />
                           <span className="font-medium">{piece.name}</span>
                           {piece.isSplice && (
