@@ -1,7 +1,16 @@
 "use client";
 
-import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { UIDoorBom, EnhancedEngineeringDrawing } from "@/module/production/doorBom/UIDoorBom";
+import React, {
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
+import {
+  UIDoorBom,
+  EnhancedEngineeringDrawing,
+} from "@/module/production/doorBom/UIDoorBom";
 
 // ==================== CONSTANTS ====================
 export const GLUE_THICKNESS = 1;
@@ -53,43 +62,217 @@ export const DOUBLE_FRAME_COUNT_OPTIONS = [
 ];
 
 export const CORE_TYPES = [
-  { value: "foam", label: "EPS Foam (โฟม)", type: "solid", thickness: null, spacing: null },
-  { value: "plywood_strips", label: "Plywood Strips (ไม้อัดซี่)", type: "strips", thickness: 4, spacing: 40 },
-  { value: "particle_solid", label: "Particle Board (ปาติเกิ้ลตัน)", type: "solid", thickness: null, spacing: null },
-  { value: "rockwool", label: "Rockwool (ใยแก้ว)", type: "solid", thickness: null, spacing: null },
-  { value: "honeycomb", label: "Honeycomb (รังผึ้ง)", type: "solid", thickness: null, spacing: null },
-  { value: "particle_strips", label: "Particle Strips (ปาติเกิ้ลซี่)", type: "strips", thickness: 12, spacing: null },
+  {
+    value: "foam",
+    label: "EPS Foam (โฟม)",
+    type: "solid",
+    thickness: null,
+    spacing: null,
+  },
+  {
+    value: "plywood_strips",
+    label: "Plywood Strips (ไม้อัดซี่)",
+    type: "strips",
+    thickness: 4,
+    spacing: 40,
+  },
+  {
+    value: "particle_solid",
+    label: "Particle Board (ปาติเกิ้ลตัน)",
+    type: "solid",
+    thickness: null,
+    spacing: null,
+  },
+  {
+    value: "rockwool",
+    label: "Rockwool (ใยแก้ว)",
+    type: "solid",
+    thickness: null,
+    spacing: null,
+  },
+  {
+    value: "honeycomb",
+    label: "Honeycomb (รังผึ้ง)",
+    type: "solid",
+    thickness: null,
+    spacing: null,
+  },
+  {
+    value: "particle_strips",
+    label: "Particle Strips (ปาติเกิ้ลซี่)",
+    type: "strips",
+    thickness: 12,
+    spacing: null,
+  },
 ];
 
 export const ERP_FRAMES = {
   rubberwood: [
-    { code: "RM-14-01-26-30-200", desc: "ไม้ยางพาราจ๊อย 26x30x2040mm", thickness: 26, width: 30, length: 2040 },
-    { code: "RM-14-01-26-30-230", desc: "ไม้ยางพาราจ๊อย 26x30x2310mm", thickness: 26, width: 30, length: 2310 },
-    { code: "RM-14-01-26-30-250", desc: "ไม้ยางพาราจ๊อย 26x30x2510mm", thickness: 26, width: 30, length: 2510 },
-    { code: "RM-14-01-26-32-200", desc: "ไม้ยางพาราจ๊อย 26x32x2040mm", thickness: 26, width: 32, length: 2040 },
-    { code: "RM-14-01-26-32-230", desc: "ไม้ยางพาราจ๊อย 26x32x2310mm", thickness: 26, width: 32, length: 2310 },
-    { code: "RM-14-01-26-32-250", desc: "ไม้ยางพาราจ๊อย 26x32x2510mm", thickness: 26, width: 32, length: 2510 },
-    { code: "RM-14-01-28-50-200", desc: "ไม้ยางพาราจ๊อย 28x50x2040mm", thickness: 28, width: 50, length: 2040 },
-    { code: "RM-14-01-28-50-230", desc: "ไม้ยางพาราจ๊อย 28x50x2310mm", thickness: 28, width: 50, length: 2310 },
-    { code: "RM-14-01-28-50-230B", desc: "ไม้ยางพาราจ๊อยB 28x50x2310mm", thickness: 28, width: 50, length: 2310 },
-    { code: "RM-14-01-28-50-250", desc: "ไม้ยางพาราจ๊อย 28x50x2510mm", thickness: 28, width: 50, length: 2510 },
-    { code: "RM-14-01-32-50-200", desc: "ไม้ยางพาราจ๊อย 32x50x2040mm", thickness: 32, width: 50, length: 2040 },
-    { code: "RM-14-01-32-50-230", desc: "ไม้ยางพาราจ๊อย 32x50x2310mm", thickness: 32, width: 50, length: 2310 },
-    { code: "RM-14-01-32-50-250", desc: "ไม้ยางพาราจ๊อย 32x50x2510mm", thickness: 32, width: 50, length: 2510 },
+    {
+      code: "RM-14-01-26-30-200",
+      desc: "ไม้ยางพาราจ๊อย 26x30x2040mm",
+      thickness: 26,
+      width: 30,
+      length: 2040,
+    },
+    {
+      code: "RM-14-01-26-30-230",
+      desc: "ไม้ยางพาราจ๊อย 26x30x2310mm",
+      thickness: 26,
+      width: 30,
+      length: 2310,
+    },
+    {
+      code: "RM-14-01-26-30-250",
+      desc: "ไม้ยางพาราจ๊อย 26x30x2510mm",
+      thickness: 26,
+      width: 30,
+      length: 2510,
+    },
+    {
+      code: "RM-14-01-26-32-200",
+      desc: "ไม้ยางพาราจ๊อย 26x32x2040mm",
+      thickness: 26,
+      width: 32,
+      length: 2040,
+    },
+    {
+      code: "RM-14-01-26-32-230",
+      desc: "ไม้ยางพาราจ๊อย 26x32x2310mm",
+      thickness: 26,
+      width: 32,
+      length: 2310,
+    },
+    {
+      code: "RM-14-01-26-32-250",
+      desc: "ไม้ยางพาราจ๊อย 26x32x2510mm",
+      thickness: 26,
+      width: 32,
+      length: 2510,
+    },
+    {
+      code: "RM-14-01-28-50-200",
+      desc: "ไม้ยางพาราจ๊อย 28x50x2040mm",
+      thickness: 28,
+      width: 50,
+      length: 2040,
+    },
+    {
+      code: "RM-14-01-28-50-230",
+      desc: "ไม้ยางพาราจ๊อย 28x50x2310mm",
+      thickness: 28,
+      width: 50,
+      length: 2310,
+    },
+    {
+      code: "RM-14-01-28-50-230B",
+      desc: "ไม้ยางพาราจ๊อยB 28x50x2310mm",
+      thickness: 28,
+      width: 50,
+      length: 2310,
+    },
+    {
+      code: "RM-14-01-28-50-250",
+      desc: "ไม้ยางพาราจ๊อย 28x50x2510mm",
+      thickness: 28,
+      width: 50,
+      length: 2510,
+    },
+    {
+      code: "RM-14-01-32-50-200",
+      desc: "ไม้ยางพาราจ๊อย 32x50x2040mm",
+      thickness: 32,
+      width: 50,
+      length: 2040,
+    },
+    {
+      code: "RM-14-01-32-50-230",
+      desc: "ไม้ยางพาราจ๊อย 32x50x2310mm",
+      thickness: 32,
+      width: 50,
+      length: 2310,
+    },
+    {
+      code: "RM-14-01-32-50-250",
+      desc: "ไม้ยางพาราจ๊อย 32x50x2510mm",
+      thickness: 32,
+      width: 50,
+      length: 2510,
+    },
   ],
   sadao: [
-    { code: "RM-14-04-32-50-200", desc: "ไม้สะเดาจ๊อย 32x50x2040mm", thickness: 32, width: 50, length: 2040 },
-    { code: "RM-14-04-32-50-225", desc: "ไม้สะเดาจ๊อย 32x50x2250mm", thickness: 32, width: 50, length: 2250 },
-    { code: "RM-14-04-32-50-230", desc: "ไม้สะเดาจ๊อย 32x50x2300mm", thickness: 32, width: 50, length: 2300 },
-    { code: "RM-14-04-32-50-250", desc: "ไม้สะเดาจ๊อย 32x50x2500mm", thickness: 32, width: 50, length: 2500 },
+    {
+      code: "RM-14-04-32-50-200",
+      desc: "ไม้สะเดาจ๊อย 32x50x2040mm",
+      thickness: 32,
+      width: 50,
+      length: 2040,
+    },
+    {
+      code: "RM-14-04-32-50-225",
+      desc: "ไม้สะเดาจ๊อย 32x50x2250mm",
+      thickness: 32,
+      width: 50,
+      length: 2250,
+    },
+    {
+      code: "RM-14-04-32-50-230",
+      desc: "ไม้สะเดาจ๊อย 32x50x2300mm",
+      thickness: 32,
+      width: 50,
+      length: 2300,
+    },
+    {
+      code: "RM-14-04-32-50-250",
+      desc: "ไม้สะเดาจ๊อย 32x50x2500mm",
+      thickness: 32,
+      width: 50,
+      length: 2500,
+    },
   ],
   lvl: [
-    { code: "RM-16-19-2.9-3.4-258", desc: "ไม้อัด LVL 29x34x2580mm", thickness: 29, width: 34, length: 2580 },
-    { code: "RM-16-19-2.9-3.5-202", desc: "ไม้อัด LVL 29x35x2020mm", thickness: 29, width: 35, length: 2020 },
-    { code: "RM-16-19-2.9-3.5-244", desc: "ไม้อัด LVL 29x35x2440mm", thickness: 29, width: 35, length: 2440 },
-    { code: "RM-16-19-2.9-3.5-258", desc: "ไม้อัด LVL 29x35x2580mm", thickness: 29, width: 35, length: 2580 },
-    { code: "RM-16-19-3.2-3.5-202", desc: "ไม้อัด LVL 32x35x2020mm", thickness: 32, width: 35, length: 2020 },
-    { code: "RM-16-19-3.2-3.5-244", desc: "ไม้อัด LVL 32x35x2440mm", thickness: 32, width: 35, length: 2440 },
+    {
+      code: "RM-16-19-2.9-3.4-258",
+      desc: "ไม้อัด LVL 29x34x2580mm",
+      thickness: 29,
+      width: 34,
+      length: 2580,
+    },
+    {
+      code: "RM-16-19-2.9-3.5-202",
+      desc: "ไม้อัด LVL 29x35x2020mm",
+      thickness: 29,
+      width: 35,
+      length: 2020,
+    },
+    {
+      code: "RM-16-19-2.9-3.5-244",
+      desc: "ไม้อัด LVL 29x35x2440mm",
+      thickness: 29,
+      width: 35,
+      length: 2440,
+    },
+    {
+      code: "RM-16-19-2.9-3.5-258",
+      desc: "ไม้อัด LVL 29x35x2580mm",
+      thickness: 29,
+      width: 35,
+      length: 2580,
+    },
+    {
+      code: "RM-16-19-3.2-3.5-202",
+      desc: "ไม้อัด LVL 32x35x2020mm",
+      thickness: 32,
+      width: 35,
+      length: 2020,
+    },
+    {
+      code: "RM-16-19-3.2-3.5-244",
+      desc: "ไม้อัด LVL 32x35x2440mm",
+      thickness: 32,
+      width: 35,
+      length: 2440,
+    },
   ],
 };
 
@@ -97,22 +280,69 @@ export const GRID_LETTERS = ["A", "B", "C", "D", "E", "F"];
 export const GRID_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 export const LAYER_CONFIG = {
-  grid: { id: "grid", label: "Grid Reference", color: "#DCDCDC", defaultVisible: true },
-  title: { id: "title", label: "Title Block", color: "#4456E9", defaultVisible: true },
-  dimensions: { id: "dimensions", label: "Dimensions", color: "#000000", defaultVisible: true },
-  centerlines: { id: "centerlines", label: "Center Lines", color: "#666666", defaultVisible: true },
-  surface: { id: "surface", label: "Surface Material", color: "#10B981", defaultVisible: true },
-  frame: { id: "frame", label: "Frame (Stile)", color: "#FFB441", defaultVisible: true },
-  rails: { id: "rails", label: "Frame (Rail)", color: "#FF8A00", defaultVisible: true },
-  lockblock: { id: "lockblock", label: "Lock Block", color: "#FF0076", defaultVisible: true },
+  grid: {
+    id: "grid",
+    label: "Grid Reference",
+    color: "#DCDCDC",
+    defaultVisible: true,
+  },
+  title: {
+    id: "title",
+    label: "Title Block",
+    color: "#4456E9",
+    defaultVisible: true,
+  },
+  dimensions: {
+    id: "dimensions",
+    label: "Dimensions",
+    color: "#000000",
+    defaultVisible: true,
+  },
+  centerlines: {
+    id: "centerlines",
+    label: "Center Lines",
+    color: "#666666",
+    defaultVisible: true,
+  },
+  surface: {
+    id: "surface",
+    label: "Surface Material",
+    color: "#10B981",
+    defaultVisible: true,
+  },
+  frame: {
+    id: "frame",
+    label: "Frame (Stile)",
+    color: "#FFB441",
+    defaultVisible: true,
+  },
+  rails: {
+    id: "rails",
+    label: "Frame (Rail)",
+    color: "#FF8A00",
+    defaultVisible: true,
+  },
+  lockblock: {
+    id: "lockblock",
+    label: "Lock Block",
+    color: "#FF0076",
+    defaultVisible: true,
+  },
   core: { id: "core", label: "Core", color: "#4456E9", defaultVisible: true },
-  doubleframe: { id: "doubleframe", label: "Double Frame", color: "#FFB441", defaultVisible: true },
+  doubleframe: {
+    id: "doubleframe",
+    label: "Double Frame",
+    color: "#FFB441",
+    defaultVisible: true,
+  },
 };
 
 // ==================== UTILITY FUNCTIONS ====================
-export const formatDimension = (t, w, h, separator = "×") => `${t || "-"}${separator}${w || "-"}${separator}${h || "-"}`;
+export const formatDimension = (t, w, h, separator = "×") =>
+  `${t || "-"}${separator}${w || "-"}${separator}${h || "-"}`;
 
-export const getMaterialLabel = (materials, value) => materials.find((m) => m.value === value)?.label || "-";
+export const getMaterialLabel = (materials, value) =>
+  materials.find((m) => m.value === value)?.label || "-";
 
 export const getEfficiencyColor = (efficiency) => {
   const val = parseFloat(String(efficiency)) || 0;
@@ -129,7 +359,8 @@ export const generateDXF = (results) => {
   const offsetX = 100;
   const offsetY = 100;
 
-  const addLine = (x1, y1, x2, y2) => `0\nLINE\n8\n0\n10\n${x1}\n20\n${y1}\n30\n0\n11\n${x2}\n21\n${y2}\n31\n0\n`;
+  const addLine = (x1, y1, x2, y2) =>
+    `0\nLINE\n8\n0\n10\n${x1}\n20\n${y1}\n30\n0\n11\n${x2}\n21\n${y2}\n31\n0\n`;
 
   dxf += addLine(offsetX, offsetY, offsetX + W, offsetY);
   dxf += addLine(offsetX + W, offsetY, offsetX + W, offsetY + H);
@@ -139,7 +370,12 @@ export const generateDXF = (results) => {
   dxf += addLine(offsetX + F, offsetY, offsetX + F, offsetY + H);
   dxf += addLine(offsetX + W - F, offsetY, offsetX + W - F, offsetY + H);
   dxf += addLine(offsetX + F, offsetY + F, offsetX + W - F, offsetY + F);
-  dxf += addLine(offsetX + F, offsetY + H - F, offsetX + W - F, offsetY + H - F);
+  dxf += addLine(
+    offsetX + F,
+    offsetY + H - F,
+    offsetX + W - F,
+    offsetY + H - F,
+  );
 
   railPositions?.forEach((pos) => {
     const railY = offsetY + H - pos;
@@ -151,14 +387,24 @@ export const generateDXF = (results) => {
 };
 
 // ==================== CUSTOM HOOKS ====================
-export const useFrameSelection = (frameType, doorThickness, surfaceThickness, doorHeight) => {
+export const useFrameSelection = (
+  frameType,
+  doorThickness,
+  surfaceThickness,
+  doorHeight,
+) => {
   return useMemo(() => {
     const S = parseFloat(surfaceThickness) || 0;
-    const requiredThickness = doorThickness ? parseFloat(doorThickness) - (S + GLUE_THICKNESS) * 2 : 0;
+    const requiredThickness = doorThickness
+      ? parseFloat(doorThickness) - (S + GLUE_THICKNESS) * 2
+      : 0;
     const requiredLength = doorHeight ? parseFloat(doorHeight) : 0;
     const frames = ERP_FRAMES[frameType] || [];
 
-    const filterAndSort = (frameList) => frameList.filter((f) => f.length >= requiredLength).sort((a, b) => a.length - b.length);
+    const filterAndSort = (frameList) =>
+      frameList
+        .filter((f) => f.length >= requiredLength)
+        .sort((a, b) => a.length - b.length);
 
     const findSpliceable = (frameList) => {
       const sorted = [...frameList].sort((a, b) => b.length - a.length);
@@ -185,13 +431,23 @@ export const useFrameSelection = (frameType, doorThickness, surfaceThickness, do
       if (planeAmount > 0) parts.push(`ไส ${planeAmount}mm`);
       if (needSplice) parts.push("ต่อ 2 ท่อน");
       const suffix = parts.length > 0 ? ` (${parts.join("+")})` : "";
-      return isFlipped ? `${f.width}×${f.thickness}×${f.length}${suffix}` : `${f.thickness}×${f.width}×${f.length}${suffix}`;
+      return isFlipped
+        ? `${f.width}×${f.thickness}×${f.length}${suffix}`
+        : `${f.thickness}×${f.width}×${f.length}${suffix}`;
     };
 
-    const createFrameResult = (frameList, isFlipped, planeAmount, needSplice = false, spliceInfo = null) => {
+    const createFrameResult = (
+      frameList,
+      isFlipped,
+      planeAmount,
+      needSplice = false,
+      spliceInfo = null,
+    ) => {
       const mapFrame = (f) => ({
         ...f,
-        useThickness: isFlipped ? f.width - planeAmount : f.thickness - planeAmount,
+        useThickness: isFlipped
+          ? f.width - planeAmount
+          : f.thickness - planeAmount,
         useWidth: isFlipped ? f.thickness : f.width,
         isFlipped,
         planeAmount,
@@ -205,7 +461,9 @@ export const useFrameSelection = (frameType, doorThickness, surfaceThickness, do
         displaySize: createDisplaySize(f, isFlipped, planeAmount, needSplice),
       });
       return {
-        frames: needSplice ? [mapFrame(spliceInfo.frame)] : frameList.map(mapFrame),
+        frames: needSplice
+          ? [mapFrame(spliceInfo.frame)]
+          : frameList.map(mapFrame),
         needFlip: isFlipped,
         needPlane: planeAmount > 0,
         needSplice,
@@ -214,36 +472,93 @@ export const useFrameSelection = (frameType, doorThickness, surfaceThickness, do
 
     const strategies = [
       () => {
-        const exact = filterAndSort(frames.filter((f) => f.thickness === requiredThickness));
+        const exact = filterAndSort(
+          frames.filter((f) => f.thickness === requiredThickness),
+        );
         return exact.length > 0 ? createFrameResult(exact, false, 0) : null;
       },
       () => {
-        const flipExact = filterAndSort(frames.filter((f) => f.width === requiredThickness));
-        return flipExact.length > 0 ? createFrameResult(flipExact, true, 0) : null;
+        const flipExact = filterAndSort(
+          frames.filter((f) => f.width === requiredThickness),
+        );
+        return flipExact.length > 0
+          ? createFrameResult(flipExact, true, 0)
+          : null;
       },
       () => {
-        const thicker = frames.filter((f) => f.thickness > requiredThickness && f.length >= requiredLength).sort((a, b) => (a.thickness !== b.thickness ? a.thickness - b.thickness : a.length - b.length));
-        return thicker.length > 0 ? createFrameResult(thicker, false, thicker[0].thickness - requiredThickness) : null;
+        const thicker = frames
+          .filter(
+            (f) =>
+              f.thickness > requiredThickness && f.length >= requiredLength,
+          )
+          .sort((a, b) =>
+            a.thickness !== b.thickness
+              ? a.thickness - b.thickness
+              : a.length - b.length,
+          );
+        return thicker.length > 0
+          ? createFrameResult(
+              thicker,
+              false,
+              thicker[0].thickness - requiredThickness,
+            )
+          : null;
       },
       () => {
-        const flipPlane = frames.filter((f) => f.width > requiredThickness && f.length >= requiredLength).sort((a, b) => (a.width !== b.width ? a.width - b.width : a.length - b.length));
-        return flipPlane.length > 0 ? createFrameResult(flipPlane, true, flipPlane[0].width - requiredThickness) : null;
+        const flipPlane = frames
+          .filter(
+            (f) => f.width > requiredThickness && f.length >= requiredLength,
+          )
+          .sort((a, b) =>
+            a.width !== b.width ? a.width - b.width : a.length - b.length,
+          );
+        return flipPlane.length > 0
+          ? createFrameResult(
+              flipPlane,
+              true,
+              flipPlane[0].width - requiredThickness,
+            )
+          : null;
       },
       () => {
-        const splice = findSpliceable(frames.filter((f) => f.thickness === requiredThickness));
+        const splice = findSpliceable(
+          frames.filter((f) => f.thickness === requiredThickness),
+        );
         return splice ? createFrameResult([], false, 0, true, splice) : null;
       },
       () => {
-        const splice = findSpliceable(frames.filter((f) => f.width === requiredThickness));
+        const splice = findSpliceable(
+          frames.filter((f) => f.width === requiredThickness),
+        );
         return splice ? createFrameResult([], true, 0, true, splice) : null;
       },
       () => {
-        const splice = findSpliceable(frames.filter((f) => f.thickness > requiredThickness));
-        return splice ? createFrameResult([], false, splice.frame.thickness - requiredThickness, true, splice) : null;
+        const splice = findSpliceable(
+          frames.filter((f) => f.thickness > requiredThickness),
+        );
+        return splice
+          ? createFrameResult(
+              [],
+              false,
+              splice.frame.thickness - requiredThickness,
+              true,
+              splice,
+            )
+          : null;
       },
       () => {
-        const splice = findSpliceable(frames.filter((f) => f.width > requiredThickness));
-        return splice ? createFrameResult([], true, splice.frame.width - requiredThickness, true, splice) : null;
+        const splice = findSpliceable(
+          frames.filter((f) => f.width > requiredThickness),
+        );
+        return splice
+          ? createFrameResult(
+              [],
+              true,
+              splice.frame.width - requiredThickness,
+              true,
+              splice,
+            )
+          : null;
       },
     ];
 
@@ -260,13 +575,27 @@ export const useFrameSelection = (frameType, doorThickness, surfaceThickness, do
       needPlane: false,
       needSplice: false,
       noMatch: true,
-      reason: maxLength > 0 ? `ไม่มีไม้ที่ใช้ได้ (ต้องการ ≥${requiredLength}mm, ต่อได้สูงสุด ${maxSpliceLength}mm)` : `ไม่มีไม้ความหนา ${requiredThickness}mm`,
+      reason:
+        maxLength > 0
+          ? `ไม่มีไม้ที่ใช้ได้ (ต้องการ ≥${requiredLength}mm, ต่อได้สูงสุด ${maxSpliceLength}mm)`
+          : `ไม่มีไม้ความหนา ${requiredThickness}mm`,
     };
   }, [frameType, doorThickness, surfaceThickness, doorHeight]);
 };
 
 export const useCalculations = (params) => {
-  const { doorThickness, doorWidth, doorHeight, surfaceThickness, currentFrame, lockBlockLeft, lockBlockRight, lockBlockPiecesPerSide, doubleFrameSides, doubleFrameCount } = params;
+  const {
+    doorThickness,
+    doorWidth,
+    doorHeight,
+    surfaceThickness,
+    currentFrame,
+    lockBlockLeft,
+    lockBlockRight,
+    lockBlockPiecesPerSide,
+    doubleFrameSides,
+    doubleFrameCount,
+  } = params;
 
   return useMemo(() => {
     const T = parseFloat(doorThickness) || 0;
@@ -287,7 +616,8 @@ export const useCalculations = (params) => {
     };
 
     const numericDoubleCount = parseInt(doubleFrameCount) || 0;
-    const hasDoubleFrame = numericDoubleCount > 0 && Object.values(effectiveSides).some(Boolean);
+    const hasDoubleFrame =
+      numericDoubleCount > 0 && Object.values(effectiveSides).some(Boolean);
     const DF = hasDoubleFrame ? F * numericDoubleCount : 0;
     const totalFrameWidth = F + (hasDoubleFrame ? DF : 0);
     const innerWidth = W - 2 * totalFrameWidth;
@@ -311,11 +641,18 @@ export const useCalculations = (params) => {
       railPositionsOriginal.push(eqPosition);
       const railTop = eqPosition + railThickness / 2;
       const railBottom = eqPosition - railThickness / 2;
-      const hitLockBlock = hasLockBlock && railBottom <= avoidZoneBottom && railTop >= avoidZoneTop;
+      const hitLockBlock =
+        hasLockBlock &&
+        railBottom <= avoidZoneBottom &&
+        railTop >= avoidZoneTop;
       if (hitLockBlock) {
         const distToTop = eqPosition - avoidZoneTop;
         const distToBottom = avoidZoneBottom - eqPosition;
-        railPositions.push(distToTop <= distToBottom ? avoidZoneTop - railThickness / 2 : avoidZoneBottom + railThickness / 2);
+        railPositions.push(
+          distToTop <= distToBottom
+            ? avoidZoneTop - railThickness / 2
+            : avoidZoneBottom + railThickness / 2,
+        );
       } else {
         railPositions.push(eqPosition);
       }
@@ -326,10 +663,16 @@ export const useCalculations = (params) => {
     const lockBlockSides = (lockBlockLeft ? 1 : 0) + (lockBlockRight ? 1 : 0);
     const piecesPerSide = parseInt(lockBlockPiecesPerSide) || 0;
     const lockBlockCount = lockBlockSides * piecesPerSide;
-    const railsAdjusted = railPositions.some((pos, idx) => pos !== railPositionsOriginal[idx]);
+    const railsAdjusted = railPositions.some(
+      (pos, idx) => pos !== railPositionsOriginal[idx],
+    );
 
-    const doubleFrameLeftWidth = effectiveSides.left ? F * numericDoubleCount : 0;
-    const doubleFrameRightWidth = effectiveSides.right ? F * numericDoubleCount : 0;
+    const doubleFrameLeftWidth = effectiveSides.left
+      ? F * numericDoubleCount
+      : 0;
+    const doubleFrameRightWidth = effectiveSides.right
+      ? F * numericDoubleCount
+      : 0;
 
     return {
       T,
@@ -367,7 +710,18 @@ export const useCalculations = (params) => {
         rightWidth: doubleFrameRightWidth,
       },
     };
-  }, [doorThickness, doorWidth, doorHeight, surfaceThickness, currentFrame, lockBlockLeft, lockBlockRight, lockBlockPiecesPerSide, doubleFrameSides, doubleFrameCount]);
+  }, [
+    doorThickness,
+    doorWidth,
+    doorHeight,
+    surfaceThickness,
+    currentFrame,
+    lockBlockLeft,
+    lockBlockRight,
+    lockBlockPiecesPerSide,
+    doubleFrameSides,
+    doubleFrameCount,
+  ]);
 };
 
 export const useCuttingPlan = (results, currentFrame, coreType) => {
@@ -397,10 +751,24 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
     const spliceOverlap = currentFrame.spliceOverlap || 100;
     const cutPieces = [];
 
-    const addPiece = (name, finishedLength, qty, color, isSplice = false, withAllowance = true) => {
+    const addPiece = (
+      name,
+      finishedLength,
+      qty,
+      color,
+      isSplice = false,
+      withAllowance = true,
+    ) => {
       if (!finishedLength || finishedLength <= 0 || !qty) return;
       const cutLength = finishedLength + (withAllowance ? CUT_ALLOWANCE : 0);
-      cutPieces.push({ name, length: finishedLength, cutLength, qty, color, isSplice });
+      cutPieces.push({
+        name,
+        length: finishedLength,
+        cutLength,
+        qty,
+        color,
+        isSplice,
+      });
     };
 
     const stileLength = H;
@@ -424,8 +792,20 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
       if (doubleFrame.left) {
         if (needSplice && clearHeight > stockLength) {
           const pieceLength = Math.ceil(clearHeight / 2) + spliceOverlap / 2;
-          addPiece("เบิ้ลโครงตั้งซ้าย (ท่อน 1)", pieceLength, count, "warning", true);
-          addPiece("เบิ้ลโครงตั้งซ้าย (ท่อน 2)", pieceLength, count, "secondary", true);
+          addPiece(
+            "เบิ้ลโครงตั้งซ้าย (ท่อน 1)",
+            pieceLength,
+            count,
+            "warning",
+            true,
+          );
+          addPiece(
+            "เบิ้ลโครงตั้งซ้าย (ท่อน 2)",
+            pieceLength,
+            count,
+            "secondary",
+            true,
+          );
         } else {
           addPiece("เบิ้ลโครงตั้งซ้าย", clearHeight, count, "warning");
         }
@@ -434,8 +814,20 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
       if (doubleFrame.right) {
         if (needSplice && clearHeight > stockLength) {
           const pieceLength = Math.ceil(clearHeight / 2) + spliceOverlap / 2;
-          addPiece("เบิ้ลโครงตั้งขวา (ท่อน 1)", pieceLength, count, "warning", true);
-          addPiece("เบิ้ลโครงตั้งขวา (ท่อน 2)", pieceLength, count, "secondary", true);
+          addPiece(
+            "เบิ้ลโครงตั้งขวา (ท่อน 1)",
+            pieceLength,
+            count,
+            "warning",
+            true,
+          );
+          addPiece(
+            "เบิ้ลโครงตั้งขวา (ท่อน 2)",
+            pieceLength,
+            count,
+            "secondary",
+            true,
+          );
         } else {
           addPiece("เบิ้ลโครงตั้งขวา", clearHeight, count, "warning");
         }
@@ -477,7 +869,14 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
     }
 
     if (lockBlockCount > 0) {
-      addPiece("Lock Block", LOCK_BLOCK_HEIGHT, lockBlockCount, "danger", false, false);
+      addPiece(
+        "Lock Block",
+        LOCK_BLOCK_HEIGHT,
+        lockBlockCount,
+        "danger",
+        false,
+        false,
+      );
     }
 
     const allPieces = cutPieces
@@ -518,8 +917,12 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
     const totalStock = totalStocks * stockLength;
     const totalWaste = stocks.reduce((sum, s) => sum + s.remaining, 0);
     const usedLength = totalStock - totalWaste;
-    const efficiency = totalStock ? ((usedLength / totalStock) * 100).toFixed(1) : "0.0";
-    const spliceCount = cutPieces.filter((p) => p.isSplice).reduce((sum, p) => sum + p.qty, 0) / 2;
+    const efficiency = totalStock
+      ? ((usedLength / totalStock) * 100).toFixed(1)
+      : "0.0";
+    const spliceCount =
+      cutPieces.filter((p) => p.isSplice).reduce((sum, p) => sum + p.qty, 0) /
+      2;
 
     return {
       cutPieces,
@@ -555,10 +958,30 @@ export const useCoreCalculation = (results, coreType) => {
       };
     }
 
-    const { W, H, F, railPositions, lockBlockLeft, lockBlockRight, lockBlockTop, lockBlockBottom, doubleFrame } = results;
+    const {
+      W,
+      H,
+      F,
+      railPositions,
+      lockBlockLeft,
+      lockBlockRight,
+      lockBlockTop,
+      lockBlockBottom,
+      doubleFrame,
+    } = results;
     const coreConfig = CORE_TYPES.find((c) => c.value === coreType);
     if (!coreConfig) {
-      return { coreType: null, pieces: [], damPieces: [], totalPieces: 0, columns: 0, rows: 0, stripThickness: 0, stripSpacing: 0, isSolid: true };
+      return {
+        coreType: null,
+        pieces: [],
+        damPieces: [],
+        totalPieces: 0,
+        columns: 0,
+        rows: 0,
+        stripThickness: 0,
+        stripSpacing: 0,
+        isSolid: true,
+      };
     }
 
     const leftOffset = F + (doubleFrame?.left ? F * doubleFrame.count : 0);
@@ -574,9 +997,13 @@ export const useCoreCalculation = (results, coreType) => {
     const lockBlockZoneEnd = hasLockBlock ? lockBlockBottom : null;
 
     if (coreConfig.type === "solid") {
-      const solidLockBlockSides = (lockBlockLeft ? 1 : 0) + (lockBlockRight ? 1 : 0);
+      const solidLockBlockSides =
+        (lockBlockLeft ? 1 : 0) + (lockBlockRight ? 1 : 0);
       const solidLockBlockCount = results.lockBlockCount || 0;
-      const solidPiecesPerSide = solidLockBlockSides > 0 ? Math.max(1, Math.ceil(solidLockBlockCount / solidLockBlockSides)) : 0;
+      const solidPiecesPerSide =
+        solidLockBlockSides > 0
+          ? Math.max(1, Math.ceil(solidLockBlockCount / solidLockBlockSides))
+          : 0;
       const solidLockBlockWidth = F * solidPiecesPerSide;
 
       const rowBoundaries = [topOffset];
@@ -593,7 +1020,12 @@ export const useCoreCalculation = (results, coreType) => {
       for (let i = 0; i < rowBoundaries.length - 1; i += 2) {
         const rowTop = rowBoundaries[i];
         const rowBottom = rowBoundaries[i + 1];
-        if (rowBottom > rowTop) rows.push({ top: rowTop, bottom: rowBottom, height: rowBottom - rowTop });
+        if (rowBottom > rowTop)
+          rows.push({
+            top: rowTop,
+            bottom: rowBottom,
+            height: rowBottom - rowTop,
+          });
       }
 
       const pieces = [];
@@ -601,7 +1033,11 @@ export const useCoreCalculation = (results, coreType) => {
         const rowTopFromBottom = H - row.bottom;
         const rowBottomFromBottom = H - row.top;
 
-        if (hasLockBlock && lockBlockZoneStart < rowBottomFromBottom && lockBlockZoneEnd > rowTopFromBottom) {
+        if (
+          hasLockBlock &&
+          lockBlockZoneStart < rowBottomFromBottom &&
+          lockBlockZoneEnd > rowTopFromBottom
+        ) {
           if (lockBlockLeft && lockBlockRight) {
             pieces.push({
               name: `ไส้แถว ${rowIdx + 1} (ซ้าย)`,
@@ -612,18 +1048,40 @@ export const useCoreCalculation = (results, coreType) => {
             });
             pieces.push({
               name: `ไส้แถว ${rowIdx + 1} (ขวา)`,
-              x: W - rightOffset - solidLockBlockWidth - (coreWidth - solidLockBlockWidth * 2) / 2,
+              x:
+                W -
+                rightOffset -
+                solidLockBlockWidth -
+                (coreWidth - solidLockBlockWidth * 2) / 2,
               y: row.top,
               width: (coreWidth - solidLockBlockWidth * 2) / 2,
               height: row.height,
             });
           } else if (lockBlockLeft) {
-            pieces.push({ name: `ไส้แถว ${rowIdx + 1}`, x: leftOffset + solidLockBlockWidth, y: row.top, width: coreWidth - solidLockBlockWidth, height: row.height });
+            pieces.push({
+              name: `ไส้แถว ${rowIdx + 1}`,
+              x: leftOffset + solidLockBlockWidth,
+              y: row.top,
+              width: coreWidth - solidLockBlockWidth,
+              height: row.height,
+            });
           } else if (lockBlockRight) {
-            pieces.push({ name: `ไส้แถว ${rowIdx + 1}`, x: leftOffset, y: row.top, width: coreWidth - solidLockBlockWidth, height: row.height });
+            pieces.push({
+              name: `ไส้แถว ${rowIdx + 1}`,
+              x: leftOffset,
+              y: row.top,
+              width: coreWidth - solidLockBlockWidth,
+              height: row.height,
+            });
           }
         } else {
-          pieces.push({ name: `ไส้แถว ${rowIdx + 1}`, x: leftOffset, y: row.top, width: coreWidth, height: row.height });
+          pieces.push({
+            name: `ไส้แถว ${rowIdx + 1}`,
+            x: leftOffset,
+            y: row.top,
+            width: coreWidth,
+            height: row.height,
+          });
         }
       });
 
@@ -656,11 +1114,16 @@ export const useCoreCalculation = (results, coreType) => {
 
     if (coreConfig.value === "particle_strips") {
       columnCount = Math.round(W / 100) + 1;
-      actualSpacing = (stripAreaWidth - columnCount * stripThickness) / (columnCount - 1 || 1);
+      actualSpacing =
+        (stripAreaWidth - columnCount * stripThickness) /
+        (columnCount - 1 || 1);
     } else {
       const stripSpacing = coreConfig.spacing || 40;
-      columnCount = Math.floor(stripAreaWidth / (stripThickness + stripSpacing)) + 1;
-      actualSpacing = (stripAreaWidth - columnCount * stripThickness) / (columnCount - 1 || 1);
+      columnCount =
+        Math.floor(stripAreaWidth / (stripThickness + stripSpacing)) + 1;
+      actualSpacing =
+        (stripAreaWidth - columnCount * stripThickness) /
+        (columnCount - 1 || 1);
     }
 
     const rows =
@@ -681,19 +1144,29 @@ export const useCoreCalculation = (results, coreType) => {
             for (let i = 0; i < rowBoundaries.length - 1; i += 2) {
               const rowTop = rowBoundaries[i];
               const rowBottom = rowBoundaries[i + 1];
-              if (rowBottom > rowTop) out.push({ top: rowTop, bottom: rowBottom, height: rowBottom - rowTop });
+              if (rowBottom > rowTop)
+                out.push({
+                  top: rowTop,
+                  bottom: rowBottom,
+                  height: rowBottom - rowTop,
+                });
             }
             return out;
           })();
 
     const lockBlockSides = (lockBlockLeft ? 1 : 0) + (lockBlockRight ? 1 : 0);
     const lockBlockCount = results.lockBlockCount || 0;
-    const piecesPerSide = lockBlockSides > 0 ? Math.max(1, Math.ceil(lockBlockCount / lockBlockSides)) : 0;
+    const piecesPerSide =
+      lockBlockSides > 0
+        ? Math.max(1, Math.ceil(lockBlockCount / lockBlockSides))
+        : 0;
 
     const lockBlockWidth = F * piecesPerSide;
     const lockBlockLeftStart = lockBlockLeft ? leftOffset : null;
     const lockBlockLeftEnd = lockBlockLeft ? leftOffset + lockBlockWidth : null;
-    const lockBlockRightStart = lockBlockRight ? W - rightOffset - lockBlockWidth : null;
+    const lockBlockRightStart = lockBlockRight
+      ? W - rightOffset - lockBlockWidth
+      : null;
     const lockBlockRightEnd = lockBlockRight ? W - rightOffset : null;
 
     const lockBlockYTop = H - (lockBlockZoneEnd ?? 0);
@@ -706,25 +1179,69 @@ export const useCoreCalculation = (results, coreType) => {
       const stripX = stripStartX + col * (stripThickness + actualSpacing);
       const stripXEnd = stripX + stripThickness;
 
-      const overlapsLeftLockBlock = lockBlockLeft && lockBlockLeftStart !== null && lockBlockLeftEnd !== null && stripXEnd > lockBlockLeftStart && stripX < lockBlockLeftEnd;
-      const overlapsRightLockBlock = lockBlockRight && lockBlockRightStart !== null && lockBlockRightEnd !== null && stripXEnd > lockBlockRightStart && stripX < lockBlockRightEnd;
-      const overlapsAnyLockBlockX = overlapsLeftLockBlock || overlapsRightLockBlock;
+      const overlapsLeftLockBlock =
+        lockBlockLeft &&
+        lockBlockLeftStart !== null &&
+        lockBlockLeftEnd !== null &&
+        stripXEnd > lockBlockLeftStart &&
+        stripX < lockBlockLeftEnd;
+      const overlapsRightLockBlock =
+        lockBlockRight &&
+        lockBlockRightStart !== null &&
+        lockBlockRightEnd !== null &&
+        stripXEnd > lockBlockRightStart &&
+        stripX < lockBlockRightEnd;
+      const overlapsAnyLockBlockX =
+        overlapsLeftLockBlock || overlapsRightLockBlock;
 
       rows.forEach((row, rowIdx) => {
-        const rowOverlapsLockBlockY = hasLockBlock && row.top < lockBlockYBottom && row.bottom > lockBlockYTop;
-        const stripHitsLockBlock = overlapsAnyLockBlockX && rowOverlapsLockBlockY;
+        const rowOverlapsLockBlockY =
+          hasLockBlock &&
+          row.top < lockBlockYBottom &&
+          row.bottom > lockBlockYTop;
+        const stripHitsLockBlock =
+          overlapsAnyLockBlockX && rowOverlapsLockBlockY;
 
         if (stripHitsLockBlock) {
           if (lockBlockYTop > row.top) {
             const pieceHeight = lockBlockYTop - row.top;
-            if (pieceHeight > 5) pieces.push({ id: pieceId++, col, row: rowIdx, x: stripX, y: row.top, width: stripThickness, height: pieceHeight, name: `ซี่ C${col + 1}-R${rowIdx + 1}a` });
+            if (pieceHeight > 5)
+              pieces.push({
+                id: pieceId++,
+                col,
+                row: rowIdx,
+                x: stripX,
+                y: row.top,
+                width: stripThickness,
+                height: pieceHeight,
+                name: `ซี่ C${col + 1}-R${rowIdx + 1}a`,
+              });
           }
           if (lockBlockYBottom < row.bottom) {
             const pieceHeight = row.bottom - lockBlockYBottom;
-            if (pieceHeight > 5) pieces.push({ id: pieceId++, col, row: rowIdx, x: stripX, y: lockBlockYBottom, width: stripThickness, height: pieceHeight, name: `ซี่ C${col + 1}-R${rowIdx + 1}b` });
+            if (pieceHeight > 5)
+              pieces.push({
+                id: pieceId++,
+                col,
+                row: rowIdx,
+                x: stripX,
+                y: lockBlockYBottom,
+                width: stripThickness,
+                height: pieceHeight,
+                name: `ซี่ C${col + 1}-R${rowIdx + 1}b`,
+              });
           }
         } else {
-          pieces.push({ id: pieceId++, col, row: rowIdx, x: stripX, y: row.top, width: stripThickness, height: row.height, name: `ซี่ C${col + 1}-R${rowIdx + 1}` });
+          pieces.push({
+            id: pieceId++,
+            col,
+            row: rowIdx,
+            x: stripX,
+            y: row.top,
+            width: stripThickness,
+            height: row.height,
+            name: `ซี่ C${col + 1}-R${rowIdx + 1}`,
+          });
         }
       });
     }
@@ -733,7 +1250,14 @@ export const useCoreCalculation = (results, coreType) => {
       coreConfig.value === "particle_strips" && railPositions?.length
         ? railPositions.map((pos, idx) => {
             const yCenter = H - pos;
-            return { id: `dam-${idx}`, x: leftOffset, y: yCenter - stripThickness / 2, width: coreWidth, height: stripThickness, name: `ไม้ดามปาติเกิ้ล ${idx + 1}` };
+            return {
+              id: `dam-${idx}`,
+              x: leftOffset,
+              y: yCenter - stripThickness / 2,
+              width: coreWidth,
+              height: stripThickness,
+              name: `ไม้ดามปาติเกิ้ล ${idx + 1}`,
+            };
           })
         : [];
 
@@ -782,10 +1306,17 @@ export default function DoorConfigurator() {
   const [doubleFrameCount, setDoubleFrameCount] = useState("");
   const [coreType, setCoreType] = useState("");
 
-  const lockBlockLeft = lockBlockPosition === "left" || lockBlockPosition === "both";
-  const lockBlockRight = lockBlockPosition === "right" || lockBlockPosition === "both";
+  const lockBlockLeft =
+    lockBlockPosition === "left" || lockBlockPosition === "both";
+  const lockBlockRight =
+    lockBlockPosition === "right" || lockBlockPosition === "both";
 
-  const frameSelection = useFrameSelection(frameType, doorThickness, surfaceThickness, doorHeight);
+  const frameSelection = useFrameSelection(
+    frameType,
+    doorThickness,
+    surfaceThickness,
+    doorHeight,
+  );
 
   const currentFrame = useMemo(() => {
     if (!frameSelection.frames?.length)
@@ -800,11 +1331,15 @@ export default function DoorConfigurator() {
         code: "",
         desc: "",
       };
-    return frameSelection.frames.find((f) => f.code === selectedFrameCode) || frameSelection.frames[0];
+    return (
+      frameSelection.frames.find((f) => f.code === selectedFrameCode) ||
+      frameSelection.frames[0]
+    );
   }, [frameSelection, selectedFrameCode]);
 
   useEffect(() => {
-    if (frameSelection.frames?.length > 0) setSelectedFrameCode(frameSelection.frames[0].code);
+    if (frameSelection.frames?.length > 0)
+      setSelectedFrameCode(frameSelection.frames[0].code);
   }, [frameSelection]);
 
   const numericDoubleCount = parseInt(doubleFrameCount) || 0;
@@ -831,24 +1366,46 @@ export default function DoorConfigurator() {
   const doubleConfigSummary = useMemo(() => {
     const df = results.doubleFrame;
     if (!df?.hasAny || !df.count) return "";
-    const sideLabels = { top: "บน", bottom: "ล่าง", left: "ซ้าย", center: "กลาง", right: "ขวา" };
+    const sideLabels = {
+      top: "บน",
+      bottom: "ล่าง",
+      left: "ซ้าย",
+      center: "กลาง",
+      right: "ขวา",
+    };
     const sides = Object.entries(sideLabels)
       .filter(([key]) => df[key])
       .map(([_, label]) => label);
-    return sides.length ? `เบิ้ลโครงด้าน ${sides.join(", ")} จำนวน ${df.count} ชั้น/ด้าน` : "";
+    return sides.length
+      ? `เบิ้ลโครงด้าน ${sides.join(", ")} จำนวน ${df.count} ชั้น/ด้าน`
+      : "";
   }, [results]);
 
   const handleToggleDoubleSide = useCallback((side) => {
     setDoubleFrameSides((prev) => {
       if (side === "all") {
         const newValue = !prev.all;
-        return { top: newValue, bottom: newValue, left: newValue, center: newValue, right: newValue, all: newValue };
+        return {
+          top: newValue,
+          bottom: newValue,
+          left: newValue,
+          center: newValue,
+          right: newValue,
+          all: newValue,
+        };
       }
       return { ...prev, [side]: !prev[side], all: false };
     });
   }, []);
 
-  const lockBlockDesc = lockBlockLeft && lockBlockRight ? `ซ้าย ${piecesPerSide} + ขวา ${piecesPerSide}` : lockBlockLeft ? `ซ้าย ${piecesPerSide}` : lockBlockRight ? `ขวา ${piecesPerSide}` : "-";
+  const lockBlockDesc =
+    lockBlockLeft && lockBlockRight
+      ? `ซ้าย ${piecesPerSide} + ขวา ${piecesPerSide}`
+      : lockBlockLeft
+        ? `ซ้าย ${piecesPerSide}`
+        : lockBlockRight
+          ? `ขวา ${piecesPerSide}`
+          : "-";
 
   // Props to pass to UI component
   const uiProps = {
