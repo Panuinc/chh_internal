@@ -9,13 +9,11 @@ import React, {
 } from "react";
 import { UIDoorBom } from "@/module/production/doorBom/UIDoorBom";
 
-// ==================== CONSTANTS ====================
 export const GLUE_THICKNESS = 1;
 export const LOCK_BLOCK_HEIGHT = 400;
 export const LOCK_BLOCK_POSITION = 1000;
 export const CUT_ALLOWANCE = 10;
 
-// Core types ที่ไม่มีไม้ดามตรงกลาง (ไส้เต็มบาน)
 export const NO_RAIL_CORE_TYPES = ["foam", "particle_solid", "honeycomb"];
 
 export const SURFACE_MATERIALS = [
@@ -337,7 +335,6 @@ export const LAYER_CONFIG = {
   },
 };
 
-// ==================== UTILITY FUNCTIONS ====================
 export const formatDimension = (t, w, h, separator = "×") =>
   `${t || "-"}${separator}${w || "-"}${separator}${h || "-"}`;
 
@@ -386,7 +383,6 @@ export const generateDXF = (results) => {
   return dxf;
 };
 
-// ==================== CUSTOM HOOKS ====================
 export const useFrameSelection = (
   frameType,
   doorThickness,
@@ -858,7 +854,6 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
       }
     }
 
-    // ไม่สร้างไม้ดามสำหรับ foam, particle_solid, honeycomb, particle_strips
     const railCount = railSections - 1;
     const skipRailCoreTypes = [...NO_RAIL_CORE_TYPES, "particle_strips"];
     if (railCount > 0 && !skipRailCoreTypes.includes(coreType)) {
@@ -998,7 +993,6 @@ export const useCoreCalculation = (results, coreType) => {
     const lockBlockZoneStart = hasLockBlock ? lockBlockTop : null;
     const lockBlockZoneEnd = hasLockBlock ? lockBlockBottom : null;
 
-    // สำหรับ solid type
     if (coreConfig.type === "solid") {
       const solidLockBlockSides =
         (lockBlockLeft ? 1 : 0) + (lockBlockRight ? 1 : 0);
@@ -1009,18 +1003,15 @@ export const useCoreCalculation = (results, coreType) => {
           : 0;
       const solidLockBlockWidth = F * solidPiecesPerSide;
 
-      // ตรวจสอบว่าเป็น core type ที่ไม่มีไม้ดาม (ไส้เต็มบาน)
       const isFullPanelCore = NO_RAIL_CORE_TYPES.includes(coreType);
 
       let rows = [];
 
       if (isFullPanelCore) {
-        // สำหรับ foam, particle_solid, honeycomb - ไส้เต็มบาน (1 แถวเดียว)
         rows = [
           { top: topOffset, bottom: H - bottomOffset, height: coreHeight },
         ];
       } else {
-        // สำหรับ rockwool - ยังคงแบ่งตาม railPositions
         const rowBoundaries = [topOffset];
         if (railPositions && railPositions.length > 0) {
           railPositions.forEach((pos) => {
@@ -1046,14 +1037,9 @@ export const useCoreCalculation = (results, coreType) => {
       const pieces = [];
 
       if (isFullPanelCore && hasLockBlock) {
-        // สำหรับ foam, particle_solid, honeycomb ที่มี lockblock
-        // ไส้จะไม่ทับ lockblock - แบ่งตาม lockblock zone
-        const lockBlockYTop = H - lockBlockZoneEnd; // Y position ของ lockblock (จากบน)
+        const lockBlockYTop = H - lockBlockZoneEnd;
         const lockBlockYBottom = H - lockBlockZoneStart;
 
-        // แบ่งไส้เป็น 3 ส่วน: บน lockblock, ข้าง lockblock, ล่าง lockblock
-
-        // ส่วนบน lockblock (ถ้ามี)
         if (lockBlockYTop > topOffset) {
           pieces.push({
             name: "ไส้ส่วนบน",
@@ -1064,11 +1050,9 @@ export const useCoreCalculation = (results, coreType) => {
           });
         }
 
-        // ส่วนกลาง (ข้าง lockblock) - แบ่งซ้ายขวา
         const middleHeight = lockBlockYBottom - lockBlockYTop;
         if (middleHeight > 0) {
           if (lockBlockLeft && lockBlockRight) {
-            // มี lockblock ทั้งสองฝั่ง - ไส้ตรงกลาง
             const middleWidth = coreWidth - solidLockBlockWidth * 2;
             if (middleWidth > 0) {
               pieces.push({
@@ -1080,7 +1064,6 @@ export const useCoreCalculation = (results, coreType) => {
               });
             }
           } else if (lockBlockLeft) {
-            // มี lockblock ฝั่งซ้าย - ไส้ฝั่งขวา
             pieces.push({
               name: "ไส้ส่วนกลาง",
               x: leftOffset + solidLockBlockWidth,
@@ -1089,7 +1072,6 @@ export const useCoreCalculation = (results, coreType) => {
               height: middleHeight,
             });
           } else if (lockBlockRight) {
-            // มี lockblock ฝั่งขวา - ไส้ฝั่งซ้าย
             pieces.push({
               name: "ไส้ส่วนกลาง",
               x: leftOffset,
@@ -1100,7 +1082,6 @@ export const useCoreCalculation = (results, coreType) => {
           }
         }
 
-        // ส่วนล่าง lockblock (ถ้ามี)
         if (lockBlockYBottom < H - bottomOffset) {
           pieces.push({
             name: "ไส้ส่วนล่าง",
@@ -1111,8 +1092,6 @@ export const useCoreCalculation = (results, coreType) => {
           });
         }
       } else if (isFullPanelCore && !hasLockBlock) {
-        // สำหรับ foam, particle_solid, honeycomb ที่ไม่มี lockblock
-        // ไส้เต็มบาน 1 ชิ้น
         pieces.push({
           name: "ไส้เต็มบาน",
           x: leftOffset,
@@ -1121,7 +1100,6 @@ export const useCoreCalculation = (results, coreType) => {
           height: coreHeight,
         });
       } else {
-        // สำหรับ rockwool - ยังคงใช้ logic เดิม (แบ่งตาม rows และ lockblock)
         rows.forEach((row, rowIdx) => {
           const rowTopFromBottom = H - row.bottom;
           const rowBottomFromBottom = H - row.top;
@@ -1199,7 +1177,6 @@ export const useCoreCalculation = (results, coreType) => {
       };
     }
 
-    // สำหรับ strips type (plywood_strips, particle_strips)
     const stripThickness = coreConfig.thickness || 4;
     const edgePadding = 40;
     const stripAreaWidth = coreWidth - edgePadding * 2;
@@ -1379,7 +1356,6 @@ export const useCoreCalculation = (results, coreType) => {
   }, [results, coreType]);
 };
 
-// ==================== MAIN COMPONENT ====================
 export default function DoorConfigurator() {
   const formRef = useRef(null);
   const [doorThickness, setDoorThickness] = useState("");
@@ -1504,7 +1480,6 @@ export default function DoorConfigurator() {
           ? `ขวา ${piecesPerSide}`
           : "-";
 
-  // Props to pass to UI component
   const uiProps = {
     formRef,
     doorThickness,

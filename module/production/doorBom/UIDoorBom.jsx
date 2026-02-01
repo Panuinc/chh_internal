@@ -62,7 +62,6 @@ import {
   generateDXF,
 } from "@/app/(pages)/production/doorBom/page";
 
-// ==================== SVG DRAWING COMPONENTS ====================
 export const DimLine = memo(
   ({
     x1,
@@ -589,7 +588,6 @@ export const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
   );
 };
 
-// ==================== ENHANCED ENGINEERING DRAWING ====================
 export const EnhancedEngineeringDrawing = memo(
   ({ results, coreCalculation, surfaceMaterial }) => {
     const svgRef = useRef(null);
@@ -632,9 +630,9 @@ export const EnhancedEngineeringDrawing = memo(
       lockBlockSides = 1,
       doubleFrame = {},
     } = safeResults;
-    
-    // หาชื่อวัสดุปิดผิว
-    const surfaceMaterialLabel = getMaterialLabel(SURFACE_MATERIALS, surfaceMaterial) || "ไม่ระบุ";
+
+    const surfaceMaterialLabel =
+      getMaterialLabel(SURFACE_MATERIALS, surfaceMaterial) || "ไม่ระบุ";
 
     const titleData = useMemo(
       () => ({
@@ -669,7 +667,7 @@ export const EnhancedEngineeringDrawing = memo(
     const viewBoxHeight = 2100;
     const DRAWING_SCALE = 0.45;
     const titleBlockWidth = 439;
-    const drawingAreaWidth = viewBoxWidth - titleBlockWidth - 20; // พื้นที่สำหรับวาดรูป
+    const drawingAreaWidth = viewBoxWidth - titleBlockWidth - 20;
 
     const hasDoubleFrame = doubleFrame?.hasAny && doubleFrame.count > 0;
     const drawingDF = hasDoubleFrame ? safeF * doubleFrame.count : 0;
@@ -700,11 +698,14 @@ export const EnhancedEngineeringDrawing = memo(
       [safeW, safeH, safeT, safeS, safeF, safeR, drawingDF],
     );
 
-    // คำนวณความกว้างรวมของทั้ง 3 views
-    const gapBetweenViews = 350; // ระยะห่างระหว่าง views
-    const totalDrawingWidth = dims.side.T + gapBetweenViews + dims.front.W + gapBetweenViews + dims.exterior.W;
-    
-    // คำนวณ startX ให้อยู่กึ่งกลาง (minimum 100)
+    const gapBetweenViews = 350;
+    const totalDrawingWidth =
+      dims.side.T +
+      gapBetweenViews +
+      dims.front.W +
+      gapBetweenViews +
+      dims.exterior.W;
+
     const calculatedStartX = (drawingAreaWidth - totalDrawingWidth) / 2;
     const startX = Math.max(100, calculatedStartX);
     const marginY = 180;
@@ -712,7 +713,15 @@ export const EnhancedEngineeringDrawing = memo(
     const positions = {
       side: { x: startX, y: marginY + 200 },
       front: { x: startX + dims.side.T + gapBetweenViews, y: marginY + 200 },
-      exterior: { x: startX + dims.side.T + gapBetweenViews + dims.front.W + gapBetweenViews, y: marginY + 200 },
+      exterior: {
+        x:
+          startX +
+          dims.side.T +
+          gapBetweenViews +
+          dims.front.W +
+          gapBetweenViews,
+        y: marginY + 200,
+      },
     };
 
     const layerStyle = useMemo(() => {
@@ -965,10 +974,10 @@ export const EnhancedEngineeringDrawing = memo(
 
     const renderRails = useCallback(() => {
       if (!railPositions || railPositions.length === 0) return null;
-      
-      // ไม่แสดงไม้ดามสำหรับ foam, particle_solid, honeycomb, particle_strips
+
       const skipRailCoreTypes = [...NO_RAIL_CORE_TYPES, "particle_strips"];
-      if (skipRailCoreTypes.includes(coreCalculation?.coreType?.value)) return null;
+      if (skipRailCoreTypes.includes(coreCalculation?.coreType?.value))
+        return null;
 
       const leftOffset = hasDoubleFrame && doubleFrame.left ? dims.front.DF : 0;
       const rightOffset =
@@ -1626,12 +1635,16 @@ export const EnhancedEngineeringDrawing = memo(
                         theme={theme}
                       />
 
-                      {/* แสดงไม้ดามใน Side View เฉพาะถ้าไม่ใช่ NO_RAIL_CORE_TYPES */}
-                      {!NO_RAIL_CORE_TYPES.includes(coreCalculation?.coreType?.value) &&
-                        coreCalculation?.coreType?.value !== "particle_strips" &&
+                      {!NO_RAIL_CORE_TYPES.includes(
+                        coreCalculation?.coreType?.value,
+                      ) &&
+                        coreCalculation?.coreType?.value !==
+                          "particle_strips" &&
                         railPositions.map((pos, idx) => {
                           const railY =
-                            positions.side.y + dims.side.H - pos * DRAWING_SCALE;
+                            positions.side.y +
+                            dims.side.H -
+                            pos * DRAWING_SCALE;
                           const railH = safeR * DRAWING_SCALE * 0.5;
                           return (
                             <FilledRect
@@ -1861,10 +1874,12 @@ export const EnhancedEngineeringDrawing = memo(
                         />
                       )}
 
-                      {/* แสดง dimension ของไม้ดามเฉพาะถ้าไม่ใช่ NO_RAIL_CORE_TYPES */}
                       {railPositions.length > 0 &&
-                        !NO_RAIL_CORE_TYPES.includes(coreCalculation?.coreType?.value) &&
-                        coreCalculation?.coreType?.value !== "particle_strips" &&
+                        !NO_RAIL_CORE_TYPES.includes(
+                          coreCalculation?.coreType?.value,
+                        ) &&
+                        coreCalculation?.coreType?.value !==
+                          "particle_strips" &&
                         (() => {
                           const railPos = railPositions[0];
                           const railCenter =
@@ -1888,12 +1903,9 @@ export const EnhancedEngineeringDrawing = memo(
                             />
                           );
                         })()}
-
                     </g>
 
-                    {/* Exterior View - แสดงประตูธรรมดาไม่มีโครง (ขาวดำ) */}
                     <g id="exterior-view">
-                      {/* ประตูหน้าบาน - สี่เหลี่ยมขาว */}
                       <rect
                         x={positions.exterior.x}
                         y={positions.exterior.y}
@@ -1904,7 +1916,6 @@ export const EnhancedEngineeringDrawing = memo(
                         strokeWidth="1.5"
                       />
 
-                      {/* เส้นประตรงกลางแนวนอน (centerline) */}
                       <line
                         x1={positions.exterior.x}
                         y1={positions.exterior.y + dims.exterior.H / 2}
@@ -1915,7 +1926,6 @@ export const EnhancedEngineeringDrawing = memo(
                         strokeDasharray="10,3,2,3"
                       />
 
-                      {/* เส้นประตรงกลางแนวตั้ง (centerline) */}
                       <line
                         x1={positions.exterior.x + dims.exterior.W / 2}
                         y1={positions.exterior.y}
@@ -1926,7 +1936,6 @@ export const EnhancedEngineeringDrawing = memo(
                         strokeDasharray="10,3,2,3"
                       />
 
-                      {/* Dimension - ความกว้าง (บน) */}
                       <DimLine
                         x1={positions.exterior.x}
                         y1={positions.exterior.y}
@@ -1938,7 +1947,6 @@ export const EnhancedEngineeringDrawing = memo(
                         theme={theme}
                       />
 
-                      {/* Dimension - ความสูง (ขวา) */}
                       <DimLine
                         x1={positions.exterior.x + dims.exterior.W}
                         y1={positions.exterior.y}
@@ -1951,7 +1959,6 @@ export const EnhancedEngineeringDrawing = memo(
                         theme={theme}
                       />
 
-                      {/* ข้อความอธิบาย (ด้านล่าง) */}
                       <text
                         x={positions.exterior.x + dims.exterior.W / 2}
                         y={positions.exterior.y + dims.exterior.H + 40}
@@ -1971,7 +1978,6 @@ export const EnhancedEngineeringDrawing = memo(
                         ความหนาปิดผิว: {S} mm × 2 ด้าน
                       </text>
 
-                      {/* Title - ด้านล่าง */}
                       <text
                         x={positions.exterior.x + dims.exterior.W / 2}
                         y={positions.exterior.y + dims.exterior.H + 90}
@@ -2007,7 +2013,6 @@ export const EnhancedEngineeringDrawing = memo(
             <span>
               Frame: {R}×{F} mm
             </span>
-            {/* แสดงจำนวนไม้ดามเฉพาะถ้าไม่ใช่ NO_RAIL_CORE_TYPES */}
             {!NO_RAIL_CORE_TYPES.includes(coreCalculation?.coreType?.value) &&
               coreCalculation?.coreType?.value !== "particle_strips" && (
                 <span>Rails: {railSections - 1}</span>
@@ -2025,7 +2030,6 @@ export const EnhancedEngineeringDrawing = memo(
 
 EnhancedEngineeringDrawing.displayName = "EnhancedEngineeringDrawing";
 
-// ==================== MAIN UI COMPONENT ====================
 export const UIDoorBom = ({
   formRef,
   doorThickness,
@@ -2064,7 +2068,6 @@ export const UIDoorBom = ({
   handleToggleDoubleSide,
   lockBlockDesc,
 }) => {
-  // ตรวจสอบว่าเป็น core type ที่ไม่มีไม้ดาม
   const isNoRailCoreType = NO_RAIL_CORE_TYPES.includes(coreType);
 
   return (
@@ -2080,7 +2083,6 @@ export const UIDoorBom = ({
 
       <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-fit p-2 gap-2 border-2 border-foreground border-dashed">
         <div className="grid grid-cols-1 xl:grid-cols-2 p-2 gap-2 w-full h-full border-2 border-foreground border-dashed">
-          {/* Card 1: Customer Specs */}
           <Card className="w-full">
             <CardHeader className="bg-primary text-white">
               <div className="flex items-center gap-2">
@@ -2147,7 +2149,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 2: Surface Material */}
           <Card className="w-full">
             <CardHeader className="bg-success text-white">
               <div className="flex items-center gap-2">
@@ -2231,7 +2232,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 3: Frame (ERP) */}
           <Card className="w-full">
             <CardHeader className="bg-warning text-white">
               <div className="flex items-center gap-2">
@@ -2393,7 +2393,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 4: Horizontal Rails */}
           <Card className="w-full">
             <CardHeader className="bg-secondary text-white">
               <div className="flex items-center gap-2">
@@ -2407,7 +2406,8 @@ export const UIDoorBom = ({
               {isNoRailCoreType ? (
                 <div className="flex flex-col gap-2 text-sm p-2 bg-warning/10 rounded-xl">
                   <Chip color="warning" variant="shadow" size="md">
-                    ⚠️ ไส้ประเภท {coreCalculation?.coreType?.label || coreType} ไม่มีไม้ดามตรงกลาง
+                    ⚠️ ไส้ประเภท {coreCalculation?.coreType?.label || coreType}{" "}
+                    ไม่มีไม้ดามตรงกลาง
                   </Chip>
                   <span className="text-foreground/60">
                     ไส้จะเต็มบานโดยมีแค่โครง ซ้าย ขวา บน ล่าง
@@ -2480,7 +2480,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 5: Lock Block */}
           <Card className="w-full">
             <CardHeader className="bg-danger text-white">
               <div className="flex items-center gap-2">
@@ -2581,7 +2580,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 6: Core Material */}
           <Card className="w-full">
             <CardHeader className="bg-primary/80 text-white">
               <div className="flex items-center gap-2">
@@ -2693,7 +2691,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card: Summary */}
           <Card className="w-full">
             <CardHeader className="bg-default-100">
               <div className="flex items-center gap-2">
@@ -2741,7 +2738,8 @@ export const UIDoorBom = ({
                   ) : (
                     <>
                       <span className="font-bold text-secondary">
-                        {results.railSections - 1} ตัว ({results.railSections} ช่อง)
+                        {results.railSections - 1} ตัว ({results.railSections}{" "}
+                        ช่อง)
                       </span>
                       {coreType === "particle_strips" && (
                         <span className="block text-xs text-secondary">
@@ -2795,7 +2793,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 7: Cutting Plan */}
           {isDataComplete ? (
             <Card className="w-full">
               <CardHeader className="bg-primary text-white">
@@ -2811,7 +2808,8 @@ export const UIDoorBom = ({
               <CardBody className="gap-2">
                 {isNoRailCoreType && (
                   <Chip color="warning" variant="shadow" className="w-full">
-                    ⚠️ ไส้ {coreCalculation?.coreType?.label}: ไม่มีไม้ดาม (ไส้เต็มบาน)
+                    ⚠️ ไส้ {coreCalculation?.coreType?.label}: ไม่มีไม้ดาม
+                    (ไส้เต็มบาน)
                   </Chip>
                 )}
 
@@ -3040,7 +3038,6 @@ export const UIDoorBom = ({
           )}
         </div>
 
-        {/* Drawing Section */}
         <div className="grid grid-cols-1 xl:grid-cols-1 p-2 gap-2 w-full h-full border-2 border-foreground border-dashed">
           <Card className="w-full">
             <CardHeader className="bg-primary text-white flex justify-between items-center">
