@@ -13,7 +13,6 @@ import {
   FileImage,
   FileText,
   FileCode,
-  Printer,
   ChevronDown,
 } from "lucide-react";
 import {
@@ -1215,20 +1214,6 @@ export const EnhancedEngineeringDrawing = memo(
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
-
-            <Tooltip content="Print">
-              <Button
-                color="primary"
-                variant="shadow"
-                size="md"
-                radius="md"
-                className="w-fit text-background"
-                isIconOnly
-                onPress={() => window.print()}
-              >
-                <Printer />
-              </Button>
-            </Tooltip>
           </div>
         </div>
 
