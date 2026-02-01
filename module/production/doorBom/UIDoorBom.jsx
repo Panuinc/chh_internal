@@ -45,7 +45,6 @@ import * as htmlToImage from "html-to-image";
 import {
   GLUE_THICKNESS,
   LOCK_BLOCK_HEIGHT,
-  LOCK_BLOCK_POSITION,
   SURFACE_MATERIALS,
   FRAME_TYPES,
   DOUBLE_FRAME_SIDES,

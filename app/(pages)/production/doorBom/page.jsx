@@ -7,10 +7,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import {
-  UIDoorBom,
-  EnhancedEngineeringDrawing,
-} from "@/module/production/doorBom/UIDoorBom";
+import { UIDoorBom } from "@/module/production/doorBom/UIDoorBom";
 
 // ==================== CONSTANTS ====================
 export const GLUE_THICKNESS = 1;
