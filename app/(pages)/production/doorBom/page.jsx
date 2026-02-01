@@ -9,11 +9,11 @@ import React, {
 } from "react";
 import { UIDoorBom } from "@/module/production/doorBom/UIDoorBom";
 
-// ==================== CONSTANTS ====================
 export const GLUE_THICKNESS = 1;
 export const LOCK_BLOCK_HEIGHT = 400;
 export const LOCK_BLOCK_POSITION = 1000;
 export const CUT_ALLOWANCE = 10;
+export const NO_RAIL_CORE_TYPES = ["foam", "particle_solid", "honeycomb"];
 
 export const SURFACE_MATERIALS = [
   { value: "upvc", label: "UPVC" },
@@ -334,7 +334,6 @@ export const LAYER_CONFIG = {
   },
 };
 
-// ==================== UTILITY FUNCTIONS ====================
 export const formatDimension = (t, w, h, separator = "×") =>
   `${t || "-"}${separator}${w || "-"}${separator}${h || "-"}`;
 
@@ -383,7 +382,6 @@ export const generateDXF = (results) => {
   return dxf;
 };
 
-// ==================== CUSTOM HOOKS ====================
 export const useFrameSelection = (
   frameType,
   doorThickness,
@@ -856,7 +854,8 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
     }
 
     const railCount = railSections - 1;
-    if (railCount > 0 && coreType !== "particle_strips") {
+    const skipRailCoreTypes = [...NO_RAIL_CORE_TYPES, "particle_strips"];
+    if (railCount > 0 && !skipRailCoreTypes.includes(coreType)) {
       let damLength = clearWidth;
       if (doubleFrame?.hasAny && doubleFrame.count > 0) {
         if (doubleFrame.left) damLength -= F * doubleFrame.count;
@@ -1003,84 +1002,159 @@ export const useCoreCalculation = (results, coreType) => {
           : 0;
       const solidLockBlockWidth = F * solidPiecesPerSide;
 
-      const rowBoundaries = [topOffset];
-      if (railPositions && railPositions.length > 0) {
-        railPositions.forEach((pos) => {
-          rowBoundaries.push(H - pos - F / 2);
-          rowBoundaries.push(H - pos + F / 2);
-        });
-      }
-      rowBoundaries.push(H - bottomOffset);
-      rowBoundaries.sort((a, b) => a - b);
+      const isFullPanelCore = NO_RAIL_CORE_TYPES.includes(coreType);
 
-      const rows = [];
-      for (let i = 0; i < rowBoundaries.length - 1; i += 2) {
-        const rowTop = rowBoundaries[i];
-        const rowBottom = rowBoundaries[i + 1];
-        if (rowBottom > rowTop)
-          rows.push({
-            top: rowTop,
-            bottom: rowBottom,
-            height: rowBottom - rowTop,
+      let rows = [];
+
+      if (isFullPanelCore) {
+        rows = [
+          { top: topOffset, bottom: H - bottomOffset, height: coreHeight },
+        ];
+      } else {
+        const rowBoundaries = [topOffset];
+        if (railPositions && railPositions.length > 0) {
+          railPositions.forEach((pos) => {
+            rowBoundaries.push(H - pos - F / 2);
+            rowBoundaries.push(H - pos + F / 2);
           });
+        }
+        rowBoundaries.push(H - bottomOffset);
+        rowBoundaries.sort((a, b) => a - b);
+
+        for (let i = 0; i < rowBoundaries.length - 1; i += 2) {
+          const rowTop = rowBoundaries[i];
+          const rowBottom = rowBoundaries[i + 1];
+          if (rowBottom > rowTop)
+            rows.push({
+              top: rowTop,
+              bottom: rowBottom,
+              height: rowBottom - rowTop,
+            });
+        }
       }
 
       const pieces = [];
-      rows.forEach((row, rowIdx) => {
-        const rowTopFromBottom = H - row.bottom;
-        const rowBottomFromBottom = H - row.top;
 
-        if (
-          hasLockBlock &&
-          lockBlockZoneStart < rowBottomFromBottom &&
-          lockBlockZoneEnd > rowTopFromBottom
-        ) {
+      if (isFullPanelCore && hasLockBlock) {
+        const lockBlockYTop = H - lockBlockZoneEnd;
+        const lockBlockYBottom = H - lockBlockZoneStart;
+
+        if (lockBlockYTop > topOffset) {
+          pieces.push({
+            name: "ไส้ส่วนบน",
+            x: leftOffset,
+            y: topOffset,
+            width: coreWidth,
+            height: lockBlockYTop - topOffset,
+          });
+        }
+
+        const middleHeight = lockBlockYBottom - lockBlockYTop;
+        if (middleHeight > 0) {
           if (lockBlockLeft && lockBlockRight) {
-            pieces.push({
-              name: `ไส้แถว ${rowIdx + 1} (ซ้าย)`,
-              x: leftOffset + solidLockBlockWidth,
-              y: row.top,
-              width: (coreWidth - solidLockBlockWidth * 2) / 2,
-              height: row.height,
-            });
-            pieces.push({
-              name: `ไส้แถว ${rowIdx + 1} (ขวา)`,
-              x:
-                W -
-                rightOffset -
-                solidLockBlockWidth -
-                (coreWidth - solidLockBlockWidth * 2) / 2,
-              y: row.top,
-              width: (coreWidth - solidLockBlockWidth * 2) / 2,
-              height: row.height,
-            });
+            const middleWidth = coreWidth - solidLockBlockWidth * 2;
+            if (middleWidth > 0) {
+              pieces.push({
+                name: "ไส้ส่วนกลาง",
+                x: leftOffset + solidLockBlockWidth,
+                y: lockBlockYTop,
+                width: middleWidth,
+                height: middleHeight,
+              });
+            }
           } else if (lockBlockLeft) {
             pieces.push({
-              name: `ไส้แถว ${rowIdx + 1}`,
+              name: "ไส้ส่วนกลาง",
               x: leftOffset + solidLockBlockWidth,
-              y: row.top,
+              y: lockBlockYTop,
               width: coreWidth - solidLockBlockWidth,
-              height: row.height,
+              height: middleHeight,
             });
           } else if (lockBlockRight) {
+            pieces.push({
+              name: "ไส้ส่วนกลาง",
+              x: leftOffset,
+              y: lockBlockYTop,
+              width: coreWidth - solidLockBlockWidth,
+              height: middleHeight,
+            });
+          }
+        }
+
+        if (lockBlockYBottom < H - bottomOffset) {
+          pieces.push({
+            name: "ไส้ส่วนล่าง",
+            x: leftOffset,
+            y: lockBlockYBottom,
+            width: coreWidth,
+            height: H - bottomOffset - lockBlockYBottom,
+          });
+        }
+      } else if (isFullPanelCore && !hasLockBlock) {
+        pieces.push({
+          name: "ไส้เต็มบาน",
+          x: leftOffset,
+          y: topOffset,
+          width: coreWidth,
+          height: coreHeight,
+        });
+      } else {
+        rows.forEach((row, rowIdx) => {
+          const rowTopFromBottom = H - row.bottom;
+          const rowBottomFromBottom = H - row.top;
+
+          if (
+            hasLockBlock &&
+            lockBlockZoneStart < rowBottomFromBottom &&
+            lockBlockZoneEnd > rowTopFromBottom
+          ) {
+            if (lockBlockLeft && lockBlockRight) {
+              pieces.push({
+                name: `ไส้แถว ${rowIdx + 1} (ซ้าย)`,
+                x: leftOffset + solidLockBlockWidth,
+                y: row.top,
+                width: (coreWidth - solidLockBlockWidth * 2) / 2,
+                height: row.height,
+              });
+              pieces.push({
+                name: `ไส้แถว ${rowIdx + 1} (ขวา)`,
+                x:
+                  W -
+                  rightOffset -
+                  solidLockBlockWidth -
+                  (coreWidth - solidLockBlockWidth * 2) / 2,
+                y: row.top,
+                width: (coreWidth - solidLockBlockWidth * 2) / 2,
+                height: row.height,
+              });
+            } else if (lockBlockLeft) {
+              pieces.push({
+                name: `ไส้แถว ${rowIdx + 1}`,
+                x: leftOffset + solidLockBlockWidth,
+                y: row.top,
+                width: coreWidth - solidLockBlockWidth,
+                height: row.height,
+              });
+            } else if (lockBlockRight) {
+              pieces.push({
+                name: `ไส้แถว ${rowIdx + 1}`,
+                x: leftOffset,
+                y: row.top,
+                width: coreWidth - solidLockBlockWidth,
+                height: row.height,
+              });
+            }
+          } else {
             pieces.push({
               name: `ไส้แถว ${rowIdx + 1}`,
               x: leftOffset,
               y: row.top,
-              width: coreWidth - solidLockBlockWidth,
+              width: coreWidth,
               height: row.height,
             });
           }
-        } else {
-          pieces.push({
-            name: `ไส้แถว ${rowIdx + 1}`,
-            x: leftOffset,
-            y: row.top,
-            width: coreWidth,
-            height: row.height,
-          });
-        }
-      });
+        });
+      }
 
       return {
         coreType: coreConfig,
@@ -1088,10 +1162,11 @@ export const useCoreCalculation = (results, coreType) => {
         damPieces: [],
         totalPieces: pieces.length,
         columns: 1,
-        rows: rows.length,
+        rows: isFullPanelCore ? 1 : rows.length,
         stripThickness: 0,
         stripSpacing: 0,
         isSolid: true,
+        isFullPanelCore,
         coreWidth,
         coreHeight,
         leftOffset,
@@ -1280,7 +1355,6 @@ export const useCoreCalculation = (results, coreType) => {
   }, [results, coreType]);
 };
 
-// ==================== MAIN COMPONENT ====================
 export default function DoorConfigurator() {
   const formRef = useRef(null);
   const [doorThickness, setDoorThickness] = useState("");
@@ -1336,7 +1410,6 @@ export default function DoorConfigurator() {
 
   useEffect(() => {
     if (frameSelection.frames?.length > 0)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedFrameCode(frameSelection.frames[0].code);
   }, [frameSelection]);
 
@@ -1405,7 +1478,6 @@ export default function DoorConfigurator() {
           ? `ขวา ${piecesPerSide}`
           : "-";
 
-  // Props to pass to UI component
   const uiProps = {
     formRef,
     doorThickness,

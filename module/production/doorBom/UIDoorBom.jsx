@@ -55,13 +55,13 @@ import {
   GRID_LETTERS,
   GRID_NUMBERS,
   LAYER_CONFIG,
+  NO_RAIL_CORE_TYPES,
   formatDimension,
   getMaterialLabel,
   getEfficiencyColor,
   generateDXF,
 } from "@/app/(pages)/production/doorBom/page";
 
-// ==================== SVG DRAWING COMPONENTS ====================
 export const DimLine = memo(
   ({
     x1,
@@ -588,7 +588,6 @@ export const TitleBlockSVG = ({ x, y, w, h, theme, data }) => {
   );
 };
 
-// ==================== ENHANCED ENGINEERING DRAWING ====================
 export const EnhancedEngineeringDrawing = memo(
   ({ results, coreCalculation }) => {
     const svgRef = useRef(null);
@@ -947,7 +946,10 @@ export const EnhancedEngineeringDrawing = memo(
 
     const renderRails = useCallback(() => {
       if (!railPositions || railPositions.length === 0) return null;
-      if (coreCalculation?.coreType?.value === "particle_strips") return null;
+
+      const skipRailCoreTypes = [...NO_RAIL_CORE_TYPES, "particle_strips"];
+      if (skipRailCoreTypes.includes(coreCalculation?.coreType?.value))
+        return null;
 
       const leftOffset = hasDoubleFrame && doubleFrame.left ? dims.front.DF : 0;
       const rightOffset =
@@ -1605,22 +1607,29 @@ export const EnhancedEngineeringDrawing = memo(
                         theme={theme}
                       />
 
-                      {railPositions.map((pos, idx) => {
-                        const railY =
-                          positions.side.y + dims.side.H - pos * DRAWING_SCALE;
-                        const railH = safeR * DRAWING_SCALE * 0.5;
-                        return (
-                          <FilledRect
-                            key={`side-rail-${idx}`}
-                            className="layer-rails"
-                            x={positions.side.x + dims.side.S}
-                            y={railY - railH / 2}
-                            width={dims.side.T - 2 * dims.side.S}
-                            height={railH}
-                            patternId="hatch-rails"
-                          />
-                        );
-                      })}
+                      {!NO_RAIL_CORE_TYPES.includes(
+                        coreCalculation?.coreType?.value,
+                      ) &&
+                        coreCalculation?.coreType?.value !==
+                          "particle_strips" &&
+                        railPositions.map((pos, idx) => {
+                          const railY =
+                            positions.side.y +
+                            dims.side.H -
+                            pos * DRAWING_SCALE;
+                          const railH = safeR * DRAWING_SCALE * 0.5;
+                          return (
+                            <FilledRect
+                              key={`side-rail-${idx}`}
+                              className="layer-rails"
+                              x={positions.side.x + dims.side.S}
+                              y={railY - railH / 2}
+                              width={dims.side.T - 2 * dims.side.S}
+                              height={railH}
+                              patternId="hatch-rails"
+                            />
+                          );
+                        })}
 
                       {(lockBlockLeft || lockBlockRight) && (
                         <rect
@@ -1838,6 +1847,11 @@ export const EnhancedEngineeringDrawing = memo(
                       )}
 
                       {railPositions.length > 0 &&
+                        !NO_RAIL_CORE_TYPES.includes(
+                          coreCalculation?.coreType?.value,
+                        ) &&
+                        coreCalculation?.coreType?.value !==
+                          "particle_strips" &&
                         (() => {
                           const railPos = railPositions[0];
                           const railCenter =
@@ -1862,42 +1876,47 @@ export const EnhancedEngineeringDrawing = memo(
                           );
                         })()}
 
-                      {railPositions.map((pos, idx) => (
-                        <g
-                          key={`front-ann-${idx}`}
-                          className="layer-dimensions"
-                        >
-                          <line
-                            x1={positions.front.x + dims.front.W + 200}
-                            y1={
-                              positions.front.y +
-                              dims.front.H -
-                              pos * DRAWING_SCALE
-                            }
-                            x2={positions.front.x + dims.front.W + 240}
-                            y2={
-                              positions.front.y +
-                              dims.front.H -
-                              pos * DRAWING_SCALE
-                            }
-                            stroke={theme.stroke}
-                            strokeWidth="0.8"
-                          />
-                          <text
-                            x={positions.front.x + dims.front.W + 260}
-                            y={
-                              positions.front.y +
-                              dims.front.H -
-                              pos * DRAWING_SCALE +
-                              10
-                            }
-                            fontSize="20"
-                            fill={theme.text}
+                      {!NO_RAIL_CORE_TYPES.includes(
+                        coreCalculation?.coreType?.value,
+                      ) &&
+                        coreCalculation?.coreType?.value !==
+                          "particle_strips" &&
+                        railPositions.map((pos, idx) => (
+                          <g
+                            key={`front-ann-${idx}`}
+                            className="layer-dimensions"
                           >
-                            {pos}
-                          </text>
-                        </g>
-                      ))}
+                            <line
+                              x1={positions.front.x + dims.front.W + 200}
+                              y1={
+                                positions.front.y +
+                                dims.front.H -
+                                pos * DRAWING_SCALE
+                              }
+                              x2={positions.front.x + dims.front.W + 240}
+                              y2={
+                                positions.front.y +
+                                dims.front.H -
+                                pos * DRAWING_SCALE
+                              }
+                              stroke={theme.stroke}
+                              strokeWidth="0.8"
+                            />
+                            <text
+                              x={positions.front.x + dims.front.W + 260}
+                              y={
+                                positions.front.y +
+                                dims.front.H -
+                                pos * DRAWING_SCALE +
+                                10
+                              }
+                              fontSize="20"
+                              fill={theme.text}
+                            >
+                              {pos}
+                            </text>
+                          </g>
+                        ))}
                     </g>
 
                     <TitleBlockSVG
@@ -1923,7 +1942,10 @@ export const EnhancedEngineeringDrawing = memo(
             <span>
               Frame: {R}×{F} mm
             </span>
-            <span>Rails: {railSections - 1}</span>
+            {!NO_RAIL_CORE_TYPES.includes(coreCalculation?.coreType?.value) &&
+              coreCalculation?.coreType?.value !== "particle_strips" && (
+                <span>Rails: {railSections - 1}</span>
+              )}
             <span>Lock Blocks: {lockBlockCount}</span>
           </div>
           <div className="flex items-center gap-2">
@@ -1937,7 +1959,6 @@ export const EnhancedEngineeringDrawing = memo(
 
 EnhancedEngineeringDrawing.displayName = "EnhancedEngineeringDrawing";
 
-// ==================== MAIN UI COMPONENT ====================
 export const UIDoorBom = ({
   formRef,
   doorThickness,
@@ -1976,6 +1997,8 @@ export const UIDoorBom = ({
   handleToggleDoubleSide,
   lockBlockDesc,
 }) => {
+  const isNoRailCoreType = NO_RAIL_CORE_TYPES.includes(coreType);
+
   return (
     <div
       ref={formRef}
@@ -1989,7 +2012,6 @@ export const UIDoorBom = ({
 
       <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-fit p-2 gap-2 border-2 border-foreground border-dashed">
         <div className="grid grid-cols-1 xl:grid-cols-2 p-2 gap-2 w-full h-full border-2 border-foreground border-dashed">
-          {/* Card 1: Customer Specs */}
           <Card className="w-full">
             <CardHeader className="bg-primary text-white">
               <div className="flex items-center gap-2">
@@ -2056,7 +2078,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 2: Surface Material */}
           <Card className="w-full">
             <CardHeader className="bg-success text-white">
               <div className="flex items-center gap-2">
@@ -2140,7 +2161,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 3: Frame (ERP) */}
           <Card className="w-full">
             <CardHeader className="bg-warning text-white">
               <div className="flex items-center gap-2">
@@ -2302,7 +2322,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 4: Horizontal Rails */}
           <Card className="w-full">
             <CardHeader className="bg-secondary text-white">
               <div className="flex items-center gap-2">
@@ -2313,72 +2332,83 @@ export const UIDoorBom = ({
               </div>
             </CardHeader>
             <CardBody className="gap-2">
-              <div className="flex flex-col gap-2 text-sm p-2 bg-secondary/10 rounded-xl">
-                <div className="flex justify-between">
-                  <span>จำนวนช่อง:</span>
-                  <span className="font-bold text-secondary">
-                    {results.railSections} ช่อง ({results.railSections - 1}{" "}
-                    ไม้ดาม)
-                  </span>
-                </div>
-
-                {doorHeight && parseFloat(doorHeight) >= 2400 && (
-                  <Chip color="secondary" variant="shadow" size="md">
-                    ⚡ ประตูสูงเกิน 2400mm → แบ่ง 4 ช่อง อัตโนมัติ
-                  </Chip>
-                )}
-
-                {results.railsAdjusted && (
+              {isNoRailCoreType ? (
+                <div className="flex flex-col gap-2 text-sm p-2 bg-warning/10 rounded-xl">
                   <Chip color="warning" variant="shadow" size="md">
-                    🔄 ปรับตำแหน่งไม้ดามอัตโนมัติเพื่อหลบ Lock Block
+                    ⚠️ ไส้ประเภท {coreCalculation?.coreType?.label || coreType}{" "}
+                    ไม่มีไม้ดามตรงกลาง
                   </Chip>
-                )}
-
-                <div className="flex justify-between">
-                  <span>ขนาดไม้ดาม:</span>
-                  <span className="font-bold text-secondary">
-                    {coreType === "particle_strips"
-                      ? `${coreCalculation.stripThickness || 12} mm (ปาติเกิ้ลซี่ตัดซอย)`
-                      : `${currentFrame.useThickness || 0}×${currentFrame.useWidth || 0} mm`}
+                  <span className="text-foreground/60">
+                    ไส้จะเต็มบานโดยมีแค่โครง ซ้าย ขวา บน ล่าง
                   </span>
                 </div>
+              ) : (
+                <div className="flex flex-col gap-2 text-sm p-2 bg-secondary/10 rounded-xl">
+                  <div className="flex justify-between">
+                    <span>จำนวนช่อง:</span>
+                    <span className="font-bold text-secondary">
+                      {results.railSections} ช่อง ({results.railSections - 1}{" "}
+                      ไม้ดาม)
+                    </span>
+                  </div>
 
-                {coreType !== "particle_strips" && (
-                  <span className="text-xs text-foreground/60">
-                    (ใช้ไม้เดียวกับโครง)
-                  </span>
-                )}
-                {coreType === "particle_strips" && (
-                  <span className="text-xs text-foreground/60">
-                    (ใช้ปาติเกิ้ลซี่ทำเป็นไม้ดามแทน)
-                  </span>
-                )}
+                  {doorHeight && parseFloat(doorHeight) >= 2400 && (
+                    <Chip color="secondary" variant="shadow" size="md">
+                      ⚡ ประตูสูงเกิน 2400mm → แบ่ง 4 ช่อง อัตโนมัติ
+                    </Chip>
+                  )}
 
-                <Divider className="my-1" />
+                  {results.railsAdjusted && (
+                    <Chip color="warning" variant="shadow" size="md">
+                      🔄 ปรับตำแหน่งไม้ดามอัตโนมัติเพื่อหลบ Lock Block
+                    </Chip>
+                  )}
 
-                {results.railPositions.map((pos, idx) => {
-                  const wasAdjusted =
-                    results.railPositionsOriginal &&
-                    pos !== results.railPositionsOriginal[idx];
-                  return (
-                    <div key={idx} className="flex justify-between">
-                      <span>ตำแหน่งที่ {idx + 1}:</span>
-                      <span>
-                        {pos} mm{" "}
-                        {wasAdjusted && (
-                          <span className="text-xs">
-                            (เดิม {results.railPositionsOriginal[idx]})
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+                  <div className="flex justify-between">
+                    <span>ขนาดไม้ดาม:</span>
+                    <span className="font-bold text-secondary">
+                      {coreType === "particle_strips"
+                        ? `${coreCalculation.stripThickness || 12} mm (ปาติเกิ้ลซี่ตัดซอย)`
+                        : `${currentFrame.useThickness || 0}×${currentFrame.useWidth || 0} mm`}
+                    </span>
+                  </div>
+
+                  {coreType !== "particle_strips" && (
+                    <span className="text-xs text-foreground/60">
+                      (ใช้ไม้เดียวกับโครง)
+                    </span>
+                  )}
+                  {coreType === "particle_strips" && (
+                    <span className="text-xs text-foreground/60">
+                      (ใช้ปาติเกิ้ลซี่ทำเป็นไม้ดามแทน)
+                    </span>
+                  )}
+
+                  <Divider className="my-1" />
+
+                  {results.railPositions.map((pos, idx) => {
+                    const wasAdjusted =
+                      results.railPositionsOriginal &&
+                      pos !== results.railPositionsOriginal[idx];
+                    return (
+                      <div key={idx} className="flex justify-between">
+                        <span>ตำแหน่งที่ {idx + 1}:</span>
+                        <span>
+                          {pos} mm{" "}
+                          {wasAdjusted && (
+                            <span className="text-xs">
+                              (เดิม {results.railPositionsOriginal[idx]})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardBody>
           </Card>
 
-          {/* Card 5: Lock Block */}
           <Card className="w-full">
             <CardHeader className="bg-danger text-white">
               <div className="flex items-center gap-2">
@@ -2479,7 +2509,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 6: Core Material */}
           <Card className="w-full">
             <CardHeader className="bg-primary/80 text-white">
               <div className="flex items-center gap-2">
@@ -2523,6 +2552,7 @@ export const UIDoorBom = ({
                     <span>รูปแบบ:</span>
                     <span className="font-bold">
                       {coreCalculation.isSolid ? "เต็มแผ่น" : "ซี่"}
+                      {coreCalculation.isFullPanelCore && " (ไม่มีไม้ดาม)"}
                     </span>
                   </div>
 
@@ -2590,7 +2620,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card: Summary */}
           <Card className="w-full">
             <CardHeader className="bg-default-100">
               <div className="flex items-center gap-2">
@@ -2631,13 +2660,22 @@ export const UIDoorBom = ({
                 </div>
                 <div className="p-2 bg-secondary/20 rounded-xl">
                   <span className="block text-foreground/70">ไม้ดาม:</span>
-                  <span className="font-bold text-secondary">
-                    {results.railSections - 1} ตัว ({results.railSections} ช่อง)
-                  </span>
-                  {coreType === "particle_strips" && (
-                    <span className="block text-xs text-secondary">
-                      ใช้ปาติเกิ้ลซี่ทำไม้ดามแทน
+                  {isNoRailCoreType ? (
+                    <span className="font-bold text-warning">
+                      ไม่มี (ไส้เต็มบาน)
                     </span>
+                  ) : (
+                    <>
+                      <span className="font-bold text-secondary">
+                        {results.railSections - 1} ตัว ({results.railSections}{" "}
+                        ช่อง)
+                      </span>
+                      {coreType === "particle_strips" && (
+                        <span className="block text-xs text-secondary">
+                          ใช้ปาติเกิ้ลซี่ทำไม้ดามแทน
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
                 <div className="col-span-2 p-2 bg-danger/10 rounded-xl">
@@ -2660,6 +2698,11 @@ export const UIDoorBom = ({
                         {coreCalculation.stripSpacing}mm
                       </span>
                     )}
+                    {coreCalculation.isFullPanelCore && (
+                      <span className="block text-xs text-warning">
+                        ⚠️ ไส้เต็มบาน ไม่มีไม้ดามตรงกลาง
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
@@ -2679,7 +2722,6 @@ export const UIDoorBom = ({
             </CardBody>
           </Card>
 
-          {/* Card 7: Cutting Plan */}
           {isDataComplete ? (
             <Card className="w-full">
               <CardHeader className="bg-primary text-white">
@@ -2693,6 +2735,13 @@ export const UIDoorBom = ({
                 </div>
               </CardHeader>
               <CardBody className="gap-2">
+                {isNoRailCoreType && (
+                  <Chip color="warning" variant="shadow" className="w-full">
+                    ⚠️ ไส้ {coreCalculation?.coreType?.label}: ไม่มีไม้ดาม
+                    (ไส้เต็มบาน)
+                  </Chip>
+                )}
+
                 {coreType === "particle_strips" && (
                   <Chip color="warning" variant="shadow" className="w-full">
                     ไม้ดาม: ใช้ปาติเกิ้ลซี่ตัดซอยทำแทน (ไม่รวมในแผนตัดไม้โครง)
@@ -2918,7 +2967,6 @@ export const UIDoorBom = ({
           )}
         </div>
 
-        {/* Drawing Section */}
         <div className="grid grid-cols-1 xl:grid-cols-1 p-2 gap-2 w-full h-full border-2 border-foreground border-dashed">
           <Card className="w-full">
             <CardHeader className="bg-primary text-white flex justify-between items-center">
