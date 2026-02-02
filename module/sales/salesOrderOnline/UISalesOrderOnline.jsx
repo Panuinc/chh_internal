@@ -97,9 +97,6 @@ function formatNumber(value) {
   return new Intl.NumberFormat("th-TH").format(value || 0);
 }
 
-// ============ DATA ANALYSIS HELPERS ============
-
-// Helper to get month name in Thai
 function getMonthName(dateString) {
   const date = new Date(dateString);
   const months = [
@@ -144,7 +141,6 @@ function calculateOrderStats(orders) {
   );
   const avgOrderValue = totalOrders > 0 ? totalAmount / totalOrders : 0;
 
-  // Product breakdown - analyze from salesOrderLines
   const productStats = {};
   const skuStats = {};
   let totalItemCount = 0;
@@ -159,7 +155,6 @@ function calculateOrderStats(orders) {
       const itemNumber = line.itemNumber || line.lineObjectNumber || "Unknown";
       const description = line.description || "";
 
-      // Determine product category
       let category = "อื่นๆ";
       if (description.includes("WPC") || itemNumber.includes("WPC")) {
         category =
@@ -182,7 +177,6 @@ function calculateOrderStats(orders) {
       productStats[category] =
         (productStats[category] || 0) + (line.quantity || 0);
 
-      // SKU stats for Top 10
       if (!skuStats[itemNumber]) {
         skuStats[itemNumber] = {
           name: itemNumber,
@@ -210,7 +204,6 @@ function calculateOrderStats(orders) {
     }),
   );
 
-  // Top 10 SKUs
   const topSKUs = Object.values(skuStats)
     .sort((a, b) => b.quantity - a.quantity)
     .slice(0, 10)
@@ -219,7 +212,6 @@ function calculateOrderStats(orders) {
       color: ["#006FEE", "#17C964", "#F5A524", "#9353D3", "#F31260"][index % 5],
     }));
 
-  // Channel breakdown - analyze from order source or external document
   const channelStats = { Facebook: 0, Line: 0, Website: 0, อื่นๆ: 0 };
   orders.forEach((order) => {
     const extDoc = (order.externalDocumentNumber || "").toLowerCase();
@@ -255,7 +247,6 @@ function calculateOrderStats(orders) {
               : "#F5A524",
     }));
 
-  // Monthly data aggregation
   const monthStats = {};
   orders.forEach((order) => {
     const date = new Date(order.orderDate);
@@ -273,7 +264,6 @@ function calculateOrderStats(orders) {
     a.month.localeCompare(b.month),
   );
 
-  // Customer analysis
   const uniqueCustomers = new Set(orders.map((o) => o.customerNumber)).size;
   const newLeads = Math.ceil(uniqueCustomers * 0.8);
   const repeatCustomers = Math.floor(uniqueCustomers * 0.2);
@@ -292,8 +282,6 @@ function calculateOrderStats(orders) {
     uniqueCustomers,
   };
 }
-
-// ============ CHART COMPONENTS ============
 
 function MonthlySalesChart({ data }) {
   const chartData = data.map((d) => ({ ...d, target: 1500000 }));
@@ -441,7 +429,6 @@ function Top10SKUChart({ data }) {
 
   return (
     <div className="w-full">
-      {/* Chart View */}
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -484,7 +471,6 @@ function Top10SKUChart({ data }) {
         </ResponsiveContainer>
       </div>
 
-      {/* Table Summary */}
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -536,28 +522,22 @@ function Top10SKUChart({ data }) {
   );
 }
 
-// ============ DATE FILTER COMPONENTS ============
-
-// Helper function to format date for input
 function formatDateForInput(date) {
   if (!date) return "";
   const d = new Date(date);
   return d.toISOString().split("T")[0];
 }
 
-// Helper function to get start of month
 function getStartOfMonth() {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), 1);
 }
 
-// Helper function to get end of month
 function getEndOfMonth() {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth() + 1, 0);
 }
 
-// Helper function to get start of week
 function getStartOfWeek() {
   const now = new Date();
   const day = now.getDay();
@@ -565,19 +545,16 @@ function getStartOfWeek() {
   return new Date(now.setDate(diff));
 }
 
-// Helper function to get today
 function getToday() {
   return new Date();
 }
 
-// Helper function to filter orders by date range
 function filterOrdersByDateRange(orders, fromDate, toDate) {
   if (!fromDate && !toDate) return orders;
 
   const from = fromDate ? new Date(fromDate) : null;
   const to = toDate ? new Date(toDate) : null;
 
-  // Set time to end of day for 'to' date
   if (to) {
     to.setHours(23, 59, 59, 999);
   }
@@ -651,7 +628,6 @@ function DateRangeFilter({
 
   return (
     <div className="flex flex-col gap-3 p-4 bg-default/30 rounded-xl border border-default">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-primary" />
@@ -670,7 +646,6 @@ function DateRangeFilter({
         )}
       </div>
 
-      {/* Quick Select Buttons */}
       <div className="flex flex-wrap gap-2">
         {quickSelectOptions.map((option) => (
           <Button
@@ -685,7 +660,6 @@ function DateRangeFilter({
         ))}
       </div>
 
-      {/* Date Inputs */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="flex flex-col gap-1">
           <label className="text-xs text-foreground/60">
@@ -713,7 +687,6 @@ function DateRangeFilter({
         </div>
       </div>
 
-      {/* Selected Range Display */}
       {hasFilter && (
         <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-lg">
           <Calendar className="w-4 h-4 text-primary" />
@@ -731,7 +704,6 @@ function DateRangeFilter({
   );
 }
 
-// Customer Satisfaction (Coming Soon)
 const customerSatisfactionStatus = {
   message: "จะดำเนินการภายในเดือนกุมภาพันธ์ สัปดาห์ที่ 3",
   effectiveDate: "ต้นเดือนมีนาคม 2568",
@@ -1698,16 +1670,13 @@ export default function UISalesOrderOnline({
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [previewOrder, setPreviewOrder] = useState(null);
 
-  // Date filter state
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  // Filter orders by date range
   const filteredOrders = useMemo(() => {
     return filterOrdersByDateRange(orders, fromDate, toDate);
   }, [orders, fromDate, toDate]);
 
-  // Calculate statistics from filtered orders
   const stats = useMemo(() => {
     return calculateOrderStats(filteredOrders);
   }, [filteredOrders]);
@@ -1930,7 +1899,6 @@ export default function UISalesOrderOnline({
           </div>
         </div>
 
-        {/* Date Filter Section */}
         <div className="w-full p-4">
           <DateRangeFilter
             fromDate={fromDate}
@@ -1948,9 +1916,7 @@ export default function UISalesOrderOnline({
           />
         </div>
 
-        {/* Executive Summary Section */}
         <div className="flex flex-col w-full p-4 gap-4">
-          {/* Section Title */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-primary" />
@@ -1965,9 +1931,7 @@ export default function UISalesOrderOnline({
             )}
           </div>
 
-          {/* Key Metrics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-            {/* Total Sales */}
             <ExecutiveSummaryCard
               title="ยอดขายออนไลน์รวม"
               value={`${formatNumber(stats.totalAmount)} บาท`}
@@ -1976,7 +1940,6 @@ export default function UISalesOrderOnline({
               color="primary"
             />
 
-            {/* Total Orders */}
             <ExecutiveSummaryCard
               title="จำนวนออเดอร์"
               value={`${formatNumber(stats.totalOrders)} ออเดอร์`}
@@ -1984,7 +1947,6 @@ export default function UISalesOrderOnline({
               color="default"
             />
 
-            {/* Total Items */}
             <ExecutiveSummaryCard
               title="จำนวนสินค้า"
               value={`${formatNumber(stats.totalItems)} ชิ้น`}
@@ -1992,7 +1954,6 @@ export default function UISalesOrderOnline({
               color="success"
             />
 
-            {/* Avg Order Value */}
             <ExecutiveSummaryCard
               title="ราคาเฉลี่ยต่อออเดอร์"
               value={`${formatNumber(Math.round(stats.avgOrderValue))} บาท`}
@@ -2002,7 +1963,6 @@ export default function UISalesOrderOnline({
             />
           </div>
 
-          {/* Orders Breakdown */}
           <div className="flex flex-col gap-3 p-4 bg-default/30 rounded-xl border border-default">
             <div className="flex items-center gap-2">
               <ShoppingCart className="w-4 h-4 text-foreground/70" />
@@ -2010,7 +1970,6 @@ export default function UISalesOrderOnline({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {/* Channel Breakdown */}
               <div className="flex flex-col gap-2">
                 <span className="text-sm text-foreground/60">
                   แยกตามช่องทาง
@@ -2038,7 +1997,6 @@ export default function UISalesOrderOnline({
                 )}
               </div>
 
-              {/* Product Breakdown */}
               <div className="flex flex-col gap-2">
                 <span className="text-sm text-foreground/60">แยกตามสินค้า</span>
                 <div className="flex flex-col gap-1 p-2 bg-default/50 rounded-lg">
@@ -2062,7 +2020,6 @@ export default function UISalesOrderOnline({
                 </div>
               </div>
 
-              {/* Customer Type Breakdown */}
               <div className="flex flex-col gap-2">
                 <span className="text-sm text-foreground/60">
                   แยกตามประเภทลูกค้า
@@ -2089,7 +2046,6 @@ export default function UISalesOrderOnline({
             </div>
           </div>
 
-          {/* Monthly Sales Chart */}
           <div className="p-4 bg-default/30 rounded-xl border border-default">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-4 h-4 text-primary" />
@@ -2100,9 +2056,7 @@ export default function UISalesOrderOnline({
             <MonthlySalesChart data={stats.monthlyData} />
           </div>
 
-          {/* Conversion Rate & Customer Satisfaction */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {/* Conversion Rate */}
             <div className="flex flex-col gap-2 p-4 bg-primary/5 rounded-xl border border-primary/20">
               <div className="flex items-center gap-2">
                 <MousePointerClick className="w-4 h-4 text-primary" />
@@ -2121,7 +2075,6 @@ export default function UISalesOrderOnline({
               </p>
             </div>
 
-            {/* Customer Satisfaction */}
             <div className="flex flex-col gap-2 p-4 bg-warning/5 rounded-xl border border-warning/20">
               <div className="flex items-center gap-2">
                 <Smile className="w-4 h-4 text-warning" />
@@ -2143,7 +2096,6 @@ export default function UISalesOrderOnline({
           </div>
         </div>
 
-        {/* Sales Performance Section */}
         <div className="flex flex-col w-full p-4 gap-4 border-t border-default">
           <div className="flex items-center gap-2">
             <Target className="w-5 h-5 text-success" />
@@ -2153,7 +2105,6 @@ export default function UISalesOrderOnline({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-            {/* New Leads */}
             <ExecutiveSummaryCard
               title="จำนวนลีดใหม่ (New Leads)"
               value={`${stats.uniqueCustomers} ราย`}
@@ -2162,7 +2113,6 @@ export default function UISalesOrderOnline({
               color="success"
             />
 
-            {/* Closing Rate */}
             <ExecutiveSummaryCard
               title="อัตราการปิดการขาย (Closing Rate)"
               value={`${stats.uniqueCustomers > 0 ? ((stats.totalOrders / stats.uniqueCustomers) * 100).toFixed(1) : 0}%`}
@@ -2171,7 +2121,6 @@ export default function UISalesOrderOnline({
               color="primary"
             />
 
-            {/* Repeat Customers */}
             <ExecutiveSummaryCard
               title="จำนวนลูกค้าซ้ำ (ประมาณการ)"
               value={`${stats.repeatCustomers} คน`}
@@ -2180,7 +2129,6 @@ export default function UISalesOrderOnline({
               color="warning"
             />
 
-            {/* Total Orders Summary */}
             <ExecutiveSummaryCard
               title="สรุปยอดออเดอร์รวม"
               value={`${stats.totalOrders} ออเดอร์`}
@@ -2190,9 +2138,7 @@ export default function UISalesOrderOnline({
             />
           </div>
 
-          {/* Charts Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Product Sales Chart */}
             <div className="p-4 bg-default/30 rounded-xl border border-default">
               <div className="flex items-center gap-2 mb-4">
                 <Package className="w-4 h-4 text-success" />
@@ -2201,7 +2147,6 @@ export default function UISalesOrderOnline({
               <ProductSalesChart data={stats.productBreakdown} />
             </div>
 
-            {/* Channel Sales Chart */}
             <div className="p-4 bg-default/30 rounded-xl border border-default">
               <div className="flex items-center gap-2 mb-4">
                 <Globe className="w-4 h-4 text-primary" />
@@ -2211,7 +2156,6 @@ export default function UISalesOrderOnline({
             </div>
           </div>
 
-          {/* Top 10 SKU Section */}
           <div className="p-4 bg-default/30 rounded-xl border border-default">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-danger" />
@@ -2223,7 +2167,6 @@ export default function UISalesOrderOnline({
           </div>
         </div>
 
-        {/* Data Table */}
         <div className="flex flex-col w-full p-4 gap-2">
           <div className="flex items-center gap-2">
             <Package className="w-5 h-5 text-foreground/70" />
