@@ -1,0 +1,3 @@
+[2026-02-03 12:59:04] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-03 12:59:04] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":1000000}
+[2026-02-03 12:59:04] [INFO] GetAllDepartmentUseCase success {"total":1,"returned":1}
