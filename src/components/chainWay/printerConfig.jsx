@@ -136,13 +136,16 @@ export function PrinterStatusBadge({ className = "" }) {
   return (
     <div className={`inline-flex items-center gap-2 ${className}`}>
       <StatusBadge connected={isConnected} loading={printerLoading} />
-      <button
+      <Button
+        color="default"
+        size="md"
+        radius="md"
         onPress={refreshPrinter}
         disabled={printerLoading}
         className="p-2 hover:bg-default text-foreground/40 disabled:opacity-50 rounded-xl"
       >
         <RefreshCw className={printerLoading ? "animate-spin" : ""} />
-      </button>
+      </Button>
     </div>
   );
 }
