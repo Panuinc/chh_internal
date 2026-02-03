@@ -137,7 +137,7 @@ export function PrinterStatusBadge({ className = "" }) {
     <div className={`inline-flex items-center gap-2 ${className}`}>
       <StatusBadge connected={isConnected} loading={printerLoading} />
       <button
-        onClick={refreshPrinter}
+        onPress={refreshPrinter}
         disabled={printerLoading}
         className="p-2 hover:bg-default text-foreground/40 disabled:opacity-50 rounded-xl"
       >

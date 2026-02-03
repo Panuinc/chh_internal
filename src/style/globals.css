@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @plugin '../lib/hero.js';
-@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+
+@custom-variant dark (&:is(.dark *));
 
 .font-system {
   font-family: var(--font-en), var(--font-th), sans-serif;

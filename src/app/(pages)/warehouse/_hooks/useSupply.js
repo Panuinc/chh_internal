@@ -6,16 +6,16 @@ const API_URL = "/api/warehouse/supply";
 
 function extractItems(result) {
   if (Array.isArray(result)) return result;
-  if (result?.data?.supplyItems) return result.data.supplyItems;
+  if (result?.data?.catSupplyItems) return result.data.catSupplyItems;
   if (result?.data && Array.isArray(result.data)) return result.data;
-  if (result?.supplyItems) return result.supplyItems;
+  if (result?.catSupplyItems) return result.catSupplyItems;
   return [];
 }
 
 function extractItem(result) {
-  if (result?.data?.supplyItem) return result.data.supplyItem;
+  if (result?.data?.catSupplyItem) return result.data.catSupplyItem;
   if (result?.data && !Array.isArray(result.data)) return result.data;
-  if (result?.supplyItem) return result.supplyItem;
+  if (result?.catSupplyItem) return result.catSupplyItem;
   return result;
 }
 

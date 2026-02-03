@@ -601,16 +601,13 @@ export default function UIRawMaterial({
 
       return (
         <div className="flex items-center justify-center gap-2">
-          <Button
-            isIconOnly
-            color="default"
-            variant="shadow"
-            size="md"
-            radius="md"
-            onPress={() => handleViewItem(item._rawItem)}
+          <button
+            className="p-2 rounded-md bg-default hover:bg-default-100 border border-default shadow-sm cursor-pointer"
+            onClick={() => handleViewItem(item._rawItem)}
+            type="button"
           >
-            <Telescope />
-          </Button>
+            <Telescope size={20} />
+          </button>
         </div>
       );
     },

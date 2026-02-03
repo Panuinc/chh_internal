@@ -1,9 +1,9 @@
-import { GetByIdSupplyUseCase, formatSupplyData } from "@/services/warehouse";
+import { getSupplyItemById } from "@/services/warehouse";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(request, context) {
   const { id } = await context.params;
-  return GetByIdSupplyUseCase(request, id);
+  return getSupplyItemById(request, id);
 }

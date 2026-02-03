@@ -4,20 +4,42 @@ import { useState, useEffect, useCallback } from "react";
 
 const API_URL = "/api/warehouse/finishedGoods";
 
+export function extractDimensionCodes(itemNumber) {
+  if (!itemNumber) return { projectCode: null, productCode: null };
+
+  // Expected format: PROJECT-CATEGORY-PRODUCT or PROJECT-PRODUCT variations
+  // Examples: "PROJ-CAT-PROD", "PROJ-PROD", "PRJ-CT-P001"
+  const parts = itemNumber.split("-");
+
+  if (parts.length >= 3) {
+    return {
+      projectCode: parts[0] || null,
+      productCode: parts.slice(2).join("-") || null,
+    };
+  } else if (parts.length === 2) {
+    return {
+      projectCode: parts[0] || null,
+      productCode: parts[1] || null,
+    };
+  }
+
+  return { projectCode: null, productCode: null };
+}
+
 function extractItems(result) {
   if (Array.isArray(result)) return result;
-  if (result?.data?.finishedGoodsItems)
-    return result.data.finishedGoodsItems;
+  if (result?.data?.catFinishedGoodsItems)
+    return result.data.catFinishedGoodsItems;
   if (result?.data && Array.isArray(result.data)) return result.data;
-  if (result?.finishedGoodsItems) return result.finishedGoodsItems;
+  if (result?.catFinishedGoodsItems) return result.catFinishedGoodsItems;
   return [];
 }
 
 function extractItem(result) {
-  if (result?.data?.finishedGoodsItem)
-    return result.data.finishedGoodsItem;
+  if (result?.data?.catFinishedGoodsItem)
+    return result.data.catFinishedGoodsItem;
   if (result?.data && !Array.isArray(result.data)) return result.data;
-  if (result?.finishedGoodsItem) return result.finishedGoodsItem;
+  if (result?.catFinishedGoodsItem) return result.catFinishedGoodsItem;
   return result;
 }
 
@@ -158,4 +180,5 @@ export function useFinishedGoodsItem(itemId) {
 export default {
   useFinishedGoodsItems,
   useFinishedGoodsItem,
+  extractDimensionCodes,
 };

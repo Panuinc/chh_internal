@@ -6,16 +6,16 @@ const API_URL = "/api/warehouse/packing";
 
 function extractItems(result) {
   if (Array.isArray(result)) return result;
-  if (result?.data?.packingItems) return result.data.packingItems;
+  if (result?.data?.catPackingItems) return result.data.catPackingItems;
   if (result?.data && Array.isArray(result.data)) return result.data;
-  if (result?.packingItems) return result.packingItems;
+  if (result?.catPackingItems) return result.catPackingItems;
   return [];
 }
 
 function extractItem(result) {
-  if (result?.data?.packingItem) return result.data.packingItem;
+  if (result?.data?.catPackingItem) return result.data.catPackingItem;
   if (result?.data && !Array.isArray(result.data)) return result.data;
-  if (result?.packingItem) return result.packingItem;
+  if (result?.catPackingItem) return result.catPackingItem;
   return result;
 }
 

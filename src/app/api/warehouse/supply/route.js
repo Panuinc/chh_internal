@@ -1,8 +1,8 @@
-import { GetAllSupplyUseCase, formatSupplyData } from "@/services/warehouse";
+import { getAllSupplyItems } from "@/services/warehouse";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(request) {
-  return GetAllSupplyUseCase(request);
+  return getAllSupplyItems(request);
 }
