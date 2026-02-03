@@ -116,7 +116,6 @@ function getMonthName(dateString) {
   return months[date.getMonth()];
 }
 
-// Helper to calculate statistics from orders
 function calculateOrderStats(orders) {
   if (!orders || orders.length === 0) {
     return {
@@ -191,7 +190,6 @@ function calculateOrderStats(orders) {
     });
   });
 
-  // Convert productStats to array
   const productBreakdown = Object.entries(productStats).map(
     ([name, quantity]) => ({
       name,
