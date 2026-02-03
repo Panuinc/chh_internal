@@ -1,37 +1,37 @@
 export {
-  getAllCatFinishedGoodsItems,
-  getCatFinishedGoodsItemById,
-  GetAllUseCase as GetAllCatFinishedGoodsUseCase,
-  GetByIdUseCase as GetByIdCatFinishedGoodsUseCase,
-  formatData as formatCatFinishedGoodsData,
+  getAllFinishedGoodsItems,
+  getFinishedGoodsItemById,
+  GetAllUseCase as GetAllFinishedGoodsUseCase,
+  GetByIdUseCase as GetByIdFinishedGoodsUseCase,
+  formatData as formatFinishedGoodsData,
   extractDimensionCodes,
   buildDimensionFilter,
   fetchDimensionValue,
   getProjectInfoFromItemNumber,
   batchGetProjectInfo,
   GetAllWithProjectInfoUseCase,
-} from "./catFinishedGoods.service.js";
+} from "./finishedGoods.service.js";
 
 export {
-  getAllCatPackingItems,
-  getCatPackingItemById,
-  GetAllUseCase as GetAllCatPackingUseCase,
-  GetByIdUseCase as GetByIdCatPackingUseCase,
-  formatData as formatCatPackingData,
-} from "./catPacking.service.js";
+  getAllPackingItems,
+  getPackingItemById,
+  GetAllUseCase as GetAllPackingUseCase,
+  GetByIdUseCase as GetByIdPackingUseCase,
+  formatData as formatPackingData,
+} from "./packing.service.js";
 
 export {
-  getAllCatRawMaterialItems,
-  getCatRawMaterialItemById,
-  GetAllUseCase as GetAllCatRawMaterialUseCase,
-  GetByIdUseCase as GetByIdCatRawMaterialUseCase,
-  formatData as formatCatRawMaterialData,
-} from "./catRawMaterial.service.js";
+  getAllRawMaterialItems,
+  getRawMaterialItemById,
+  GetAllUseCase as GetAllRawMaterialUseCase,
+  GetByIdUseCase as GetByIdRawMaterialUseCase,
+  formatData as formatRawMaterialData,
+} from "./rawMaterial.service.js";
 
 export {
-  getAllCatSupplyItems,
-  getCatSupplyItemById,
-  GetAllUseCase as GetAllCatSupplyUseCase,
-  GetByIdUseCase as GetByIdCatSupplyUseCase,
-  formatData as formatCatSupplyData,
-} from "./catSupply.service.js";
+  getAllSupplyItems,
+  getSupplyItemById,
+  GetAllUseCase as GetAllSupplyUseCase,
+  GetByIdUseCase as GetByIdSupplyUseCase,
+  formatData as formatSupplyData,
+} from "./supply.service.js";

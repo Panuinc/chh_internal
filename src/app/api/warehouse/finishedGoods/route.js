@@ -1,0 +1,8 @@
+import { GetAllFinishedGoodsUseCase, formatFinishedGoodsData } from "@/services/warehouse";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export async function GET(request) {
+  return GetAllFinishedGoodsUseCase(request);
+}
