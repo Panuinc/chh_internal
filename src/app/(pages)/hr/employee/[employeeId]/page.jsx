@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import UIEmployeeForm from "@/module/hr/employee/UIEmployeeForm";
+import UIEmployeeForm from "@/app/(pages)/hr/_components/employee/UIEmployeeForm";
 import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { useEmployee, useSubmitEmployee } from "@/app/(pages)/hr/_hooks/useEmployee";

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIPatrol from "@/module/security/patrol/UIPatrol";
+import UIPatrol from "@/app/(pages)/security/_components/patrol/UIPatrol";
 import { usePatrols } from "@/app/(pages)/security/_hooks/usePatrol";
 import { useMenu } from "@/hooks";
 

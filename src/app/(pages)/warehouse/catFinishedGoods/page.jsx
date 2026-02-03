@@ -7,7 +7,7 @@ import {
 } from "@/app/(pages)/warehouse/_hooks/useCatFinishedGoods";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
-import UICatFinishedGoods from "@/module/warehouse/catFinishedGoods/UICatFinishedGoods";
+import UICatFinishedGoods from "@/app/(pages)/warehouse/_components/catFinishedGoods/UICatFinishedGoods";
 import { showToast } from "@/components";
 
 function useProjectNames(items) {

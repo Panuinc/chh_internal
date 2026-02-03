@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import UIDepartmentForm from "@/module/hr/department/UIDepartmentForm";
+import UIDepartmentForm from "@/app/(pages)/hr/_components/department/UIDepartmentForm";
 import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import {

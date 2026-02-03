@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIAssign from "@/module/hr/assign/UIAssign";
+import UIAssign from "@/app/(pages)/hr/_components/assign/UIAssign";
 import { useEmployees } from "@/app/(pages)/hr/_hooks/useEmployee";
 import { useMenu } from "@/hooks";
 

@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { useCatPackingItems } from "@/app/(pages)/warehouse/_hooks/useCatPacking";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
-import UICatPacking from "@/module/warehouse/catPacking/UICatPacking";
+import UICatPacking from "@/app/(pages)/warehouse/_components/catPacking/UICatPacking";
 import { showToast } from "@/components";
 
 function CatPackingContent() {

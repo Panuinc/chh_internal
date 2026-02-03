@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIVisitor from "@/module/security/visitor/UIVisitor";
+import UIVisitor from "@/app/(pages)/security/_components/visitor/UIVisitor";
 import { useVisitors } from "@/app/(pages)/security/_hooks/useVisitor";
 import { useMenu } from "@/hooks";
 

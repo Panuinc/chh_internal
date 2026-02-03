@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import UIPatrolForm from "@/module/security/patrol/UIPatrolForm";
+import UIPatrolForm from "@/app/(pages)/security/_components/patrol/UIPatrolForm";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { useSubmitPatrol } from "@/app/(pages)/security/_hooks/usePatrol";
 import { useFormHandler, useMenu } from "@/hooks";

@@ -4,7 +4,7 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { showToast } from "@/components";
 import { AUTH_MESSAGES } from "@/lib/auth-messages";
-import UISignIn from "@/module/signIn/UISignIn";
+import UISignIn from "@/app/(auth)/_components/UISignIn";
 
 function SignInContent() {
   const searchParams = useSearchParams();

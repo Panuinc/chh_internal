@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import UIAssignForm from "@/module/hr/assign/UIAssignForm";
+import UIAssignForm from "@/app/(pages)/hr/_components/assign/UIAssignForm";
 import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { useEmployee } from "@/app/(pages)/hr/_hooks/useEmployee";

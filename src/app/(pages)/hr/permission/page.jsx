@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIPermission from "@/module/hr/permission/UIPermission";
+import UIPermission from "@/app/(pages)/hr/_components/permission/UIPermission";
 import { usePermissions } from "@/app/(pages)/hr/_hooks/usePermission";
 import { useMenu } from "@/hooks";
 

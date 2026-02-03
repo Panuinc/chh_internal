@@ -8,7 +8,7 @@ import {
   useVisitor,
   useCheckoutVisitor,
 } from "@/app/(pages)/security/_hooks/useVisitor";
-import UIQuickCheckout from "@/module/security/visitor/UIQuickCheckout";
+import UIQuickCheckout from "@/app/(pages)/security/_components/visitor/UIQuickCheckout";
 
 export default function QuickCheckoutPage() {
   const router = useRouter();

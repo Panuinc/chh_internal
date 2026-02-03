@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import UIVisitorForm from "@/module/security/visitor/UIVisitorForm";
+import UIVisitorForm from "@/app/(pages)/security/_components/visitor/UIVisitorForm";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { useSubmitVisitor } from "@/app/(pages)/security/_hooks/useVisitor";
 import { useEmployees } from "@/app/(pages)/hr/_hooks/useEmployee";

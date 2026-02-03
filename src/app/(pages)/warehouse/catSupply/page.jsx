@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { useCatSupplyItems } from "@/app/(pages)/warehouse/_hooks/useCatSupply";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
-import UICatSupply from "@/module/warehouse/catSupply/UICatSupply";
+import UICatSupply from "@/app/(pages)/warehouse/_components/catSupply/UICatSupply";
 import { showToast } from "@/components";
 
 function CatSupplyContent() {

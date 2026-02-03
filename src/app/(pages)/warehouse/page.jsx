@@ -1,7 +1,7 @@
 "use client";
 
 import { useModuleMenu } from "@/hooks/useMenu";
-import UIWarehouse from "@/module/warehouse/UIWarehouse";
+import UIWarehouse from "@/app/(pages)/warehouse/_components/UIWarehouse";
 
 export default function Warehouse() {
   const { menu, isEmpty } = useModuleMenu("warehouse");

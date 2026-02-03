@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { UIDoorBom } from "@/module/production/doorBom/UIDoorBom";
+import { UIDoorBom } from "@/app/(pages)/production/_components/doorBom/UIDoorBom";
 
 export const GLUE_THICKNESS = 1;
 export const LOCK_BLOCK_HEIGHT = 400;

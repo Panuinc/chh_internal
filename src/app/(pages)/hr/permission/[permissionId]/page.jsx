@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import UIPermissionForm from "@/module/hr/permission/UIPermissionForm";
+import UIPermissionForm from "@/app/(pages)/hr/_components/permission/UIPermissionForm";
 import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import {

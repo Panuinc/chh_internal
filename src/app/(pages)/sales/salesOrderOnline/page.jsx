@@ -4,7 +4,7 @@ import React, { useCallback, useState } from "react";
 import { useSalesOrdersOnline } from "@/app/(pages)/sales/_hooks/useSalesOrderOnline";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
-import UISalesOrderOnline from "@/module/sales/salesOrderOnline/UISalesOrderOnline";
+import UISalesOrderOnline from "@/app/(pages)/sales/_components/salesOrderOnline/UISalesOrderOnline";
 import { showToast } from "@/components";
 
 function SalesOrderOnlineContent() {

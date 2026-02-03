@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIDepartment from "@/module/hr/department/UIDepartment";
+import UIDepartment from "@/app/(pages)/hr/_components/department/UIDepartment";
 import { useDepartments } from "@/app/(pages)/hr/_hooks/useDepartment";
 import { useMenu } from "@/hooks";
 

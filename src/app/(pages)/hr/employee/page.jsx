@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIEmployee from "@/module/hr/employee/UIEmployee";
+import UIEmployee from "@/app/(pages)/hr/_components/employee/UIEmployee";
 import { useEmployees } from "@/app/(pages)/hr/_hooks/useEmployee";
 import { useMenu } from "@/hooks";
 
