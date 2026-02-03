@@ -601,13 +601,14 @@ export default function UISupply({
 
       return (
         <div className="flex items-center justify-center gap-2">
-          <button
-            className="p-2 rounded-md bg-default hover:bg-default-100 border border-default shadow-sm cursor-pointer"
-            onClick={() => handleViewItem(item._rawItem)}
+          <Button
             type="button"
+            size="md"
+            radius="md"
+            onPress={() => handleViewItem(item._rawItem)}
           >
-            <Telescope size={20} />
-          </button>
+            <Telescope />
+          </Button>
         </div>
       );
     },
