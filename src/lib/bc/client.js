@@ -10,6 +10,42 @@ const tokenCache = {
   expiresAt: null,
 };
 
+// Response cache: path -> { data, timestamp }
+const responseCache = new Map();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 นาที
+
+// รายการ endpoint ที่ไม่ควรแคช (เปลี่ยนแปลงบ่อยหรือสำคัญ)
+const NO_CACHE_PATHS = ["/salesOrders", "/customers"];
+
+// จำกัดจำนวนหน้าสูงสุดสำหรับ auto-pagination
+const MAX_PAGES = 10;
+const MAX_TOTAL_ITEMS = 5000;
+
+// Retry configuration
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
+const RETRY_STATUS_CODES = [408, 429, 500, 502, 503, 504]; // รหัสที่ควรลองใหม่ได้
+const FETCH_TIMEOUT_MS = 30000; // 30 วินาที
+
+// Helper: delay แบบ async
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Helper: fetch พร้อม timeout
+async function fetchWithTimeout(url, options, timeoutMs = FETCH_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 class BCClient {
   constructor() {
     this.config = bcConfig;
@@ -69,6 +105,48 @@ class BCClient {
     this.log("Token cache cleared");
   }
 
+  // Cache management helpers
+  _getCacheKey(path) {
+    return path;
+  }
+
+  _shouldCache(path) {
+    // ไม่แคชถ้า path อยู่ในรายการยกเว้น
+    return !NO_CACHE_PATHS.some((noCache) => path.includes(noCache));
+  }
+
+  _getCachedResponse(path) {
+    const key = this._getCacheKey(path);
+    const cached = responseCache.get(key);
+
+    if (!cached) return null;
+
+    // ตรวจสอบว่าแคสหมดอายุหรือยัง
+    if (Date.now() - cached.timestamp > CACHE_TTL_MS) {
+      responseCache.delete(key);
+      return null;
+    }
+
+    this.log(`Cache hit: ${path}`);
+    return cached.data;
+  }
+
+  _setCachedResponse(path, data) {
+    if (!this._shouldCache(path)) return;
+
+    const key = this._getCacheKey(path);
+    responseCache.set(key, {
+      data,
+      timestamp: Date.now(),
+    });
+    this.log(`Cached response: ${path}`);
+  }
+
+  clearResponseCache() {
+    responseCache.clear();
+    this.log("Response cache cleared");
+  }
+
   buildUrl(path) {
     if (path.startsWith("http")) return path;
 
@@ -77,7 +155,7 @@ class BCClient {
     if (path.startsWith("/ODataV4")) {
       return `${baseUrl}/${tenantId}/${environment}/ODataV4/Company('${company}')${path.replace(
         "/ODataV4",
-        ""
+        "",
       )}`;
     }
 
@@ -94,18 +172,62 @@ class BCClient {
     };
   }
 
-  async executeFetch(url, options, headers) {
-    const response = await fetch(url, { ...options, headers });
+  async executeFetch(url, options, headers, retryCount = 0) {
+    try {
+      const response = await fetchWithTimeout(
+        url,
+        { ...options, headers },
+        FETCH_TIMEOUT_MS,
+      );
 
-    if (response.status === 401) {
-      this.log("Received 401, refreshing token");
-      this.clearTokenCache();
-      const newToken = await this.getAccessToken();
-      const newHeaders = this.buildHeaders(newToken, options.headers);
-      return fetch(url, { ...options, headers: newHeaders });
+      // 401: Token หมดอายุ, ลองขอ token ใหม่ 1 ครั้ง
+      if (response.status === 401 && retryCount === 0) {
+        this.log("Received 401, refreshing token");
+        this.clearTokenCache();
+        const newToken = await this.getAccessToken();
+        const newHeaders = this.buildHeaders(newToken, options.headers);
+        return fetchWithTimeout(
+          url,
+          { ...options, headers: newHeaders },
+          FETCH_TIMEOUT_MS,
+        );
+      }
+
+      // ถ้าเป็น error ที่ควร retry และยังไม่เกินจำนวนครั้ง
+      if (
+        RETRY_STATUS_CODES.includes(response.status) &&
+        retryCount < MAX_RETRIES
+      ) {
+        const waitTime = RETRY_DELAY_MS * Math.pow(2, retryCount); // Exponential backoff
+        this.log(
+          `Received ${response.status}, retrying in ${waitTime}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`,
+        );
+        await delay(waitTime);
+        return this.executeFetch(url, options, headers, retryCount + 1);
+      }
+
+      return response;
+    } catch (error) {
+      // AbortError = timeout
+      if (error.name === "AbortError") {
+        throw new BCApiError(
+          `Request timeout after ${FETCH_TIMEOUT_MS}ms`,
+          408,
+          "TIMEOUT",
+        );
+      }
+
+      // Network error (เช่น connection refused) ให้ลองใหม่ได้
+      if (retryCount < MAX_RETRIES) {
+        const waitTime = RETRY_DELAY_MS * Math.pow(2, retryCount);
+        this.log(
+          `Network error: ${error.message}, retrying in ${waitTime}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`,
+        );
+        await delay(waitTime);
+        return this.executeFetch(url, options, headers, retryCount + 1);
+      }
+      throw error;
     }
-
-    return response;
   }
 
   async fetch(path, options = {}) {
@@ -121,6 +243,21 @@ class BCClient {
 
     while (nextUrl) {
       pageCount++;
+
+      // จำกัดจำนวนหน้าสูงสุด
+      if (pageCount > MAX_PAGES) {
+        this.log(`Reached max page limit (${MAX_PAGES}), stopping pagination`);
+        break;
+      }
+
+      // จำกัดจำนวน items สูงสุด
+      if (allResults.length >= MAX_TOTAL_ITEMS) {
+        this.log(
+          `Reached max items limit (${MAX_TOTAL_ITEMS}), stopping pagination`,
+        );
+        break;
+      }
+
       this.log(`Fetching page ${pageCount}: ${nextUrl}`);
 
       const response = await this.executeFetch(nextUrl, options, headers);
@@ -130,7 +267,7 @@ class BCClient {
         throw new BCApiError(
           `BC API Error: ${response.status} - ${errorText}`,
           response.status,
-          errorText
+          errorText,
         );
       }
 
@@ -138,6 +275,13 @@ class BCClient {
 
       if (Array.isArray(data.value)) {
         allResults.push(...data.value);
+
+        // ตรวจสอบจำนวน items อีกครั้งหลังเพิ่มข้อมูล
+        if (allResults.length >= MAX_TOTAL_ITEMS) {
+          this.log(`Reached max items limit after adding page ${pageCount}`);
+          break;
+        }
+
         nextUrl = data["@odata.nextLink"] || null;
       } else {
         this.log(`Response received (single object)`);
@@ -145,12 +289,25 @@ class BCClient {
       }
     }
 
-    this.log(`Response received (${allResults.length} items)`);
+    this.log(
+      `Response received (${allResults.length} items, ${pageCount} pages)`,
+    );
     return allResults;
   }
 
   async get(path, options = {}) {
-    return this.fetch(path, { ...options, method: "GET" });
+    // ตรวจสอบแคสก่อน (เฉพาะ GET ที่ไม่มี force refresh)
+    if (!options.skipCache) {
+      const cached = this._getCachedResponse(path);
+      if (cached) return cached;
+    }
+
+    const result = await this.fetch(path, { ...options, method: "GET" });
+
+    // เก็บลงแคส
+    this._setCachedResponse(path, result);
+
+    return result;
   }
 
   async post(path, body, options = {}) {
@@ -175,7 +332,7 @@ class BCClient {
 
   log(message) {
     if (this.config.options.debug) {
-      logger.error({ message });
+      logger.debug({ message });
     }
   }
 }
