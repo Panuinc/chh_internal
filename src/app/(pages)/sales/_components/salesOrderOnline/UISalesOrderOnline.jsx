@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useCallback, useState, useEffect } from "react";
+import React, { useMemo, useCallback, useState, useEffect, useRef } from "react";
 import {
   Modal,
   ModalContent,
@@ -1253,6 +1253,14 @@ function SlipPreviewModal({
     };
   }, [useCustomAddress, customAddress, order]);
 
+  // Clamp previewIndex when totalPieces changes
+  const clampedPreviewIndex = useMemo(() => {
+    if (previewIndex >= totalPieces && totalPieces > 0) {
+      return totalPieces - 1;
+    }
+    return previewIndex;
+  }, [previewIndex, totalPieces]);
+
   const currentPiece = clampedPreviewIndex + 1;
   const currentExpandedItem = expandedItems[clampedPreviewIndex];
   const currentItem = currentExpandedItem?.item;
@@ -1352,14 +1360,6 @@ function SlipPreviewModal({
     quantities,
     onPrint,
   ]);
-
-  // Clamp previewIndex when totalPieces changes
-  const clampedPreviewIndex = useMemo(() => {
-    if (previewIndex >= totalPieces && totalPieces > 0) {
-      return totalPieces - 1;
-    }
-    return previewIndex;
-  }, [previewIndex, totalPieces]);
 
   // Update previewIndex if clamped
   useEffect(() => {
