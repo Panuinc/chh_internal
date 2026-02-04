@@ -9,9 +9,16 @@ export function extractDimensionCodes(itemNumber) {
 
   const parts = itemNumber.split("-");
 
+  if (parts.length >= 3 && parts[0] === "FG") {
+    return {
+      projectCode: parts[1] || null,
+      productCode: parts.slice(2).join("-") || null,
+    };
+  }
+
   if (parts.length >= 3) {
     return {
-      projectCode: parts[0] || null,
+      projectCode: parts[1] || null,
       productCode: parts.slice(2).join("-") || null,
     };
   } else if (parts.length === 2) {
