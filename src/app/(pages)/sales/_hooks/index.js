@@ -3,4 +3,9 @@ export {
   useSalesOrderOnline,
 } from "./useSalesOrderOnline";
 
-export { useMemos, useMemo } from "./useMemo";
+export {
+  useMemos,
+  useMemo,
+  useNextDocumentNo,
+  useSubmitMemo,
+} from "./useMemo";

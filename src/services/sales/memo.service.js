@@ -32,11 +32,11 @@ export const createSchema = z.object({
   date: preprocessDate("Please provide date"),
   content: preprocessString("Please provide content"),
   requesterName: preprocessString("Please provide requesterName"),
-  requesterDate: preprocessDate("Please provide requesterDate"),
+  requesterDate: z.string().optional().nullable(),
   salesManagerName: z.string().optional().nullable(),
-  salesManagerDate: z.coerce.date().optional().nullable(),
+  salesManagerDate: z.string().optional().nullable(),
   ceoName: z.string().optional().nullable(),
-  ceoDate: z.coerce.date().optional().nullable(),
+  ceoDate: z.string().optional().nullable(),
   createdBy: preprocessString("Please provide the creator ID"),
 });
 
@@ -49,11 +49,11 @@ export const updateSchema = z.object({
   date: preprocessDate("Please provide date"),
   content: preprocessString("Please provide content"),
   requesterName: preprocessString("Please provide requesterName"),
-  requesterDate: preprocessDate("Please provide requesterDate"),
+  requesterDate: z.string().optional().nullable(),
   salesManagerName: z.string().optional().nullable(),
-  salesManagerDate: z.coerce.date().optional().nullable(),
+  salesManagerDate: z.string().optional().nullable(),
   ceoName: z.string().optional().nullable(),
-  ceoDate: z.coerce.date().optional().nullable(),
+  ceoDate: z.string().optional().nullable(),
   updatedBy: preprocessString("Please provide the updater ID"),
 });
 
@@ -113,6 +113,20 @@ export const MemoRepository = {
       where: { memoId: id },
     });
   },
+
+  async findLatestDocumentNoForMonth(monthPrefix) {
+    const latest = await prisma.salesMemo.findFirst({
+      where: {
+        memoDocumentNo: {
+          startsWith: `ME-${monthPrefix}`,
+        },
+      },
+      orderBy: {
+        memoDocumentNo: "desc",
+      },
+    });
+    return latest?.memoDocumentNo || null;
+  },
 };
 
 export const MemoService = {
@@ -145,6 +159,27 @@ export const MemoService = {
 
   async delete(id) {
     return MemoRepository.delete(id);
+  },
+
+  async getNextDocumentNo() {
+    const now = new Date();
+    const year = now.getFullYear().toString().slice(-2);
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const monthPrefix = `${year}${month}`;
+
+    const latest = await MemoRepository.findLatestDocumentNoForMonth(monthPrefix);
+    
+    if (!latest) {
+      return `ME-${monthPrefix}-0001`;
+    }
+
+    const match = latest.match(/ME-\d{4}-(\d+)/);
+    if (!match) {
+      return `ME-${monthPrefix}-0001`;
+    }
+
+    const nextNumber = parseInt(match[1], 10) + 1;
+    return `ME-${monthPrefix}-${nextNumber.toString().padStart(4, "0")}`;
   },
 };
 
@@ -285,6 +320,20 @@ export async function DeleteUseCase(id, deletedBy) {
 
     log.success({ id });
     return { success: true };
+  } catch (error) {
+    log.error({ error: error.message });
+    throw error;
+  }
+}
+
+export async function GetNextDocumentNoUseCase() {
+  const log = createLogger("GetNextDocumentNoUseCase");
+  log.start();
+
+  try {
+    const nextDocumentNo = await MemoService.getNextDocumentNo();
+    log.success({ nextDocumentNo });
+    return { documentNo: nextDocumentNo };
   } catch (error) {
     log.error({ error: error.message });
     throw error;

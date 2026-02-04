@@ -1,121 +1,264 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import showToast from "@/components/UIToast";
 
-export function useMemos({ limit = 100, offset = 0 } = {}) {
-  const [memos, setMemos] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState(null);
+const API_URL = "/api/sales/memo";
 
-  const fetchMemos = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/sales/memo?limit=${limit}&offset=${offset}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch memos");
-      }
-      const data = await response.json();
-      setMemos(data.data || []);
-      setPagination(data.pagination);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [limit, offset]);
+const TOAST = {
+  SUCCESS: "success",
+  DANGER: "danger",
+  WARNING: "warning",
+};
 
-  useEffect(() => {
-    fetchMemos();
-  }, [fetchMemos]);
+function formatMemo(memo, index = null) {
+  if (!memo) return null;
 
-  const createMemo = useCallback(async (memoData) => {
-    try {
-      const response = await fetch("/api/sales/memo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(memoData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create memo");
-      }
-      await fetchMemos();
-      return await response.json();
-    } catch (err) {
-      throw err;
-    }
-  }, [fetchMemos]);
-
-  const updateMemo = useCallback(async (id, memoData) => {
-    try {
-      const response = await fetch(`/api/sales/memo/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(memoData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update memo");
-      }
-      await fetchMemos();
-      return await response.json();
-    } catch (err) {
-      throw err;
-    }
-  }, [fetchMemos]);
-
-  const deleteMemo = useCallback(async (id) => {
-    try {
-      const response = await fetch(`/api/sales/memo/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to delete memo");
-      }
-      await fetchMemos();
-    } catch (err) {
-      throw err;
-    }
-  }, [fetchMemos]);
+  const getFullName = (employee) =>
+    employee
+      ? `${employee.employeeFirstName} ${employee.employeeLastName}`
+      : "-";
 
   return {
-    memos,
-    loading,
-    error,
-    pagination,
-    refetch: fetchMemos,
-    createMemo,
-    updateMemo,
-    deleteMemo,
+    ...memo,
+    ...(index !== null && { memoIndex: index + 1 }),
+    memoCreatedBy: getFullName(memo.createdByEmployee),
+    memoUpdatedBy: getFullName(memo.updatedByEmployee),
+    memoDateFormatted: memo.memoDate
+      ? new Date(memo.memoDate).toLocaleDateString("th-TH")
+      : "-",
+    memoCreatedAtFormatted: memo.memoCreatedAt
+      ? new Date(memo.memoCreatedAt).toLocaleString("th-TH")
+      : "-",
   };
 }
 
-export function useMemo(id) {
-  const [memo, setMemo] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+function getErrorMessage(error) {
+  if (typeof error === "string") return error;
+  return error?.message || "Unknown error";
+}
 
-  const fetchMemo = useCallback(async () => {
-    if (!id) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/sales/memo/${id}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch memo");
-      }
-      const data = await response.json();
-      setMemo(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
+async function fetchWithAbort(url, options, signal) {
+  const response = await fetch(url, {
+    ...options,
+    credentials: "include",
+    signal,
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      data.error || `Request failed with status ${response.status}`
+    );
+  }
+
+  return data;
+}
+
+export function useMemos(apiUrl = API_URL) {
+  const [memos, setMemos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchMemo();
-  }, [fetchMemo]);
+    const controller = new AbortController();
 
-  return { memo, loading, error, refetch: fetchMemo };
+    (async () => {
+      try {
+        const result = await fetchWithAbort(apiUrl, {}, controller.signal);
+
+        const items = result.memos || result.data || [];
+
+        const formatted = Array.isArray(items)
+          ? items.map((p, i) => formatMemo(p, i)).filter(Boolean)
+          : [];
+
+        setMemos(formatted);
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => controller.abort();
+  }, [apiUrl]);
+
+  return { memos, loading };
+}
+
+export function useMemo(memoId) {
+  const [memo, setMemo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!memoId) {
+      setLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    setLoading(true);
+
+    (async () => {
+      try {
+        const result = await fetchWithAbort(
+          `${API_URL}/${memoId}`,
+          {},
+          controller.signal
+        );
+
+        const item = result.memo || result.data;
+
+        if (!item) {
+          showToast(TOAST.WARNING, "No Memo data found.");
+          return;
+        }
+
+        setMemo(formatMemo(item));
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => controller.abort();
+  }, [memoId]);
+
+  return { memo, loading };
+}
+
+export function useNextDocumentNo() {
+  const [documentNo, setDocumentNo] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    (async () => {
+      try {
+        const result = await fetchWithAbort(
+          `${API_URL}/next-document-no`,
+          {},
+          controller.signal
+        );
+        setDocumentNo(result.documentNo || "");
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => controller.abort();
+  }, []);
+
+  return { documentNo, loading };
+}
+
+export function useSubmitMemo({
+  mode = "create",
+  memoId = null,
+  currentEmployeeId,
+}) {
+  const router = useRouter();
+
+  return useCallback(
+    async (formRefOrData, formDataOrSetErrors, setErrorsOptional) => {
+      let formData, setErrors;
+
+      if (setErrorsOptional !== undefined) {
+        formData = formDataOrSetErrors;
+        setErrors = setErrorsOptional;
+      } else {
+        formData = formRefOrData;
+        setErrors = formDataOrSetErrors || (() => {});
+      }
+
+      const isCreate = mode === "create";
+      const byField = isCreate ? "createdBy" : "updatedBy";
+
+      const payload = {
+        ...formData,
+        [byField]: currentEmployeeId,
+      };
+
+      const url = isCreate ? API_URL : `${API_URL}/${memoId}`;
+      const method = isCreate ? "POST" : "PUT";
+
+      try {
+        const response = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          showToast(TOAST.SUCCESS, result.message || "Success");
+          setTimeout(() => router.push("/sales/memo"), 1500);
+        } else {
+          if (result.details && typeof result.details === "object") {
+            setErrors(result.details);
+          } else {
+            setErrors({});
+          }
+
+          showToast(
+            TOAST.DANGER,
+            result.error || "Failed to submit Memo."
+          );
+        }
+      } catch (err) {
+        showToast(
+          TOAST.DANGER,
+          `Failed to submit Memo: ${getErrorMessage(err)}`
+        );
+      }
+    },
+    [mode, memoId, currentEmployeeId, router]
+  );
+}
+
+export function useDeleteMemo() {
+  return useCallback(async (memoId) => {
+    try {
+      const response = await fetch(`${API_URL}/${memoId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        showToast(TOAST.SUCCESS, result.message || "Deleted successfully");
+        return true;
+      } else {
+        showToast(
+          TOAST.DANGER,
+          result.error || "Failed to delete Memo."
+        );
+        return false;
+      }
+    } catch (err) {
+      showToast(
+        TOAST.DANGER,
+        `Failed to delete Memo: ${getErrorMessage(err)}`
+      );
+      return false;
+    }
+  }, []);
 }
