@@ -172,3 +172,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   trustHost: true,
 });
+
+export function hasPermission(session, permission) {
+  if (!session?.user) return false;
+  if (session.user.isSuperAdmin) return true;
+  return session.user.permissions?.includes(permission) || false;
+}

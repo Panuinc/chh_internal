@@ -81,6 +81,9 @@ model Employee {
   createdPatrols Patrol[] @relation("PatrolCreatedBy")
   updatedPatrols Patrol[] @relation("PatrolUpdatedBy")
 
+  createdSalesMemos SalesMemo[] @relation("SalesMemoCreatedBy")
+  updatedSalesMemos SalesMemo[] @relation("SalesMemoUpdatedBy")
+
   @@index([employeeCreatedBy])
   @@index([employeeUpdatedBy])
 }
@@ -221,4 +224,32 @@ model RefreshToken {
   @@index([accountId])
   @@index([token])
   @@index([expiresAt])
+}
+
+model SalesMemo {
+  memoId               String    @id @default(cuid())
+  memoDocumentNo       String    @unique
+  memoTo               String
+  memoCopy             String?
+  memoSubject          String
+  memoDate             DateTime
+  memoContent          String    @db.Text
+  memoRequesterName    String
+  memoRequesterDate    String
+  memoSalesManagerName String?
+  memoSalesManagerDate String?
+  memoCeoName          String?
+  memoCeoDate          String?
+  memoCreatedBy        String?
+  memoCreatedAt        DateTime  @default(now())
+  memoUpdatedBy        String?
+  memoUpdatedAt        DateTime?
+
+  createdByEmployee Employee? @relation("SalesMemoCreatedBy", fields: [memoCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("SalesMemoUpdatedBy", fields: [memoUpdatedBy], references: [employeeId])
+
+  @@index([memoDocumentNo])
+  @@index([memoCreatedBy])
+  @@index([memoUpdatedBy])
+  @@index([memoCreatedAt])
 }

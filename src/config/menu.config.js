@@ -12,6 +12,7 @@ import {
   DoorOpen,
   BadgeDollarSign,
   ListOrdered,
+  FileText,
 } from "lucide-react";
 
 export const menuConfig = {
@@ -236,6 +237,18 @@ export const menuConfig = {
             view: "sales.salesOrderOnline.view",
             create: "sales.salesOrderOnline.create",
             edit: "sales.salesOrderOnline.edit",
+          },
+        },
+        {
+          id: "memo",
+          href: "/sales/memo",
+          text: "MEMO",
+          icon: FileText,
+          permission: "sales.memo.view",
+          actions: {
+            view: "sales.memo.view",
+            create: "sales.memo.create",
+            edit: "sales.memo.edit",
           },
         },
       ],
