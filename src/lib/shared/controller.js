@@ -8,27 +8,28 @@ export function successResponse(data, status = HTTP_STATUS.OK) {
 }
 
 export function errorResponse(error) {
-  const { status, message, details } = normalizeError(error);
+  const { statusCode, message, details } = normalizeError(error);
   const body = { error: message };
 
   if (details) {
     body.details = details;
   }
 
-  return NextResponse.json(body, { status });
+  return NextResponse.json(body, { status: statusCode });
 }
 
 export function getPaginationParams(request) {
   const { searchParams } = new URL(request.url);
+  const rawLimit = parseInt(
+    searchParams.get("limit") || String(PAGINATION.DEFAULT_LIMIT),
+    10,
+  );
   return {
-    page: parseInt(
-      searchParams.get("page") || String(PAGINATION.DEFAULT_PAGE),
-      10
+    page: Math.max(
+      1,
+      parseInt(searchParams.get("page") || String(PAGINATION.DEFAULT_PAGE), 10),
     ),
-    limit: parseInt(
-      searchParams.get("limit") || String(PAGINATION.DEFAULT_LIMIT),
-      10
-    ),
+    limit: Math.min(PAGINATION.MAX_LIMIT, Math.max(1, rawLimit)),
   };
 }
 
@@ -101,7 +102,7 @@ export function createBaseController({
             message: SUCCESS_MESSAGES.CREATED,
             [singularKey]: formatData([item])[0],
           },
-          HTTP_STATUS.CREATED
+          HTTP_STATUS.CREATED,
         );
       } catch (error) {
         log.error({

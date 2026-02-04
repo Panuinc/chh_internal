@@ -14,7 +14,7 @@ export default function UINotFound() {
         Whoops!
       </div>
       <div className="flex items-center justify-center text-center w-6/12 h-fit p-2 gap-2 opacity-50">
-        We Couldn't find the page you were looking for.
+        We Couldn&apos;t find the page you were looking for.
       </div>
       <Link
         href="/home"

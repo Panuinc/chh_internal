@@ -29,10 +29,11 @@ export function errorResponse(error, endpoint = "") {
 
 export function getPaginationParams(searchParams) {
   const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-  const limit = Math.min(
-    PAGINATION.MAX_LIMIT,
-    Math.max(1, parseInt(searchParams.get("limit") || String(PAGINATION.DEFAULT_LIMIT), 10))
+  const rawLimit = parseInt(
+    searchParams.get("limit") || String(PAGINATION.DEFAULT_LIMIT),
+    10,
   );
+  const limit = Math.min(PAGINATION.MAX_LIMIT, Math.max(1, rawLimit));
   return { page, limit };
 }
 
@@ -45,7 +46,10 @@ export function parseQueryParams(searchParams, schema) {
     if (value === null) {
       if (config.required) {
         const { BCValidationError } = require("./errors.js");
-        throw new BCValidationError(`Query parameter '${key}' is required`, key);
+        throw new BCValidationError(
+          `Query parameter '${key}' is required`,
+          key,
+        );
       }
       result[key] = config.default ?? null;
       continue;
@@ -69,7 +73,10 @@ export function parseQueryParams(searchParams, schema) {
 
     if (config.validate && !config.validate(result[key])) {
       const { BCValidationError } = require("./errors.js");
-      throw new BCValidationError(config.message || `Invalid value for '${key}'`, key);
+      throw new BCValidationError(
+        config.message || `Invalid value for '${key}'`,
+        key,
+      );
     }
   }
 
@@ -99,7 +106,7 @@ export function createBCController({
             page,
             limit,
             ...(filters && { filters }),
-          }
+          },
         );
       } catch (error) {
         return errorResponse(error, `GET /${entityKey}`);

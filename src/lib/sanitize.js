@@ -12,7 +12,7 @@ const SQL_PATTERNS = [
 
 const PATH_TRAVERSAL_PATTERNS = [
   /\.\.(\\|\/)/g,
-  /~\
+  /~.*/g,
 ];
 
 

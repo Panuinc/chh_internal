@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { PAGINATION } from "@/config/app.config";
 import { getLocalNow } from "@/lib/getLocalNow";
 import { z } from "zod";
 import { preprocessString, preprocessEnum, formatData } from "@/lib/zodSchema";
@@ -119,7 +120,7 @@ export const PermissionService = {
   },
 };
 
-export async function GetAllUseCase(page = 1, limit = 1000000) {
+export async function GetAllUseCase(page = 1, limit = PAGINATION.DEFAULT_LIMIT) {
   const log = createLogger("GetAllPermissionUseCase");
   log.start({ page, limit });
 

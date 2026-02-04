@@ -1,3 +1,4 @@
+// eslint-disable-next-line camelcase
 import { unstable_cache } from "next/cache";
 import { CACHE } from "@/config/app.config";
 

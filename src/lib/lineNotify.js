@@ -1,4 +1,5 @@
 import { createLogger } from "@/lib/shared/logger";
+import { withRetry } from "@/lib/retry";
 
 const logger = createLogger("line-notify");
 
@@ -43,31 +44,40 @@ export async function sendFlexMessage(
 ) {
   const url = "https://api.line.me/v2/bot/message/push";
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`,
-    },
-    body: JSON.stringify({
-      to: groupId,
-      messages: [
-        {
-          type: "flex",
-          altText,
-          contents: flexContent,
+  return withRetry(
+    async () => {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`,
         },
-      ],
-    }),
-  });
+        body: JSON.stringify({
+          to: groupId,
+          messages: [
+            {
+              type: "flex",
+              altText,
+              contents: flexContent,
+            },
+          ],
+        }),
+      });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    logger.error({ message: "LINE API Error Response", error });
-    throw new Error(`LINE API Error: ${error.message || response.statusText}`);
-  }
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        logger.error({ message: "LINE API Error Response", error });
+        throw new Error(`LINE API Error: ${error.message || response.statusText}`);
+      }
 
-  return response;
+      return response;
+    },
+    {
+      maxRetries: 3,
+      retryDelay: 1000,
+      backoffMultiplier: 2,
+    }
+  );
 }
 
 export function buildVisitorCheckInFlex(visitor, contactUser) {

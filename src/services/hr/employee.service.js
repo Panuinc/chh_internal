@@ -3,6 +3,7 @@ import { getLocalNow } from "@/lib/getLocalNow";
 import { formatData } from "@/lib/zodSchema";
 import { employeeCreateSchema, employeeUpdateSchema } from "@/schemas/hr";
 import { PAGINATION } from "@/config/app.config";
+import { isValidId } from "@/lib/validators";
 import {
   NotFoundError,
   BadRequestError,
@@ -17,7 +18,7 @@ const ENTITY_NAME = "Employee";
 const ENTITY_KEY = "employees";
 const ENTITY_SINGULAR = "employee";
 
-const DEFAULT_LIMIT = PAGINATION.LARGE_PAGE_SIZE;
+const DEFAULT_LIMIT = PAGINATION.DEFAULT_LIMIT;
 
 const EMPLOYEE_SELECT = {
   employeeId: true,
@@ -132,8 +133,8 @@ export async function GetByIdUseCase(id) {
   log.start({ id });
 
   try {
-    if (!id || typeof id !== "string") {
-      throw new BadRequestError(`Invalid ${ENTITY_NAME} ID`);
+    if (!id || !isValidId(id)) {
+      throw new BadRequestError(`Invalid ${ENTITY_NAME} ID format`);
     }
 
     const item = await EmployeeService.findById(id);

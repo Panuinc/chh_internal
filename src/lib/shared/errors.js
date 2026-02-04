@@ -1,10 +1,14 @@
 import { HTTP_STATUS, ERROR_MESSAGES } from "./constants";
 
 export class AppError extends Error {
-  constructor(message, status = HTTP_STATUS.INTERNAL_ERROR, details = null) {
+  constructor(
+    message,
+    statusCode = HTTP_STATUS.INTERNAL_ERROR,
+    details = null,
+  ) {
     super(message);
     this.name = this.constructor.name;
-    this.status = status;
+    this.statusCode = statusCode;
     this.details = details;
   }
 
@@ -50,7 +54,7 @@ export class UnauthorizedError extends AppError {
 export function normalizeError(error) {
   if (error instanceof AppError) {
     return {
-      status: error.status,
+      statusCode: error.statusCode,
       message: error.message,
       details: error.details,
     };
@@ -58,7 +62,7 @@ export function normalizeError(error) {
 
   if (error && typeof error === "object" && !Array.isArray(error)) {
     return {
-      status: error.status || HTTP_STATUS.INTERNAL_ERROR,
+      statusCode: error.statusCode || HTTP_STATUS.INTERNAL_ERROR,
       message: error.message || ERROR_MESSAGES.INTERNAL_ERROR,
       details: error.details,
     };
@@ -66,13 +70,13 @@ export function normalizeError(error) {
 
   if (error instanceof Error) {
     return {
-      status: HTTP_STATUS.INTERNAL_ERROR,
+      statusCode: HTTP_STATUS.INTERNAL_ERROR,
       message: error.message || ERROR_MESSAGES.INTERNAL_ERROR,
     };
   }
 
   return {
-    status: HTTP_STATUS.INTERNAL_ERROR,
+    statusCode: HTTP_STATUS.INTERNAL_ERROR,
     message: ERROR_MESSAGES.INTERNAL_ERROR,
   };
 }

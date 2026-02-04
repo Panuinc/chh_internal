@@ -1,4 +1,9 @@
-import { Montserrat, Noto_Sans_Thai } from "next/font/google";
+// Validate environment variables on server startup
+if (typeof window === "undefined") {
+  require("@/lib/env");
+}
+
+import { Montserrat, Noto_Sans_Thai as notoSansThai } from "next/font/google";
 import "@/style/globals.css";
 import { Providers } from "./providers";
 
@@ -9,7 +14,7 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-const notoThai = Noto_Sans_Thai({
+const notoThai = notoSansThai({
   subsets: ["thai"],
   variable: "--font-th",
   weight: ["400"],

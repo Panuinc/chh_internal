@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { PAGINATION } from "@/config/app.config";
 import { getLocalNow } from "@/lib/getLocalNow";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -171,7 +172,7 @@ export const AccountService = {
   },
 };
 
-export async function GetAllUseCase(page = 1, limit = 1000000) {
+export async function GetAllUseCase(page = 1, limit = PAGINATION.DEFAULT_LIMIT) {
   const log = createLogger("GetAllAccountUseCase");
   log.start({ page, limit });
 

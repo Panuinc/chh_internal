@@ -1,4 +1,6 @@
 import prisma from "@/lib/prisma";
+import { PAGINATION } from "@/config/app.config";
+import { isValidId } from "@/lib/validators";
 import { getLocalNow } from "@/lib/getLocalNow";
 import { z } from "zod";
 import { preprocessString, formatData } from "@/lib/zodSchema";
@@ -7,7 +9,23 @@ import {
   validateOrThrow,
   createLogger,
 } from "@/lib/shared/server";
-import { saveUploadedFile } from "@/lib/fileStore";
+import { saveUploadedFile, deleteFile } from "@/lib/fileStore";
+
+/**
+ * Helper function to cleanup uploaded files on error
+ * @param {string[]} filePaths - Array of file paths to delete
+ */
+async function cleanupFiles(filePaths) {
+  for (const path of filePaths) {
+    if (path) {
+      try {
+        await deleteFile(path);
+      } catch (e) {
+        // Silently ignore cleanup errors
+      }
+    }
+  }
+}
 
 const ENTITY_NAME = "Patrol";
 const ENTITY_KEY = "patrols";
@@ -65,7 +83,7 @@ export const PatrolService = {
   },
 };
 
-export async function GetAllUseCase(page = 1, limit = 1000000) {
+export async function GetAllUseCase(page = 1, limit = PAGINATION.DEFAULT_LIMIT) {
   const log = createLogger("GetAllPatrolUseCase");
   log.start({ page, limit });
 
@@ -85,12 +103,13 @@ export async function CreateUseCase(data, patrolPicture) {
   const log = createLogger("CreatePatrolUseCase");
   log.start({ qrCodeInfo: data?.patrolQrCodeInfo });
 
+  const validated = validateOrThrow(createSchema, data);
+  const timestamp = Date.now();
+  const baseName = `patrol_${timestamp}`;
+  const uploadedFiles = [];
+
   try {
-    const validated = validateOrThrow(createSchema, data);
-
-    const timestamp = Date.now();
-    const baseName = `patrol_${timestamp}`;
-
+    // 1. Save file first
     let picturePath = "";
     if (patrolPicture) {
       picturePath = await saveUploadedFile(
@@ -98,12 +117,21 @@ export async function CreateUseCase(data, patrolPicture) {
         "patrols/pictures",
         baseName
       );
+      uploadedFiles.push(picturePath);
     }
 
-    const item = await PatrolService.create({
-      ...validated,
-      patrolPicture: picturePath,
-      patrolCreatedAt: getLocalNow(),
+    // 2. Create DB record within transaction
+    const item = await prisma.$transaction(async (tx) => {
+      return await tx.patrol.create({
+        data: {
+          ...validated,
+          patrolPicture: picturePath,
+          patrolCreatedAt: getLocalNow(),
+        },
+        include: {
+          createdByEmployee: { select: EMPLOYEE_SELECT },
+        },
+      });
     });
 
     log.success({
@@ -112,6 +140,8 @@ export async function CreateUseCase(data, patrolPicture) {
     });
     return item;
   } catch (error) {
+    // Cleanup uploaded files on error
+    await cleanupFiles(uploadedFiles);
     log.error({ error: error.message });
     throw error;
   }
@@ -138,10 +168,14 @@ async function parseFormData(request) {
 }
 
 export async function getAllPatrol(request) {
+  const log = createLogger("getAllPatrol");
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "1000000", 10);
+    const limit = Math.min(
+      parseInt(searchParams.get("limit") || String(PAGINATION.DEFAULT_LIMIT), 10),
+      PAGINATION.MAX_LIMIT
+    );
 
     const { items, total } = await GetAllUseCase(page, limit);
     const formatted = formatPatrolData(items);
@@ -163,6 +197,7 @@ export async function getAllPatrol(request) {
 }
 
 export async function createPatrol(request) {
+  const log = createLogger("createPatrol");
   try {
     const { data, patrolPicture } = await parseFormData(request);
     const item = await CreateUseCase(data, patrolPicture);

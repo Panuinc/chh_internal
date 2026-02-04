@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { getProtectedRoutes } from "@/config/menu.config";
+import { generateRequestId } from "@/lib/requestContext";
 
 const publicRoutes = ["/signIn", "/api/auth"];
 const protectedRoutes = getProtectedRoutes();
@@ -8,6 +9,10 @@ const protectedRoutes = getProtectedRoutes();
 export default auth((req) => {
   const { nextUrl, auth: session } = req;
   const pathname = nextUrl.pathname;
+  
+  // Generate or reuse request ID
+  const existingRequestId = req.headers.get("x-request-id");
+  const requestId = existingRequestId || generateRequestId();
 
   const isPublicRoute = publicRoutes.some(
     (route) => pathname === route || pathname.startsWith("/api/auth")
@@ -15,27 +20,37 @@ export default auth((req) => {
 
   if (pathname === "/") {
     if (session) {
-      return NextResponse.redirect(new URL("/home", nextUrl.origin));
+      const response = NextResponse.redirect(new URL("/home", nextUrl.origin));
+      response.headers.set("x-request-id", requestId);
+      return response;
     } else {
-      return NextResponse.redirect(new URL("/signIn", nextUrl.origin));
+      const response = NextResponse.redirect(new URL("/signIn", nextUrl.origin));
+      response.headers.set("x-request-id", requestId);
+      return response;
     }
   }
 
   if (!session && !isPublicRoute) {
     const signInUrl = new URL("/signIn", nextUrl.origin);
     signInUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(signInUrl);
+    const response = NextResponse.redirect(signInUrl);
+    response.headers.set("x-request-id", requestId);
+    return response;
   }
 
   if (session && pathname === "/signIn") {
-    return NextResponse.redirect(new URL("/home", nextUrl.origin));
+    const response = NextResponse.redirect(new URL("/home", nextUrl.origin));
+    response.headers.set("x-request-id", requestId);
+    return response;
   }
 
   if (session && !isPublicRoute) {
     const user = session.user;
 
     if (user.isSuperAdmin) {
-      return NextResponse.next();
+      const response = NextResponse.next();
+      response.headers.set("x-request-id", requestId);
+      return response;
     }
 
     const matchedRoute = findMatchingRoute(pathname, protectedRoutes);
@@ -44,16 +59,22 @@ export default auth((req) => {
       const { config } = matchedRoute;
 
       if (config.requireSuperAdmin) {
-        return NextResponse.redirect(new URL("/forbidden", nextUrl.origin));
+        const response = NextResponse.redirect(new URL("/forbidden", nextUrl.origin));
+        response.headers.set("x-request-id", requestId);
+        return response;
       }
 
       if (!hasPermission(user.permissions, config.permission)) {
-        return NextResponse.redirect(new URL("/forbidden", nextUrl.origin));
+        const response = NextResponse.redirect(new URL("/forbidden", nextUrl.origin));
+        response.headers.set("x-request-id", requestId);
+        return response;
       }
     }
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set("x-request-id", requestId);
+  return response;
 });
 
 function findMatchingRoute(pathname, routes) {

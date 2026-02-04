@@ -26,12 +26,14 @@ class BCClient {
 
     this.log("Requesting new access token");
 
+    /* eslint-disable camelcase */
     const params = new URLSearchParams({
       grant_type: "client_credentials",
       client_id: this.config.auth.clientId,
       client_secret: this.config.auth.clientSecret,
       scope: this.config.auth.scope,
     });
+    /* eslint-enable camelcase */
 
     try {
       const response = await fetch(this.config.auth.url, {

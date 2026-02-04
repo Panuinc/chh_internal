@@ -1,4 +1,6 @@
 import prisma from "@/lib/prisma";
+import { PAGINATION } from "@/config/app.config";
+import { isValidId } from "@/lib/validators";
 import { getLocalNow } from "@/lib/getLocalNow";
 import { z } from "zod";
 import { preprocessString, preprocessEnum, formatData } from "@/lib/zodSchema";
@@ -9,6 +11,22 @@ import {
   createLogger,
 } from "@/lib/shared/server";
 import { saveUploadedFile, deleteFile } from "@/lib/fileStore";
+
+/**
+ * Helper function to cleanup uploaded files on error
+ * @param {string[]} filePaths - Array of file paths to delete
+ */
+async function cleanupFiles(filePaths) {
+  for (const path of filePaths) {
+    if (path) {
+      try {
+        await deleteFile(path);
+      } catch (e) {
+        // Silently ignore cleanup errors
+      }
+    }
+  }
+}
 import {
   notifyVisitorCheckIn,
   notifyVisitorStatusUpdate,
@@ -149,7 +167,7 @@ export const VisitorService = {
   },
 };
 
-export async function GetAllUseCase(page = 1, limit = 1000000) {
+export async function GetAllUseCase(page = 1, limit = PAGINATION.DEFAULT_LIMIT) {
   const log = createLogger("GetAllVisitorUseCase");
   log.start({ page, limit });
 
@@ -170,8 +188,8 @@ export async function GetByIdUseCase(id) {
   log.start({ id });
 
   try {
-    if (!id || typeof id !== "string") {
-      throw new BadRequestError(`Invalid ${ENTITY_NAME} ID`);
+    if (!id || !isValidId(id)) {
+      throw new BadRequestError(`Invalid ${ENTITY_NAME} ID format`);
     }
 
     const item = await VisitorService.findById(id);
@@ -194,12 +212,13 @@ export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
   const log = createLogger("CreateVisitorUseCase");
   log.start({ name: `${data?.visitorFirstName} ${data?.visitorLastName}` });
 
+  const validated = validateOrThrow(createSchema, data);
+  const timestamp = Date.now();
+  const baseName = `visitor_${timestamp}`;
+  const uploadedFiles = [];
+
   try {
-    const validated = validateOrThrow(createSchema, data);
-
-    const timestamp = Date.now();
-    const baseName = `visitor_${timestamp}`;
-
+    // 1. Save files first (these need cleanup if DB fails)
     let photoPath = "";
     if (visitorPhoto) {
       photoPath = await saveUploadedFile(
@@ -207,30 +226,42 @@ export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
         "visitors/photos",
         baseName
       );
+      uploadedFiles.push(photoPath);
     }
 
     let documentPhotosPath = "";
+    const documentPaths = [];
     if (visitorDocumentPhotos && visitorDocumentPhotos.length > 0) {
-      const paths = [];
       for (let i = 0; i < visitorDocumentPhotos.length; i++) {
         const docPath = await saveUploadedFile(
           visitorDocumentPhotos[i],
           "visitors/documents",
           `${baseName}_doc${i}`
         );
-        paths.push(docPath);
+        documentPaths.push(docPath);
+        uploadedFiles.push(docPath);
       }
-      documentPhotosPath = JSON.stringify(paths);
+      documentPhotosPath = JSON.stringify(documentPaths);
     }
 
-    const item = await VisitorService.create({
-      ...validated,
-      visitorPhoto: photoPath,
-      visitorDocumentPhotos: documentPhotosPath,
-      visitorStatus: "CheckIn",
-      visitorCreatedAt: getLocalNow(),
+    // 2. Create DB record within transaction
+    const item = await prisma.$transaction(async (tx) => {
+      return await tx.visitor.create({
+        data: {
+          ...validated,
+          visitorPhoto: photoPath,
+          visitorDocumentPhotos: documentPhotosPath,
+          visitorStatus: "CheckIn",
+          visitorCreatedAt: getLocalNow(),
+        },
+        include: {
+          contactUser: { select: EMPLOYEE_SELECT },
+          createdByEmployee: { select: EMPLOYEE_SELECT },
+        },
+      });
     });
 
+    // 3. Send notification (outside transaction - non-critical)
     try {
       const contactUser = item.contactUser
         ? {
@@ -251,6 +282,8 @@ export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
     });
     return item;
   } catch (error) {
+    // Cleanup uploaded files on error
+    await cleanupFiles(uploadedFiles);
     log.error({ error: error.message });
     throw error;
   }
@@ -260,41 +293,38 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
   const log = createLogger("UpdateVisitorUseCase");
   log.start({ id: data?.visitorId });
 
-  try {
-    const validated = validateOrThrow(updateSchema, data);
-    const { visitorId, ...updateData } = validated;
+  const validated = validateOrThrow(updateSchema, data);
+  const { visitorId, ...updateData } = validated;
+  const newUploadedFiles = [];
+  const deletedOldFiles = [];
 
+  try {
+    // 1. Find existing record first
     const existing = await VisitorService.findById(visitorId);
     if (!existing) {
       throw new NotFoundError(ENTITY_NAME);
     }
 
+    // 2. Save new files first (before deleting old ones)
+    const timestamp = Date.now();
+    const baseName = `visitor_${timestamp}`;
+
     let photoPath = existing.visitorPhoto;
     if (visitorPhoto) {
-      if (existing.visitorPhoto) {
-        await deleteFile(existing.visitorPhoto);
-      }
-      const timestamp = Date.now();
-      const baseName = `visitor_${timestamp}`;
-      photoPath = await saveUploadedFile(
+      const newPhotoPath = await saveUploadedFile(
         visitorPhoto,
         "visitors/photos",
         baseName
       );
+      photoPath = newPhotoPath;
+      newUploadedFiles.push(newPhotoPath);
+      if (existing.visitorPhoto) {
+        deletedOldFiles.push(existing.visitorPhoto);
+      }
     }
 
     let documentPhotosPath = existing.visitorDocumentPhotos;
     if (visitorDocumentPhotos && visitorDocumentPhotos.length > 0) {
-      if (existing.visitorDocumentPhotos) {
-        try {
-          const oldPaths = JSON.parse(existing.visitorDocumentPhotos);
-          for (const oldPath of oldPaths) {
-            await deleteFile(oldPath);
-          }
-        } catch (_) {}
-      }
-      const timestamp = Date.now();
-      const baseName = `visitor_${timestamp}`;
       const paths = [];
       for (let i = 0; i < visitorDocumentPhotos.length; i++) {
         const docPath = await saveUploadedFile(
@@ -303,17 +333,47 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
           `${baseName}_doc${i}`
         );
         paths.push(docPath);
+        newUploadedFiles.push(docPath);
       }
       documentPhotosPath = JSON.stringify(paths);
+      
+      // Mark old documents for deletion
+      if (existing.visitorDocumentPhotos) {
+        try {
+          const oldPaths = JSON.parse(existing.visitorDocumentPhotos);
+          deletedOldFiles.push(...oldPaths);
+        } catch (_) {}
+      }
     }
 
-    const item = await VisitorService.update(visitorId, {
-      ...updateData,
-      visitorPhoto: photoPath,
-      visitorDocumentPhotos: documentPhotosPath,
-      visitorUpdatedAt: getLocalNow(),
+    // 3. Update DB record within transaction
+    const item = await prisma.$transaction(async (tx) => {
+      return await tx.visitor.update({
+        where: { visitorId },
+        data: {
+          ...updateData,
+          visitorPhoto: photoPath,
+          visitorDocumentPhotos: documentPhotosPath,
+          visitorUpdatedAt: getLocalNow(),
+        },
+        include: {
+          contactUser: { select: EMPLOYEE_SELECT },
+          createdByEmployee: { select: EMPLOYEE_SELECT },
+          updatedByEmployee: { select: EMPLOYEE_SELECT },
+        },
+      });
     });
 
+    // 4. Delete old files only after DB update succeeds
+    for (const oldPath of deletedOldFiles) {
+      try {
+        await deleteFile(oldPath);
+      } catch (e) {
+        log.error({ message: "Failed to delete old file", path: oldPath });
+      }
+    }
+
+    // 5. Send notification (outside transaction)
     if (
       updateData.visitorStatus &&
       updateData.visitorStatus !== existing.visitorStatus
@@ -346,6 +406,8 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
     });
     return item;
   } catch (error) {
+    // Cleanup newly uploaded files on error
+    await cleanupFiles(newUploadedFiles);
     log.error({ error: error.message });
     throw error;
   }
@@ -356,8 +418,8 @@ export async function CheckoutUseCase(visitorId, updatedBy) {
   log.start({ visitorId });
 
   try {
-    if (!visitorId || typeof visitorId !== "string") {
-      throw new BadRequestError(`Invalid ${ENTITY_NAME} ID`);
+    if (!visitorId || !isValidId(visitorId)) {
+      throw new BadRequestError(`Invalid ${ENTITY_NAME} ID format`);
     }
 
     const existing = await VisitorService.findById(visitorId);
@@ -429,10 +491,14 @@ async function parseFormData(request) {
 }
 
 export async function getAllVisitor(request) {
+  const log = createLogger("getAllVisitor");
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "1000000", 10);
+    const limit = Math.min(
+      parseInt(searchParams.get("limit") || String(PAGINATION.DEFAULT_LIMIT), 10),
+      PAGINATION.MAX_LIMIT
+    );
 
     const { items, total } = await GetAllUseCase(page, limit);
     const formatted = formatVisitorData(items);
@@ -454,6 +520,7 @@ export async function getAllVisitor(request) {
 }
 
 export async function getVisitorById(request, visitorId) {
+  const log = createLogger("getVisitorById");
   try {
     const item = await GetByIdUseCase(visitorId);
     const formatted = formatVisitorData([item])[0];
@@ -470,6 +537,7 @@ export async function getVisitorById(request, visitorId) {
 }
 
 export async function createVisitor(request) {
+  const log = createLogger("createVisitor");
   try {
     const { data, visitorPhoto, visitorDocumentPhotos } = await parseFormData(
       request
@@ -495,6 +563,7 @@ export async function createVisitor(request) {
 }
 
 export async function updateVisitor(request, visitorId) {
+  const log = createLogger("updateVisitor");
   try {
     const { data, visitorPhoto, visitorDocumentPhotos } = await parseFormData(
       request
@@ -524,6 +593,7 @@ export async function updateVisitor(request, visitorId) {
 }
 
 export async function checkoutVisitor(request, visitorId) {
+  const log = createLogger("checkoutVisitor");
   try {
     const body = await request.json().catch(() => ({}));
     const updatedBy = body.updatedBy;

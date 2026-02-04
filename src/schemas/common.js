@@ -6,6 +6,7 @@ const parseNumeric = (val, parser) => {
   return Number.isNaN(parsed) ? undefined : parsed;
 };
 
+/* eslint-disable camelcase */
 export const preprocessString = (msg = "Invalid string") =>
   z.string({ required_error: msg, invalid_type_error: msg }).trim().min(1, msg);
 
@@ -121,6 +122,7 @@ export const preprocessDateOptional = (msg = "Invalid date") =>
     const d = new Date(val);
     return isNaN(d.getTime()) ? undefined : d;
   }, z.date().optional());
+/* eslint-enable camelcase */
 
 export const preprocessFileFlexible = (msg = "Invalid input") =>
   z
@@ -136,7 +138,10 @@ export const paginationSchema = z.object({
   limit: preprocessIntOptional("Invalid limit").default(10),
 });
 
-export const idSchema = preprocessString("ID is required");
+export const idSchema = preprocessString("ID is required").refine(
+  (val) => /^[a-z0-9-]{8,}$/i.test(val),
+  { message: "Invalid ID format" }
+);
 
 export const STATUS_VALUES = {
   EMPLOYEE: ["Active", "Inactive"],
