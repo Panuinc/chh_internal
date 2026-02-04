@@ -1146,8 +1146,6 @@ function SlipPreviewModal({
 
   useEffect(() => {
     if (order) {
-      console.log("[SlipPreview] Initializing for order:", order.number);
-
       setCustomAddress({
         shipToName: order.shipToName || order.customerName || "",
         shipToAddressLine1: order.shipToAddressLine1 || "",
@@ -1159,11 +1157,6 @@ function SlipPreviewModal({
       setUseCustomAddress(false);
 
       const items = getItemLines(order);
-      console.log(
-        "[SlipPreview] Found items:",
-        items.length,
-        items.map((i) => ({ itemNumber: i.itemNumber, qty: i.quantity })),
-      );
 
       const initialSelected = {};
       const initialQuantities = {};
@@ -1174,11 +1167,6 @@ function SlipPreviewModal({
       setSelectedItems(initialSelected);
       setQuantities(initialQuantities);
       setPreviewIndex(0);
-
-      console.log("[SlipPreview] State initialized:", {
-        selectedItems: initialSelected,
-        quantities: initialQuantities,
-      });
     }
   }, [order?.number]);
 
@@ -1280,7 +1268,6 @@ function SlipPreviewModal({
 
   const handlePrint = useCallback(() => {
     if (!order) {
-      console.error("[SlipPreview] No order to print");
       return;
     }
 
@@ -1318,16 +1305,7 @@ function SlipPreviewModal({
       .filter((l) => l.lineType === "Item")
       .reduce((sum, l) => sum + (l.quantity || 0), 0);
 
-    console.log("[SlipPreview] Printing order:", {
-      orderNumber: modifiedOrder.number,
-      itemCount,
-      totalQty,
-      useCustomAddress,
-      shipToName: modifiedOrder.shipToName,
-    });
-
     if (totalQty === 0) {
-      console.error("[SlipPreview] No items selected to print");
       return;
     }
 

@@ -84,7 +84,6 @@ export function useSalesOrdersOnline(params = {}) {
         setMeta(result.meta || { total: data.length });
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("Error fetching sales orders:", err);
         setError(err.message);
         setOrders([]);
       } finally {
@@ -146,7 +145,6 @@ export function useSalesOrderOnline(orderId) {
         setOrder(data);
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("Error fetching sales order:", err);
         setError(err.message);
         setOrder(null);
       } finally {

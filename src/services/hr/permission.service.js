@@ -130,7 +130,7 @@ export async function GetAllUseCase(page = 1, limit = 1000000) {
     log.success({ total, returned: items.length });
     return { items, total };
   } catch (error) {
-    console.error("[GetAllPermissionUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -152,7 +152,7 @@ export async function GetByIdUseCase(id) {
     log.success({ id, name: item.permissionName });
     return item;
   } catch (error) {
-    console.error("[GetPermissionByIdUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -176,7 +176,7 @@ export async function CreateUseCase(data) {
     log.success({ id: item.permissionId, name: item.permissionName });
     return item;
   } catch (error) {
-    console.error("[CreatePermissionUseCase] Error:", error);
+    log.error({ error: error.message });
     handlePrismaUniqueError(error, "permissionName", data?.permissionName);
     throw error;
   }
@@ -214,7 +214,7 @@ export async function UpdateUseCase(data) {
     log.success({ id: permissionId, name: item.permissionName });
     return item;
   } catch (error) {
-    console.error("[UpdatePermissionUseCase] Error:", error);
+    log.error({ error: error.message });
     handlePrismaUniqueError(error, "permissionName", data?.permissionName);
     throw error;
   }

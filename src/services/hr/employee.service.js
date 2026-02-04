@@ -1,12 +1,8 @@
 import prisma from "@/lib/prisma";
 import { getLocalNow } from "@/lib/getLocalNow";
-import { z } from "zod";
-import {
-  preprocessString,
-  preprocessEnum,
-  preprocessEmail,
-  formatData,
-} from "@/lib/zodSchema";
+import { formatData } from "@/lib/zodSchema";
+import { employeeCreateSchema, employeeUpdateSchema } from "@/schemas/hr";
+import { PAGINATION } from "@/config/app.config";
 import {
   NotFoundError,
   BadRequestError,
@@ -21,6 +17,9 @@ const ENTITY_NAME = "Employee";
 const ENTITY_KEY = "employees";
 const ENTITY_SINGULAR = "employee";
 
+// ใช้ค่า PAGINATION จาก config แทน hardcoded
+const DEFAULT_LIMIT = PAGINATION.LARGE_PAGE_SIZE;
+
 const EMPLOYEE_SELECT = {
   employeeId: true,
   employeeFirstName: true,
@@ -28,24 +27,9 @@ const EMPLOYEE_SELECT = {
   employeeEmail: true,
 };
 
-export const createSchema = z.object({
-  employeeFirstName: preprocessString("Please provide employeeFirstName"),
-  employeeLastName: preprocessString("Please provide employeeLastName"),
-  employeeEmail: preprocessEmail("Please provide employeeEmail"),
-  employeeCreatedBy: preprocessString("Please provide the creator ID"),
-});
-
-export const updateSchema = z.object({
-  employeeId: preprocessString("Please provide the employee ID"),
-  employeeFirstName: preprocessString("Please provide employeeFirstName"),
-  employeeLastName: preprocessString("Please provide employeeLastName"),
-  employeeEmail: preprocessEmail("Please provide employeeEmail"),
-  employeeStatus: preprocessEnum(
-    ["Active", "Inactive"],
-    "Please provide employeeStatus"
-  ),
-  employeeUpdatedBy: preprocessString("Please provide the updater ID"),
-});
+// Re-export schemas เพื่อ backward compatibility
+export const createSchema = employeeCreateSchema;
+export const updateSchema = employeeUpdateSchema;
 
 export const EmployeeRepository = {
   async findMany(skip = 0, take = 10) {
@@ -97,6 +81,8 @@ export const EmployeeRepository = {
       },
     });
   },
+
+
 };
 
 export const EmployeeService = {
@@ -129,7 +115,7 @@ export const EmployeeService = {
   },
 };
 
-export async function GetAllUseCase(page = 1, limit = 1000000) {
+export async function GetAllUseCase(page = 1, limit = DEFAULT_LIMIT) {
   const log = createLogger("GetAllEmployeeUseCase");
   log.start({ page, limit });
 
@@ -140,7 +126,7 @@ export async function GetAllUseCase(page = 1, limit = 1000000) {
     log.success({ total, returned: items.length });
     return { items, total };
   } catch (error) {
-    console.error("[GetAllEmployeeUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -162,7 +148,7 @@ export async function GetByIdUseCase(id) {
     log.success({ id, email: item.employeeEmail });
     return item;
   } catch (error) {
-    console.error("[GetEmployeeByIdUseCase] Error:", error);
+    log.error({ id, error: error.message });
     throw error;
   }
 }
@@ -191,7 +177,7 @@ export async function CreateUseCase(data) {
     log.success({ id: item.employeeId, email: item.employeeEmail });
     return item;
   } catch (error) {
-    console.error("[CreateEmployeeUseCase] Error:", error);
+    log.error({ email: data?.employeeEmail, error: error.message });
     handlePrismaUniqueError(error, "employeeEmail", data?.employeeEmail);
     throw error;
   }
@@ -232,7 +218,7 @@ export async function UpdateUseCase(data) {
     log.success({ id: employeeId, email: item.employeeEmail });
     return item;
   } catch (error) {
-    console.error("[UpdateEmployeeUseCase] Error:", error);
+    log.error({ id: data?.employeeId, error: error.message });
     handlePrismaUniqueError(error, "employeeEmail", data?.employeeEmail);
     throw error;
   }

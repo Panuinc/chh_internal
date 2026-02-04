@@ -97,7 +97,6 @@ export function useFinishedGoodsItems(params = {}) {
         }
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("Error fetching cat finished goods items:", err);
         setError(err.message);
         setItems([]);
       } finally {
@@ -153,7 +152,6 @@ export function useFinishedGoodsItem(itemId) {
         }
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("Error fetching cat finished goods item:", err);
         setError(err.message);
         setItem(null);
       } finally {

@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 import { bcConfig } from "./config.js";
 import { BCAuthError, BCApiError } from "./errors.js";
+import { createLogger } from "@/lib/shared/logger";
+
+const logger = createLogger("bc-client");
 
 const tokenCache = {
   token: null,
@@ -172,7 +175,7 @@ class BCClient {
 
   log(message) {
     if (this.config.options.debug) {
-      console.log(`[BC Client] ${new Date().toISOString()} - ${message}`);
+      logger.error({ message });
     }
   }
 }

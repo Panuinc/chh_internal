@@ -153,7 +153,7 @@ export async function GetByEmployeeUseCase(employeeId) {
     log.success({ total: items.length });
     return items;
   } catch (error) {
-    console.error("[GetAssignsByEmployeeUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -182,7 +182,7 @@ export async function SyncPermissionsUseCase(data) {
     log.success(result);
     return result;
   } catch (error) {
-    console.error("[SyncPermissionsUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }

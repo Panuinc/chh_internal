@@ -46,7 +46,7 @@ function useProjectNames(items) {
           }
         }
       } catch (error) {
-        console.error("Error fetching project names:", error);
+        // Error handled by UI
       } finally {
         setLoading(false);
       }
@@ -105,7 +105,6 @@ function FinishedGoodsContent() {
           showToast("danger", `พิมพ์ไม่สำเร็จ: ${errorMsg}`);
         }
       } catch (err) {
-        console.error("Print error:", err);
         showToast("danger", `Print failed: ${err.message}`);
       }
     },

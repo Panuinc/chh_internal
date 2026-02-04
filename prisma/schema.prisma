@@ -102,6 +102,8 @@ model Account {
   createdByEmployee Employee? @relation("AccountCreatedBy", fields: [accountCreatedBy], references: [employeeId])
   updatedByEmployee Employee? @relation("AccountUpdatedBy", fields: [accountUpdatedBy], references: [employeeId])
 
+  refreshTokens RefreshToken[]
+
   @@index([accountCreatedBy])
   @@index([accountUpdatedBy])
 }
@@ -203,4 +205,20 @@ model Patrol {
 
   @@index([patrolCreatedBy])
   @@index([patrolUpdatedBy])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  accountId String
+  account   Account   @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+  ipAddress String?
+  userAgent String?
+
+  @@index([accountId])
+  @@index([token])
+  @@index([expiresAt])
 }

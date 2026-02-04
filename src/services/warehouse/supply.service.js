@@ -4,10 +4,10 @@ import {
   query,
   BCNotFoundError,
   BCValidationError,
-  createLogger,
   createBCController,
   parseQueryParams,
 } from "@/lib/bc/server";
+import { createLogger } from "@/lib/shared/logger";
 
 const ENTITY_NAME = "Category Supply Item";
 const ENTITY_KEY = "catSupplyItems";
@@ -135,7 +135,6 @@ export function formatData(items) {
     displayName: item.displayName,
     displayName2: item.displayName2 || "",
     type: item.type,
-    inventoryPostingGroupCode: item.inventoryPostingGroupCode,
     inventoryPostingGroupCode: item.inventoryPostingGroupCode,
     unitOfMeasureCode: item.baseUnitOfMeasureCode,
     unitPrice: item.unitPrice,

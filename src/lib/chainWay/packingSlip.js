@@ -3,6 +3,9 @@ import path from "path";
 import { COMPANY_INFO } from "./config.js";
 import { mmToDots, sanitizeText, getItemLines, splitText } from "./utils.js";
 import { textToGraphic } from "./zpl.js";
+import { createLogger } from "@/lib/shared/logger";
+
+const logger = createLogger("packing-slip");
 
 const LABEL = {
   WIDTH: 100,
@@ -34,7 +37,7 @@ export async function loadImage(imagePath, maxW, maxH) {
     const fullPath = path.join(process.cwd(), "public", imagePath);
 
     if (!fs.existsSync(fullPath)) {
-      console.warn(`[PackingSlip] Image not found: ${fullPath}`);
+      logger.warn("Image not found", { path: fullPath });
       return null;
     }
 
@@ -73,7 +76,7 @@ export async function loadImage(imagePath, maxW, maxH) {
       h,
     };
   } catch (e) {
-    console.error("[PackingSlip] Image error:", e);
+    logger.error({ message: "Image error", error: e.message });
     return null;
   }
 }

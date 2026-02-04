@@ -623,7 +623,7 @@ export default function UIFinishedGoods({
           await onPrintWithQuantity(item, quantity, options);
           closePreview();
         } catch (error) {
-          console.error("Print error:", error);
+          // Silent catch - error already handled by UI
         }
       }
     },

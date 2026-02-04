@@ -76,7 +76,7 @@ export async function GetAllUseCase(page = 1, limit = 1000000) {
     log.success({ total, returned: items.length });
     return { items, total };
   } catch (error) {
-    console.error("[GetAllPatrolUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -112,7 +112,7 @@ export async function CreateUseCase(data, patrolPicture) {
     });
     return item;
   } catch (error) {
-    console.error("[CreatePatrolUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -153,7 +153,7 @@ export async function getAllPatrol(request) {
       limit,
     });
   } catch (error) {
-    console.error("[getAllPatrol] Error:", error);
+    log.error({ error: error.message });
     const status = error.statusCode || 500;
     return Response.json(
       { error: error.message || "Internal Server Error" },
@@ -173,7 +173,7 @@ export async function createPatrol(request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("[createPatrol] Error:", error);
+    log.error({ error: error.message });
     const status = error.statusCode || 500;
     return Response.json(
       {

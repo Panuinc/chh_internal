@@ -37,7 +37,6 @@ function PackingContent() {
           showToast("danger", `พิมพ์ไม่สำเร็จ: ${errorMsg}`);
         }
       } catch (err) {
-        console.error("Print error:", err);
         showToast("danger", `Print failed: ${err.message}`);
       }
     },

@@ -182,7 +182,7 @@ export async function GetAllUseCase(page = 1, limit = 1000000) {
     log.success({ total, returned: items.length });
     return { items, total };
   } catch (error) {
-    console.error("[GetAllAccountUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -204,7 +204,7 @@ export async function GetByIdUseCase(id) {
     log.success({ id, username: item.accountUsername });
     return item;
   } catch (error) {
-    console.error("[GetAccountByIdUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -234,7 +234,7 @@ export async function CreateUseCase(data) {
     log.success({ id: item.accountId, username: item.accountUsername });
     return item;
   } catch (error) {
-    console.error("[CreateAccountUseCase] Error:", error);
+    log.error({ error: error.message });
     handlePrismaUniqueError(
       error,
       "accountEmployeeId",
@@ -299,7 +299,7 @@ export async function UpdateUseCase(data) {
     log.success({ id: accountId, username: item.accountUsername });
     return item;
   } catch (error) {
-    console.error("[UpdateAccountUseCase] Error:", error);
+    log.error({ error: error.message });
     handlePrismaUniqueError(error, "accountUsername", data?.accountUsername);
     throw error;
   }

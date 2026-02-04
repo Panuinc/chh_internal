@@ -753,9 +753,7 @@ export const EnhancedEngineeringDrawing = memo(
         });
 
         pdf.save(`door-drawing-${safeT}x${safeW}x${safeH}.pdf`);
-      } catch (error) {
-        console.error("PDF export error:", error);
-      }
+      } catch (error) {}
       setIsExporting(false);
     }, [safeT, safeW, safeH]);
 
@@ -773,9 +771,7 @@ export const EnhancedEngineeringDrawing = memo(
           link.download = `door-drawing-${safeT}x${safeW}x${safeH}.png`;
           link.href = dataUrl;
           link.click();
-        } catch (error) {
-          console.error("PNG export error:", error);
-        }
+        } catch (error) {}
         setIsExporting(false);
       },
       [safeT, safeW, safeH, theme.background],
@@ -792,9 +788,7 @@ export const EnhancedEngineeringDrawing = memo(
         link.href = url;
         link.click();
         URL.revokeObjectURL(url);
-      } catch (error) {
-        console.error("DXF export error:", error);
-      }
+      } catch (error) {}
       setIsExporting(false);
     }, [safeResults, safeT, safeW, safeH]);
 

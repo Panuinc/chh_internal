@@ -3,7 +3,6 @@ import { getProtectedRoutes } from "@/config/menu.config";
 export default async function sitemap() {
   const baseUrl = "https://your-domain.com";
 
-  // Static routes
   const staticRoutes = [
     {
       url: baseUrl,
@@ -25,7 +24,6 @@ export default async function sitemap() {
     },
   ];
 
-  // Dynamic routes from menu config
   const protectedRoutes = getProtectedRoutes();
   const dynamicRoutes = Object.keys(protectedRoutes).map((route) => ({
     url: `${baseUrl}${route}`,

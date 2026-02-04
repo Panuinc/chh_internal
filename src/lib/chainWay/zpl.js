@@ -1,6 +1,9 @@
 import { ZPL_CONFIG, LABEL_SIZES } from "./config.js";
 import { mmToDots, sanitizeText } from "./utils.js";
 import { generatePlainEPC } from "./epc.js";
+import { createLogger } from "@/lib/shared/logger";
+
+const logger = createLogger("zpl");
 
 const PAD = {
   top: mmToDots(2),
@@ -64,7 +67,7 @@ export async function textToGraphic(text, options = {}) {
       height,
     };
   } catch (error) {
-    console.error("[ZPL] Text to graphic conversion failed:", error.message);
+    logger.error({ message: "Text to graphic conversion failed", error: error.message });
     return null;
   }
 }

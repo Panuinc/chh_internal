@@ -1,3 +1,7 @@
+import { createLogger } from "@/lib/shared/logger";
+
+const logger = createLogger("line-notify");
+
 const LINE_CHANNEL_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
 const LINE_VISITOR_GROUP_ID = process.env.LINE_VISITOR_GROUP_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -14,8 +18,8 @@ function getPublicImageUrl(imagePath) {
   if (!imagePath) return null;
 
   if (isLocalhost()) {
-    console.warn(
-      "Running on localhost - images will not display in LINE. Use ngrok or deploy to see images."
+    logger.warn(
+      "localhost - images will not display in LINE", { url: BASE_URL }
     );
     return null;
   }
@@ -59,7 +63,7 @@ export async function sendFlexMessage(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    console.error("LINE API Error Response:", error);
+    logger.error({ message: "LINE API Error Response", error });
     throw new Error(`LINE API Error: ${error.message || response.statusText}`);
   }
 
@@ -423,9 +427,7 @@ export function buildVisitorStatusUpdateFlex(visitor, contactUser, newStatus) {
  */
 export async function notifyVisitorCheckIn(visitor, contactUser) {
   if (!LINE_CHANNEL_ACCESS_TOKEN || !LINE_VISITOR_GROUP_ID) {
-    console.warn(
-      "LINE credentials not configured, skipping check-in notification"
-    );
+    logger.warn("LINE credentials not configured, skipping check-in notification");
     return null;
   }
 
@@ -433,9 +435,7 @@ export async function notifyVisitorCheckIn(visitor, contactUser) {
     const flexMessage = buildVisitorCheckInFlex(visitor, contactUser);
 
     if (isLocalhost()) {
-      console.warn(
-        "Running on localhost - images will not display in LINE Flex Message. Use ngrok or deploy for images."
-      );
+      logger.warn("localhost - images will not display in LINE Flex Message");
     }
 
     const result = await sendFlexMessage(
@@ -443,10 +443,10 @@ export async function notifyVisitorCheckIn(visitor, contactUser) {
       flexMessage,
       `🚨 ผู้มาติดต่อ: ${visitor.visitorFirstName} ${visitor.visitorLastName}`
     );
-    console.log("LINE check-in notification sent successfully");
+    // Success - no log needed
     return result;
   } catch (error) {
-    console.error("Failed to send LINE check-in notification:", error);
+    logger.error({ message: "Failed to send LINE check-in notification", error: error.message });
     throw error;
   }
 }
@@ -460,9 +460,7 @@ export async function notifyVisitorStatusUpdate(
   newStatus
 ) {
   if (!LINE_CHANNEL_ACCESS_TOKEN || !LINE_VISITOR_GROUP_ID) {
-    console.warn(
-      "LINE credentials not configured, skipping status update notification"
-    );
+    logger.warn("LINE credentials not configured, skipping status update notification");
     return null;
   }
 
@@ -478,10 +476,10 @@ export async function notifyVisitorStatusUpdate(
       flexMessage,
       `${visitor.visitorFirstName} ${visitor.visitorLastName} - ${newStatus}`
     );
-    console.log("LINE status update notification sent successfully");
+    // Success - no log needed
     return result;
   } catch (error) {
-    console.error("Failed to send LINE status update notification:", error);
+    logger.error({ message: "Failed to send LINE status update notification", error: error.message });
     throw error;
   }
 }

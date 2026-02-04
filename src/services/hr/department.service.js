@@ -130,7 +130,7 @@ export async function GetAllUseCase(page = 1, limit = 1000000) {
     log.success({ total, returned: items.length });
     return { items, total };
   } catch (error) {
-    console.error("[GetAllDepartmentUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -152,7 +152,7 @@ export async function GetByIdUseCase(id) {
     log.success({ id, name: item.departmentName });
     return item;
   } catch (error) {
-    console.error("[GetDepartmentByIdUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -176,7 +176,7 @@ export async function CreateUseCase(data) {
     log.success({ id: item.departmentId, name: item.departmentName });
     return item;
   } catch (error) {
-    console.error("[CreateDepartmentUseCase] Error:", error);
+    log.error({ error: error.message });
     handlePrismaUniqueError(error, "departmentName", data?.departmentName);
     throw error;
   }
@@ -214,7 +214,7 @@ export async function UpdateUseCase(data) {
     log.success({ id: departmentId, name: item.departmentName });
     return item;
   } catch (error) {
-    console.error("[UpdateDepartmentUseCase] Error:", error);
+    log.error({ error: error.message });
     handlePrismaUniqueError(error, "departmentName", data?.departmentName);
     throw error;
   }

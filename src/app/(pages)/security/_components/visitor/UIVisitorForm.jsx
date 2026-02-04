@@ -137,13 +137,11 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
               setIsStreaming(true);
             })
             .catch((err) => {
-              console.error("Error playing video:", err);
               setError("ไม่สามารถเล่นวิดีโอได้");
             });
         };
       }
     } catch (err) {
-      console.error("Error accessing camera:", err);
       if (err.name === "NotAllowedError") {
         setError("กรุณาอนุญาตการเข้าถึงกล้อง");
       } else if (err.name === "NotFoundError") {
@@ -321,13 +319,11 @@ function MultiCameraModal({
               setIsStreaming(true);
             })
             .catch((err) => {
-              console.error("Error playing video:", err);
               setError("ไม่สามารถเล่นวิดีโอได้");
             });
         };
       }
     } catch (err) {
-      console.error("Error accessing camera:", err);
       if (err.name === "NotAllowedError") {
         setError("กรุณาอนุญาตการเข้าถึงกล้อง");
       } else if (err.name === "NotFoundError") {

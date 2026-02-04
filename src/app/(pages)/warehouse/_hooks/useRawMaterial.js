@@ -71,7 +71,6 @@ export function useRawMaterialItems(params = {}) {
         }
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("Error fetching cat packing items:", err);
         setError(err.message);
         setItems([]);
       } finally {
@@ -121,7 +120,6 @@ export function useRawMaterialItem(itemId) {
         }
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("Error fetching cat packing item:", err);
         setError(err.message);
         setItem(null);
       } finally {

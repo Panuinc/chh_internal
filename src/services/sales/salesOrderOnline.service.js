@@ -2,10 +2,10 @@ import {
   bcClient,
   BCNotFoundError,
   BCValidationError,
-  createLogger,
   createBCController,
   parseQueryParams,
 } from "@/lib/bc/server";
+import { createLogger } from "@/lib/shared/logger";
 
 const ENTITY_NAME = "Sales Order Online";
 const ENTITY_KEY = "salesOrders";

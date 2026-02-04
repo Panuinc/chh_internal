@@ -39,9 +39,7 @@ function SalesOrderOnlineContent() {
           try {
             const { printPackingSlips } =
               await import("@/lib/chainWay/packingSlipLabel");
-            const result = await printPackingSlips(order, (current, total) => {
-              console.log(`Printing ${current}/${total}`);
-            });
+            const result = await printPackingSlips(order, () => {});
 
             if (result.success) {
               showToast(
@@ -52,7 +50,6 @@ function SalesOrderOnlineContent() {
               throw new Error(result.error || "Print failed");
             }
           } catch (err) {
-            console.error("Packing slip print error:", err);
             showToast("danger", `Print failed: ${err.message}`);
           } finally {
             setIsPrintingSlip(false);
@@ -84,7 +81,6 @@ function SalesOrderOnlineContent() {
           `Printed ${lineItems.length} items from ${order.number} successfully`,
         );
       } catch (err) {
-        console.error("Print error:", err);
         showToast("danger", `Print failed: ${err.message}`);
       }
     },

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { BCError, normalizeError } from "./errors.js";
 import { HTTP_STATUS, SUCCESS_MESSAGES, PAGINATION } from "./config.js";
+import { createLogger } from "@/lib/shared/logger";
+
+const logger = createLogger("bc-controller");
 
 export function successResponse(data, meta = {}) {
   return NextResponse.json({
@@ -11,7 +14,8 @@ export function successResponse(data, meta = {}) {
 }
 
 export function errorResponse(error, endpoint = "") {
-  console.error(`[BC API] ${endpoint || "Unknown"} error:`, {
+  logger.error({
+    endpoint: endpoint || "Unknown",
     message: error.message,
     code: error.code,
     stack: error.stack,
@@ -70,17 +74,6 @@ export function parseQueryParams(searchParams, schema) {
   }
 
   return result;
-}
-
-export function createLogger(useCaseName) {
-  const isDebug = process.env.BC_DEBUG === "true";
-
-  return {
-    start: (data) => isDebug && console.log(`[${useCaseName}] start`, data),
-    success: (data) => isDebug && console.log(`[${useCaseName}] success`, data),
-    warn: (msg, data) => console.warn(`[${useCaseName}] ${msg}`, data),
-    error: (data) => console.error(`[${useCaseName}] error`, data),
-  };
 }
 
 export function createBCController({

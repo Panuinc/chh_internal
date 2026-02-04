@@ -2,16 +2,21 @@ import {
   getEmployeeById,
   updateEmployee,
 } from "@/services/hr/employee.service";
+import { withRateLimit } from "@/lib/rateLimiter";
+import { withSanitization } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function GET(request, context) {
+async function getHandler(request, context) {
   const { employeeId } = await context.params;
   return getEmployeeById(request, String(employeeId));
 }
 
-export async function PUT(request, context) {
+async function putHandler(request, context) {
   const { employeeId } = await context.params;
   return updateEmployee(request, String(employeeId));
 }
+
+export const GET = withRateLimit(getHandler, { type: 'general' });
+export const PUT = withRateLimit(withSanitization(putHandler), { type: 'general' });

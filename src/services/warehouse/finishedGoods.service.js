@@ -4,10 +4,10 @@ import {
   query,
   BCNotFoundError,
   BCValidationError,
-  createLogger,
   createBCController,
   parseQueryParams,
 } from "@/lib/bc/server";
+import { createLogger } from "@/lib/shared/logger";
 
 const ENTITY_NAME = "Category Finished Goods Item";
 const ENTITY_KEY = "catFinishedGoodsItems";

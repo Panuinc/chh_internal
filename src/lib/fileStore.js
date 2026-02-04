@@ -1,5 +1,8 @@
 import fs from "fs/promises";
 import path from "path";
+import { createLogger } from "@/lib/shared/logger";
+
+const logger = createLogger("fileStore");
 
 export async function saveUploadedFile(file, typeFolder, baseName) {
   const safeName = baseName.replace(/\s/g, "");
@@ -25,7 +28,7 @@ export async function deleteFile(publicPath) {
     const folder = path.dirname(fullPath);
     await deleteEmptyDirsRecursively(folder);
   } catch (err) {
-    console.error("deleteFile error:", err.message);
+    logger.error({ message: "deleteFile error", error: err.message });
   }
 
   async function deleteEmptyDirsRecursively(dirPath) {

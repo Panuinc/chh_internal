@@ -27,7 +27,6 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
           await html5QrCodeRef.current.stop();
         }
       } catch (err) {
-        console.error("Error stopping scanner:", err);
       }
       try {
         html5QrCodeRef.current.clear();
@@ -60,7 +59,6 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
         { facingMode: "environment" },
         config,
         (decodedText) => {
-          console.log("QR Code scanned:", decodedText);
           onScan(decodedText);
           stopScanner();
           onClose();
@@ -70,7 +68,6 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
 
       setIsScanning(true);
     } catch (err) {
-      console.error("Error starting scanner:", err);
       const errorStr = err.toString();
       if (
         errorStr.includes("NotAllowedError") ||
@@ -176,7 +173,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
         try {
           track.stop();
         } catch (e) {
-          console.error("Error stopping track:", e);
+          // Silent catch
         }
       });
       streamRef.current = null;
@@ -213,14 +210,12 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
                 setIsStreaming(true);
               })
               .catch((err) => {
-                console.error("Error playing video:", err);
                 setError("ไม่สามารถเล่นวิดีโอได้");
               });
           }
         };
       }
     } catch (err) {
-      console.error("Error accessing camera:", err);
       if (err.name === "NotAllowedError") {
         setError("กรุณาอนุญาตการเข้าถึงกล้อง");
       } else if (err.name === "NotFoundError") {

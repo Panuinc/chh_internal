@@ -160,7 +160,7 @@ export async function GetAllUseCase(page = 1, limit = 1000000) {
     log.success({ total, returned: items.length });
     return { items, total };
   } catch (error) {
-    console.error("[GetAllVisitorUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -185,7 +185,7 @@ export async function GetByIdUseCase(id) {
     });
     return item;
   } catch (error) {
-    console.error("[GetVisitorByIdUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -242,10 +242,7 @@ export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
       await notifyVisitorCheckIn(item, contactUser);
       log.success({ lineNotification: "sent" });
     } catch (lineError) {
-      console.error(
-        "[CreateVisitorUseCase] LINE notification failed:",
-        lineError
-      );
+      log.error({ error: lineError.message });
     }
 
     log.success({
@@ -254,7 +251,7 @@ export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
     });
     return item;
   } catch (error) {
-    console.error("[CreateVisitorUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -339,10 +336,7 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
           newStatus: updateData.visitorStatus,
         });
       } catch (lineError) {
-        console.error(
-          "[UpdateVisitorUseCase] LINE notification failed:",
-          lineError
-        );
+        log.error({ error: lineError.message });
       }
     }
 
@@ -352,7 +346,7 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
     });
     return item;
   } catch (error) {
-    console.error("[UpdateVisitorUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -392,10 +386,7 @@ export async function CheckoutUseCase(visitorId, updatedBy) {
       await notifyVisitorStatusUpdate(item, contactUser, "CheckOut");
       log.success({ lineNotification: "sent", status: "CheckOut" });
     } catch (lineError) {
-      console.error(
-        "[CheckoutVisitorUseCase] LINE notification failed:",
-        lineError
-      );
+      log.error({ error: lineError.message });
     }
 
     log.success({
@@ -405,7 +396,7 @@ export async function CheckoutUseCase(visitorId, updatedBy) {
     });
     return item;
   } catch (error) {
-    console.error("[CheckoutVisitorUseCase] Error:", error);
+    log.error({ error: error.message });
     throw error;
   }
 }
@@ -453,7 +444,7 @@ export async function getAllVisitor(request) {
       limit,
     });
   } catch (error) {
-    console.error("[getAllVisitor] Error:", error);
+    log.error({ error: error.message });
     const status = error.statusCode || 500;
     return Response.json(
       { error: error.message || "Internal Server Error" },
@@ -469,7 +460,7 @@ export async function getVisitorById(request, visitorId) {
 
     return Response.json({ [ENTITY_SINGULAR]: formatted });
   } catch (error) {
-    console.error("[getVisitorById] Error:", error);
+    log.error({ error: error.message });
     const status = error.statusCode || 500;
     return Response.json(
       { error: error.message || "Internal Server Error" },
@@ -491,7 +482,7 @@ export async function createVisitor(request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("[createVisitor] Error:", error);
+    log.error({ error: error.message });
     const status = error.statusCode || 500;
     return Response.json(
       {
@@ -520,7 +511,7 @@ export async function updateVisitor(request, visitorId) {
       [ENTITY_SINGULAR]: formatted,
     });
   } catch (error) {
-    console.error("[updateVisitor] Error:", error);
+    log.error({ error: error.message });
     const status = error.statusCode || 500;
     return Response.json(
       {
@@ -549,7 +540,7 @@ export async function checkoutVisitor(request, visitorId) {
       [ENTITY_SINGULAR]: formatted,
     });
   } catch (error) {
-    console.error("[checkoutVisitor] Error:", error);
+    log.error({ error: error.message });
     const status = error.statusCode || 500;
     return Response.json(
       {

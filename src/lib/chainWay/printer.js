@@ -2,6 +2,9 @@ import net from "net";
 import { PRINTER_CONFIG, TIMEOUTS } from "./config.js";
 import { PrinterCommands } from "./zpl.js";
 import { delay } from "./utils.js";
+import { createLogger } from "@/lib/shared/logger";
+
+const logger = createLogger("rfid-printer");
 
 export class RFIDPrinter {
   constructor(config = {}) {
@@ -24,7 +27,7 @@ export class RFIDPrinter {
       socket.removeAllListeners();
       if (!socket.destroyed) socket.destroy();
     } catch (e) {
-      console.error("[Printer] Socket close error:", e.message);
+      logger.error({ message: "Socket close error", error: e.message });
     }
     this.activeConnections.delete(socket);
   }
@@ -162,7 +165,7 @@ export class RFIDPrinter {
         return await this.send(zplCommand, options);
       } catch (error) {
         lastError = error;
-        console.warn(`[Printer] Attempt ${attempt} failed:`, error.message);
+        logger.warn("send attempt failed", { attempt, error: error.message });
         if (attempt < this.config.retries) {
           await delay(this.config.retryDelay * attempt);
         }
