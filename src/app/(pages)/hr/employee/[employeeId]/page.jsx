@@ -6,6 +6,8 @@ import UIEmployeeForm from "@/app/(pages)/hr/_components/employee/UIEmployeeForm
 import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { useEmployee, useSubmitEmployee } from "@/app/(pages)/hr/_hooks/useEmployee";
+import { useDepartments } from "@/app/(pages)/hr/_hooks/useDepartment";
+import { useRoles } from "@/app/(pages)/hr/_hooks/useRole";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function EmployeeUpdate() {
@@ -16,6 +18,8 @@ export default function EmployeeUpdate() {
   const { userId: sessionUserId, userName } = useSessionUser();
 
   const { employee, loading: employeeLoading } = useEmployee(employeeId);
+  const { departments } = useDepartments();
+  const { roles } = useRoles();
 
   useEffect(() => {
     if (!hasPermission("hr.employee.edit")) {
@@ -35,6 +39,8 @@ export default function EmployeeUpdate() {
       employeeLastName: "",
       employeeEmail: "",
       employeeStatus: "",
+      employeeDepartmentId: "",
+      employeeRoleId: "",
     },
     submitEmployee
   );
@@ -48,6 +54,8 @@ export default function EmployeeUpdate() {
         employeeLastName: employee.employeeLastName || "",
         employeeEmail: employee.employeeEmail || "",
         employeeStatus: employee.employeeStatus || "",
+        employeeDepartmentId: employee.employeeDepartmentId || "",
+        employeeRoleId: employee.employeeRoleId || "",
       });
     }
   }, [employee, setFormData]);
@@ -60,6 +68,8 @@ export default function EmployeeUpdate() {
       mode="update"
       operatedBy={userName}
       isUpdate
+      departments={departments}
+      roles={roles}
     />
   );
 }

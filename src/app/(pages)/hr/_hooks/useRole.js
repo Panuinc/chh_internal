@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import showToast from "@/components/UIToast";
 
-const API_URL = "/api/hr/employee";
+const API_URL = "/api/hr/role";
 
 const TOAST = {
   SUCCESS: "success",
@@ -12,8 +12,8 @@ const TOAST = {
   WARNING: "warning",
 };
 
-function formatEmployee(employee, index = null) {
-  if (!employee) return null;
+function formatRole(role, index = null) {
+  if (!role) return null;
 
   const getFullName = (employee) =>
     employee
@@ -21,11 +21,10 @@ function formatEmployee(employee, index = null) {
       : "-";
 
   return {
-    ...employee,
-    ...(index !== null && { employeeIndex: index + 1 }),
-    employeeFullName: `${employee.employeeFirstName} ${employee.employeeLastName}`,
-    employeeCreatedByName: getFullName(employee.createdByEmployee),
-    employeeUpdatedByName: getFullName(employee.updatedByEmployee),
+    ...role,
+    ...(index !== null && { roleIndex: index + 1 }),
+    roleCreatedBy: getFullName(role.createdByEmployee),
+    roleUpdatedBy: getFullName(role.updatedByEmployee),
   };
 }
 
@@ -52,8 +51,8 @@ async function fetchWithAbort(url, options, signal) {
   return data;
 }
 
-export function useEmployees(apiUrl = API_URL) {
-  const [employees, setEmployees] = useState([]);
+export function useRoles(apiUrl = API_URL) {
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -63,13 +62,13 @@ export function useEmployees(apiUrl = API_URL) {
       try {
         const result = await fetchWithAbort(apiUrl, {}, controller.signal);
 
-        const items = result.employees || result.data || [];
+        const items = result.roles || result.data || [];
 
         const formatted = Array.isArray(items)
-          ? items.map((p, i) => formatEmployee(p, i)).filter(Boolean)
+          ? items.map((p, i) => formatRole(p, i)).filter(Boolean)
           : [];
 
-        setEmployees(formatted);
+        setRoles(formatted);
       } catch (err) {
         if (err.name === "AbortError") return;
         showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);
@@ -83,15 +82,15 @@ export function useEmployees(apiUrl = API_URL) {
     return () => controller.abort();
   }, [apiUrl]);
 
-  return { employees, loading };
+  return { roles, loading };
 }
 
-export function useEmployee(employeeId) {
-  const [employee, setEmployee] = useState(null);
+export function useRole(roleId) {
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!employeeId) {
+    if (!roleId) {
       setLoading(false);
       return;
     }
@@ -102,19 +101,19 @@ export function useEmployee(employeeId) {
     (async () => {
       try {
         const result = await fetchWithAbort(
-          `${API_URL}/${employeeId}`,
+          `${API_URL}/${roleId}`,
           {},
           controller.signal
         );
 
-        const item = result.employee || result.data;
+        const item = result.role || result.data;
 
         if (!item) {
-          showToast(TOAST.WARNING, "No Employee data found.");
+          showToast(TOAST.WARNING, "No Role data found.");
           return;
         }
 
-        setEmployee(formatEmployee(item));
+        setRole(formatRole(item));
       } catch (err) {
         if (err.name === "AbortError") return;
         showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);
@@ -126,15 +125,15 @@ export function useEmployee(employeeId) {
     })();
 
     return () => controller.abort();
-  }, [employeeId]);
+  }, [roleId]);
 
-  return { employee, loading };
+  return { role, loading };
 }
 
-export function useSubmitEmployee({
+export function useSubmitRole({
   mode = "create",
-  employeeId = null,
-  currentEmployeeId,
+  roleId = null,
+  currentRoleId,
 }) {
   const router = useRouter();
 
@@ -151,19 +150,14 @@ export function useSubmitEmployee({
       }
 
       const isCreate = mode === "create";
-      const byField = isCreate ? "employeeCreatedBy" : "employeeUpdatedBy";
+      const byField = isCreate ? "roleCreatedBy" : "roleUpdatedBy";
 
       const payload = {
-        employeeFirstName: formData.employeeFirstName,
-        employeeLastName: formData.employeeLastName,
-        employeeEmail: formData.employeeEmail,
-        employeeDepartmentId: formData.employeeDepartmentId || null,
-        employeeRoleId: formData.employeeRoleId || null,
-        ...(isCreate ? {} : { employeeStatus: formData.employeeStatus }),
-        [byField]: currentEmployeeId,
+        ...formData,
+        [byField]: currentRoleId,
       };
 
-      const url = isCreate ? API_URL : `${API_URL}/${employeeId}`;
+      const url = isCreate ? API_URL : `${API_URL}/${roleId}`;
       const method = isCreate ? "POST" : "PUT";
 
       try {
@@ -178,7 +172,7 @@ export function useSubmitEmployee({
 
         if (response.ok) {
           showToast(TOAST.SUCCESS, result.message || "Success");
-          setTimeout(() => router.push("/hr/employee"), 1500);
+          setTimeout(() => router.push("/hr/role"), 1500);
         } else {
           if (result.details && typeof result.details === "object") {
             setErrors(result.details);
@@ -186,15 +180,18 @@ export function useSubmitEmployee({
             setErrors({});
           }
 
-          showToast(TOAST.DANGER, result.error || "Failed to submit Employee.");
+          showToast(
+            TOAST.DANGER,
+            result.error || "Failed to submit Role."
+          );
         }
       } catch (err) {
         showToast(
           TOAST.DANGER,
-          `Failed to submit Employee: ${getErrorMessage(err)}`
+          `Failed to submit Role: ${getErrorMessage(err)}`
         );
       }
     },
-    [mode, employeeId, currentEmployeeId, router]
+    [mode, roleId, currentRoleId, router]
   );
 }

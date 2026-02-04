@@ -4,17 +4,13 @@ import { DataTable } from "@/components";
 import { Loading } from "@/components";
 
 const columns = [
-  { name: "ID", uid: "employeeIndex" },
-  { name: "First Name", uid: "employeeFirstName" },
-  { name: "Last Name", uid: "employeeLastName" },
-  { name: "Email", uid: "employeeEmail" },
-  { name: "Department", uid: "departmentName" },
-  { name: "Role", uid: "roleName" },
-  { name: "Status", uid: "employeeStatus" },
-  { name: "Created By", uid: "employeeCreatedBy" },
-  { name: "Created At", uid: "employeeCreatedAt" },
-  { name: "Updated By", uid: "employeeUpdatedBy" },
-  { name: "Updated At", uid: "employeeUpdatedAt" },
+  { name: "ID", uid: "roleIndex" },
+  { name: "Role Name", uid: "roleName" },
+  { name: "Status", uid: "roleStatus" },
+  { name: "Created By", uid: "roleCreatedBy" },
+  { name: "Created At", uid: "roleCreatedAt" },
+  { name: "Updated By", uid: "roleUpdatedBy" },
+  { name: "Updated At", uid: "roleUpdatedAt" },
   { name: "Actions", uid: "actions" },
 ];
 
@@ -28,38 +24,36 @@ const statusColorMap = {
   Inactive: "danger",
 };
 
-export default function UIEmployee({
-  Employees = [],
+export default function UIRole({
+  Roles = [],
   loading,
   onAddNew,
   onEdit,
 }) {
-  const total = Employees.length;
-  const active = Employees.filter(
-    (employee) => employee.employeeStatus === "Active",
+  const total = Roles.length;
+  const active = Roles.filter(
+    (role) => role.roleStatus === "Active"
   ).length;
-  const inactive = Employees.filter(
-    (employee) => employee.employeeStatus === "Inactive",
+  const inactive = Roles.filter(
+    (role) => role.roleStatus === "Inactive"
   ).length;
 
-  const normalized = Array.isArray(Employees)
-    ? Employees.map((employee, i) => ({
-        ...employee,
-        id: employee.employeeId,
-        employeeIndex: i + 1,
-        departmentName: employee.department?.departmentName || "-",
-        roleName: employee.role?.roleName || "-",
-        employeeCreatedBy: employee.createdByEmployee
-          ? `${employee.createdByEmployee.employeeFirstName} ${employee.createdByEmployee.employeeLastName}`
-          : employee.employeeCreatedBy || "-",
-        employeeUpdatedBy: employee.updatedByEmployee
-          ? `${employee.updatedByEmployee.employeeFirstName} ${employee.updatedByEmployee.employeeLastName}`
-          : employee.employeeUpdatedBy || "-",
-        employeeCreatedAt: employee.employeeCreatedAt
-          ? new Date(employee.employeeCreatedAt).toISOString().split("T")[0]
+  const normalized = Array.isArray(Roles)
+    ? Roles.map((role, i) => ({
+        ...role,
+        id: role.roleId,
+        roleIndex: i + 1,
+        roleCreatedBy: role.createdByEmployee
+          ? `${role.createdByEmployee.employeeFirstName} ${role.createdByEmployee.employeeLastName}`
+          : role.roleCreatedBy || "-",
+        roleUpdatedBy: role.updatedByEmployee
+          ? `${role.updatedByEmployee.employeeFirstName} ${role.updatedByEmployee.employeeLastName}`
+          : role.roleUpdatedBy || "-",
+        roleCreatedAt: role.roleCreatedAt
+          ? new Date(role.roleCreatedAt).toISOString().split("T")[0]
           : "-",
-        employeeUpdatedAt: employee.employeeUpdatedAt
-          ? new Date(employee.employeeUpdatedAt).toISOString().split("T")[0]
+        roleUpdatedAt: role.roleUpdatedAt
+          ? new Date(role.roleUpdatedAt).toISOString().split("T")[0]
           : "-",
       }))
     : [];
@@ -69,7 +63,7 @@ export default function UIEmployee({
       <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Total Employees
+            Total Roles
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {total}
@@ -77,7 +71,7 @@ export default function UIEmployee({
         </div>
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Active Employees
+            Active Roles
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {active}
@@ -85,7 +79,7 @@ export default function UIEmployee({
         </div>
         <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Inactive Employees
+            Inactive Roles
           </div>
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
             {inactive}
@@ -104,9 +98,9 @@ export default function UIEmployee({
             data={normalized}
             statusOptions={statusOptions}
             statusColorMap={statusColorMap}
-            searchPlaceholder="Search by employee name or email..."
-            emptyContent="No Employees found"
-            itemName="Employees"
+            searchPlaceholder="Search by role name..."
+            emptyContent="No roles found"
+            itemName="roles"
             onAddNew={onAddNew}
             onEdit={onEdit}
           />

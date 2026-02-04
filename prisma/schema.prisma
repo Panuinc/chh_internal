@@ -47,10 +47,15 @@ model Employee {
   employeeLastName  String
   employeeEmail     String         @unique
   employeeStatus    employeeStatus @default(Active)
+  employeeDepartmentId String?
+  employeeRoleId    String?
   employeeCreatedBy String?
   employeeCreatedAt DateTime?
   employeeUpdatedBy String?
   employeeUpdatedAt DateTime?
+
+  department Department? @relation(fields: [employeeDepartmentId], references: [departmentId])
+  role       Role?       @relation(fields: [employeeRoleId], references: [roleId])
 
   createdByEmployee Employee? @relation("EmployeeCreatedBy", fields: [employeeCreatedBy], references: [employeeId])
   updatedByEmployee Employee? @relation("EmployeeUpdatedBy", fields: [employeeUpdatedBy], references: [employeeId])
@@ -73,7 +78,11 @@ model Employee {
 
   createdDepartments Department[] @relation("DepartmentCreatedBy")
   updatedDepartments Department[] @relation("DepartmentUpdatedBy")
-  contactVisitors    Visitor[]    @relation("VisitorContactUserRelation")
+
+  createdRoles Role[] @relation("RoleCreatedBy")
+  updatedRoles Role[] @relation("RoleUpdatedBy")
+
+  contactVisitors Visitor[] @relation("VisitorContactUserRelation")
 
   createdVisitors Visitor[] @relation("VisitorCreatedBy")
   updatedVisitors Visitor[] @relation("VisitorUpdatedBy")
@@ -84,6 +93,8 @@ model Employee {
   createdSalesMemos SalesMemo[] @relation("SalesMemoCreatedBy")
   updatedSalesMemos SalesMemo[] @relation("SalesMemoUpdatedBy")
 
+  @@index([employeeDepartmentId])
+  @@index([employeeRoleId])
   @@index([employeeCreatedBy])
   @@index([employeeUpdatedBy])
 }
@@ -160,11 +171,31 @@ model Department {
   departmentUpdatedBy String?
   departmentUpdatedAt DateTime?
 
+  employees Employee[]
+
   createdByEmployee Employee? @relation("DepartmentCreatedBy", fields: [departmentCreatedBy], references: [employeeId])
   updatedByEmployee Employee? @relation("DepartmentUpdatedBy", fields: [departmentUpdatedBy], references: [employeeId])
 
   @@index([departmentCreatedBy])
   @@index([departmentUpdatedBy])
+}
+
+model Role {
+  roleId        String           @id @default(cuid())
+  roleName      String           @unique
+  roleStatus    departmentStatus @default(Active)
+  roleCreatedBy String?
+  roleCreatedAt DateTime?
+  roleUpdatedBy String?
+  roleUpdatedAt DateTime?
+
+  employees Employee[]
+
+  createdByEmployee Employee? @relation("RoleCreatedBy", fields: [roleCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("RoleUpdatedBy", fields: [roleUpdatedBy], references: [employeeId])
+
+  @@index([roleCreatedBy])
+  @@index([roleUpdatedBy])
 }
 
 model Visitor {

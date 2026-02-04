@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import UIEmployeeForm from "@/app/(pages)/hr/_components/employee/UIEmployeeForm";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { useSubmitEmployee } from "@/app/(pages)/hr/_hooks/useEmployee";
+import { useDepartments } from "@/app/(pages)/hr/_hooks/useDepartment";
+import { useRoles } from "@/app/(pages)/hr/_hooks/useRole";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function EmployeeCreate() {
@@ -18,6 +20,9 @@ export default function EmployeeCreate() {
     }
   }, [hasPermission, router]);
 
+  const { departments } = useDepartments();
+  const { roles } = useRoles();
+
   const submitEmployee = useSubmitEmployee({
     mode: "create",
     currentEmployeeId: userId,
@@ -28,6 +33,8 @@ export default function EmployeeCreate() {
       employeeFirstName: "",
       employeeLastName: "",
       employeeEmail: "",
+      employeeDepartmentId: "",
+      employeeRoleId: "",
     },
     submitEmployee
   );
@@ -37,6 +44,8 @@ export default function EmployeeCreate() {
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}
+      departments={departments}
+      roles={roles}
     />
   );
 }

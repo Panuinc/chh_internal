@@ -27,6 +27,18 @@ const EMPLOYEE_SELECT = {
   employeeEmail: true,
 };
 
+const DEPARTMENT_SELECT = {
+  departmentId: true,
+  departmentName: true,
+  departmentStatus: true,
+};
+
+const ROLE_SELECT = {
+  roleId: true,
+  roleName: true,
+  roleStatus: true,
+};
+
 export const createSchema = employeeCreateSchema;
 export const updateSchema = employeeUpdateSchema;
 
@@ -37,6 +49,8 @@ export const EmployeeRepository = {
       take,
       orderBy: { employeeCreatedAt: "asc" },
       include: {
+        department: { select: DEPARTMENT_SELECT },
+        role: { select: ROLE_SELECT },
         createdByEmployee: { select: EMPLOYEE_SELECT },
         updatedByEmployee: { select: EMPLOYEE_SELECT },
       },
@@ -51,6 +65,8 @@ export const EmployeeRepository = {
     return prisma.employee.findUnique({
       where: { employeeId: id },
       include: {
+        department: { select: DEPARTMENT_SELECT },
+        role: { select: ROLE_SELECT },
         createdByEmployee: { select: EMPLOYEE_SELECT },
         updatedByEmployee: { select: EMPLOYEE_SELECT },
       },
@@ -66,7 +82,11 @@ export const EmployeeRepository = {
   async create(data) {
     return prisma.employee.create({
       data,
-      include: { createdByEmployee: { select: EMPLOYEE_SELECT } },
+      include: {
+        department: { select: DEPARTMENT_SELECT },
+        role: { select: ROLE_SELECT },
+        createdByEmployee: { select: EMPLOYEE_SELECT },
+      },
     });
   },
 
@@ -75,6 +95,8 @@ export const EmployeeRepository = {
       where: { employeeId: id },
       data,
       include: {
+        department: { select: DEPARTMENT_SELECT },
+        role: { select: ROLE_SELECT },
         createdByEmployee: { select: EMPLOYEE_SELECT },
         updatedByEmployee: { select: EMPLOYEE_SELECT },
       },

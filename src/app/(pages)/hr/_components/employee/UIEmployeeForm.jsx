@@ -7,6 +7,8 @@ export default function UIEmployeeForm({
   mode,
   isUpdate,
   operatedBy,
+  departments = [],
+  roles = [],
 }) {
   const { formRef, formData, handleChange, handleSubmit, errors } = formHandler;
 
@@ -105,6 +107,65 @@ export default function UIEmployeeForm({
             </Select>
           </div>
         )}
+      </div>
+
+      <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <Select
+            name="employeeDepartmentId"
+            label="Department"
+            labelPlacement="outside"
+            placeholder="Select Department"
+            color="default"
+            variant="bordered"
+            size="md"
+            radius="md"
+            selectedKeys={
+              formData.employeeDepartmentId
+                ? [formData.employeeDepartmentId]
+                : []
+            }
+            onSelectionChange={(keys) =>
+              handleChange("employeeDepartmentId")([...keys][0])
+            }
+            isInvalid={!!errors.employeeDepartmentId}
+            errorMessage={
+              errors.employeeDepartmentId?.[0] || errors.employeeDepartmentId
+            }
+          >
+            {departments.map((dept) => (
+              <SelectItem key={dept.departmentId}>
+                {dept.departmentName}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <Select
+            name="employeeRoleId"
+            label="Role"
+            labelPlacement="outside"
+            placeholder="Select Role"
+            color="default"
+            variant="bordered"
+            size="md"
+            radius="md"
+            selectedKeys={
+              formData.employeeRoleId ? [formData.employeeRoleId] : []
+            }
+            onSelectionChange={(keys) =>
+              handleChange("employeeRoleId")([...keys][0])
+            }
+            isInvalid={!!errors.employeeRoleId}
+            errorMessage={
+              errors.employeeRoleId?.[0] || errors.employeeRoleId
+            }
+          >
+            {roles.map((role) => (
+              <SelectItem key={role.roleId}>{role.roleName}</SelectItem>
+            ))}
+          </Select>
+        </div>
       </div>
 
       <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">

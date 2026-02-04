@@ -10,6 +10,10 @@ export const employeeCreateSchema = z.object({
   employeeFirstName: preprocessString("Please provide employeeFirstName"),
   employeeLastName: preprocessString("Please provide employeeLastName"),
   employeeEmail: preprocessEmail("Please provide employeeEmail"),
+  employeeDepartmentId: preprocessString(
+    "Please provide employeeDepartmentId",
+  ).optional(),
+  employeeRoleId: preprocessString("Please provide employeeRoleId").optional(),
   employeeCreatedBy: preprocessString("Please provide the creator ID"),
 });
 
@@ -18,6 +22,10 @@ export const employeeUpdateSchema = z.object({
   employeeFirstName: preprocessString("Please provide employeeFirstName"),
   employeeLastName: preprocessString("Please provide employeeLastName"),
   employeeEmail: preprocessEmail("Please provide employeeEmail"),
+  employeeDepartmentId: preprocessString(
+    "Please provide employeeDepartmentId",
+  ).optional(),
+  employeeRoleId: preprocessString("Please provide employeeRoleId").optional(),
   employeeStatus: preprocessEnum(
     STATUS_VALUES.EMPLOYEE,
     "Please provide employeeStatus",

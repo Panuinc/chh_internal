@@ -116,6 +116,19 @@ export const menuConfig = {
             edit: "hr.department.edit",
           },
         },
+
+        {
+          id: "role",
+          href: "/hr/role",
+          text: "Role",
+          icon: ScrollText,
+          permission: "hr.role.view",
+          actions: {
+            view: "hr.role.view",
+            create: "hr.role.create",
+            edit: "hr.role.edit",
+          },
+        },
       ],
     },
     security: {
