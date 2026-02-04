@@ -9,8 +9,7 @@ const protectedRoutes = getProtectedRoutes();
 export default auth((req) => {
   const { nextUrl, auth: session } = req;
   const pathname = nextUrl.pathname;
-  
-  // Generate or reuse request ID
+
   const existingRequestId = req.headers.get("x-request-id");
   const requestId = existingRequestId || generateRequestId();
 

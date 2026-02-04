@@ -12,17 +12,13 @@ import {
 } from "@/lib/shared/server";
 import { saveUploadedFile, deleteFile } from "@/lib/fileStore";
 
-/**
- * Helper function to cleanup uploaded files on error
- * @param {string[]} filePaths - Array of file paths to delete
- */
 async function cleanupFiles(filePaths) {
   for (const path of filePaths) {
     if (path) {
       try {
         await deleteFile(path);
       } catch (e) {
-        // Silently ignore cleanup errors
+
       }
     }
   }
@@ -218,7 +214,7 @@ export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
   const uploadedFiles = [];
 
   try {
-    // 1. Save files first (these need cleanup if DB fails)
+
     let photoPath = "";
     if (visitorPhoto) {
       photoPath = await saveUploadedFile(
@@ -244,7 +240,6 @@ export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
       documentPhotosPath = JSON.stringify(documentPaths);
     }
 
-    // 2. Create DB record within transaction
     const item = await prisma.$transaction(async (tx) => {
       return await tx.visitor.create({
         data: {
@@ -261,7 +256,6 @@ export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
       });
     });
 
-    // 3. Send notification (outside transaction - non-critical)
     try {
       const contactUser = item.contactUser
         ? {
@@ -282,7 +276,7 @@ export async function CreateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
     });
     return item;
   } catch (error) {
-    // Cleanup uploaded files on error
+
     await cleanupFiles(uploadedFiles);
     log.error({ error: error.message });
     throw error;
@@ -299,13 +293,12 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
   const deletedOldFiles = [];
 
   try {
-    // 1. Find existing record first
+
     const existing = await VisitorService.findById(visitorId);
     if (!existing) {
       throw new NotFoundError(ENTITY_NAME);
     }
 
-    // 2. Save new files first (before deleting old ones)
     const timestamp = Date.now();
     const baseName = `visitor_${timestamp}`;
 
@@ -336,8 +329,7 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
         newUploadedFiles.push(docPath);
       }
       documentPhotosPath = JSON.stringify(paths);
-      
-      // Mark old documents for deletion
+
       if (existing.visitorDocumentPhotos) {
         try {
           const oldPaths = JSON.parse(existing.visitorDocumentPhotos);
@@ -346,7 +338,6 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
       }
     }
 
-    // 3. Update DB record within transaction
     const item = await prisma.$transaction(async (tx) => {
       return await tx.visitor.update({
         where: { visitorId },
@@ -364,7 +355,6 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
       });
     });
 
-    // 4. Delete old files only after DB update succeeds
     for (const oldPath of deletedOldFiles) {
       try {
         await deleteFile(oldPath);
@@ -373,7 +363,6 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
       }
     }
 
-    // 5. Send notification (outside transaction)
     if (
       updateData.visitorStatus &&
       updateData.visitorStatus !== existing.visitorStatus
@@ -406,7 +395,7 @@ export async function UpdateUseCase(data, visitorPhoto, visitorDocumentPhotos) {
     });
     return item;
   } catch (error) {
-    // Cleanup newly uploaded files on error
+
     await cleanupFiles(newUploadedFiles);
     log.error({ error: error.message });
     throw error;

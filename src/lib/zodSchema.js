@@ -6,7 +6,6 @@ const parseNumeric = (val, parser) => {
   return Number.isNaN(parsed) ? undefined : parsed;
 };
 
-/* eslint-disable camelcase */
 export const preprocessInt = (msg = "Invalid integer") =>
   z.preprocess(
     (val) => parseNumeric(val, (v) => parseInt(v, 10)),
@@ -110,7 +109,6 @@ export const preprocessDateOptional = (msg = "Invalid date") =>
     const d = new Date(val);
     return isNaN(d.getTime()) ? undefined : d;
   }, z.date().optional());
-/* eslint-enable camelcase */
 
 export const preprocessFileFlexible = (msg = "Invalid input") =>
   z

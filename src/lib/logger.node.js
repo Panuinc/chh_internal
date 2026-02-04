@@ -1,5 +1,4 @@
-// This file should only be imported in Node.js environment (not Edge, not Browser)
-// It uses Node.js-specific APIs like fs and Winston
+
 
 const winston = require("winston");
 const DailyRotateFile = require("winston-daily-rotate-file");
@@ -16,7 +15,7 @@ try {
     fs.mkdirSync(logDir, { recursive: true });
   }
 } catch (err) {
-  // Silent fail - will log to console only
+
 }
 
 const fileTransport = new DailyRotateFile({
@@ -27,7 +26,7 @@ const fileTransport = new DailyRotateFile({
 });
 
 fileTransport.on("error", () => {
-  // Silent fail for file transport errors
+
 });
 
 const logger = winston.createLogger({

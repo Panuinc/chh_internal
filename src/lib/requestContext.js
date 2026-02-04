@@ -1,12 +1,11 @@
-// Request Context for tracking request ID
-// Compatible with both Node.js and Edge Runtime
+
 
 function generateUUID() {
-  // Use Web Crypto API for Edge Runtime compatibility
+
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return crypto.randomUUID();
   }
-  // Fallback for older environments
+
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     const r = (Math.random() * 16) | 0;
     const v = c === "x" ? r : (r & 0x3) | 0x8;
@@ -41,7 +40,7 @@ export function setRequestId(requestId) {
       store.requestId = requestId;
     }
   } catch {
-    // Ignore errors in Edge Runtime
+
   }
 }
 

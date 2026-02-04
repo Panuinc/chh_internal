@@ -28,7 +28,6 @@ export default function AssignUpdate() {
   const { assignedPermissionIds, loading: assignsLoading } =
     useEmployeeAssigns(employeeId);
 
-  // Initialize selectedIds from assignedPermissionIds using lazy initialization
   const [selectedIds, setSelectedIds] = useState(() => {
     if (assignedPermissionIds && assignedPermissionIds.length > 0) {
       return new Set(assignedPermissionIds);
@@ -36,7 +35,6 @@ export default function AssignUpdate() {
     return new Set();
   });
 
-  // Update selectedIds when assignedPermissionIds changes (but not during editing)
   const [isEditing, setIsEditing] = useState(false);
   const prevAssignedIdsRef = useRef(assignedPermissionIds);
 
@@ -46,19 +44,18 @@ export default function AssignUpdate() {
     }
   }, [hasPermission, router]);
 
-  // Sync with server data only when not editing and data actually changes
   useEffect(() => {
     if (
       !assignsLoading &&
       !isEditing &&
       assignedPermissionIds !== prevAssignedIdsRef.current
     ) {
-      const hasChanged = 
+      const hasChanged =
         assignedPermissionIds.length !== prevAssignedIdsRef.current?.length ||
         !assignedPermissionIds.every(id => prevAssignedIdsRef.current?.includes(id));
-      
+
       if (hasChanged) {
-        // Schedule to avoid synchronous setState
+
         setTimeout(() => {
           setSelectedIds(new Set(assignedPermissionIds));
           prevAssignedIdsRef.current = assignedPermissionIds;

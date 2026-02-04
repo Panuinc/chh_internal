@@ -1,25 +1,21 @@
 import { getRequestId } from "@/lib/requestContext";
 
-// Check if we're in a browser environment
 const isBrowser = typeof window !== "undefined";
 
-// Check if we're in Edge Runtime (Next.js specific)
 const isEdgeRuntime = typeof process !== "undefined" && process.env.NEXT_RUNTIME === "edge";
 
-// Check if we have full Node.js API available (not Edge, not Browser)
-const isFullNodeEnvironment = 
-  typeof process !== "undefined" && 
-  typeof process.cwd === "function" && 
-  !isEdgeRuntime && 
+const isFullNodeEnvironment =
+  typeof process !== "undefined" &&
+  typeof process.cwd === "function" &&
+  !isEdgeRuntime &&
   !isBrowser;
 
-// Simple console logger for Edge Runtime and Browser
 function createConsoleLogger(useCaseName) {
   const log = (level, message, data) => {
     const requestId = getRequestId?.() || "";
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}] [${useCaseName}]${requestId ? ` [${requestId}]` : ""}`;
-    
+
     const logData = {
       useCase: useCaseName,
       requestId,
@@ -51,7 +47,6 @@ function createConsoleLogger(useCaseName) {
   };
 }
 
-// Node.js Winston logger (only loaded in Node.js environment)
 let winstonLogger = null;
 let winstonPromise = null;
 
@@ -59,12 +54,11 @@ async function loadWinstonLogger() {
   if (!isFullNodeEnvironment) {
     return null;
   }
-  
+
   try {
-    // Dynamic import with obfuscated path to prevent static analysis
-    // This ensures the module is only loaded at runtime in Node.js environment
+
     const modulePath = "@/lib/logger" + ".node";
-    const module = await import(/* webpackIgnore: true */ modulePath);
+    const module = await import( modulePath);
     return module.default || module;
   } catch {
     return null;
@@ -73,23 +67,22 @@ async function loadWinstonLogger() {
 
 function getWinstonLogger() {
   if (winstonLogger) return winstonLogger;
-  
-  // Only load Winston in full Node.js environment
+
   if (isFullNodeEnvironment && !winstonPromise) {
     winstonPromise = loadWinstonLogger().then(logger => {
       winstonLogger = logger;
       return logger;
     });
   }
-  
+
   return winstonLogger;
 }
 
 function createWinstonWrapper(useCaseName) {
   const nodeLogger = getWinstonLogger();
-  
+
   if (!nodeLogger) {
-    // Fallback to console logger
+
     return createConsoleLogger(useCaseName);
   }
 
@@ -100,7 +93,7 @@ function createWinstonWrapper(useCaseName) {
       requestId,
       ...data,
     };
-    
+
     nodeLogger.log(level, `[${useCaseName}] ${message}`, logData);
   };
 
@@ -115,8 +108,7 @@ function createWinstonWrapper(useCaseName) {
 }
 
 export function createLogger(useCaseName) {
-  // Use Winston only in full Node.js environment
-  // Use console logger for Edge Runtime and Browser
+
   if (isFullNodeEnvironment) {
     return createWinstonWrapper(useCaseName);
   }

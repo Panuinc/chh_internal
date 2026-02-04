@@ -1,4 +1,3 @@
-// Validate environment variables on server startup
 if (typeof window === "undefined") {
   require("@/lib/env");
 }
@@ -34,8 +33,8 @@ export default function RootLayout({ children }) {
       </head>
       <body
         className={`
-          ${montserrat.variable} 
-          ${notoThai.variable} 
+          ${montserrat.variable}
+          ${notoThai.variable}
           font-system
           antialiased
         `}

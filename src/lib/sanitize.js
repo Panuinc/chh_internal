@@ -2,19 +2,16 @@
 
 import DOMPurify from 'isomorphic-dompurify';
 
-
 const SQL_PATTERNS = [
   /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|SCRIPT)\b)/gi,
   /(--|#|\/\*|\*\/)/g,
   /(\bOR\b|\bAND\b)\s+\d+\s*=\s*\d+/gi,
 ];
 
-
 const PATH_TRAVERSAL_PATTERNS = [
   /\.\.(\\|\/)/g,
   /~.*/g,
 ];
-
 
 export function sanitizeHTML(html) {
   if (!html || typeof html !== 'string') return '';
@@ -30,18 +27,14 @@ export function sanitizeHTML(html) {
   });
 }
 
-
 export function sanitizeText(text) {
   if (!text || typeof text !== 'string') return '';
-
 
   return text.replace(/<[^>]*>/g, '').trim();
 }
 
-
 export function sanitizeAttribute(value) {
   if (!value || typeof value !== 'string') return '';
-
 
   return value
     .replace(/&/g, '&amp;')
@@ -52,20 +45,17 @@ export function sanitizeAttribute(value) {
     .trim();
 }
 
-
 export function containsSQLInjection(input) {
   if (!input || typeof input !== 'string') return false;
 
   return SQL_PATTERNS.some(pattern => pattern.test(input));
 }
 
-
 export function containsPathTraversal(input) {
   if (!input || typeof input !== 'string') return false;
 
   return PATH_TRAVERSAL_PATTERNS.some(pattern => pattern.test(input));
 }
-
 
 export function sanitizeObject(obj, options = {}) {
   const { allowHTML = false, deep = true } = options;
@@ -98,7 +88,6 @@ export function sanitizeObject(obj, options = {}) {
   return obj;
 }
 
-
 export function withSanitization(handler, options = {}) {
   return async function(request, ...args) {
 
@@ -109,7 +98,6 @@ export function withSanitization(handler, options = {}) {
         return sanitizeObject(body, options);
       };
     }
-
 
     const url = new URL(request.url);
     url.searchParams.forEach((value, key) => {
@@ -122,12 +110,10 @@ export function withSanitization(handler, options = {}) {
   };
 }
 
-
 export function escapeRegExp(string) {
   if (!string || typeof string !== 'string') return '';
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-
 
 export function isValidEmail(email) {
   if (!email || typeof email !== 'string') return false;
@@ -135,7 +121,6 @@ export function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
-
 
 export function isEmpty(value) {
   if (value === null || value === undefined) return true;

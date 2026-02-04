@@ -1177,7 +1177,6 @@ function SlipPreviewModal({
     return {};
   });
 
-  // Reset state when order changes
   const prevOrderRef = useRef(order?.number);
   useEffect(() => {
     if (order?.number !== prevOrderRef.current) {
@@ -1253,7 +1252,6 @@ function SlipPreviewModal({
     };
   }, [useCustomAddress, customAddress, order]);
 
-  // Clamp previewIndex when totalPieces changes
   const clampedPreviewIndex = useMemo(() => {
     if (previewIndex >= totalPieces && totalPieces > 0) {
       return totalPieces - 1;
@@ -1361,7 +1359,6 @@ function SlipPreviewModal({
     onPrint,
   ]);
 
-  // Update previewIndex if clamped
   useEffect(() => {
     if (clampedPreviewIndex !== previewIndex) {
       setPreviewIndex(clampedPreviewIndex);

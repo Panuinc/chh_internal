@@ -11,17 +11,13 @@ import {
 } from "@/lib/shared/server";
 import { saveUploadedFile, deleteFile } from "@/lib/fileStore";
 
-/**
- * Helper function to cleanup uploaded files on error
- * @param {string[]} filePaths - Array of file paths to delete
- */
 async function cleanupFiles(filePaths) {
   for (const path of filePaths) {
     if (path) {
       try {
         await deleteFile(path);
       } catch (e) {
-        // Silently ignore cleanup errors
+
       }
     }
   }
@@ -109,7 +105,7 @@ export async function CreateUseCase(data, patrolPicture) {
   const uploadedFiles = [];
 
   try {
-    // 1. Save file first
+
     let picturePath = "";
     if (patrolPicture) {
       picturePath = await saveUploadedFile(
@@ -120,7 +116,6 @@ export async function CreateUseCase(data, patrolPicture) {
       uploadedFiles.push(picturePath);
     }
 
-    // 2. Create DB record within transaction
     const item = await prisma.$transaction(async (tx) => {
       return await tx.patrol.create({
         data: {
@@ -140,7 +135,7 @@ export async function CreateUseCase(data, patrolPicture) {
     });
     return item;
   } catch (error) {
-    // Cleanup uploaded files on error
+
     await cleanupFiles(uploadedFiles);
     log.error({ error: error.message });
     throw error;

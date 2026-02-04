@@ -23,46 +23,43 @@ export function calculateDelay(attempt, options) {
 
 export function isRetryableError(error, retryableErrors) {
   if (!error) return false;
-  
-  // Network errors
-  if (error.code === "ECONNRESET" || 
-      error.code === "ETIMEDOUT" || 
+
+  if (error.code === "ECONNRESET" ||
+      error.code === "ETIMEDOUT" ||
       error.code === "ECONNREFUSED" ||
       error.code === "ENOTFOUND") {
     return true;
   }
-  
-  // HTTP status codes that are retryable
+
   const retryableStatusCodes = [408, 429, 500, 502, 503, 504];
   if (retryableStatusCodes.includes(error.statusCode)) {
     return true;
   }
-  
-  // Custom retryable errors
+
   if (retryableErrors.length > 0) {
-    return retryableErrors.some((retryableError) => 
+    return retryableErrors.some((retryableError) =>
       error.message?.includes(retryableError) ||
       error.code === retryableError
     );
   }
-  
+
   return false;
 }
 
 export async function withRetry(fn, options = {}) {
   const config = { ...DEFAULT_RETRY_OPTIONS, ...options };
   const { maxRetries, onRetry } = config;
-  
+
   let lastError;
-  
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error;
-      
+
       const isRetryable = isRetryableError(error, config.retryableErrors);
-      
+
       if (!isRetryable || attempt === maxRetries) {
         logger.error({
           message: `Failed after ${attempt} attempt(s)`,
@@ -71,23 +68,23 @@ export async function withRetry(fn, options = {}) {
         });
         throw error;
       }
-      
+
       const waitTime = calculateDelay(attempt, config);
-      
+
       logger.warn({
         message: `Retry attempt ${attempt}/${maxRetries}`,
         error: error.message,
         waitTime,
       });
-      
+
       if (onRetry) {
         onRetry(attempt, error, waitTime);
       }
-      
+
       await delay(waitTime);
     }
   }
-  
+
   throw lastError;
 }
 

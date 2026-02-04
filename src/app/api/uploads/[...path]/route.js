@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
   try {
     const file = await readFile(filePath);
     const ext = filePath.split(".").pop().toLowerCase();
-    
+
     const mimeTypes = {
       jpg: "image/jpeg",
       jpeg: "image/jpeg",
