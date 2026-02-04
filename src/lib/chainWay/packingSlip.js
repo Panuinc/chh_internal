@@ -360,7 +360,7 @@ export async function generateAllPackingSlips(order) {
   const expandedItems = expandItemsByQuantity(items);
 
   const logoSize = mm(16);
-  const logo = await loadImage("logo/logo-09.png", logoSize, logoSize);
+  const logo = await loadImage("logo/logo-03.png", logoSize, logoSize);
 
   const qrSize = mm(22);
   const qrCode = await loadImage("qrcode/lineEvergreen.png", qrSize, qrSize);

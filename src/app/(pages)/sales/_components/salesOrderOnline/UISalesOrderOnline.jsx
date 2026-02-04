@@ -1429,7 +1429,7 @@ function SlipPreviewModal({
                 <div className="flex flex-row items-stretch border-b-1 border-default">
                   <div className="flex items-center justify-center w-[15%] p-2 border-r-2 border-default">
                     <Image
-                      src="/logo/logo-09.png"
+                      src="/logo/logo-03.png"
                       alt="Logo"
                       width={64}
                       height={64}
