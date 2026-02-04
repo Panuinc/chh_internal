@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { getLocalNow } from "@/lib/getLocalNow";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/shared/logger-edge";
 
 const logger = createLogger("RefreshTokenService");
 

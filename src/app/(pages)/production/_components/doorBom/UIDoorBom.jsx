@@ -611,7 +611,7 @@ export const EnhancedEngineeringDrawing = memo(
       accent: "#000000",
     };
 
-    const safeResults = results || {};
+    const safeResults = useMemo(() => results || {}, [results]);
     const {
       W = 0,
       H = 0,
@@ -709,19 +709,22 @@ export const EnhancedEngineeringDrawing = memo(
     const startX = Math.max(100, calculatedStartX);
     const marginY = 180;
 
-    const positions = {
-      side: { x: startX, y: marginY + 200 },
-      front: { x: startX + dims.side.T + gapBetweenViews, y: marginY + 200 },
-      exterior: {
-        x:
-          startX +
-          dims.side.T +
-          gapBetweenViews +
-          dims.front.W +
-          gapBetweenViews,
-        y: marginY + 200,
-      },
-    };
+    const positions = useMemo(
+      () => ({
+        side: { x: startX, y: marginY + 200 },
+        front: { x: startX + dims.side.T + gapBetweenViews, y: marginY + 200 },
+        exterior: {
+          x:
+            startX +
+            dims.side.T +
+            gapBetweenViews +
+            dims.front.W +
+            gapBetweenViews,
+          y: marginY + 200,
+        },
+      }),
+      [startX, dims.side.T, dims.front.W, gapBetweenViews, marginY],
+    );
 
     const layerStyle = useMemo(() => {
       let css = "";

@@ -4,7 +4,7 @@ import { CredentialsSignin } from "next-auth";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { AUTH_MESSAGES } from "@/lib/auth-messages";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/shared/logger-edge";
 import { createRefreshToken } from "@/services/auth/refreshToken.service";
 
 const logger = createLogger("next-auth");

@@ -63,8 +63,11 @@ class BCClient {
     this.log("Requesting new access token");
 
     const params = new URLSearchParams({
+      // eslint-disable-next-line camelcase
       grant_type: "client_credentials",
+      // eslint-disable-next-line camelcase
       client_id: this.config.auth.clientId,
+      // eslint-disable-next-line camelcase
       client_secret: this.config.auth.clientSecret,
       scope: this.config.auth.scope,
     });

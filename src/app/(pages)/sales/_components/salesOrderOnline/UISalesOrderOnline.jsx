@@ -1181,25 +1181,27 @@ function SlipPreviewModal({
   useEffect(() => {
     if (order?.number !== prevOrderRef.current) {
       prevOrderRef.current = order?.number;
-      setPreviewIndex(0);
-      setUseCustomAddress(false);
-      setCustomAddress({
-        shipToName: order.shipToName || order.customerName || "",
-        shipToAddressLine1: order.shipToAddressLine1 || "",
-        shipToAddressLine2: order.shipToAddressLine2 || "",
-        shipToCity: order.shipToCity || "",
-        shipToPostCode: order.shipToPostCode || "",
-        phoneNumber: order.phoneNumber || "",
+      queueMicrotask(() => {
+        setPreviewIndex(0);
+        setUseCustomAddress(false);
+        setCustomAddress({
+          shipToName: order.shipToName || order.customerName || "",
+          shipToAddressLine1: order.shipToAddressLine1 || "",
+          shipToAddressLine2: order.shipToAddressLine2 || "",
+          shipToCity: order.shipToCity || "",
+          shipToPostCode: order.shipToPostCode || "",
+          phoneNumber: order.phoneNumber || "",
+        });
+        const items = getItemLines(order);
+        const initialSelected = {};
+        const initialQuantities = {};
+        items.forEach((item) => {
+          initialSelected[item.itemNumber] = true;
+          initialQuantities[item.itemNumber] = item.quantity || 1;
+        });
+        setSelectedItems(initialSelected);
+        setQuantities(initialQuantities);
       });
-      const items = getItemLines(order);
-      const initialSelected = {};
-      const initialQuantities = {};
-      items.forEach((item) => {
-        initialSelected[item.itemNumber] = true;
-        initialQuantities[item.itemNumber] = item.quantity || 1;
-      });
-      setSelectedItems(initialSelected);
-      setQuantities(initialQuantities);
     }
   }, [order?.number, order]);
 
@@ -1359,11 +1361,7 @@ function SlipPreviewModal({
     onPrint,
   ]);
 
-  useEffect(() => {
-    if (clampedPreviewIndex !== previewIndex) {
-      setPreviewIndex(clampedPreviewIndex);
-    }
-  }, [clampedPreviewIndex, previewIndex]);
+  // Use clampedPreviewIndex directly instead of syncing via effect to avoid cascading renders
 
   if (!order) return null;
 

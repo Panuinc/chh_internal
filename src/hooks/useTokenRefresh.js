@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/shared/logger-edge";
 
 const logger = createLogger("useTokenRefresh");
 

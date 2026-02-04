@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+/* eslint-disable camelcase */
+
 const parseNumeric = (val, parser) => {
   if (val === null || val === undefined || val === "") return undefined;
   const parsed = parser(val);
