@@ -4,25 +4,21 @@ import moment from "moment-timezone";
 
 const timeZone = "Asia/Bangkok";
 
-// ตรวจสอบว่าอยู่ใน Node.js environment หรือไม่
-const isNodeEnvironment = typeof process !== 'undefined' && process.cwd;
+const isNodeEnvironment = typeof process !== "undefined" && process.cwd;
 
 let logger;
 
 if (isNodeEnvironment) {
-  // Dynamic import สำหรับ Node.js modules
   const fs = require("fs");
   const path = require("path");
-  
+
   const logDir = path.join(process.cwd(), "logs");
 
   try {
     if (!fs.existsSync(logDir)) {
       fs.mkdirSync(logDir, { recursive: true });
     }
-  } catch (err) {
-    // Silent fail in edge runtime
-  }
+  } catch (err) {}
 
   const fileTransport = new DailyRotateFile({
     filename: path.join(logDir, "%DATE%.log"),
@@ -31,9 +27,7 @@ if (isNodeEnvironment) {
     zippedArchive: true,
   });
 
-  fileTransport.on("error", () => {
-    // Silent fail
-  });
+  fileTransport.on("error", () => {});
 
   logger = winston.createLogger({
     level: process.env.LOG_LEVEL || "info",
@@ -46,7 +40,7 @@ if (isNodeEnvironment) {
             ? " " + JSON.stringify(meta, null, 0)
             : "";
         return `[${ts}] [${level.toUpperCase()}] ${message}${metaStr}`;
-      })
+      }),
     ),
     transports: [
       fileTransport,
@@ -58,7 +52,6 @@ if (isNodeEnvironment) {
 
   logger.info("Logger initialized successfully", { logDir });
 } else {
-  // Fallback logger สำหรับ Edge Runtime
   logger = {
     info: (message, meta) => console.log(`[INFO] ${message}`, meta || ""),
     error: (message, meta) => console.error(`[ERROR] ${message}`, meta || ""),

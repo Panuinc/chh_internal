@@ -46,7 +46,6 @@ function useProjectNames(items) {
           }
         }
       } catch (error) {
-        // Error handled by UI
       } finally {
         setLoading(false);
       }

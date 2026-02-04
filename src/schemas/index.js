@@ -1,16 +1,7 @@
-/**
- * Schema Index
- * รวม schemas ทั้งหมดของระบบ
- */
+export * from "./common";
 
-// Common schemas
-export * from './common';
+export * from "./hr";
 
-// HR schemas
-export * from './hr';
+export * from "./security";
 
-// Security schemas
-export * from './security';
-
-// Re-export zod for convenience
-export { z } from 'zod';
+export { z } from "zod";

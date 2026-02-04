@@ -7,8 +7,6 @@ const API_URL = "/api/warehouse/finishedGoods";
 export function extractDimensionCodes(itemNumber) {
   if (!itemNumber) return { projectCode: null, productCode: null };
 
-  // Expected format: PROJECT-CATEGORY-PRODUCT or PROJECT-PRODUCT variations
-  // Examples: "PROJ-CAT-PROD", "PROJ-PROD", "PRJ-CT-P001"
   const parts = itemNumber.split("-");
 
   if (parts.length >= 3) {

@@ -78,7 +78,7 @@ function RFIDLabelCard({
   return (
     <div
       className={`
-        flex flex-col w-full bg-background rounded-xl border-1 
+        flex flex-col w-full bg-background rounded-xl border-1
         transition-all duration-200
         ${isActive ? "border-default shadow-md scale-[1.02]" : "border-default"}
       `}
@@ -622,9 +622,7 @@ export default function UIFinishedGoods({
         try {
           await onPrintWithQuantity(item, quantity, options);
           closePreview();
-        } catch (error) {
-          // Silent catch - error already handled by UI
-        }
+        } catch (error) {}
       }
     },
     [onPrintWithQuantity, closePreview],

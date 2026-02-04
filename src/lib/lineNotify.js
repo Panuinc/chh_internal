@@ -18,9 +18,9 @@ function getPublicImageUrl(imagePath) {
   if (!imagePath) return null;
 
   if (isLocalhost()) {
-    logger.warn(
-      "localhost - images will not display in LINE", { url: BASE_URL }
-    );
+    logger.warn("localhost - images will not display in LINE", {
+      url: BASE_URL,
+    });
     return null;
   }
 
@@ -39,7 +39,7 @@ function getActionUrl(path) {
 export async function sendFlexMessage(
   groupId,
   flexContent,
-  altText = "Visitor Notification"
+  altText = "Visitor Notification",
 ) {
   const url = "https://api.line.me/v2/bot/message/push";
 
@@ -70,9 +70,6 @@ export async function sendFlexMessage(
   return response;
 }
 
-/**
- * สร้าง Flex Message สำหรับ Visitor Check-In พร้อมปุ่ม Checkout
- */
 export function buildVisitorCheckInFlex(visitor, contactUser) {
   const reasonLabels = {
     Shipping: "📦 การจัดส่ง",
@@ -99,7 +96,7 @@ export function buildVisitorCheckInFlex(visitor, contactUser) {
   const photoUrl = getPublicImageUrl(visitor.visitorPhoto);
   const detailUrl = getActionUrl(`/security/visitor/${visitor.visitorId}`);
   const checkoutUrl = getActionUrl(
-    `/security/visitor/${visitor.visitorId}/quick-checkout`
+    `/security/visitor/${visitor.visitorId}/quick-checkout`,
   );
 
   const flexContent = {
@@ -306,9 +303,6 @@ export function buildVisitorCheckInFlex(visitor, contactUser) {
   return flexContent;
 }
 
-/**
- * สร้าง Flex Message สำหรับ Status Update
- */
 export function buildVisitorStatusUpdateFlex(visitor, contactUser, newStatus) {
   const statusConfig = {
     CheckIn: { emoji: "🟢", label: "Check-In", color: "#28a745" },
@@ -422,12 +416,11 @@ export function buildVisitorStatusUpdateFlex(visitor, contactUser, newStatus) {
   return flexContent;
 }
 
-/**
- * ส่ง notification เมื่อ Visitor Check-In
- */
 export async function notifyVisitorCheckIn(visitor, contactUser) {
   if (!LINE_CHANNEL_ACCESS_TOKEN || !LINE_VISITOR_GROUP_ID) {
-    logger.warn("LINE credentials not configured, skipping check-in notification");
+    logger.warn(
+      "LINE credentials not configured, skipping check-in notification",
+    );
     return null;
   }
 
@@ -441,26 +434,28 @@ export async function notifyVisitorCheckIn(visitor, contactUser) {
     const result = await sendFlexMessage(
       LINE_VISITOR_GROUP_ID,
       flexMessage,
-      `🚨 ผู้มาติดต่อ: ${visitor.visitorFirstName} ${visitor.visitorLastName}`
+      `🚨 ผู้มาติดต่อ: ${visitor.visitorFirstName} ${visitor.visitorLastName}`,
     );
-    // Success - no log needed
+
     return result;
   } catch (error) {
-    logger.error({ message: "Failed to send LINE check-in notification", error: error.message });
+    logger.error({
+      message: "Failed to send LINE check-in notification",
+      error: error.message,
+    });
     throw error;
   }
 }
 
-/**
- * ส่ง notification เมื่อ Visitor Status Update
- */
 export async function notifyVisitorStatusUpdate(
   visitor,
   contactUser,
-  newStatus
+  newStatus,
 ) {
   if (!LINE_CHANNEL_ACCESS_TOKEN || !LINE_VISITOR_GROUP_ID) {
-    logger.warn("LINE credentials not configured, skipping status update notification");
+    logger.warn(
+      "LINE credentials not configured, skipping status update notification",
+    );
     return null;
   }
 
@@ -468,18 +463,21 @@ export async function notifyVisitorStatusUpdate(
     const flexMessage = buildVisitorStatusUpdateFlex(
       visitor,
       contactUser,
-      newStatus
+      newStatus,
     );
 
     const result = await sendFlexMessage(
       LINE_VISITOR_GROUP_ID,
       flexMessage,
-      `${visitor.visitorFirstName} ${visitor.visitorLastName} - ${newStatus}`
+      `${visitor.visitorFirstName} ${visitor.visitorLastName} - ${newStatus}`,
     );
-    // Success - no log needed
+
     return result;
   } catch (error) {
-    logger.error({ message: "Failed to send LINE status update notification", error: error.message });
+    logger.error({
+      message: "Failed to send LINE status update notification",
+      error: error.message,
+    });
     throw error;
   }
 }

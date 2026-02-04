@@ -321,7 +321,7 @@ export function PrinterSettings({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "command",
-          command: "^XA^HR^XZ", // RFID Tag Calibration command
+          command: "^XA^HR^XZ",
         }),
       });
       const result = await response.json();

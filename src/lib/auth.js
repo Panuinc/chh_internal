@@ -7,7 +7,6 @@ import { AUTH_MESSAGES } from "@/lib/auth-messages";
 import { createLogger } from "@/lib/shared/logger";
 import { createRefreshToken } from "@/services/auth/refreshToken.service";
 
-
 const logger = createLogger("next-auth");
 
 class InvalidCredentialsError extends CredentialsSignin {
@@ -26,8 +25,7 @@ class LoginError extends CredentialsSignin {
   code = AUTH_MESSAGES.LOGIN_ERROR;
 }
 
-// Access Token อายุ 15 นาที
-const ACCESS_TOKEN_MAX_AGE = 15 * 60; // วินาที
+const ACCESS_TOKEN_MAX_AGE = 15 * 60;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -67,7 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const valid = await bcrypt.compare(
             credentials.password,
-            account.accountPassword
+            account.accountPassword,
           );
 
           if (!valid) throw new InvalidCredentialsError();
@@ -76,7 +74,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             .filter((a) => a.permission.permissionStatus === "Active")
             .map((a) => a.permission.permissionName);
 
-          // สร้าง Refresh Token
           const metadata = {
             ipAddress: request.headers?.get("x-forwarded-for") || null,
             userAgent: request.headers?.get("user-agent") || null,
@@ -84,7 +81,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const refreshTokenData = await createRefreshToken(
             account.accountId,
-            metadata
+            metadata,
           );
 
           return {
@@ -111,7 +108,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   callbacks: {
     async jwt({ token, user, trigger, session }) {
-      // เมื่อ login สำเร็จ (มี user object)
       if (user) {
         token.id = user.id;
         token.accountId = user.accountId;
@@ -127,7 +123,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.accessTokenExpires = Date.now() + ACCESS_TOKEN_MAX_AGE * 1000;
       }
 
-      // ถ้าเป็นการ update session จาก client
       if (trigger === "update" && session) {
         token.accessTokenExpires = Date.now() + ACCESS_TOKEN_MAX_AGE * 1000;
         if (session.refreshToken) {
@@ -153,8 +148,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.permissions = token.permissions;
         session.user.isSuperAdmin = token.isSuperAdmin;
         session.user.accessTokenExpires = token.accessTokenExpires;
-        
-        // ตรวจสอบว่า access token ใกล้หมดอายุหรือไม่ (เหลือน้อยกว่า 5 นาที)
+
         const expiresIn = token.accessTokenExpires - Date.now();
         session.user.accessTokenExpired = expiresIn < 5 * 60 * 1000;
       }
@@ -169,11 +163,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 วัน (ใช้สำหรับ refresh token)
+    maxAge: 30 * 24 * 60 * 60,
   },
 
   jwt: {
-    maxAge: ACCESS_TOKEN_MAX_AGE, // 15 นาที (access token)
+    maxAge: ACCESS_TOKEN_MAX_AGE,
   },
 
   trustHost: true,

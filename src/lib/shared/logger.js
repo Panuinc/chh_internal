@@ -1,6 +1,3 @@
-// Simple logger that works in both Node.js and Edge Runtime
-// In Edge Runtime, falls back to console logging
-
 function createConsoleLogger(useCaseName) {
   return {
     start: (data) => console.log(`[${useCaseName}] start`, data),
@@ -11,7 +8,6 @@ function createConsoleLogger(useCaseName) {
 }
 
 export function createLogger(useCaseName) {
-  // Always use console logger (simplest, works everywhere)
   return createConsoleLogger(useCaseName);
 }
 

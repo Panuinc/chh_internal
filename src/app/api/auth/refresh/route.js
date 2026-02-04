@@ -1,23 +1,16 @@
-/**
- * Refresh Token API
- * ใช้สำหรับขอ Access Token ใหม่โดยใช้ Refresh Token
- */
-
 import { NextResponse } from "next/server";
-import { verifyRefreshToken, rotateRefreshToken } from "@/services/auth/refreshToken.service";
+import {
+  verifyRefreshToken,
+  rotateRefreshToken,
+} from "@/services/auth/refreshToken.service";
 import { sign } from "jsonwebtoken";
 import { createLogger } from "@/lib/shared/logger";
 import { withRateLimit } from "@/lib/rateLimiter";
 
 const logger = createLogger("RefreshTokenAPI");
 
-// JWT Configuration
-const ACCESS_TOKEN_EXPIRES = 15 * 60; // 15 นาที (วินาที)
+const ACCESS_TOKEN_EXPIRES = 15 * 60;
 
-/**
- * POST /api/auth/refresh
- * ขอ Access Token ใหม่โดยใช้ Refresh Token
- */
 async function handler(request) {
   logger.start({});
 
@@ -28,11 +21,10 @@ async function handler(request) {
     if (!refreshToken) {
       return NextResponse.json(
         { error: "Refresh token is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // ตรวจสอบ Refresh Token และทำ Rotation
     const metadata = {
       ipAddress: request.headers.get("x-forwarded-for") || request.ip,
       userAgent: request.headers.get("user-agent"),
@@ -42,14 +34,12 @@ async function handler(request) {
     if (!account) {
       return NextResponse.json(
         { error: "Invalid or expired refresh token" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
-    // ทำ Token Rotation (สร้างใหม่ + ยกเลิกเก่า)
     const newRefreshToken = await rotateRefreshToken(refreshToken, metadata);
 
-    // สร้าง Access Token ใหม่
     const permissions = account.accountEmployee.assigns
       .filter((a) => a.permission.permissionStatus === "Active")
       .map((a) => a.permission.permissionName);
@@ -67,7 +57,7 @@ async function handler(request) {
         isSuperAdmin: permissions.includes("superadmin"),
       },
       process.env.AUTH_SECRET,
-      { expiresIn: ACCESS_TOKEN_EXPIRES }
+      { expiresIn: ACCESS_TOKEN_EXPIRES },
     );
 
     logger.success({ accountId: account.accountId });
@@ -82,13 +72,12 @@ async function handler(request) {
     logger.error({ error: error.message });
     return NextResponse.json(
       { error: "Failed to refresh token" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-// ใช้ Rate Limiting แบบเข้มงวดสำหรับ refresh endpoint
-export const POST = withRateLimit(handler, { type: 'strict' });
+export const POST = withRateLimit(handler, { type: "strict" });
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

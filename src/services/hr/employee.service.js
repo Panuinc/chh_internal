@@ -17,7 +17,6 @@ const ENTITY_NAME = "Employee";
 const ENTITY_KEY = "employees";
 const ENTITY_SINGULAR = "employee";
 
-// ใช้ค่า PAGINATION จาก config แทน hardcoded
 const DEFAULT_LIMIT = PAGINATION.LARGE_PAGE_SIZE;
 
 const EMPLOYEE_SELECT = {
@@ -27,7 +26,6 @@ const EMPLOYEE_SELECT = {
   employeeEmail: true,
 };
 
-// Re-export schemas เพื่อ backward compatibility
 export const createSchema = employeeCreateSchema;
 export const updateSchema = employeeUpdateSchema;
 
@@ -81,8 +79,6 @@ export const EmployeeRepository = {
       },
     });
   },
-
-
 };
 
 export const EmployeeService = {
@@ -203,7 +199,7 @@ export async function UpdateUseCase(data) {
     if (normalizedEmail !== existing.employeeEmail.toLowerCase()) {
       await EmployeeService.ensureEmailNotDuplicate(
         normalizedEmail,
-        employeeId
+        employeeId,
       );
     }
 

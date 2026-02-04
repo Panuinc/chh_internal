@@ -1411,7 +1411,6 @@ export default function DoorConfigurator() {
 
   useEffect(() => {
     if (frameSelection.frames?.length > 0)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedFrameCode(frameSelection.frames[0].code);
   }, [frameSelection]);
 

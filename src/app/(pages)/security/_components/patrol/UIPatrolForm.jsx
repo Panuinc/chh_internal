@@ -26,8 +26,7 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
         if (state === 2) {
           await html5QrCodeRef.current.stop();
         }
-      } catch (err) {
-      }
+      } catch (err) {}
       try {
         html5QrCodeRef.current.clear();
       } catch (err) {}
@@ -87,7 +86,6 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
 
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       startScanner();
     }
     return () => {
@@ -172,9 +170,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
       streamRef.current.getTracks().forEach((track) => {
         try {
           track.stop();
-        } catch (e) {
-          // Silent catch
-        }
+        } catch (e) {}
       });
       streamRef.current = null;
     }
@@ -254,7 +250,6 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
 
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       startCamera();
     }
     return () => {

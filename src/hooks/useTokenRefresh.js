@@ -6,13 +6,8 @@ import { createLogger } from "@/lib/shared/logger";
 
 const logger = createLogger("useTokenRefresh");
 
-// เวลาที่จะ refresh ก่อนหมดอายุ (5 นาที)
 const REFRESH_BUFFER = 5 * 60 * 1000;
 
-/**
- * Hook สำหรับจัดการ Token Refresh อัตโนมัติ
- * ใช้ในฝั่ง Client เพื่อตรวจสอบและ refresh token ก่อนหมดอายุ
- */
 export function useTokenRefresh() {
   const { data: session, update } = useSession();
   const refreshTimeoutRef = useRef(null);
@@ -43,18 +38,17 @@ export function useTokenRefresh() {
 
       const data = await response.json();
 
-      // อัปเดต session ด้วย token ใหม่
       await update({
         refreshToken: data.refreshToken,
         refreshTokenExpires: new Date(
-          Date.now() + data.expiresIn * 1000
+          Date.now() + data.expiresIn * 1000,
         ).toISOString(),
       });
 
       logger.success({});
     } catch (error) {
       logger.error({ error: error.message });
-      // ถ้า refresh ไม่สำเร็จ ให้ logout
+
       signOut({ callbackUrl: "/signIn" });
     }
   }, [session, update]);
@@ -66,13 +60,11 @@ export function useTokenRefresh() {
     const now = Date.now();
     const expiresIn = expiresAt - now;
 
-    // ถ้า token หมดอายุแล้ว หรือใกล้หมดอายุ
     if (expiresIn <= REFRESH_BUFFER) {
       refreshToken();
       return;
     }
 
-    // ตั้งเวลา refresh ก่อนหมดอายุ 5 นาที
     const timeout = setTimeout(() => {
       refreshToken();
     }, expiresIn - REFRESH_BUFFER);
