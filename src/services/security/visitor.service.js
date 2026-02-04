@@ -9,6 +9,8 @@ import {
   BadRequestError,
   validateOrThrow,
   createLogger,
+  successResponse,
+  errorResponse,
 } from "@/lib/shared/server";
 import { saveUploadedFile, deleteFile } from "@/lib/fileStore";
 
@@ -492,7 +494,7 @@ export async function getAllVisitor(request) {
     const { items, total } = await GetAllUseCase(page, limit);
     const formatted = formatVisitorData(items);
 
-    return Response.json({
+    return successResponse({
       [ENTITY_KEY]: formatted,
       total,
       page,
@@ -500,11 +502,7 @@ export async function getAllVisitor(request) {
     });
   } catch (error) {
     log.error({ error: error.message });
-    const status = error.statusCode || 500;
-    return Response.json(
-      { error: error.message || "Internal Server Error" },
-      { status }
-    );
+    return errorResponse(error);
   }
 }
 
@@ -514,14 +512,10 @@ export async function getVisitorById(request, visitorId) {
     const item = await GetByIdUseCase(visitorId);
     const formatted = formatVisitorData([item])[0];
 
-    return Response.json({ [ENTITY_SINGULAR]: formatted });
+    return successResponse({ [ENTITY_SINGULAR]: formatted });
   } catch (error) {
     log.error({ error: error.message });
-    const status = error.statusCode || 500;
-    return Response.json(
-      { error: error.message || "Internal Server Error" },
-      { status }
-    );
+    return errorResponse(error);
   }
 }
 
@@ -534,20 +528,13 @@ export async function createVisitor(request) {
     const item = await CreateUseCase(data, visitorPhoto, visitorDocumentPhotos);
     const formatted = formatVisitorData([item])[0];
 
-    return Response.json(
+    return successResponse(
       { message: "Visitor created successfully", [ENTITY_SINGULAR]: formatted },
-      { status: 201 }
+      201
     );
   } catch (error) {
     log.error({ error: error.message });
-    const status = error.statusCode || 500;
-    return Response.json(
-      {
-        error: error.message || "Internal Server Error",
-        details: error.details || null,
-      },
-      { status }
-    );
+    return errorResponse(error);
   }
 }
 
@@ -564,20 +551,13 @@ export async function updateVisitor(request, visitorId) {
     );
     const formatted = formatVisitorData([item])[0];
 
-    return Response.json({
+    return successResponse({
       message: "Visitor updated successfully",
       [ENTITY_SINGULAR]: formatted,
     });
   } catch (error) {
     log.error({ error: error.message });
-    const status = error.statusCode || 500;
-    return Response.json(
-      {
-        error: error.message || "Internal Server Error",
-        details: error.details || null,
-      },
-      { status }
-    );
+    return errorResponse(error);
   }
 }
 
@@ -588,25 +568,18 @@ export async function checkoutVisitor(request, visitorId) {
     const updatedBy = body.updatedBy;
 
     if (!updatedBy) {
-      return Response.json({ error: "updatedBy is required" }, { status: 400 });
+      return errorResponse(new BadRequestError("updatedBy is required"));
     }
 
     const item = await CheckoutUseCase(visitorId, updatedBy);
     const formatted = formatVisitorData([item])[0];
 
-    return Response.json({
+    return successResponse({
       message: "Visitor checked out successfully",
       [ENTITY_SINGULAR]: formatted,
     });
   } catch (error) {
     log.error({ error: error.message });
-    const status = error.statusCode || 500;
-    return Response.json(
-      {
-        error: error.message || "Internal Server Error",
-        details: error.details || null,
-      },
-      { status }
-    );
+    return errorResponse(error);
   }
 }

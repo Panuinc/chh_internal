@@ -242,7 +242,7 @@ export const menuConfig = {
         {
           id: "memo",
           href: "/sales/memo",
-          text: "MEMO",
+          text: "Memo",
           icon: FileText,
           permission: "sales.memo.view",
           actions: {

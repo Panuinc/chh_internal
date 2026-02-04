@@ -27,7 +27,7 @@ class LoginError extends CredentialsSignin {
 
 const ACCESS_TOKEN_MAX_AGE = 15 * 60;
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const authOptions = {
   providers: [
     Credentials({
       name: "credentials",
@@ -171,7 +171,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
 
   trustHost: true,
-});
+};
+
+const { handlers, signIn, signOut, auth } = NextAuth(authOptions);
+
+export { handlers, signIn, signOut, auth };
 
 export function hasPermission(session, permission) {
   if (!session?.user) return false;

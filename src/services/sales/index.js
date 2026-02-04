@@ -7,4 +7,12 @@ export {
   formatLines,
 } from "./salesOrderOnline.service";
 
-export { SalesMemoService } from "./memo.service";
+export {
+  getAllMemo,
+  getMemoById,
+  createMemo,
+  updateMemo,
+  DeleteUseCase,
+  MemoRepository,
+  MemoService,
+} from "./memo.service";

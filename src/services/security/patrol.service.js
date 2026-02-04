@@ -8,6 +8,8 @@ import {
   BadRequestError,
   validateOrThrow,
   createLogger,
+  successResponse,
+  errorResponse,
 } from "@/lib/shared/server";
 import { saveUploadedFile, deleteFile } from "@/lib/fileStore";
 
@@ -175,7 +177,7 @@ export async function getAllPatrol(request) {
     const { items, total } = await GetAllUseCase(page, limit);
     const formatted = formatPatrolData(items);
 
-    return Response.json({
+    return successResponse({
       [ENTITY_KEY]: formatted,
       total,
       page,
@@ -183,11 +185,7 @@ export async function getAllPatrol(request) {
     });
   } catch (error) {
     log.error({ error: error.message });
-    const status = error.statusCode || 500;
-    return Response.json(
-      { error: error.message || "Internal Server Error" },
-      { status }
-    );
+    return errorResponse(error);
   }
 }
 
@@ -198,19 +196,12 @@ export async function createPatrol(request) {
     const item = await CreateUseCase(data, patrolPicture);
     const formatted = formatPatrolData([item])[0];
 
-    return Response.json(
+    return successResponse(
       { message: "Patrol created successfully", [ENTITY_SINGULAR]: formatted },
-      { status: 201 }
+      201
     );
   } catch (error) {
     log.error({ error: error.message });
-    const status = error.statusCode || 500;
-    return Response.json(
-      {
-        error: error.message || "Internal Server Error",
-        details: error.details || null,
-      },
-      { status }
-    );
+    return errorResponse(error);
   }
 }
