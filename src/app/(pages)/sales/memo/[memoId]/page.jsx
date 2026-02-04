@@ -11,6 +11,14 @@ import {
 } from "@/app/(pages)/sales/_hooks/useMemo";
 import { useFormHandler, useMenu } from "@/hooks";
 
+// Helper to format Date to YYYY-MM-DD
+function formatDateForInput(dateString) {
+  if (!dateString) return "";
+  const d = new Date(dateString);
+  if (isNaN(d.getTime())) return "";
+  return d.toISOString().split("T")[0];
+}
+
 export default function MemoUpdate() {
   const router = useRouter();
   const { hasPermission } = useMenu();
@@ -59,16 +67,14 @@ export default function MemoUpdate() {
         to: memo.memoTo || "",
         copy: memo.memoCopy || "",
         subject: memo.memoSubject || "",
-        date: memo.memoDate
-          ? new Date(memo.memoDate).toISOString().split("T")[0]
-          : "",
+        date: formatDateForInput(memo.memoDate),
         content: memo.memoContent || "",
         requesterName: memo.memoRequesterName || "",
-        requesterDate: memo.memoRequesterDate || "",
+        requesterDate: formatDateForInput(memo.memoRequesterDate),
         salesManagerName: memo.memoSalesManagerName || "",
-        salesManagerDate: memo.memoSalesManagerDate || "",
+        salesManagerDate: formatDateForInput(memo.memoSalesManagerDate),
         ceoName: memo.memoCeoName || "",
-        ceoDate: memo.memoCeoDate || "",
+        ceoDate: formatDateForInput(memo.memoCeoDate),
       });
     }
   }, [memo, setFormData]);

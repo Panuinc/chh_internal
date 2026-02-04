@@ -235,11 +235,11 @@ model SalesMemo {
   memoDate             DateTime
   memoContent          String    @db.Text
   memoRequesterName    String
-  memoRequesterDate    String
+  memoRequesterDate    DateTime?
   memoSalesManagerName String?
-  memoSalesManagerDate String?
+  memoSalesManagerDate DateTime?
   memoCeoName          String?
-  memoCeoDate          String?
+  memoCeoDate          DateTime?
   memoCreatedBy        String?
   memoCreatedAt        DateTime  @default(now())
   memoUpdatedBy        String?

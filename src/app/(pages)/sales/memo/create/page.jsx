@@ -25,16 +25,18 @@ export default function MemoCreate() {
     currentEmployeeId: userId,
   });
 
+  const today = new Date().toISOString().split("T")[0];
+
   const formHandler = useFormHandler(
     {
       documentNo: documentNo || "",
       to: "",
       copy: "",
       subject: "",
-      date: new Date().toISOString().split("T")[0],
+      date: today,
       content: "",
       requesterName: "",
-      requesterDate: "",
+      requesterDate: today,
       salesManagerName: "",
       salesManagerDate: "",
       ceoName: "",

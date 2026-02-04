@@ -32,11 +32,11 @@ export const createSchema = z.object({
   date: preprocessDate("Please provide date"),
   content: preprocessString("Please provide content"),
   requesterName: preprocessString("Please provide requesterName"),
-  requesterDate: z.string().optional().nullable(),
+  requesterDate: preprocessDate("Please provide requesterDate").optional().nullable(),
   salesManagerName: z.string().optional().nullable(),
-  salesManagerDate: z.string().optional().nullable(),
+  salesManagerDate: preprocessDate("Please provide salesManagerDate").optional().nullable(),
   ceoName: z.string().optional().nullable(),
-  ceoDate: z.string().optional().nullable(),
+  ceoDate: preprocessDate("Please provide ceoDate").optional().nullable(),
   createdBy: preprocessString("Please provide the creator ID"),
 });
 
@@ -49,11 +49,11 @@ export const updateSchema = z.object({
   date: preprocessDate("Please provide date"),
   content: preprocessString("Please provide content"),
   requesterName: preprocessString("Please provide requesterName"),
-  requesterDate: z.string().optional().nullable(),
+  requesterDate: preprocessDate("Please provide requesterDate").optional().nullable(),
   salesManagerName: z.string().optional().nullable(),
-  salesManagerDate: z.string().optional().nullable(),
+  salesManagerDate: preprocessDate("Please provide salesManagerDate").optional().nullable(),
   ceoName: z.string().optional().nullable(),
-  ceoDate: z.string().optional().nullable(),
+  ceoDate: preprocessDate("Please provide ceoDate").optional().nullable(),
   updatedBy: preprocessString("Please provide the updater ID"),
 });
 
