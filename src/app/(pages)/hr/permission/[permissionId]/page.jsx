@@ -41,14 +41,16 @@ export default function PermissionUpdate() {
     submitPermission
   );
 
+  const { setFormData } = formHandler;
+
   useEffect(() => {
     if (permission) {
-      formHandler.setFormData({
+      setFormData({
         permissionName: permission.permissionName || "",
         permissionStatus: permission.permissionStatus || "",
       });
     }
-  }, [permission, formHandler]);
+  }, [permission, setFormData]);
 
   if (permissionLoading) return <Loading />;
 

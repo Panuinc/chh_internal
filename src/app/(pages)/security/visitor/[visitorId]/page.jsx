@@ -52,9 +52,11 @@ export default function VisitorUpdate() {
     submitVisitor
   );
 
+  const { setFormData } = formHandler;
+
   useEffect(() => {
     if (visitor) {
-      formHandler.setFormData({
+      setFormData({
         visitorFirstName: visitor.visitorFirstName || "",
         visitorLastName: visitor.visitorLastName || "",
         visitorCompany: visitor.visitorCompany || "",
@@ -67,7 +69,7 @@ export default function VisitorUpdate() {
         visitorDocumentPhotos: [],
       });
     }
-  }, [visitor, formHandler]);
+  }, [visitor, setFormData]);
 
   if (visitorLoading) return <Loading />;
 

@@ -41,14 +41,16 @@ export default function DepartmentUpdate() {
     submitDepartment
   );
 
+  const { setFormData } = formHandler;
+
   useEffect(() => {
     if (department) {
-      formHandler.setFormData({
+      setFormData({
         departmentName: department.departmentName || "",
         departmentStatus: department.departmentStatus || "",
       });
     }
-  }, [department, formHandler]);
+  }, [department, setFormData]);
 
   if (departmentLoading) return <Loading />;
 

@@ -39,16 +39,18 @@ export default function AccountUpdate() {
     submitAccount
   );
 
+  const { setFormData } = formHandler;
+
   useEffect(() => {
     if (account) {
-      formHandler.setFormData({
+      setFormData({
         accountUsername: account.accountUsername || "",
         accountPassword: "",
         accountPinNumber: "",
         accountStatus: account.accountStatus || "",
       });
     }
-  }, [account, formHandler]);
+  }, [account, setFormData]);
 
   if (accountLoading) return <Loading />;
 

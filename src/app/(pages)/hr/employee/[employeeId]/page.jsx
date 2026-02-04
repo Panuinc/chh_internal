@@ -39,16 +39,18 @@ export default function EmployeeUpdate() {
     submitEmployee
   );
 
+  const { setFormData } = formHandler;
+
   useEffect(() => {
     if (employee) {
-      formHandler.setFormData({
+      setFormData({
         employeeFirstName: employee.employeeFirstName || "",
         employeeLastName: employee.employeeLastName || "",
         employeeEmail: employee.employeeEmail || "",
         employeeStatus: employee.employeeStatus || "",
       });
     }
-  }, [employee, formHandler]);
+  }, [employee, setFormData]);
 
   if (employeeLoading) return <Loading />;
 
