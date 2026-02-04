@@ -120,7 +120,7 @@ export async function resetRateLimit(ip, type = "general") {
   await limiter.delete(key);
 }
 
-export default {
+const rateLimiterModule = {
   checkRateLimit,
   withRateLimit,
   checkAuthRateLimit,
@@ -128,3 +128,5 @@ export default {
   resetRateLimit,
   getClientIP,
 };
+
+export default rateLimiterModule;

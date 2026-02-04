@@ -157,10 +157,12 @@ const controller = createBCController({
 export const getAllPackingItems = controller.getAll;
 export const getPackingItemById = controller.getById;
 
-export default {
+const packingService = {
   getAllPackingItems,
   getPackingItemById,
   GetAllUseCase,
   GetByIdUseCase,
   formatData,
 };
+
+export default packingService;

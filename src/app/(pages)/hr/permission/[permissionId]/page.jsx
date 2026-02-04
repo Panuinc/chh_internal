@@ -48,7 +48,7 @@ export default function PermissionUpdate() {
         permissionStatus: permission.permissionStatus || "",
       });
     }
-  }, [permission]);
+  }, [permission, formHandler]);
 
   if (permissionLoading) return <Loading />;
 

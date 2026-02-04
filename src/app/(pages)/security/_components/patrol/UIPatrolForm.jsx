@@ -86,13 +86,17 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
 
   useEffect(() => {
     if (isOpen) {
-      startScanner();
-    }
-    return () => {
-      if (!isOpen) {
+      // Schedule scanner start to avoid synchronous setState
+      const timer = setTimeout(() => {
+        startScanner();
+      }, 0);
+      return () => clearTimeout(timer);
+    } else {
+      // Schedule stop to avoid synchronous setState
+      setTimeout(() => {
         stopScanner();
-      }
-    };
+      }, 0);
+    }
   }, [isOpen, startScanner, stopScanner]);
 
   const handleClose = useCallback(async () => {
@@ -250,13 +254,17 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
 
   useEffect(() => {
     if (isOpen) {
-      startCamera();
-    }
-    return () => {
-      if (!isOpen) {
+      // Schedule camera start to avoid synchronous setState
+      const timer = setTimeout(() => {
+        startCamera();
+      }, 0);
+      return () => clearTimeout(timer);
+    } else {
+      // Schedule stop to avoid synchronous setState
+      setTimeout(() => {
         stopCamera();
-      }
-    };
+      }, 0);
+    }
   }, [isOpen, startCamera, stopCamera]);
 
   const handleClose = useCallback(() => {

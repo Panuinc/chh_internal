@@ -366,6 +366,7 @@ export function RFIDProvider({ children, config = {} }) {
 
   const value = useMemo(
     () => rfid,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       rfid.printing,
       rfid.isConnected,

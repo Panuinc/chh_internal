@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import { DataTable } from "@/components";
 import { Loading } from "@/components";
 
@@ -23,10 +24,12 @@ export default function UIPatrol({ Patrols = [], loading, onAddNew }) {
         patrolQrCodeInfo: patrol.patrolQrCodeInfo || "-",
         patrolNote: patrol.patrolNote || "-",
         patrolPicturePreview: patrol.patrolPicture ? (
-          <img
+          <Image
             src={`/api/uploads/${patrol.patrolPicture}`}
             alt="Patrol"
-            className="w-14 h-14 object-cover rounded"
+            width={56}
+            height={56}
+            className="object-cover rounded"
           />
         ) : (
           "-"

@@ -168,7 +168,9 @@ export function useSalesOrderOnline(orderId) {
   return { order, loading, error, refetch };
 }
 
-export default {
+const salesOrderOnlineHooks = {
   useSalesOrdersOnline,
   useSalesOrderOnline,
 };
+
+export default salesOrderOnlineHooks;

@@ -400,7 +400,7 @@ const controller = createBCController({
 export const getAllFinishedGoodsItems = controller.getAll;
 export const getFinishedGoodsItemById = controller.getById;
 
-export default {
+const finishedGoodsService = {
   getAllFinishedGoodsItems,
   getFinishedGoodsItemById,
   GetAllUseCase,

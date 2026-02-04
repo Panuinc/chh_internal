@@ -190,15 +190,25 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
 
   useEffect(() => {
     if (isOpen) {
-      startCamera();
+      // Schedule camera start to avoid synchronous setState
+      const timer = setTimeout(() => {
+        startCamera();
+      }, 0);
+      return () => clearTimeout(timer);
     } else {
-      stopCamera();
+      // Schedule stop to avoid synchronous setState
+      setTimeout(() => {
+        stopCamera();
+      }, 0);
     }
   }, [isOpen, startCamera, stopCamera]);
 
   useEffect(() => {
     return () => {
-      stopCamera();
+      // Schedule stop to avoid synchronous setState
+      setTimeout(() => {
+        stopCamera();
+      }, 0);
     };
   }, [stopCamera]);
 
@@ -384,15 +394,25 @@ function MultiCameraModal({
 
   useEffect(() => {
     if (isOpen) {
-      startCamera();
+      // Schedule camera start to avoid synchronous setState
+      const timer = setTimeout(() => {
+        startCamera();
+      }, 0);
+      return () => clearTimeout(timer);
     } else {
-      stopCamera();
+      // Schedule stop to avoid synchronous setState
+      setTimeout(() => {
+        stopCamera();
+      }, 0);
     }
   }, [isOpen, startCamera, stopCamera]);
 
   useEffect(() => {
     return () => {
-      stopCamera();
+      // Schedule stop to avoid synchronous setState
+      setTimeout(() => {
+        stopCamera();
+      }, 0);
     };
   }, [stopCamera]);
 

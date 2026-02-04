@@ -143,7 +143,9 @@ export function useRawMaterialItem(itemId) {
   return { item, loading, error, refetch };
 }
 
-export default {
+const rawMaterialHooks = {
   useRawMaterialItems,
   useRawMaterialItem,
 };
+
+export default rawMaterialHooks;

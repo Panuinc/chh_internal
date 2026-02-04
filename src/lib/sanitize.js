@@ -145,7 +145,7 @@ export function isEmpty(value) {
   return false;
 }
 
-export default {
+const sanitizeModule = {
   sanitizeHTML,
   sanitizeText,
   sanitizeAttribute,
@@ -157,3 +157,5 @@ export default {
   isValidEmail,
   isEmpty,
 };
+
+export default sanitizeModule;

@@ -48,7 +48,7 @@ export default function EmployeeUpdate() {
         employeeStatus: employee.employeeStatus || "",
       });
     }
-  }, [employee]);
+  }, [employee, formHandler]);
 
   if (employeeLoading) return <Loading />;
 

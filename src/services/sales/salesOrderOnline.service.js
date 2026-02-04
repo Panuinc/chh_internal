@@ -215,7 +215,7 @@ const controller = createBCController({
 export const getAllSalesOrdersOnline = controller.getAll;
 export const getSalesOrderOnlineById = controller.getById;
 
-export default {
+const salesOrderOnlineService = {
   getAllSalesOrdersOnline,
   getSalesOrderOnlineById,
   GetAllUseCase,
@@ -223,3 +223,5 @@ export default {
   formatData,
   formatLines,
 };
+
+export default salesOrderOnlineService;

@@ -1403,16 +1403,13 @@ export default function DoorConfigurator() {
         code: "",
         desc: "",
       };
-    return (
-      frameSelection.frames.find((f) => f.code === selectedFrameCode) ||
-      frameSelection.frames[0]
-    );
+    // Use selectedFrameCode if it exists in frames, otherwise use first frame
+    const frame = frameSelection.frames.find((f) => f.code === selectedFrameCode);
+    if (frame) return frame;
+    // Auto-select first frame if no valid selection
+    const firstFrame = frameSelection.frames[0];
+    return firstFrame;
   }, [frameSelection, selectedFrameCode]);
-
-  useEffect(() => {
-    if (frameSelection.frames?.length > 0)
-      setSelectedFrameCode(frameSelection.frames[0].code);
-  }, [frameSelection]);
 
   const numericDoubleCount = parseInt(doubleFrameCount) || 0;
 

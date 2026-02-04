@@ -67,7 +67,7 @@ export default function VisitorUpdate() {
         visitorDocumentPhotos: [],
       });
     }
-  }, [visitor]);
+  }, [visitor, formHandler]);
 
   if (visitorLoading) return <Loading />;
 

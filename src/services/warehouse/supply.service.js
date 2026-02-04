@@ -157,10 +157,12 @@ const controller = createBCController({
 export const getAllSupplyItems = controller.getAll;
 export const getSupplyItemById = controller.getById;
 
-export default {
+const supplyService = {
   getAllSupplyItems,
   getSupplyItemById,
   GetAllUseCase,
   GetByIdUseCase,
   formatData,
 };
+
+export default supplyService;

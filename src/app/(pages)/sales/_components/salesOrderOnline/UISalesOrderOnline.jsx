@@ -1132,20 +1132,58 @@ function SlipPreviewModal({
   const [previewIndex, setPreviewIndex] = useState(0);
 
   const [useCustomAddress, setUseCustomAddress] = useState(false);
-  const [customAddress, setCustomAddress] = useState({
-    shipToName: "",
-    shipToAddressLine1: "",
-    shipToAddressLine2: "",
-    shipToCity: "",
-    shipToPostCode: "",
-    phoneNumber: "",
+  const [customAddress, setCustomAddress] = useState(() => {
+    if (order) {
+      return {
+        shipToName: order.shipToName || order.customerName || "",
+        shipToAddressLine1: order.shipToAddressLine1 || "",
+        shipToAddressLine2: order.shipToAddressLine2 || "",
+        shipToCity: order.shipToCity || "",
+        shipToPostCode: order.shipToPostCode || "",
+        phoneNumber: order.phoneNumber || "",
+      };
+    }
+    return {
+      shipToName: "",
+      shipToAddressLine1: "",
+      shipToAddressLine2: "",
+      shipToCity: "",
+      shipToPostCode: "",
+      phoneNumber: "",
+    };
   });
 
-  const [selectedItems, setSelectedItems] = useState({});
-  const [quantities, setQuantities] = useState({});
-
-  useEffect(() => {
+  const [selectedItems, setSelectedItems] = useState(() => {
     if (order) {
+      const items = getItemLines(order);
+      const initialSelected = {};
+      items.forEach((item) => {
+        initialSelected[item.itemNumber] = true;
+      });
+      return initialSelected;
+    }
+    return {};
+  });
+
+  const [quantities, setQuantities] = useState(() => {
+    if (order) {
+      const items = getItemLines(order);
+      const initialQuantities = {};
+      items.forEach((item) => {
+        initialQuantities[item.itemNumber] = item.quantity || 1;
+      });
+      return initialQuantities;
+    }
+    return {};
+  });
+
+  // Reset state when order changes
+  const prevOrderRef = useRef(order?.number);
+  useEffect(() => {
+    if (order?.number !== prevOrderRef.current) {
+      prevOrderRef.current = order?.number;
+      setPreviewIndex(0);
+      setUseCustomAddress(false);
       setCustomAddress({
         shipToName: order.shipToName || order.customerName || "",
         shipToAddressLine1: order.shipToAddressLine1 || "",
@@ -1154,10 +1192,7 @@ function SlipPreviewModal({
         shipToPostCode: order.shipToPostCode || "",
         phoneNumber: order.phoneNumber || "",
       });
-      setUseCustomAddress(false);
-
       const items = getItemLines(order);
-
       const initialSelected = {};
       const initialQuantities = {};
       items.forEach((item) => {
@@ -1166,9 +1201,8 @@ function SlipPreviewModal({
       });
       setSelectedItems(initialSelected);
       setQuantities(initialQuantities);
-      setPreviewIndex(0);
     }
-  }, [order?.number]);
+  }, [order?.number, order]);
 
   const { itemLines, filteredItems, expandedItems, totalPieces } =
     useMemo(() => {
@@ -1219,8 +1253,8 @@ function SlipPreviewModal({
     };
   }, [useCustomAddress, customAddress, order]);
 
-  const currentPiece = previewIndex + 1;
-  const currentExpandedItem = expandedItems[previewIndex];
+  const currentPiece = clampedPreviewIndex + 1;
+  const currentExpandedItem = expandedItems[clampedPreviewIndex];
   const currentItem = currentExpandedItem?.item;
 
   const previewBarcodeValue = currentItem
@@ -1319,11 +1353,20 @@ function SlipPreviewModal({
     onPrint,
   ]);
 
-  useEffect(() => {
+  // Clamp previewIndex when totalPieces changes
+  const clampedPreviewIndex = useMemo(() => {
     if (previewIndex >= totalPieces && totalPieces > 0) {
-      setPreviewIndex(totalPieces - 1);
+      return totalPieces - 1;
     }
-  }, [totalPieces, previewIndex]);
+    return previewIndex;
+  }, [previewIndex, totalPieces]);
+
+  // Update previewIndex if clamped
+  useEffect(() => {
+    if (clampedPreviewIndex !== previewIndex) {
+      setPreviewIndex(clampedPreviewIndex);
+    }
+  }, [clampedPreviewIndex, previewIndex]);
 
   if (!order) return null;
 
@@ -1350,7 +1393,7 @@ function SlipPreviewModal({
                 variant="flat"
                 size="md"
                 onPress={handlePrev}
-                isDisabled={previewIndex === 0}
+                isDisabled={clampedPreviewIndex === 0}
               >
                 <ChevronLeft />
               </Button>
@@ -1362,7 +1405,7 @@ function SlipPreviewModal({
                 variant="flat"
                 size="md"
                 onPress={handleNext}
-                isDisabled={previewIndex >= totalPieces - 1}
+                isDisabled={clampedPreviewIndex >= totalPieces - 1}
               >
                 <ChevronRight />
               </Button>

@@ -48,7 +48,7 @@ export default function AccountUpdate() {
         accountStatus: account.accountStatus || "",
       });
     }
-  }, [account]);
+  }, [account, formHandler]);
 
   if (accountLoading) return <Loading />;
 

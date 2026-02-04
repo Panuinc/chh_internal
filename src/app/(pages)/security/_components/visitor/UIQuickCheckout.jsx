@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   Button,
   Card,
@@ -90,10 +91,12 @@ export default function UIQuickCheckout({
         <CardBody className="p-2">
           {visitor.visitorPhoto && (
             <div className="flex justify-center mb-4">
-              <img
+              <Image
                 src={`/api/uploads/${visitor.visitorPhoto}`}
                 alt="Visitor"
-                className="w-24 h-24 rounded-full object-cover shadow-md"
+                width={96}
+                height={96}
+                className="rounded-full object-cover shadow-md"
               />
             </div>
           )}

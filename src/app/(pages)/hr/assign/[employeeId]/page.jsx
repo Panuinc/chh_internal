@@ -28,14 +28,17 @@ export default function AssignUpdate() {
   const { assignedPermissionIds, loading: assignsLoading } =
     useEmployeeAssigns(employeeId);
 
-  const [selectedIds, setSelectedIds] = useState(new Set());
-
-  const initializedRef = useRef(false);
-
-  const { syncPermissions, saving } = useSyncAssigns({
-    employeeId,
-    currentUserId: sessionUserId,
+  // Initialize selectedIds from assignedPermissionIds using lazy initialization
+  const [selectedIds, setSelectedIds] = useState(() => {
+    if (assignedPermissionIds && assignedPermissionIds.length > 0) {
+      return new Set(assignedPermissionIds);
+    }
+    return new Set();
   });
+
+  // Update selectedIds when assignedPermissionIds changes (but not during editing)
+  const [isEditing, setIsEditing] = useState(false);
+  const prevAssignedIdsRef = useRef(assignedPermissionIds);
 
   useEffect(() => {
     if (!hasPermission("assign.update")) {
@@ -43,16 +46,26 @@ export default function AssignUpdate() {
     }
   }, [hasPermission, router]);
 
+  // Sync with server data only when not editing and data actually changes
   useEffect(() => {
     if (
       !assignsLoading &&
-      !initializedRef.current &&
-      assignedPermissionIds.length > 0
+      !isEditing &&
+      assignedPermissionIds !== prevAssignedIdsRef.current
     ) {
-      setSelectedIds(new Set(assignedPermissionIds));
-      initializedRef.current = true;
+      const hasChanged = 
+        assignedPermissionIds.length !== prevAssignedIdsRef.current?.length ||
+        !assignedPermissionIds.every(id => prevAssignedIdsRef.current?.includes(id));
+      
+      if (hasChanged) {
+        // Schedule to avoid synchronous setState
+        setTimeout(() => {
+          setSelectedIds(new Set(assignedPermissionIds));
+          prevAssignedIdsRef.current = assignedPermissionIds;
+        }, 0);
+      }
     }
-  }, [assignsLoading, assignedPermissionIds]);
+  }, [assignsLoading, assignedPermissionIds, isEditing]);
 
   const activePermissions = allPermissions.filter(
     (p) => p.permissionStatus === "Active"
@@ -60,6 +73,7 @@ export default function AssignUpdate() {
   const groupedPermissions = groupPermissionsByCategory(activePermissions);
 
   const handleToggle = (permissionId) => {
+    setIsEditing(true);
     setSelectedIds((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(permissionId)) {
@@ -72,6 +86,7 @@ export default function AssignUpdate() {
   };
 
   const handleToggleCategory = (categoryPermissions, isAllSelected) => {
+    setIsEditing(true);
     setSelectedIds((prev) => {
       const newSet = new Set(prev);
       categoryPermissions.forEach((p) => {
@@ -86,16 +101,20 @@ export default function AssignUpdate() {
   };
 
   const handleSelectAll = () => {
+    setIsEditing(true);
     const allIds = activePermissions.map((p) => p.permissionId);
     setSelectedIds(new Set(allIds));
   };
 
   const handleDeselectAll = () => {
+    setIsEditing(true);
     setSelectedIds(new Set());
   };
 
   const handleSubmit = () => {
     syncPermissions(selectedIds);
+    setIsEditing(false);
+    prevAssignedIdsRef.current = Array.from(selectedIds);
   };
 
   const isLoading = employeeLoading || permissionsLoading || assignsLoading;

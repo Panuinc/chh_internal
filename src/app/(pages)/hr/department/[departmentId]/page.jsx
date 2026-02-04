@@ -48,7 +48,7 @@ export default function DepartmentUpdate() {
         departmentStatus: department.departmentStatus || "",
       });
     }
-  }, [department]);
+  }, [department, formHandler]);
 
   if (departmentLoading) return <Loading />;
 

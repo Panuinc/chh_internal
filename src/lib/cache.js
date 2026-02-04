@@ -122,7 +122,7 @@ export class CacheManager {
   }
 }
 
-export default {
+const cacheModule = {
   getCache,
   setCache,
   deleteCache,
@@ -132,5 +132,6 @@ export default {
   revalidateTag,
   revalidatePath,
   CACHE_TAGS,
-  CacheManager,
 };
+
+export default cacheModule;

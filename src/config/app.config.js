@@ -140,7 +140,7 @@ export const PRINTER_CONFIG = {
   },
 };
 
-export default {
+const appConfig = {
   PAGINATION,
   TIMEOUTS,
   RATE_LIMITS,
@@ -154,3 +154,5 @@ export default {
   BC_CONFIG,
   PRINTER_CONFIG,
 };
+
+export default appConfig;

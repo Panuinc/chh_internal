@@ -143,7 +143,9 @@ export function useSupplyItem(itemId) {
   return { item, loading, error, refetch };
 }
 
-export default {
+const supplyHooks = {
   useSupplyItems,
   useSupplyItem,
 };
+
+export default supplyHooks;

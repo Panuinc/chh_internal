@@ -611,6 +611,7 @@ export const EnhancedEngineeringDrawing = memo(
       accent: "#000000",
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const safeResults = results || {};
     const {
       W = 0,
@@ -709,6 +710,7 @@ export const EnhancedEngineeringDrawing = memo(
     const startX = Math.max(100, calculatedStartX);
     const marginY = 180;
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const positions = {
       side: { x: startX, y: marginY + 200 },
       front: { x: startX + dims.side.T + gapBetweenViews, y: marginY + 200 },

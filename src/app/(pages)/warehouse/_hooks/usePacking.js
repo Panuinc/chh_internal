@@ -143,7 +143,9 @@ export function usePackingItem(itemId) {
   return { item, loading, error, refetch };
 }
 
-export default {
+const packingHooks = {
   usePackingItems,
   usePackingItem,
 };
+
+export default packingHooks;

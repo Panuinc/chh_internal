@@ -157,10 +157,12 @@ const controller = createBCController({
 export const getAllRawMaterialItems = controller.getAll;
 export const getRawMaterialItemById = controller.getById;
 
-export default {
+const rawMaterialService = {
   getAllRawMaterialItems,
   getRawMaterialItemById,
   GetAllUseCase,
   GetByIdUseCase,
   formatData,
 };
+
+export default rawMaterialService;

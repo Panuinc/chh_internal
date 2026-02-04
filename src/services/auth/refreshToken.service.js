@@ -192,7 +192,7 @@ export async function rotateRefreshToken(oldToken, metadata = {}) {
   }
 }
 
-export default {
+const refreshTokenService = {
   createRefreshToken,
   verifyRefreshToken,
   revokeRefreshToken,
@@ -201,3 +201,5 @@ export default {
   rotateRefreshToken,
   REFRESH_TOKEN_CONFIG,
 };
+
+export default refreshTokenService;

@@ -173,8 +173,10 @@ export function useFinishedGoodsItem(itemId) {
   return { item, loading, error, refetch };
 }
 
-export default {
+const finishedGoodsHooks = {
   useFinishedGoodsItems,
   useFinishedGoodsItem,
   extractDimensionCodes,
 };
+
+export default finishedGoodsHooks;
