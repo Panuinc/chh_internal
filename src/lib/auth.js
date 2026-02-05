@@ -47,9 +47,28 @@ export const authOptions = {
             include: {
               accountEmployee: {
                 include: {
-                  assigns: {
+                  // RBAC: Get permissions through EmployeeRole -> Role -> RolePermission -> Permission
+                  employeeRoles: {
+                    where: {
+                      role: {
+                        roleStatus: "Active",
+                      },
+                    },
                     include: {
-                      permission: true,
+                      role: {
+                        include: {
+                          rolePermissions: {
+                            where: {
+                              permission: {
+                                permissionStatus: "Active",
+                              },
+                            },
+                            include: {
+                              permission: true,
+                            },
+                          },
+                        },
+                      },
                     },
                   },
                 },
@@ -70,9 +89,18 @@ export const authOptions = {
 
           if (!valid) throw new InvalidCredentialsError();
 
-          const permissions = account.accountEmployee.assigns
-            .filter((a) => a.permission.permissionStatus === "Active")
-            .map((a) => a.permission.permissionName);
+          // RBAC: Aggregate permissions from all roles
+          const permissionsSet = new Set();
+          account.accountEmployee.employeeRoles.forEach((employeeRole) => {
+            if (employeeRole.role && employeeRole.role.rolePermissions) {
+              employeeRole.role.rolePermissions.forEach((rolePermission) => {
+                if (rolePermission.permission) {
+                  permissionsSet.add(rolePermission.permission.permissionName);
+                }
+              });
+            }
+          });
+          const permissions = Array.from(permissionsSet);
 
           const metadata = {
             ipAddress: request.headers?.get("x-forwarded-for") || null,

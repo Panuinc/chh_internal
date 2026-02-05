@@ -56,12 +56,14 @@ model Employee {
   employeeEmail        String         @unique
   employeeStatus       employeeStatus @default(Active)
   employeeDepartmentId String?
+  employeeRoleId       String?
   employeeCreatedBy    String?
   employeeCreatedAt    DateTime?
   employeeUpdatedBy    String?
   employeeUpdatedAt    DateTime?
 
   department Department? @relation(fields: [employeeDepartmentId], references: [departmentId])
+  role       Role?       @relation(fields: [employeeRoleId], references: [roleId])
 
   createdByEmployee Employee? @relation("EmployeeCreatedBy", fields: [employeeCreatedBy], references: [employeeId])
   updatedByEmployee Employee? @relation("EmployeeUpdatedBy", fields: [employeeUpdatedBy], references: [employeeId])
@@ -71,11 +73,13 @@ model Employee {
 
   account Account?
 
-  // RBAC: Employee can have multiple Roles
-  employeeRoles EmployeeRole[]
+  assigns Assign[]
 
   createdAccounts Account[] @relation("AccountCreatedBy")
   updatedAccounts Account[] @relation("AccountUpdatedBy")
+
+  createdAssigns Assign[] @relation("AssignCreatedBy")
+  updatedAssigns Assign[] @relation("AssignUpdatedBy")
 
   createdPermissions Permission[] @relation("PermissionCreatedBy")
   updatedPermissions Permission[] @relation("PermissionUpdatedBy")
@@ -85,12 +89,6 @@ model Employee {
 
   createdRoles Role[] @relation("RoleCreatedBy")
   updatedRoles Role[] @relation("RoleUpdatedBy")
-
-  // RBAC Relations
-  createdEmployeeRoles EmployeeRole[] @relation("EmployeeRoleCreatedBy")
-  updatedEmployeeRoles EmployeeRole[] @relation("EmployeeRoleUpdatedBy")
-  createdRolePermissions RolePermission[] @relation("RolePermissionCreatedBy")
-  updatedRolePermissions RolePermission[] @relation("RolePermissionUpdatedBy")
 
   contactVisitors Visitor[] @relation("VisitorContactUserRelation")
 
@@ -107,6 +105,7 @@ model Employee {
   rejectedMemos     SalesMemo[] @relation("SalesMemoRejectedBy")
 
   @@index([employeeDepartmentId])
+  @@index([employeeRoleId])
   @@index([employeeCreatedBy])
   @@index([employeeUpdatedBy])
 }
@@ -134,6 +133,28 @@ model Account {
   @@index([accountUpdatedBy])
 }
 
+model Assign {
+  assignId           String    @id @default(cuid())
+  assignEmployeeId   String
+  assignPermissionId String
+  assignCreatedBy    String?
+  assignCreatedAt    DateTime?
+  assignUpdatedBy    String?
+  assignUpdatedAt    DateTime?
+
+  employee Employee @relation(fields: [assignEmployeeId], references: [employeeId])
+
+  permission Permission @relation(fields: [assignPermissionId], references: [permissionId])
+
+  createdByEmployee Employee? @relation("AssignCreatedBy", fields: [assignCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("AssignUpdatedBy", fields: [assignUpdatedBy], references: [employeeId])
+
+  @@index([assignEmployeeId])
+  @@index([assignPermissionId])
+  @@index([assignCreatedBy])
+  @@index([assignUpdatedBy])
+}
+
 model Permission {
   permissionId        String           @id @default(cuid())
   permissionName      String           @unique
@@ -143,80 +164,13 @@ model Permission {
   permissionUpdatedBy String?
   permissionUpdatedAt DateTime?
 
-  // RBAC: Permission belongs to many Roles
-  rolePermissions RolePermission[]
+  assigns Assign[]
 
   createdByEmployee Employee? @relation("PermissionCreatedBy", fields: [permissionCreatedBy], references: [employeeId])
   updatedByEmployee Employee? @relation("PermissionUpdatedBy", fields: [permissionUpdatedBy], references: [employeeId])
 
   @@index([permissionCreatedBy])
   @@index([permissionUpdatedBy])
-}
-
-model Role {
-  roleId        String           @id @default(cuid())
-  roleName      String           @unique
-  roleStatus    departmentStatus @default(Active)
-  roleCreatedBy String?
-  roleCreatedAt DateTime?
-  roleUpdatedBy String?
-  roleUpdatedAt DateTime?
-
-  // RBAC: Role has many Permissions
-  rolePermissions RolePermission[]
-  
-  // RBAC: Role assigned to many Employees
-  employeeRoles EmployeeRole[]
-
-  createdByEmployee Employee? @relation("RoleCreatedBy", fields: [roleCreatedBy], references: [employeeId])
-  updatedByEmployee Employee? @relation("RoleUpdatedBy", fields: [roleUpdatedBy], references: [employeeId])
-
-  @@index([roleCreatedBy])
-  @@index([roleUpdatedBy])
-}
-
-// RBAC: Junction table for Role-Permission Many-to-Many
-model RolePermission {
-  rolePermissionId           String    @id @default(cuid())
-  rolePermissionRoleId       String
-  rolePermissionPermissionId String
-  rolePermissionCreatedBy    String?
-  rolePermissionCreatedAt    DateTime?
-  rolePermissionUpdatedBy    String?
-  rolePermissionUpdatedAt    DateTime?
-
-  role       Role       @relation(fields: [rolePermissionRoleId], references: [roleId], onDelete: Cascade)
-  permission Permission @relation(fields: [rolePermissionPermissionId], references: [permissionId], onDelete: Cascade)
-  createdBy  Employee?  @relation("RolePermissionCreatedBy", fields: [rolePermissionCreatedBy], references: [employeeId])
-  updatedBy  Employee?  @relation("RolePermissionUpdatedBy", fields: [rolePermissionUpdatedBy], references: [employeeId])
-
-  @@unique([rolePermissionRoleId, rolePermissionPermissionId])
-  @@index([rolePermissionRoleId])
-  @@index([rolePermissionPermissionId])
-  @@index([rolePermissionCreatedBy])
-  @@index([rolePermissionUpdatedBy])
-}
-
-// RBAC: Junction table for Employee-Role Many-to-Many
-model EmployeeRole {
-  employeeRoleId        String    @id @default(cuid())
-  employeeRoleEmployeeId String
-  employeeRoleRoleId    String
-  employeeRoleCreatedBy String?
-  employeeRoleCreatedAt DateTime?
-  employeeRoleUpdatedBy String?
-  employeeRoleUpdatedAt DateTime?
-
-  employee  Employee  @relation(fields: [employeeRoleEmployeeId], references: [employeeId], onDelete: Cascade)
-  role      Role      @relation(fields: [employeeRoleRoleId], references: [roleId], onDelete: Cascade)
-  createdBy Employee? @relation("EmployeeRoleCreatedBy", fields: [employeeRoleCreatedBy], references: [employeeId])
-  updatedBy Employee? @relation("EmployeeRoleUpdatedBy", fields: [employeeRoleUpdatedBy], references: [employeeId])
-
-  @@unique([employeeRoleEmployeeId, employeeRoleRoleId])
-  @@index([employeeRoleEmployeeId])
-  @@index([employeeRoleRoleId])
-  @@index([employeeRoleCreatedBy])
-  @@index([employeeRoleUpdatedBy])
 }
 
 model Department {
@@ -235,6 +189,24 @@ model Department {
 
   @@index([departmentCreatedBy])
   @@index([departmentUpdatedBy])
+}
+
+model Role {
+  roleId        String           @id @default(cuid())
+  roleName      String           @unique
+  roleStatus    departmentStatus @default(Active)
+  roleCreatedBy String?
+  roleCreatedAt DateTime?
+  roleUpdatedBy String?
+  roleUpdatedAt DateTime?
+
+  employees Employee[]
+
+  createdByEmployee Employee? @relation("RoleCreatedBy", fields: [roleCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("RoleUpdatedBy", fields: [roleUpdatedBy], references: [employeeId])
+
+  @@index([roleCreatedBy])
+  @@index([roleUpdatedBy])
 }
 
 model Visitor {

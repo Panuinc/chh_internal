@@ -6,7 +6,7 @@ import UIMemoForm from "@/app/(pages)/sales/_components/memo/UIMemoForm";
 import { Loading } from "@/components";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import {
-  useMemo,
+  useMemoItem,
   useSubmitMemo,
   useApproveMemo,
   useRejectMemo,
@@ -28,7 +28,7 @@ export default function MemoUpdate() {
   const { memoId } = useParams();
   const { userId: sessionUserId, userName } = useSessionUser();
 
-  const { memo, loading: memoLoading, refetch } = useMemo(memoId);
+  const { memo, loading: memoLoading, refetch } = useMemoItem(memoId);
   const approveMemo = useApproveMemo();
   const rejectMemo = useRejectMemo();
 

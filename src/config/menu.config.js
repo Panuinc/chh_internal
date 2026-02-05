@@ -96,15 +96,6 @@ export const menuConfig = {
         },
 
         {
-          id: "assign",
-          href: "/hr/assign",
-          text: "Assign",
-          icon: Key,
-          permission: "hr.assign.view",
-          requireSuperAdmin: true,
-        },
-
-        {
           id: "department",
           href: "/hr/department",
           text: "Department",
@@ -128,6 +119,24 @@ export const menuConfig = {
             create: "hr.role.create",
             edit: "hr.role.edit",
           },
+        },
+
+        {
+          id: "rolePermission",
+          href: "/hr/role/permission",
+          text: "Role Permissions",
+          icon: Key,
+          permission: "hr.role.permission.view",
+          requireSuperAdmin: true,
+        },
+
+        {
+          id: "employeeRole",
+          href: "/hr/employee/role",
+          text: "Employee Roles",
+          icon: Users,
+          permission: "hr.employee.role.view",
+          requireSuperAdmin: true,
         },
       ],
     },

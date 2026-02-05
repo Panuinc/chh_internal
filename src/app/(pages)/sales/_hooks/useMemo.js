@@ -133,7 +133,7 @@ export function useMemos(apiUrl = API_URL) {
   return { memos, loading, refetch };
 }
 
-export function useMemo(memoId) {
+export function useMemoItem(memoId) {
   const [memo, setMemo] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -166,9 +166,9 @@ export function useMemo(memoId) {
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
 
     (async () => {
+      setLoading(true);
       await fetchMemo(controller.signal);
       if (!controller.signal.aborted) {
         setLoading(false);

@@ -42,15 +42,18 @@ export default function MemoCreate() {
     submitMemo
   );
 
+  // Destructure setFormData to avoid ESLint warning about formHandler dependency
+  const { setFormData } = formHandler;
+
   useEffect(() => {
     if (documentNo) {
-      formHandler.setFormData((prev) => ({
+      setFormData((prev) => ({
         ...prev,
         documentNo: documentNo,
         requesterName: userName,
       }));
     }
-  }, [documentNo, userName]);
+  }, [documentNo, userName, setFormData]);
 
   const handleSubmitForApproval = useCallback(async () => {
     // Submit with PENDING_SALES_MANAGER status directly
