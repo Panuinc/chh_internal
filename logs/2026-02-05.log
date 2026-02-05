@@ -134,3 +134,20 @@
 [2026-02-05 11:53:01] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-05 11:53:01] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:25] [INFO] GetAllRoleUseCase start {"page":1,"limit":20}
+[2026-02-05 11:53:25] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-05 11:53:28] [INFO] GetAllRoleUseCase start {"page":1,"limit":20}
+[2026-02-05 11:53:28] [INFO] GetAllPermissionUseCase start {"page":1,"limit":100}
+[2026-02-05 11:53:28] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-05 11:53:28] [INFO] GetAllPermissionUseCase success {"total":54,"returned":54}
+[2026-02-05 11:53:34] [INFO] GetAllVisitorUseCase start {"page":1,"limit":20}
+[2026-02-05 11:53:34] [INFO] GetAllVisitorUseCase success {"total":0,"returned":0}
+[2026-02-05 11:53:38] [INFO] GetAllCatPackingItems start {"displayName":null,"number":null,"description":null,"limit":500,"inventoryPostingGroupCode":"PK"}
+[2026-02-05 11:53:41] [INFO] GetAllCatPackingItems success {"total":19,"returned":19}
+[2026-02-05 11:53:47] [INFO] GetAllCatRawMaterialItems start {"displayName":null,"number":null,"description":null,"limit":500,"inventoryPostingGroupCode":"RM"}
+[2026-02-05 11:53:52] [INFO] GetAllCatRawMaterialItems success {"total":1361,"returned":1361}
+[2026-02-05 11:54:03] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-05 11:54:03] [INFO] GetAllMemoUseCase success {"total":1,"returned":1}
+[2026-02-05 11:54:07] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
+[2026-02-05 11:54:10] [INFO] GetAllSalesOrdersOnline success {"total":43,"returned":43}
