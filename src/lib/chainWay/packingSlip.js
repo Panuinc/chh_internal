@@ -3,7 +3,7 @@ import path from "path";
 import { COMPANY_INFO } from "./config.js";
 import { mmToDots, sanitizeText, getItemLines, splitText } from "./utils.js";
 import { textToGraphic } from "./zpl.js";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 
 const logger = createLogger("packing-slip");
 

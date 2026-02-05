@@ -1,4 +1,4 @@
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 import { withRetry } from "@/lib/retry";
 
 const logger = createLogger("line-notify");

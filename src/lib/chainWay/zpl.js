@@ -1,7 +1,7 @@
 import { ZPL_CONFIG, LABEL_SIZES } from "./config.js";
 import { mmToDots, sanitizeText } from "./utils.js";
 import { generatePlainEPC } from "./epc.js";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 
 const logger = createLogger("zpl");
 

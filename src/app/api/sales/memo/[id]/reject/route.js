@@ -1,5 +1,6 @@
 import { RejectUseCase } from "@/services/sales/memo.service";
-import { successResponse, createLogger } from "@/lib/shared/server";
+import { successResponse } from "@/lib/shared/server";
+import { createLogger } from "@/lib/logger.node";
 import { auth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";

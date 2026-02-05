@@ -2,7 +2,7 @@ import net from "net";
 import { PRINTER_CONFIG, TIMEOUTS } from "./config.js";
 import { PrinterCommands } from "./zpl.js";
 import { delay } from "./utils.js";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 
 const logger = createLogger("rfid-printer");
 

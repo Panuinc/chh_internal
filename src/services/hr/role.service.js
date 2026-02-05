@@ -9,9 +9,9 @@ import {
   validateOrThrow,
   normalizeString,
   createBaseController,
-  createLogger,
   handlePrismaUniqueError,
 } from "@/lib/shared/server";
+import { createLogger } from "@/lib/logger.node";
 
 const ENTITY_NAME = "Role";
 const ENTITY_KEY = "roles";

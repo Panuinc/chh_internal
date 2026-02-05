@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 
 const logger = createLogger("fileStore");
 

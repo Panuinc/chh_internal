@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { bcClient } from "@/lib/bc/server";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

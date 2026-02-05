@@ -9,10 +9,10 @@ import {
   ConflictError,
   validateOrThrow,
   normalizeString,
-  createLogger,
   handlePrismaUniqueError,
   createBaseController,
 } from "@/lib/shared/server";
+import { createLogger } from "@/lib/logger.node";
 
 const ENTITY_NAME = "SalesMemo";
 const ENTITY_KEY = "memos";

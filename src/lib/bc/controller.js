@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { BCError, normalizeError } from "./errors.js";
 import { HTTP_STATUS, SUCCESS_MESSAGES, PAGINATION } from "./config.js";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 
 const logger = createLogger("bc-controller");
 

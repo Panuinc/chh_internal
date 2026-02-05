@@ -6,8 +6,8 @@ import {
   NotFoundError,
   BadRequestError,
   validateOrThrow,
-  createLogger,
 } from "@/lib/shared/server";
+import { createLogger } from "@/lib/logger.node";
 
 const ENTITY_NAME = "EmployeeRole";
 const EMPLOYEE_SELECT = {

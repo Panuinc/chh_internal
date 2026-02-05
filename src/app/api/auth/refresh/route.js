@@ -4,7 +4,7 @@ import {
   rotateRefreshToken,
 } from "@/services/auth/refreshToken.service";
 import { sign } from "jsonwebtoken";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 import { withRateLimit } from "@/lib/rateLimiter";
 
 const logger = createLogger("RefreshTokenAPI");

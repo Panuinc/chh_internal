@@ -8,10 +8,10 @@ import {
   NotFoundError,
   BadRequestError,
   validateOrThrow,
-  createLogger,
   successResponse,
   errorResponse,
 } from "@/lib/shared/server";
+import { createLogger } from "@/lib/logger.node";
 import { saveUploadedFile, deleteFile } from "@/lib/fileStore";
 
 async function cleanupFiles(filePaths) {

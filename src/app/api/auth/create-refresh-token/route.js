@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createRefreshToken } from "@/services/auth/refreshToken.service";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 import { withRateLimit } from "@/lib/rateLimiter";
 
 const logger = createLogger("CreateRefreshTokenAPI");

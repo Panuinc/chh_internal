@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { bcConfig } from "./config.js";
 import { BCAuthError, BCApiError } from "./errors.js";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 
 const logger = createLogger("bc-client");
 

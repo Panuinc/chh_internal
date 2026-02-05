@@ -9,9 +9,9 @@ import {
   BadRequestError,
   validateOrThrow,
   createBaseController,
-  createLogger,
   handlePrismaUniqueError,
 } from "@/lib/shared/server";
+import { createLogger } from "@/lib/logger.node";
 
 const ENTITY_NAME = "Account";
 const ENTITY_KEY = "accounts";

@@ -1,10 +1,8 @@
-
-
-const winston = require("winston");
-const DailyRotateFile = require("winston-daily-rotate-file");
-const moment = require("moment-timezone");
-const fs = require("fs");
-const path = require("path");
+import winston from "winston";
+import DailyRotateFile from "winston-daily-rotate-file";
+import moment from "moment-timezone";
+import fs from "fs";
+import path from "path";
 
 const timeZone = "Asia/Bangkok";
 
@@ -15,7 +13,7 @@ try {
     fs.mkdirSync(logDir, { recursive: true });
   }
 } catch (err) {
-
+  // Silently fail if directory creation fails
 }
 
 const fileTransport = new DailyRotateFile({
@@ -26,10 +24,10 @@ const fileTransport = new DailyRotateFile({
 });
 
 fileTransport.on("error", () => {
-
+  // Silently handle file transport errors
 });
 
-const logger = winston.createLogger({
+const winstonLogger = winston.createLogger({
   level: process.env.LOG_LEVEL || "info",
   format: winston.format.combine(
     winston.format.errors({ stack: true }),
@@ -50,6 +48,23 @@ const logger = winston.createLogger({
   ],
 });
 
-logger.info("Logger initialized successfully", { logDir });
+winstonLogger.info("Logger initialized successfully", { logDir });
 
-module.exports = logger;
+/**
+ * Create a logger instance for a specific use case
+ * Compatible with the createLogger from @/lib/shared/server
+ * @param {string} useCaseName - Name of the use case (e.g., "CreateVisitorUseCase")
+ * @returns {Object} Logger instance with start, success, error, warn, info, debug methods
+ */
+export function createLogger(useCaseName) {
+  return {
+    start: (data) => winstonLogger.info(`${useCaseName} start`, data),
+    success: (data) => winstonLogger.info(`${useCaseName} success`, data),
+    error: (data) => winstonLogger.error(`${useCaseName} error`, data),
+    warn: (message, data) => winstonLogger.warn(`${useCaseName} ${message}`, data),
+    info: (message, data) => winstonLogger.info(`${useCaseName} ${message}`, data),
+    debug: (message, data) => winstonLogger.debug(`${useCaseName} ${message}`, data),
+  };
+}
+
+export default winstonLogger;

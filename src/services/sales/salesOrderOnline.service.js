@@ -5,7 +5,7 @@ import {
   createBCController,
   parseQueryParams,
 } from "@/lib/bc/server";
-import { createLogger } from "@/lib/shared/logger";
+import { createLogger } from "@/lib/logger.node";
 
 const ENTITY_NAME = "Sales Order Online";
 const ENTITY_KEY = "salesOrders";
