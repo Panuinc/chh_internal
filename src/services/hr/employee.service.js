@@ -50,7 +50,11 @@ export const EmployeeRepository = {
       orderBy: { employeeCreatedAt: "asc" },
       include: {
         department: { select: DEPARTMENT_SELECT },
-        role: { select: ROLE_SELECT },
+        employeeRoles: {
+          include: {
+            role: { select: ROLE_SELECT },
+          },
+        },
         createdByEmployee: { select: EMPLOYEE_SELECT },
         updatedByEmployee: { select: EMPLOYEE_SELECT },
       },
@@ -66,7 +70,11 @@ export const EmployeeRepository = {
       where: { employeeId: id },
       include: {
         department: { select: DEPARTMENT_SELECT },
-        role: { select: ROLE_SELECT },
+        employeeRoles: {
+          include: {
+            role: { select: ROLE_SELECT },
+          },
+        },
         createdByEmployee: { select: EMPLOYEE_SELECT },
         updatedByEmployee: { select: EMPLOYEE_SELECT },
       },
@@ -84,7 +92,11 @@ export const EmployeeRepository = {
       data,
       include: {
         department: { select: DEPARTMENT_SELECT },
-        role: { select: ROLE_SELECT },
+        employeeRoles: {
+          include: {
+            role: { select: ROLE_SELECT },
+          },
+        },
         createdByEmployee: { select: EMPLOYEE_SELECT },
       },
     });
@@ -96,7 +108,11 @@ export const EmployeeRepository = {
       data,
       include: {
         department: { select: DEPARTMENT_SELECT },
-        role: { select: ROLE_SELECT },
+        employeeRoles: {
+          include: {
+            role: { select: ROLE_SELECT },
+          },
+        },
         createdByEmployee: { select: EMPLOYEE_SELECT },
         updatedByEmployee: { select: EMPLOYEE_SELECT },
       },

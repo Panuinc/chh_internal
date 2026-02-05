@@ -48,7 +48,9 @@ export default function UIEmployee({
         id: employee.employeeId,
         employeeIndex: i + 1,
         departmentName: employee.department?.departmentName || "-",
-        roleName: employee.role?.roleName || "-",
+        roleName: employee.employeeRoles?.length > 0 
+          ? employee.employeeRoles.map(er => er.role?.roleName).filter(Boolean).join(", ")
+          : "-",
         employeeCreatedBy: employee.createdByEmployee
           ? `${employee.createdByEmployee.employeeFirstName} ${employee.createdByEmployee.employeeLastName}`
           : employee.employeeCreatedBy || "-",

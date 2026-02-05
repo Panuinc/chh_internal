@@ -50,8 +50,8 @@ export const RolePermissionRepository = {
       where: { rolePermissionRoleId: roleId },
       include: {
         permission: { select: PERMISSION_SELECT },
-        createdByEmployee: { select: EMPLOYEE_SELECT },
-        updatedByEmployee: { select: EMPLOYEE_SELECT },
+        createdBy: { select: EMPLOYEE_SELECT },
+        updatedBy: { select: EMPLOYEE_SELECT },
       },
       orderBy: { rolePermissionCreatedAt: "asc" },
     });
@@ -71,7 +71,7 @@ export const RolePermissionRepository = {
       data,
       include: {
         permission: { select: PERMISSION_SELECT },
-        createdByEmployee: { select: EMPLOYEE_SELECT },
+        createdBy: { select: EMPLOYEE_SELECT },
       },
     });
   },

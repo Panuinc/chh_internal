@@ -44,8 +44,8 @@ export const EmployeeRoleRepository = {
       where: { employeeRoleEmployeeId: employeeId },
       include: {
         role: { select: ROLE_SELECT },
-        createdByEmployee: { select: EMPLOYEE_SELECT },
-        updatedByEmployee: { select: EMPLOYEE_SELECT },
+        createdBy: { select: EMPLOYEE_SELECT },
+        updatedBy: { select: EMPLOYEE_SELECT },
       },
       orderBy: { employeeRoleCreatedAt: "asc" },
     });
@@ -74,8 +74,8 @@ export const EmployeeRoleRepository = {
       where: { employeeRoleRoleId: roleId },
       include: {
         employee: { select: EMPLOYEE_SELECT },
-        createdByEmployee: { select: EMPLOYEE_SELECT },
-        updatedByEmployee: { select: EMPLOYEE_SELECT },
+        createdBy: { select: EMPLOYEE_SELECT },
+        updatedBy: { select: EMPLOYEE_SELECT },
       },
       orderBy: { employeeRoleCreatedAt: "asc" },
     });
@@ -87,7 +87,7 @@ export const EmployeeRoleRepository = {
       include: {
         role: { select: ROLE_SELECT },
         employee: { select: EMPLOYEE_SELECT },
-        createdByEmployee: { select: EMPLOYEE_SELECT },
+        createdBy: { select: EMPLOYEE_SELECT },
       },
     });
   },
