@@ -20,8 +20,8 @@ export default function EmployeeCreate() {
     }
   }, [hasPermission, router]);
 
-  const { departments } = useDepartments();
-  const { roles } = useRoles();
+  const { departments } = useDepartments(undefined, true); // fetchAll = true
+  const { roles } = useRoles(undefined, true); // fetchAll = true
 
   const submitEmployee = useSubmitEmployee({
     mode: "create",

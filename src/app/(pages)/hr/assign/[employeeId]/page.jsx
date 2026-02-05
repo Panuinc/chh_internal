@@ -23,10 +23,12 @@ export default function AssignUpdate() {
   const { employee, loading: employeeLoading } = useEmployee(employeeId);
 
   const { permissions: allPermissions, loading: permissionsLoading } =
-    usePermissions();
+    usePermissions(undefined, true); // fetchAll = true
 
   const { assignedPermissionIds, loading: assignsLoading } =
     useEmployeeAssigns(employeeId);
+
+  const { syncPermissions, saving } = useSyncAssigns({ employeeId, currentUserId: sessionUserId });
 
   const [selectedIds, setSelectedIds] = useState(() => {
     if (assignedPermissionIds && assignedPermissionIds.length > 0) {

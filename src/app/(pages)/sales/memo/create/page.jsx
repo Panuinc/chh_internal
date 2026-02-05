@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import UIMemoForm from "@/app/(pages)/sales/_components/memo/UIMemoForm";
 import { useSessionUser } from "@/hooks/useSessionUser";
@@ -30,17 +30,14 @@ export default function MemoCreate() {
   const formHandler = useFormHandler(
     {
       documentNo: documentNo || "",
-      to: "",
-      copy: "",
+      to: "คุณจงคม ชูชัยศรี",
+      copy: "คุณนวพล ชูเกียรติ",
       subject: "",
       date: today,
       content: "",
-      requesterName: "",
+      requesterName: userName,
       requesterDate: today,
-      salesManagerName: "",
-      salesManagerDate: "",
-      ceoName: "",
-      ceoDate: "",
+      status: "DRAFT",
     },
     submitMemo
   );
@@ -50,9 +47,26 @@ export default function MemoCreate() {
       formHandler.setFormData((prev) => ({
         ...prev,
         documentNo: documentNo,
+        requesterName: userName,
       }));
     }
-  }, [documentNo]);
+  }, [documentNo, userName]);
+
+  const handleSubmitForApproval = useCallback(async () => {
+    // Submit with PENDING_SALES_MANAGER status directly
+    const submitData = {
+      ...formHandler.formData,
+      status: "PENDING_SALES_MANAGER",
+      createdBy: userId,
+    };
+    
+    console.log("=== SUBMIT FOR APPROVAL ===");
+    console.log("submitData:", submitData);
+    console.log("===========================");
+    
+    // Call submit directly with custom data
+    await submitMemo(null, submitData, formHandler.setErrors);
+  }, [formHandler.formData, userId, submitMemo, formHandler.setErrors]);
 
   if (docNoLoading) return <Loading />;
 
@@ -61,6 +75,7 @@ export default function MemoCreate() {
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}
+      onSubmitForApproval={handleSubmitForApproval}
     />
   );
 }

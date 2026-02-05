@@ -8,8 +8,25 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Chip,
 } from "@heroui/react";
-import { Settings2 } from "lucide-react";
+import { Settings2, CheckCircle, XCircle, Eye } from "lucide-react";
+
+const STATUS_LABELS = {
+  DRAFT: "ร่าง",
+  PENDING_SALES_MANAGER: "รอผจก.ฝ่ายขาย",
+  PENDING_CEO: "รอ CEO",
+  APPROVED: "อนุมัติแล้ว",
+  REJECTED: "ปฏิเสธ",
+};
+
+const STATUS_COLORS = {
+  DRAFT: "default",
+  PENDING_SALES_MANAGER: "warning",
+  PENDING_CEO: "warning",
+  APPROVED: "success",
+  REJECTED: "danger",
+};
 
 const columns = [
   { name: "ID", uid: "memoIndex" },
@@ -18,36 +35,85 @@ const columns = [
   { name: "To", uid: "memoTo" },
   { name: "Date", uid: "memoDateFormatted" },
   { name: "Requester", uid: "memoRequesterName" },
+  { name: "Status", uid: "memoStatus" },
   { name: "Created By", uid: "memoCreatedBy" },
   { name: "Created At", uid: "memoCreatedAtFormatted" },
   { name: "Actions", uid: "actions" },
 ];
 
-const ActionMenu = ({ item, onEdit }) => (
-  <Dropdown>
-    <DropdownTrigger>
-      <Button
-        isIconOnly
-        color="default"
-        variant="shadow"
-        size="md"
-        radius="md"
-        className="text-foreground"
-      >
-        <Settings2 />
-      </Button>
-    </DropdownTrigger>
-    <DropdownMenu>
-      {onEdit && (
-        <DropdownItem key="edit" onPress={() => onEdit(item)}>
-          Edit
-        </DropdownItem>
-      )}
-    </DropdownMenu>
-  </Dropdown>
-);
+const ActionMenu = ({ item, onEdit, onView, onApprove, onReject, canApproveSM, canApproveCEO }) => {
+  // Determine which actions are available
+  const canEdit = item.memoStatus === "DRAFT" || item.memoStatus === "REJECTED";
+  const canApprove = 
+    (item.memoStatus === "PENDING_SALES_MANAGER" && canApproveSM) ||
+    (item.memoStatus === "PENDING_CEO" && canApproveCEO);
+  const canReject = 
+    (item.memoStatus === "PENDING_SALES_MANAGER" && canApproveSM) ||
+    (item.memoStatus === "PENDING_CEO" && canApproveCEO);
 
-export default function UIMemo({ Memos = [], loading, onAddNew, onEdit }) {
+  return (
+    <Dropdown>
+      <DropdownTrigger>
+        <Button
+          isIconOnly
+          color="default"
+          variant="shadow"
+          size="md"
+          radius="md"
+          className="text-foreground"
+        >
+          <Settings2 />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu>
+        {onView && (
+          <DropdownItem key="view" onPress={() => onView(item)} startContent={<Eye className="w-4 h-4" />}>
+            ดูรายละเอียด
+          </DropdownItem>
+        )}
+        {canEdit && onEdit && (
+          <DropdownItem key="edit" onPress={() => onEdit(item)}>
+            แก้ไข
+          </DropdownItem>
+        )}
+        {canApprove && onApprove && (
+          <DropdownItem 
+            key="approve" 
+            onPress={() => onApprove(item)}
+            className="text-success"
+            color="success"
+            startContent={<CheckCircle className="w-4 h-4" />}
+          >
+            อนุมัติ
+          </DropdownItem>
+        )}
+        {canReject && onReject && (
+          <DropdownItem 
+            key="reject" 
+            onPress={() => onReject(item)}
+            className="text-danger"
+            color="danger"
+            startContent={<XCircle className="w-4 h-4" />}
+          >
+            ปฏิเสธ
+          </DropdownItem>
+        )}
+      </DropdownMenu>
+    </Dropdown>
+  );
+};
+
+export default function UIMemo({ 
+  Memos = [], 
+  loading, 
+  onAddNew, 
+  onEdit, 
+  onView,
+  onApprove,
+  onReject,
+  canApproveSM = false,
+  canApproveCEO = false,
+}) {
   const total = Memos.length;
 
   const normalized = Array.isArray(Memos)
@@ -71,10 +137,29 @@ export default function UIMemo({ Memos = [], loading, onAddNew, onEdit }) {
     : [];
 
   const renderCustomCell = (item, columnKey) => {
+    if (columnKey === "memoStatus") {
+      return (
+        <Chip
+          color={STATUS_COLORS[item.memoStatus] || "default"}
+          variant="flat"
+          size="sm"
+        >
+          {STATUS_LABELS[item.memoStatus] || item.memoStatus}
+        </Chip>
+      );
+    }
     if (columnKey === "actions") {
       return (
         <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          <ActionMenu item={item} onEdit={onEdit} />
+          <ActionMenu 
+            item={item} 
+            onEdit={onEdit} 
+            onView={onView}
+            onApprove={onApprove}
+            onReject={onReject}
+            canApproveSM={canApproveSM}
+            canApproveCEO={canApproveCEO}
+          />
         </div>
       );
     }

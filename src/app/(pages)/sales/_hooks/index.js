@@ -8,4 +8,6 @@ export {
   useMemo,
   useNextDocumentNo,
   useSubmitMemo,
+  useApproveMemo,
+  useRejectMemo,
 } from "./useMemo";

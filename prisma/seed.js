@@ -15,6 +15,22 @@ const defaultPermissions = [
   { name: "hr.department.view", description: "View departments" },
   { name: "hr.department.create", description: "Create departments" },
   { name: "hr.department.edit", description: "Edit departments" },
+
+  // Sales Module Permissions
+  { name: "sales.view", description: "View sales module" },
+  { name: "sales.*", description: "Full sales access" },
+  
+  // Sales Memo Permissions
+  { name: "sales.memo.view", description: "View sales memos" },
+  { name: "sales.memo.create", description: "Create sales memos" },
+  { name: "sales.memo.edit", description: "Edit sales memos" },
+  { name: "sales.memo.approve.salesmanager", description: "Approve memos as Sales Manager" },
+  { name: "sales.memo.approve.ceo", description: "Approve memos as CEO" },
+  
+  // Sales Order Online Permissions
+  { name: "sales.salesOrderOnline.view", description: "View sales order online" },
+  { name: "sales.salesOrderOnline.create", description: "Create sales order online" },
+  { name: "sales.salesOrderOnline.edit", description: "Edit sales order online" },
 ];
 
 async function main() {

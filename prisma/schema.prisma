@@ -32,6 +32,14 @@ enum VisitorStatus {
   CheckOut
 }
 
+enum SalesMemoStatus {
+  DRAFT
+  PENDING_SALES_MANAGER
+  PENDING_CEO
+  APPROVED
+  REJECTED
+}
+
 enum visitorContactReason {
   Shipping
   BillingChequeCollection
@@ -42,17 +50,17 @@ enum visitorContactReason {
 }
 
 model Employee {
-  employeeId        String         @id @default(cuid())
-  employeeFirstName String
-  employeeLastName  String
-  employeeEmail     String         @unique
-  employeeStatus    employeeStatus @default(Active)
+  employeeId           String         @id @default(cuid())
+  employeeFirstName    String
+  employeeLastName     String
+  employeeEmail        String         @unique
+  employeeStatus       employeeStatus @default(Active)
   employeeDepartmentId String?
-  employeeRoleId    String?
-  employeeCreatedBy String?
-  employeeCreatedAt DateTime?
-  employeeUpdatedBy String?
-  employeeUpdatedAt DateTime?
+  employeeRoleId       String?
+  employeeCreatedBy    String?
+  employeeCreatedAt    DateTime?
+  employeeUpdatedBy    String?
+  employeeUpdatedAt    DateTime?
 
   department Department? @relation(fields: [employeeDepartmentId], references: [departmentId])
   role       Role?       @relation(fields: [employeeRoleId], references: [roleId])
@@ -92,6 +100,9 @@ model Employee {
 
   createdSalesMemos SalesMemo[] @relation("SalesMemoCreatedBy")
   updatedSalesMemos SalesMemo[] @relation("SalesMemoUpdatedBy")
+  salesManagerMemos SalesMemo[] @relation("SalesMemoSalesManager")
+  ceoMemos          SalesMemo[] @relation("SalesMemoCeo")
+  rejectedMemos     SalesMemo[] @relation("SalesMemoRejectedBy")
 
   @@index([employeeDepartmentId])
   @@index([employeeRoleId])
@@ -258,29 +269,49 @@ model RefreshToken {
 }
 
 model SalesMemo {
-  memoId               String    @id @default(cuid())
-  memoDocumentNo       String    @unique
-  memoTo               String
-  memoCopy             String?
-  memoSubject          String
-  memoDate             DateTime
-  memoContent          String    @db.Text
-  memoRequesterName    String
-  memoRequesterDate    DateTime?
+  memoId            String          @id @default(cuid())
+  memoDocumentNo    String          @unique
+  memoTo            String
+  memoCopy          String?
+  memoSubject       String
+  memoDate          DateTime
+  memoContent       String          @db.Text
+  memoRequesterName String
+  memoRequesterDate DateTime?
+  memoStatus        SalesMemoStatus @default(DRAFT)
+
+  // Sales Manager Approval
+  memoSalesManagerId   String?
   memoSalesManagerName String?
   memoSalesManagerDate DateTime?
-  memoCeoName          String?
-  memoCeoDate          DateTime?
-  memoCreatedBy        String?
-  memoCreatedAt        DateTime  @default(now())
-  memoUpdatedBy        String?
-  memoUpdatedAt        DateTime?
 
-  createdByEmployee Employee? @relation("SalesMemoCreatedBy", fields: [memoCreatedBy], references: [employeeId])
-  updatedByEmployee Employee? @relation("SalesMemoUpdatedBy", fields: [memoUpdatedBy], references: [employeeId])
+  // CEO Approval
+  memoCeoId   String?
+  memoCeoName String?
+  memoCeoDate DateTime?
+
+  // Rejection
+  memoRejectedById   String?
+  memoRejectedByName String?
+  memoRejectedAt     DateTime?
+  memoRejectReason   String?
+
+  memoCreatedBy String?
+  memoCreatedAt DateTime  @default(now())
+  memoUpdatedBy String?
+  memoUpdatedAt DateTime?
+
+  createdByEmployee    Employee? @relation("SalesMemoCreatedBy", fields: [memoCreatedBy], references: [employeeId])
+  updatedByEmployee    Employee? @relation("SalesMemoUpdatedBy", fields: [memoUpdatedBy], references: [employeeId])
+  salesManagerEmployee Employee? @relation("SalesMemoSalesManager", fields: [memoSalesManagerId], references: [employeeId])
+  ceoEmployee          Employee? @relation("SalesMemoCeo", fields: [memoCeoId], references: [employeeId])
+  rejectedByEmployee   Employee? @relation("SalesMemoRejectedBy", fields: [memoRejectedById], references: [employeeId])
 
   @@index([memoDocumentNo])
+  @@index([memoStatus])
   @@index([memoCreatedBy])
   @@index([memoUpdatedBy])
   @@index([memoCreatedAt])
+  @@index([memoSalesManagerId])
+  @@index([memoCeoId])
 }

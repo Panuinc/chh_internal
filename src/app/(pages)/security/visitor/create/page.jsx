@@ -13,7 +13,7 @@ export default function VisitorCreate() {
   const { hasPermission } = useMenu();
   const { userId, userName } = useSessionUser();
 
-  const { employees } = useEmployees();
+  const { employees } = useEmployees(undefined, true); // fetchAll = true
 
   useEffect(() => {
     if (!hasPermission("security.visitor.create")) {

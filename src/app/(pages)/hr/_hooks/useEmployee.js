@@ -52,7 +52,7 @@ async function fetchWithAbort(url, options, signal) {
   return data;
 }
 
-export function useEmployees(apiUrl = API_URL) {
+export function useEmployees(apiUrl = API_URL, fetchAll = false) {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -61,7 +61,9 @@ export function useEmployees(apiUrl = API_URL) {
 
     (async () => {
       try {
-        const result = await fetchWithAbort(apiUrl, {}, controller.signal);
+        // Fetch all by adding a large limit
+        const url = fetchAll ? `${apiUrl}?limit=9999` : apiUrl;
+        const result = await fetchWithAbort(url, {}, controller.signal);
 
         const items = result.employees || result.data || [];
 
@@ -81,7 +83,7 @@ export function useEmployees(apiUrl = API_URL) {
     })();
 
     return () => controller.abort();
-  }, [apiUrl]);
+  }, [apiUrl, fetchAll]);
 
   return { employees, loading };
 }

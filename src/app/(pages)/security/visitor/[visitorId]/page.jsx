@@ -22,7 +22,7 @@ export default function VisitorUpdate() {
   const { visitor, loading: visitorLoading } =
     useVisitor(visitorId);
 
-  const { employees } = useEmployees();
+  const { employees } = useEmployees(undefined, true); // fetchAll = true
 
   useEffect(() => {
     if (!hasPermission("security.visitor.edit")) {

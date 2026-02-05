@@ -51,7 +51,7 @@ async function fetchWithAbort(url, options, signal) {
   return data;
 }
 
-export function useDepartments(apiUrl = API_URL) {
+export function useDepartments(apiUrl = API_URL, fetchAll = false) {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,7 +60,9 @@ export function useDepartments(apiUrl = API_URL) {
 
     (async () => {
       try {
-        const result = await fetchWithAbort(apiUrl, {}, controller.signal);
+        // Fetch all by adding a large limit
+        const url = fetchAll ? `${apiUrl}?limit=9999` : apiUrl;
+        const result = await fetchWithAbort(url, {}, controller.signal);
 
         const items = result.departments || result.data || [];
 
@@ -80,7 +82,7 @@ export function useDepartments(apiUrl = API_URL) {
     })();
 
     return () => controller.abort();
-  }, [apiUrl]);
+  }, [apiUrl, fetchAll]);
 
   return { departments, loading };
 }

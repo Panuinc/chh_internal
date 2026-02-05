@@ -12,7 +12,7 @@ export default function AccountCreate() {
   const router = useRouter();
   const { hasPermission } = useMenu();
   const { userId, userName } = useSessionUser();
-  const { employees } = useEmployees();
+  const { employees } = useEmployees(undefined, true); // fetchAll = true
 
   useEffect(() => {
     if (!hasPermission("hr.account.create")) {

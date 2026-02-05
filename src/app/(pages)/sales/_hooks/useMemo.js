@@ -12,6 +12,24 @@ const TOAST = {
   WARNING: "warning",
 };
 
+// Status labels in Thai
+const STATUS_LABELS = {
+  DRAFT: "ร่าง",
+  PENDING_SALES_MANAGER: "รอผู้จัดการฝ่ายขายอนุมัติ",
+  PENDING_CEO: "รอกรรมการผู้จัดการอนุมัติ",
+  APPROVED: "อนุมัติแล้ว",
+  REJECTED: "ปฏิเสธ",
+};
+
+// Status colors
+const STATUS_COLORS = {
+  DRAFT: "default",
+  PENDING_SALES_MANAGER: "warning",
+  PENDING_CEO: "warning",
+  APPROVED: "success",
+  REJECTED: "danger",
+};
+
 function formatMemo(memo, index = null) {
   if (!memo) return null;
 
@@ -25,12 +43,26 @@ function formatMemo(memo, index = null) {
     ...(index !== null && { memoIndex: index + 1 }),
     memoCreatedBy: getFullName(memo.createdByEmployee),
     memoUpdatedBy: getFullName(memo.updatedByEmployee),
+    memoSalesManagerName: memo.memoSalesManagerName || getFullName(memo.salesManagerEmployee),
+    memoCeoName: memo.memoCeoName || getFullName(memo.ceoEmployee),
+    memoRejectedByName: memo.memoRejectedByName || getFullName(memo.rejectedByEmployee),
+    memoStatusLabel: STATUS_LABELS[memo.memoStatus] || memo.memoStatus,
+    memoStatusColor: STATUS_COLORS[memo.memoStatus] || "default",
     memoDateFormatted: memo.memoDate
       ? new Date(memo.memoDate).toLocaleDateString("th-TH")
       : "-",
     memoCreatedAtFormatted: memo.memoCreatedAt
       ? new Date(memo.memoCreatedAt).toLocaleString("th-TH")
       : "-",
+    memoSalesManagerDateFormatted: memo.memoSalesManagerDate
+      ? new Date(memo.memoSalesManagerDate).toLocaleDateString("th-TH")
+      : null,
+    memoCeoDateFormatted: memo.memoCeoDate
+      ? new Date(memo.memoCeoDate).toLocaleDateString("th-TH")
+      : null,
+    memoRejectedAtFormatted: memo.memoRejectedAt
+      ? new Date(memo.memoRejectedAt).toLocaleString("th-TH")
+      : null,
   };
 }
 
@@ -61,79 +93,98 @@ export function useMemos(apiUrl = API_URL) {
   const [memos, setMemos] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchMemos = useCallback(async (signal) => {
+    try {
+      const result = await fetchWithAbort(apiUrl, {}, signal);
+
+      const items = result.memos || result.data || [];
+
+      const formatted = Array.isArray(items)
+        ? items.map((p, i) => formatMemo(p, i)).filter(Boolean)
+        : [];
+
+      setMemos(formatted);
+    } catch (err) {
+      if (err.name === "AbortError") return;
+      showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);
+    }
+  }, [apiUrl]);
+
   useEffect(() => {
     const controller = new AbortController();
 
     (async () => {
-      try {
-        const result = await fetchWithAbort(apiUrl, {}, controller.signal);
-
-        const items = result.memos || result.data || [];
-
-        const formatted = Array.isArray(items)
-          ? items.map((p, i) => formatMemo(p, i)).filter(Boolean)
-          : [];
-
-        setMemos(formatted);
-      } catch (err) {
-        if (err.name === "AbortError") return;
-        showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+      setLoading(true);
+      await fetchMemos(controller.signal);
+      if (!controller.signal.aborted) {
+        setLoading(false);
       }
     })();
 
     return () => controller.abort();
-  }, [apiUrl]);
+  }, [fetchMemos]);
 
-  return { memos, loading };
+  const refetch = useCallback(async () => {
+    setLoading(true);
+    await fetchMemos();
+    setLoading(false);
+  }, [fetchMemos]);
+
+  return { memos, loading, refetch };
 }
 
 export function useMemo(memoId) {
   const [memo, setMemo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchMemo = useCallback(async (signal) => {
     if (!memoId) {
       setLoading(false);
       return;
     }
 
+    try {
+      const result = await fetchWithAbort(
+        `${API_URL}/${memoId}`,
+        {},
+        signal
+      );
+
+      const item = result.memo || result.data;
+
+      if (!item) {
+        showToast(TOAST.WARNING, "No Memo data found.");
+        return;
+      }
+
+      setMemo(formatMemo(item));
+    } catch (err) {
+      if (err.name === "AbortError") return;
+      showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);
+    }
+  }, [memoId]);
+
+  useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
 
     (async () => {
-      try {
-        const result = await fetchWithAbort(
-          `${API_URL}/${memoId}`,
-          {},
-          controller.signal
-        );
-
-        const item = result.memo || result.data;
-
-        if (!item) {
-          showToast(TOAST.WARNING, "No Memo data found.");
-          return;
-        }
-
-        setMemo(formatMemo(item));
-      } catch (err) {
-        if (err.name === "AbortError") return;
-        showToast(TOAST.DANGER, `Error: ${getErrorMessage(err)}`);
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+      await fetchMemo(controller.signal);
+      if (!controller.signal.aborted) {
+        setLoading(false);
       }
     })();
 
     return () => controller.abort();
-  }, [memoId]);
+  }, [fetchMemo]);
 
-  return { memo, loading };
+  const refetch = useCallback(async () => {
+    setLoading(true);
+    await fetchMemo();
+    setLoading(false);
+  }, [fetchMemo]);
+
+  return { memo, loading, refetch };
 }
 
 export function useNextDocumentNo() {
@@ -259,6 +310,70 @@ export function useDeleteMemo() {
         `Failed to delete Memo: ${getErrorMessage(err)}`
       );
       return false;
+    }
+  }, []);
+}
+
+export function useApproveMemo() {
+  return useCallback(async (memoId) => {
+    try {
+      const response = await fetch(`${API_URL}/${memoId}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({}), // Send empty body
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        showToast(TOAST.SUCCESS, result.message || "Approved successfully");
+        return { success: true, data: result };
+      } else {
+        showToast(
+          TOAST.DANGER,
+          result.error || "Failed to approve Memo."
+        );
+        return { success: false, error: result.error };
+      }
+    } catch (err) {
+      showToast(
+        TOAST.DANGER,
+        `Failed to approve Memo: ${getErrorMessage(err)}`
+      );
+      return { success: false, error: err.message };
+    }
+  }, []);
+}
+
+export function useRejectMemo() {
+  return useCallback(async (memoId, reason) => {
+    try {
+      const response = await fetch(`${API_URL}/${memoId}/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ reason }),
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        showToast(TOAST.SUCCESS, result.message || "Rejected successfully");
+        return { success: true, data: result };
+      } else {
+        showToast(
+          TOAST.DANGER,
+          result.error || "Failed to reject Memo."
+        );
+        return { success: false, error: result.error };
+      }
+    } catch (err) {
+      showToast(
+        TOAST.DANGER,
+        `Failed to reject Memo: ${getErrorMessage(err)}`
+      );
+      return { success: false, error: err.message };
     }
   }, []);
 }

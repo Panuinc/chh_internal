@@ -18,8 +18,8 @@ export default function EmployeeUpdate() {
   const { userId: sessionUserId, userName } = useSessionUser();
 
   const { employee, loading: employeeLoading } = useEmployee(employeeId);
-  const { departments } = useDepartments();
-  const { roles } = useRoles();
+  const { departments } = useDepartments(undefined, true); // fetchAll = true
+  const { roles } = useRoles(undefined, true); // fetchAll = true
 
   useEffect(() => {
     if (!hasPermission("hr.employee.edit")) {
