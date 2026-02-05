@@ -1,16 +1,9 @@
 "use client";
 import React, { useRef, useState, useCallback, useEffect } from "react";
-import {
-  Button,
-  Textarea,
-  Image,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Image } from "@heroui/image";
+import { Textarea } from "@heroui/input";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
 import { Html5Qrcode } from "html5-qrcode";
 import { QrCode, Camera, RefreshCw } from "lucide-react";
 

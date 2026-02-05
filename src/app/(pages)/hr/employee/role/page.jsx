@@ -6,14 +6,11 @@ import { useEmployees } from "@/app/(pages)/hr/_hooks/useEmployee";
 import { useRoles } from "@/app/(pages)/hr/_hooks/useRole";
 import { useEmployeeRole } from "@/app/(pages)/hr/_hooks/useEmployeeRole";
 import { useMenu, useSessionUser } from "@/hooks";
-import {
-  Button,
-  Select,
-  SelectItem,
-  Checkbox,
-  Spinner,
-  Chip,
-} from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Select, SelectItem } from "@heroui/select";
+import { Checkbox } from "@heroui/checkbox";
+import { Spinner } from "@heroui/spinner";
+import { Chip } from "@heroui/chip";
 
 export default function EmployeeRolePage() {
   const router = useRouter();

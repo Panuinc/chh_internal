@@ -1,20 +1,14 @@
 "use client";
 
 import React, { useMemo, useCallback, useState, useEffect, useRef } from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Image,
-  useDisclosure,
-  Checkbox,
-  Input,
-  Divider,
-  Chip,
-} from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Button } from "@heroui/button";
+import { Image } from "@heroui/image";
+import { useDisclosure } from "@heroui/modal";
+import { Checkbox } from "@heroui/checkbox";
+import { Input } from "@heroui/input";
+import { Divider } from "@heroui/divider";
+import { Chip } from "@heroui/chip";
 import {
   Printer,
   RefreshCw,

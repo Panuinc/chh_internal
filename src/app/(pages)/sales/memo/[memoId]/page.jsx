@@ -12,7 +12,9 @@ import {
   useRejectMemo,
 } from "@/app/(pages)/sales/_hooks/useMemo";
 import { useFormHandler, useMenu } from "@/hooks";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Textarea } from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Button } from "@heroui/button";
+import { Textarea } from "@heroui/input";
 
 // Helper to format Date to YYYY-MM-DD
 function formatDateForInput(dateString) {

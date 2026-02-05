@@ -15,27 +15,17 @@ import {
   FileCode,
   ChevronDown,
 } from "lucide-react";
-import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Card,
-  CardHeader,
-  CardBody,
-  Chip,
-  Divider,
-  Progress,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Switch,
-  Tooltip,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
+import { Card, CardHeader, CardBody } from "@heroui/card";
+import { Chip } from "@heroui/chip";
+import { Divider } from "@heroui/divider";
+import { Progress } from "@heroui/progress";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Switch } from "@heroui/switch";
+import { Tooltip } from "@heroui/tooltip";
+import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import jsPDF from "jspdf";
 import { svg2pdf } from "svg2pdf.js";

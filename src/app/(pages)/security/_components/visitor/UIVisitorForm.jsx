@@ -1,18 +1,10 @@
 "use client";
 import React, { useRef, useState, useCallback, useEffect } from "react";
-import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Image,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
+import { Image } from "@heroui/image";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
 import { Camera, FileText, RefreshCw, Plus, X } from "lucide-react";
 
 const contactReasonOptions = [

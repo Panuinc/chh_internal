@@ -2,14 +2,9 @@
 import React from "react";
 import { DataTable } from "@/components";
 import { Loading } from "@/components";
-import {
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Chip,
-} from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Chip } from "@heroui/chip";
 import { Settings2, CheckCircle, XCircle, Eye } from "lucide-react";
 
 const STATUS_LABELS = {

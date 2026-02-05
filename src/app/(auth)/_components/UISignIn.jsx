@@ -1,5 +1,7 @@
 "use client";
-import { Button, Input, Spinner } from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
+import { Spinner } from "@heroui/spinner";
 import Image from "next/image";
 
 export default function UISignIn({

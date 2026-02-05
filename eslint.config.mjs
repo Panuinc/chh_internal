@@ -1,28 +1,24 @@
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
+import next from "eslint-config-next";
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
+  next,
   {
     rules: {
-
       "camelcase": ["error", {
         "properties": "always",
         "ignoreDestructuring": false,
         "ignoreImports": false,
         "ignoreGlobals": false
       }],
-
       "react/jsx-pascal-case": "error",
     },
   },
-
   globalIgnores([
-
     ".next/**",
     "out/**",
     "build/**",
-    "next-env.d.ts",
+    "node_modules/**",
   ]),
 ]);
 

@@ -15,3 +15,122 @@
 [2026-02-05 11:11:22] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-05 11:11:22] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-05 11:11:22] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:16:55] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:17:28] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:17:34] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-05 11:17:34] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-05 11:17:46] [INFO] GetAllAccountUseCase start {"page":1,"limit":20}
+[2026-02-05 11:17:46] [INFO] GetAllAccountUseCase success {"total":12,"returned":12}
+[2026-02-05 11:18:06] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-05 11:18:06] [INFO] GetAllMemoUseCase success {"total":0,"returned":0}
+[2026-02-05 11:18:16] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
+[2026-02-05 11:18:20] [INFO] GetAllSalesOrdersOnline success {"total":43,"returned":43}
+[2026-02-05 11:18:55] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-05 11:18:55] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-05 11:19:05] [INFO] GetAllPermissionUseCase start {"page":1,"limit":100}
+[2026-02-05 11:19:05] [INFO] GetAllPermissionUseCase success {"total":54,"returned":54}
+[2026-02-05 11:22:41] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-05 11:22:41] [INFO] GetAllMemoUseCase success {"total":0,"returned":0}
+[2026-02-05 11:24:09] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-05 11:24:10] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-05 11:24:30] [INFO] GetAllAccountUseCase start {"page":1,"limit":20}
+[2026-02-05 11:24:30] [INFO] GetAllAccountUseCase success {"total":12,"returned":12}
+[2026-02-05 11:25:13] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-05 11:25:14] [INFO] GetAllMemoUseCase success {"total":0,"returned":0}
+[2026-02-05 11:25:28] [INFO] GetNextDocumentNoUseCase start
+[2026-02-05 11:25:29] [INFO] GetNextDocumentNoUseCase success {"nextDocumentNo":"ME-2602-0001"}
+[2026-02-05 11:26:16] [INFO] CreateMemoUseCase start {"documentNo":"ME-2602-0001"}
+[2026-02-05 11:26:17] [INFO] CreateMemoUseCase success {"id":"cml8yf1cy0007crrodunzv7d5","documentNo":"ME-2602-0001"}
+[2026-02-05 11:26:18] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-05 11:26:18] [INFO] GetAllMemoUseCase success {"total":1,"returned":1}
+[2026-02-05 11:26:26] [INFO] GetMemoByIdUseCase start {"id":"cml8yf1cy0007crrodunzv7d5"}
+[2026-02-05 11:26:26] [INFO] GetMemoByIdUseCase success {"id":"cml8yf1cy0007crrodunzv7d5","documentNo":"ME-2602-0001"}
+[2026-02-05 11:26:34] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-05 11:26:34] [INFO] GetAllMemoUseCase success {"total":1,"returned":1}
+[2026-02-05 11:26:42] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-05 11:26:42] [INFO] GetAllMemoUseCase success {"total":1,"returned":1}
+[2026-02-05 11:26:45] [INFO] GetMemoByIdUseCase start {"id":"cml8yf1cy0007crrodunzv7d5"}
+[2026-02-05 11:26:45] [INFO] GetMemoByIdUseCase success {"id":"cml8yf1cy0007crrodunzv7d5","documentNo":"ME-2602-0001"}
+[2026-02-05 11:26:53] [INFO] ApproveMemoUseCase start {"memoId":"cml8yf1cy0007crrodunzv7d5"}
+[2026-02-05 11:26:53] [INFO] ApproveMemoUseCase success {"id":"cml8yf1cy0007crrodunzv7d5","status":"PENDING_CEO"}
+[2026-02-05 11:26:53] [INFO] GetMemoByIdUseCase start {"id":"cml8yf1cy0007crrodunzv7d5"}
+[2026-02-05 11:26:53] [INFO] GetMemoByIdUseCase success {"id":"cml8yf1cy0007crrodunzv7d5","documentNo":"ME-2602-0001"}
+[2026-02-05 11:26:58] [INFO] ApproveMemoUseCase start {"memoId":"cml8yf1cy0007crrodunzv7d5"}
+[2026-02-05 11:26:58] [INFO] ApproveMemoUseCase success {"id":"cml8yf1cy0007crrodunzv7d5","status":"APPROVED"}
+[2026-02-05 11:26:58] [INFO] GetMemoByIdUseCase start {"id":"cml8yf1cy0007crrodunzv7d5"}
+[2026-02-05 11:26:58] [INFO] GetMemoByIdUseCase success {"id":"cml8yf1cy0007crrodunzv7d5","documentNo":"ME-2602-0001"}
+[2026-02-05 11:27:03] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-05 11:27:03] [INFO] GetAllMemoUseCase success {"total":1,"returned":1}
+[2026-02-05 11:30:16] [INFO] GetAllCatFinishedGoodsItems start {"displayName":null,"number":null,"description":null,"includeZeroInventory":false,"limit":500,"inventoryPostingGroupCode":"FG","numberPrefix":"FG-"}
+[2026-02-05 11:30:24] [INFO] GetAllCatFinishedGoodsItems success {"total":267,"returned":267}
+[2026-02-05 11:30:24] [INFO] GetDimensionValues start {"codesCount":67,"dimensionCode":"PROJECT"}
+[2026-02-05 11:30:25] [INFO] GetDimensionId success {"dimensionCode":"PROJECT","dimensionId":"5276f03a-e5f1-eb11-a1de-002248559e6c"}
+[2026-02-05 11:30:26] [INFO] GetDimensionValues success {"source":"api","total":925}
+[2026-02-05 11:30:26] [INFO] GetDimensionValues success {"found":52,"requested":67,"totalInDimension":708}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:43:40] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:36] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:47:37] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:01] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:01] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:01] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-05 11:53:01] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}

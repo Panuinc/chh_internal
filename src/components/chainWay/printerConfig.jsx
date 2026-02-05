@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Button, Spinner, Tooltip } from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Spinner } from "@heroui/spinner";
+import { Tooltip } from "@heroui/tooltip";
 import {
   Printer,
   RefreshCw,

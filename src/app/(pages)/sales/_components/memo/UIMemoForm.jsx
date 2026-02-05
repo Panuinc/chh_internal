@@ -1,6 +1,8 @@
 "use client";
 import React from "react";
-import { Button, Input, Textarea, Chip } from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Input, Textarea } from "@heroui/input";
+import { Chip } from "@heroui/chip";
 import { Save, Send, CheckCircle, XCircle } from "lucide-react";
 import Image from "next/image";
 

@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-import { Button, Checkbox } from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Checkbox } from "@heroui/checkbox";
 
 export default function UIAssignForm({
   employee,

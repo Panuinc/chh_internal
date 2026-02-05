@@ -2,18 +2,11 @@
 
 import React, { useMemo, useCallback, useState } from "react";
 import { DataTable, Loading } from "@/components";
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Chip,
-  Divider,
-  Input,
-} from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
+import { Chip } from "@heroui/chip";
+import { Divider } from "@heroui/divider";
+import { Input } from "@heroui/input";
 import {
   Printer,
   RefreshCw,

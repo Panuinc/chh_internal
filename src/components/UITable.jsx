@@ -1,21 +1,11 @@
 "use client";
 import React from "react";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Input,
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Chip,
-  Pagination,
-} from "@heroui/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Chip } from "@heroui/chip";
+import { Pagination } from "@heroui/pagination";
 import { ChevronDown, Plus, Search, Settings2 } from "lucide-react";
 
 const capitalize = (str) =>

@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import UIMemo from "@/app/(pages)/sales/_components/memo/UIMemo";
 import { useMemos, useApproveMemo, useRejectMemo } from "@/app/(pages)/sales/_hooks/useMemo";
 import { useMenu } from "@/hooks";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Textarea } from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Button } from "@heroui/button";
+import { Textarea } from "@heroui/input";
 
 export default function MemoPage() {
   const router = useRouter();

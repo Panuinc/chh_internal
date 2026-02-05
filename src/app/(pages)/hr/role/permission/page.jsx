@@ -6,14 +6,11 @@ import { useRoles } from "@/app/(pages)/hr/_hooks/useRole";
 import { usePermissions } from "@/app/(pages)/hr/_hooks/usePermission";
 import { useRolePermission } from "@/app/(pages)/hr/_hooks/useRolePermission";
 import { useMenu, useSessionUser } from "@/hooks";
-import {
-  Button,
-  Select,
-  SelectItem,
-  Checkbox,
-  Spinner,
-  Chip,
-} from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Select, SelectItem } from "@heroui/select";
+import { Checkbox } from "@heroui/checkbox";
+import { Spinner } from "@heroui/spinner";
+import { Chip } from "@heroui/chip";
 
 export default function RolePermissionPage() {
   const router = useRouter();

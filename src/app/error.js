@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Button } from "@heroui/react";
+import { Button } from "@heroui/button";
 
 export default function RootError({ error, reset }) {
   useEffect(() => {

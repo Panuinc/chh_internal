@@ -1,5 +1,5 @@
 "use client";
-import { Breadcrumbs, BreadcrumbItem } from "@heroui/react";
+import { Breadcrumbs, BreadcrumbItem } from "@heroui/breadcrumbs";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
