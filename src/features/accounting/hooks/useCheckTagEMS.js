@@ -41,10 +41,16 @@ export function useCheckTagEMS() {
     }
   }, []);
 
+  const clearTrackingData = useCallback(() => {
+    setTrackingData(null);
+    setError(null);
+  }, []);
+
   return {
     trackingData,
     loading,
     error,
     searchEMS,
+    clearTrackingData,
   };
 }

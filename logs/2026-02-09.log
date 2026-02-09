@@ -277,3 +277,77 @@
 [2026-02-09 12:51:55] [ERROR] EMSService error
 [2026-02-09 12:51:55] [ERROR] EMSService error
 [2026-02-09 12:51:55] [ERROR] EMSTrackingAPI error
+[2026-02-09 13:57:27] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:57:27] [ERROR] EMSRecordsAPI error
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:06] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:06] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:06] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:06] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:06] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:08] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 13:58:52] [ERROR] EMSRecordsAPI error
+[2026-02-09 13:58:52] [ERROR] EMSRecordsAPI error
+[2026-02-09 13:59:01] [ERROR] EMSRecordsAPI error
+[2026-02-09 13:59:01] [ERROR] EMSRecordsAPI error
+[2026-02-09 14:00:26] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:03:08] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ed857991962th"}
+[2026-02-09 14:03:08] [INFO] EMSService Requesting JWT token from Thailand Post {"apiKeyPreview":"S%LrKoNyNIS:WOE...WAS.X_F9Vo","tokenLength":100,"firstChars":"S%LrKoNyNIS:WOEUVqAk","lastChars":"WAS.X_F9Vo"}
+[2026-02-09 14:03:09] [INFO] EMSService GetToken response {"status":200,"body":"{\"expire\":\"2026-03-09 14:03:09+07:00\",\"token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzZWN1cmUtYXBpIiwiYXVkIjoic2VjdXJlLWFwcCIsInN1YiI6IkF1dGhvcml6YXRpb24iLCJleHAiOjE3NzMwMzk3ODksInJvbCI6WyJST0xFX1VTRVIiXSwiZCpzaWciOnsicCI6InpXNzB4IiwicyI6bnVsbCwidSI6IjcxOGU0NzFjODg2YmFkM2E4NzM2ZmFjYjg4ZmU1OGVlIiwiZiI6InhzeiM5In19.am0uxgxUN5e2pgSzyYOxxx38dzIE_i7Sz-IEFES4uv4MTdL9mFxUcGIvWBRO8G2gMk7NZfhItiF63V0kna4OMg\"}"}
+[2026-02-09 14:03:09] [INFO] EMSService JWT token obtained successfully {"expire":"2026-03-09 14:03:09+07:00"}
+[2026-02-09 14:03:09] [INFO] EMSService Tracking EMS {"barcode":"ED857991962TH"}
+[2026-02-09 14:03:09] [INFO] EMSService Track API response {"status":200,"body":"{\"response\":{\"items\":{\"ED857991962TH\":[{\"barcode\":\"ED857991962TH\",\"status\":\"103\",\"status_description\":\"รับฝาก\",\"status_date\":\"24/01/2569 15:36:38+07:00\",\"location\":\"ไทรน้อย\",\"postcode\":\"11150\",\"delivery_status\":null,\"delivery_description\":null,\"delivery_datetime\":null,\"receiver_name\":null,\"signature\":null,\"status_detail\":\"รับฝากสิ่งของ [ ที่ทำการไปรษณีย์ ไทรน้อย ]\",\"delivery_officer_name\":null,\"delivery_officer_tel\":null,\"office_name\":null,\"office_tel\":null,\"call_center_tel\":\"1545\"},{\"barcode\":\""}
+[2026-02-09 14:03:58] [INFO] EMSRecordsAPI EMS record created {"emsId":"cmlett84o0001crhsseg86dpd","barcode":"ED857991962TH","createdBy":"cml8vm5wa0066crxsgwca542x"}
+[2026-02-09 14:04:25] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ED857991962TH"}
+[2026-02-09 14:04:25] [INFO] EMSService Using cached JWT token
+[2026-02-09 14:04:25] [INFO] EMSService Tracking EMS {"barcode":"ED857991962TH"}
+[2026-02-09 14:04:25] [INFO] EMSService Track API response {"status":200,"body":"{\"response\":{\"items\":{\"ED857991962TH\":[{\"barcode\":\"ED857991962TH\",\"status\":\"103\",\"status_description\":\"รับฝาก\",\"status_date\":\"24/01/2569 15:36:38+07:00\",\"location\":\"ไทรน้อย\",\"postcode\":\"11150\",\"delivery_status\":null,\"delivery_description\":null,\"delivery_datetime\":null,\"receiver_name\":null,\"signature\":null,\"status_detail\":\"รับฝากสิ่งของ [ ที่ทำการไปรษณีย์ ไทรน้อย ]\",\"delivery_officer_name\":null,\"delivery_officer_tel\":null,\"office_name\":null,\"office_tel\":null,\"call_center_tel\":\"1545\"},{\"barcode\":\""}
+[2026-02-09 14:04:47] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:04:48] [INFO] EMSRecordAPI EMS record updated {"emsId":"cmlett84o0001crhsseg86dpd","barcode":"ED857991962TH","updatedBy":"cml8vm5wa0066crxsgwca542x"}
+[2026-02-09 14:05:12] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ED857991962TH"}
+[2026-02-09 14:05:12] [INFO] EMSService Using cached JWT token
+[2026-02-09 14:05:12] [INFO] EMSService Tracking EMS {"barcode":"ED857991962TH"}
+[2026-02-09 14:05:12] [INFO] EMSService Track API response {"status":200,"body":"{\"response\":{\"items\":{\"ED857991962TH\":[{\"barcode\":\"ED857991962TH\",\"status\":\"103\",\"status_description\":\"รับฝาก\",\"status_date\":\"24/01/2569 15:36:38+07:00\",\"location\":\"ไทรน้อย\",\"postcode\":\"11150\",\"delivery_status\":null,\"delivery_description\":null,\"delivery_datetime\":null,\"receiver_name\":null,\"signature\":null,\"status_detail\":\"รับฝากสิ่งของ [ ที่ทำการไปรษณีย์ ไทรน้อย ]\",\"delivery_officer_name\":null,\"delivery_officer_tel\":null,\"office_name\":null,\"office_tel\":null,\"call_center_tel\":\"1545\"},{\"barcode\":\""}
+[2026-02-09 14:09:16] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ed867991959th"}
+[2026-02-09 14:09:16] [INFO] EMSService Using cached JWT token
+[2026-02-09 14:09:16] [INFO] EMSService Tracking EMS {"barcode":"ED867991959TH"}
+[2026-02-09 14:09:18] [INFO] EMSService Track API response {"status":200,"body":"{\"response\":{\"items\":{\"ED867991959TH\":[]},\"track_count\":{\"track_date\":\"09/02/2569\",\"count_number\":11,\"track_count_limit\":1000}},\"message\":\"successful\",\"status\":true}"}
+[2026-02-09 14:09:18] [ERROR] EMSService error
+[2026-02-09 14:09:18] [ERROR] EMSTrackingAPI error
+[2026-02-09 14:09:43] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ed857991959th"}
+[2026-02-09 14:09:43] [INFO] EMSService Using cached JWT token
+[2026-02-09 14:09:43] [INFO] EMSService Tracking EMS {"barcode":"ED857991959TH"}
+[2026-02-09 14:09:44] [INFO] EMSService Track API response {"status":200,"body":"{\"response\":{\"items\":{\"ED857991959TH\":[{\"barcode\":\"ED857991959TH\",\"status\":\"103\",\"status_description\":\"รับฝาก\",\"status_date\":\"24/01/2569 15:36:38+07:00\",\"location\":\"ไทรน้อย\",\"postcode\":\"11150\",\"delivery_status\":null,\"delivery_description\":null,\"delivery_datetime\":null,\"receiver_name\":null,\"signature\":null,\"status_detail\":\"รับฝากสิ่งของ [ ที่ทำการไปรษณีย์ ไทรน้อย ]\",\"delivery_officer_name\":null,\"delivery_officer_tel\":null,\"office_name\":null,\"office_tel\":null,\"call_center_tel\":\"1545\"},{\"barcode\":\""}
+[2026-02-09 14:10:02] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ED857991962TH"}
+[2026-02-09 14:10:02] [INFO] EMSService Using cached JWT token
+[2026-02-09 14:10:02] [INFO] EMSService Tracking EMS {"barcode":"ED857991962TH"}
+[2026-02-09 14:10:02] [INFO] EMSService Track API response {"status":200,"body":"{\"response\":{\"items\":{\"ED857991962TH\":[{\"barcode\":\"ED857991962TH\",\"status\":\"103\",\"status_description\":\"รับฝาก\",\"status_date\":\"24/01/2569 15:36:38+07:00\",\"location\":\"ไทรน้อย\",\"postcode\":\"11150\",\"delivery_status\":null,\"delivery_description\":null,\"delivery_datetime\":null,\"receiver_name\":null,\"signature\":null,\"status_detail\":\"รับฝากสิ่งของ [ ที่ทำการไปรษณีย์ ไทรน้อย ]\",\"delivery_officer_name\":null,\"delivery_officer_tel\":null,\"office_name\":null,\"office_tel\":null,\"call_center_tel\":\"1545\"},{\"barcode\":\""}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:13] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:13] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:13] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:13] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:13] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:13] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:12:15] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}

@@ -106,6 +106,9 @@ model Employee {
   ceoMemos          SalesMemo[] @relation("SalesMemoCeo")
   rejectedMemos     SalesMemo[] @relation("SalesMemoRejectedBy")
 
+  createdEMSTrackings EMSTracking[] @relation("EMSTrackingCreatedBy")
+  updatedEMSTrackings EMSTracking[] @relation("EMSTrackingUpdatedBy")
+
   @@index([employeeDepartmentId])
   @@index([employeeCreatedBy])
   @@index([employeeUpdatedBy])
@@ -342,4 +345,34 @@ model SalesMemo {
   @@index([memoCreatedAt])
   @@index([memoSalesManagerId])
   @@index([memoCeoId])
+}
+
+enum EMSTrackingStatus {
+  NOT_CALLED
+  CALLED_NOT_RECEIVED
+  CALLED_RECEIVED
+  CANNOT_CONTACT
+}
+
+model EMSTracking {
+  emsId           String            @id @default(cuid())
+  emsBarcode      String            @unique
+  emsCustomerName String?
+  emsStatus       EMSTrackingStatus @default(NOT_CALLED)
+  emsNotes        String?           @db.Text
+  emsCallDate     DateTime?
+  emsLastTracking Json?             // เก็บข้อมูล tracking ล่าสุดจากไปรษณีย์
+  emsCreatedBy    String?
+  emsCreatedAt    DateTime          @default(now())
+  emsUpdatedBy    String?
+  emsUpdatedAt    DateTime?
+
+  createdByEmployee Employee? @relation("EMSTrackingCreatedBy", fields: [emsCreatedBy], references: [employeeId])
+  updatedByEmployee Employee? @relation("EMSTrackingUpdatedBy", fields: [emsUpdatedBy], references: [employeeId])
+
+  @@index([emsBarcode])
+  @@index([emsStatus])
+  @@index([emsCreatedBy])
+  @@index([emsUpdatedBy])
+  @@index([emsCreatedAt])
 }
