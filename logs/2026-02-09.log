@@ -54,3 +54,5 @@
 [2026-02-09 10:27:25] [INFO] GetAccountByIdUseCase start {"id":"cml8vm6b7006acrxsuwy8nd7f"}
 [2026-02-09 10:27:25] [INFO] GetAccountByIdUseCase success {"id":"cml8vm6b7006acrxsuwy8nd7f","username":"superadmin"}
 [2026-02-09 10:27:26] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 10:27:27] [INFO] GetAllAccountUseCase start {"page":1,"limit":20}
+[2026-02-09 10:27:27] [INFO] GetAllAccountUseCase success {"total":12,"returned":12}
