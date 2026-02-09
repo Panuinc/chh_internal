@@ -255,3 +255,25 @@
 [2026-02-09 12:49:42] [ERROR] EMSService error
 [2026-02-09 12:49:42] [ERROR] EMSService error
 [2026-02-09 12:49:42] [ERROR] EMSTrackingAPI error
+[2026-02-09 12:50:14] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 12:50:14] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ed857991962th"}
+[2026-02-09 12:50:14] [INFO] EMSService Thailand Post API request {"barcode":"ED857991962TH","apiKeyPreview":"O+KyDuD7X@...FqNKG","apiKeyLength":77}
+[2026-02-09 12:50:15] [ERROR] EMSService error
+[2026-02-09 12:50:15] [ERROR] EMSService error
+[2026-02-09 12:50:15] [ERROR] EMSTrackingAPI error
+[2026-02-09 12:51:30] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 12:51:30] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ed857991962th"}
+[2026-02-09 12:51:30] [INFO] EMSService Thailand Post API request {"barcode":"ED857991962TH","apiKeyPreview":"O+KyDuD7X@...FqNKG","apiKeyLength":77}
+[2026-02-09 12:51:30] [ERROR] EMSService error
+[2026-02-09 12:51:30] [ERROR] EMSService error
+[2026-02-09 12:51:30] [ERROR] EMSTrackingAPI error
+[2026-02-09 12:51:54] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ed857991962th"}
+[2026-02-09 12:51:54] [INFO] EMSService Thailand Post API request {"barcode":"ED857991962TH","apiKeyPreview":"O+KyDuD7X@...FqNKG","apiKeyLength":77}
+[2026-02-09 12:51:54] [ERROR] EMSService error
+[2026-02-09 12:51:54] [ERROR] EMSService error
+[2026-02-09 12:51:54] [ERROR] EMSTrackingAPI error
+[2026-02-09 12:51:55] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ed857991962th"}
+[2026-02-09 12:51:55] [INFO] EMSService Thailand Post API request {"barcode":"ED857991962TH","apiKeyPreview":"O+KyDuD7X@...FqNKG","apiKeyLength":77}
+[2026-02-09 12:51:55] [ERROR] EMSService error
+[2026-02-09 12:51:55] [ERROR] EMSService error
+[2026-02-09 12:51:55] [ERROR] EMSTrackingAPI error
