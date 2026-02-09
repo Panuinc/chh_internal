@@ -10,31 +10,80 @@ import { Loading } from "@/components";
 import { Search, Package, Truck, CheckCircle, Clock, MapPin, AlertCircle } from "lucide-react";
 
 const STATUS_COLORS = {
-  101: "warning", // รับเข้าระบบ
-  102: "primary", // ศูนย์คัดแยก
-  103: "primary", // ศูนย์แจกจ่าย
-  104: "success", // นำจ่ายสำเร็จ
-  105: "danger",  // นำจ่ายไม่สำเร็จ
+  101: "warning", // เตรียมการฝากส่ง
+  102: "warning", // รับฝากผ่านตัวแทน
+  103: "primary", // รับฝาก
+  104: "default", // ผู้ฝากส่งขอถอนคืน
+  201: "primary", // ออกจากที่ทำการ
+  202: "primary", // ดำเนินพิธีการศุลกากร
+  203: "danger",  // ส่งคืนต้นทาง
+  204: "primary", // ถึงที่แลกเปลี่ยนขาออก
+  205: "primary", // ถึงที่แลกเปลี่ยนขาเข้า
+  206: "primary", // ถึงที่ทำการไปรษณีย์
+  211: "primary", // รับเข้า ณ ศูนย์คัดแยก
+  212: "primary", // ส่งมอบให้สายการบิน
+  213: "primary", // สายการบินรับมอบ
+  301: "warning", // อยู่ระหว่างการนำจ่าย
+  302: "warning", // นำจ่าย ณ จุดรับสิ่งของ
+  303: "warning", // เจ้าหน้าที่ติดต่อผู้รับ
+  304: "warning", // เจ้าหน้าที่ติดต่อผู้รับไม่ได้
+  401: "danger",  // นำจ่ายไม่สำเร็จ
+  402: "danger",  // ปิดประกาศ
+  501: "success", // นำจ่ายสำเร็จ
+  901: "success", // โอนเงินให้ผู้ขาย
 };
 
 const STATUS_LABELS = {
-  101: "รับเข้าระบบ",
-  102: "ศูนย์คัดแยก",
-  103: "ศูนย์แจกจ่าย",
-  104: "นำจ่ายสำเร็จ",
-  105: "นำจ่ายไม่สำเร็จ",
+  101: "เตรียมการฝากส่ง",
+  102: "รับฝากผ่านตัวแทน",
+  103: "รับฝาก",
+  104: "ผู้ฝากส่งขอถอนคืน",
+  201: "ออกจากที่ทำการ",
+  202: "ดำเนินพิธีการศุลกากร",
+  203: "ส่งคืนต้นทาง",
+  204: "ถึงที่แลกเปลี่ยนขาออก",
+  205: "ถึงที่แลกเปลี่ยนขาเข้า",
+  206: "ถึงที่ทำการไปรษณีย์",
+  211: "รับเข้า ณ ศูนย์คัดแยก",
+  212: "ส่งมอบให้สายการบิน",
+  213: "สายการบินรับมอบ",
+  301: "อยู่ระหว่างการนำจ่าย",
+  302: "นำจ่าย ณ จุดรับสิ่งของ",
+  303: "เจ้าหน้าที่ติดต่อผู้รับ",
+  304: "เจ้าหน้าที่ติดต่อผู้รับไม่ได้",
+  401: "นำจ่ายไม่สำเร็จ",
+  402: "ปิดประกาศ",
+  501: "นำจ่ายสำเร็จ",
+  901: "โอนเงินให้ผู้ขาย",
 };
 
 const getStatusIcon = (status) => {
-  switch (status) {
+  const statusNum = parseInt(status);
+  switch (statusNum) {
     case 101:
-      return <Package className="w-5 h-5" />;
     case 102:
     case 103:
+      return <Package className="w-5 h-5" />;
+    case 201:
+    case 202:
+    case 204:
+    case 205:
+    case 206:
+    case 211:
+    case 212:
+    case 213:
       return <Truck className="w-5 h-5" />;
-    case 104:
+    case 301:
+    case 302:
+    case 303:
+    case 304:
+      return <Clock className="w-5 h-5" />;
+    case 501:
+    case 901:
       return <CheckCircle className="w-5 h-5" />;
-    case 105:
+    case 401:
+    case 402:
+    case 203:
       return <AlertCircle className="w-5 h-5" />;
     default:
       return <Clock className="w-5 h-5" />;
@@ -57,12 +106,26 @@ export default function CheckTagEMS({ trackingData, loading, error, onSearch }) 
     }
   };
 
+  // ฟังก์ชันแปลงวันที่จาก พ.ศ. เป็น ค.ศ. (2569 -> 2026)
+  const parseThaiDate = (dateStr) => {
+    if (!dateStr) return null;
+    // รูปแบบ: "24/01/2569 15:36:38+07:00"
+    const match = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})/);
+    if (!match) return null;
+    
+    const [_, day, month, buddhistYear, hour, minute, second] = match;
+    const christianYear = parseInt(buddhistYear) - 543; // แปลง พ.ศ. -> ค.ศ.
+    
+    return new Date(`${christianYear}-${month}-${day}T${hour}:${minute}:${second}`);
+  };
+
   // จัดเรียงข้อมูลตามเวลาล่าสุดก่อน
   const sortedItems = trackingData?.items
-    ? [...trackingData.items].sort((a, b) => 
-        new Date(b.delivery_datetime || b.operation_date + "T" + b.operation_time) - 
-        new Date(a.delivery_datetime || a.operation_date + "T" + a.operation_time)
-      )
+    ? [...trackingData.items].sort((a, b) => {
+        const dateA = parseThaiDate(a.status_date);
+        const dateB = parseThaiDate(b.status_date);
+        return (dateB || 0) - (dateA || 0);
+      })
     : [];
 
   const latestStatus = sortedItems[0];
@@ -138,12 +201,12 @@ export default function CheckTagEMS({ trackingData, loading, error, onSearch }) 
               </div>
               {latestStatus && (
                 <Chip
-                  color={STATUS_COLORS[latestStatus.delivery_status] || "default"}
+                  color={STATUS_COLORS[parseInt(latestStatus.status)] || "default"}
                   size="lg"
                   variant="flat"
-                  startContent={getStatusIcon(latestStatus.delivery_status)}
+                  startContent={getStatusIcon(latestStatus.status)}
                 >
-                  {STATUS_LABELS[latestStatus.delivery_status] || latestStatus.delivery_status}
+                  {latestStatus.status_description || STATUS_LABELS[parseInt(latestStatus.status)] || latestStatus.status}
                 </Chip>
               )}
             </CardHeader>
@@ -202,19 +265,27 @@ export default function CheckTagEMS({ trackingData, loading, error, onSearch }) 
                           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                             <div className="flex items-center gap-2">
                               <Chip
-                                color={STATUS_COLORS[item.delivery_status] || "default"}
+                                color={STATUS_COLORS[parseInt(item.status)] || "default"}
                                 size="sm"
                                 variant="flat"
                               >
-                                {STATUS_LABELS[item.delivery_status] || item.delivery_status}
+                                {item.status_description || STATUS_LABELS[parseInt(item.status)] || item.status}
                               </Chip>
                               <span className="font-medium">{item.status_description || item.status}</span>
                             </div>
                             <span className="text-sm text-default-500 font-mono">
-                              {item.delivery_datetime 
-                                ? new Date(item.delivery_datetime).toLocaleString("th-TH")
-                                : `${item.operation_date} ${item.operation_time}`
-                              }
+                              {(() => {
+                                const date = parseThaiDate(item.status_date);
+                                return date 
+                                  ? date.toLocaleString("th-TH", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit"
+                                    })
+                                  : item.status_date;
+                              })()}
                             </span>
                           </div>
                           
