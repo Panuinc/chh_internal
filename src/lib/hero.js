@@ -6,7 +6,7 @@ module.exports = heroui({
       colors: {
         background: "#FFFFFF",
         foreground: "#000000",
-        default: "#F1F5F9",
+        default: "#EDEDED",
 
         primary: "#4456E9",
         secondary: "#FF8A00",
