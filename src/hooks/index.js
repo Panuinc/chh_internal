@@ -4,3 +4,4 @@ export { useFormHandler } from "./useFormHandler";
 export { default as useMenu } from "./useMenu";
 export { default as useSessionUser } from "./useSessionUser";
 export { useTokenRefresh } from "./useTokenRefresh";
+export { useChangePassword } from "./useChangePassword";

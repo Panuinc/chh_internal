@@ -101,3 +101,12 @@ export const assignUpdateSchema = z.object({
   assignPermissionId: preprocessString("Please provide assignPermissionId"),
   assignUpdatedBy: preprocessString("Please provide the updater ID"),
 });
+
+export const changePasswordSchema = z.object({
+  currentPassword: preprocessString("Please provide current password"),
+  newPassword: preprocessString("Please provide new password").min(
+    6,
+    "New password must be at least 6 characters",
+  ),
+  accountUpdatedBy: preprocessString("Please provide the updater ID"),
+});

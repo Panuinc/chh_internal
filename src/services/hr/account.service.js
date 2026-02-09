@@ -46,6 +46,16 @@ export const updateSchema = z.object({
   accountUpdatedBy: preprocessString("Please provide the updater ID"),
 });
 
+export const changePasswordSchema = z.object({
+  accountId: preprocessString("Please provide the account ID"),
+  currentPassword: preprocessString("Please provide current password"),
+  newPassword: preprocessString("Please provide new password").min(
+    6,
+    "New password must be at least 6 characters"
+  ),
+  accountUpdatedBy: preprocessString("Please provide the updater ID"),
+});
+
 async function hashPassword(password) {
   if (!password) return null;
   return bcrypt.hash(password, SALT_ROUNDS);
@@ -324,3 +334,41 @@ export const getAllAccount = baseController.getAll;
 export const getAccountById = baseController.getById;
 export const createAccount = baseController.create;
 export const updateAccount = baseController.update;
+
+export async function ChangePasswordUseCase(data) {
+  const log = createLogger("ChangePasswordUseCase");
+  log.start({ accountId: data?.accountId });
+
+  try {
+    const validated = validateOrThrow(changePasswordSchema, data);
+    const { accountId, currentPassword, newPassword, accountUpdatedBy } = validated;
+
+    const existing = await AccountService.findById(accountId);
+    if (!existing) {
+      throw new NotFoundError(ENTITY_NAME);
+    }
+
+    const isCurrentPasswordValid = await verifyPassword(
+      currentPassword,
+      existing.accountPassword
+    );
+    if (!isCurrentPasswordValid) {
+      const { UnauthorizedError } = await import("@/lib/shared/server");
+      throw new UnauthorizedError("Current password is incorrect");
+    }
+
+    const hashedNewPassword = await hashPassword(newPassword);
+
+    const item = await AccountService.update(accountId, {
+      accountPassword: hashedNewPassword,
+      accountUpdatedBy,
+      accountUpdatedAt: getLocalNow(),
+    });
+
+    log.success({ id: accountId, username: item.accountUsername });
+    return item;
+  } catch (error) {
+    log.error({ error: error.message });
+    throw error;
+  }
+}

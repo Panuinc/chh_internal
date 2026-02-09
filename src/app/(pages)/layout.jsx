@@ -1,9 +1,16 @@
 "use client";
 import { useState } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Avatar,
+} from "@heroui/react";
 import { LoadingState } from "@/components";
 
 export default function PagesLayout({ children }) {
@@ -36,21 +43,27 @@ export default function PagesLayout({ children }) {
 
         <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 hidden"></div>
 
-        <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 bg-primary text-background shadow-md rounded-xl cursor-pointer hover:bg-primary/50">
-          {userInitial}
-        </div>
-
-        <div
-          onClick={!isSigningOut ? handleSignOut : undefined}
-          className={`flex items-center justify-center aspect-square h-full p-2 gap-2 bg-primary text-background shadow-md rounded-xl cursor-pointer hover:bg-primary/50
-    ${
-      isSigningOut
-        ? "opacity-50 cursor-not-allowed"
-        : "cursor-pointer hover:bg-default"
-    }`}
-        >
-          <LogOut />
-        </div>
+        <Dropdown placement="bottom-end">
+          <DropdownTrigger>
+            <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 bg-primary text-background shadow-md rounded-xl cursor-pointer hover:bg-primary/50 transition-colors">
+              <span className="text-lg font-semibold">{userInitial}</span>
+            </div>
+          </DropdownTrigger>
+          <DropdownMenu aria-label="User menu" variant="flat">
+            <DropdownItem key="profile" href="/profile" startContent={<User className="w-4 h-4" />}>
+              Profile
+            </DropdownItem>
+            <DropdownItem
+              key="logout"
+              color="danger"
+              onPress={!isSigningOut ? handleSignOut : undefined}
+              isDisabled={isSigningOut}
+              startContent={<LogOut className="w-4 h-4" />}
+            >
+              {isSigningOut ? "Signing out..." : "Log out"}
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </header>
 
       <main className="flex items-center justify-center w-full h-full gap-2 overflow-hidden">

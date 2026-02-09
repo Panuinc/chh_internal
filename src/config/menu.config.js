@@ -13,6 +13,7 @@ import {
   BadgeDollarSign,
   ListOrdered,
   FileText,
+  UserCircle,
 } from "lucide-react";
 
 export const menuConfig = {

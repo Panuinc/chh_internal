@@ -21,3 +21,36 @@
 [2026-02-09 08:31:31] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
 [2026-02-09 08:31:35] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
 [2026-02-09 08:31:35] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
+[2026-02-09 08:37:07] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
+[2026-02-09 08:37:07] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
+[2026-02-09 08:37:10] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
+[2026-02-09 08:37:10] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
+[2026-02-09 10:18:10] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 10:18:10] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-09 10:18:10] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-09 10:18:19] [INFO] GetAllRoleUseCase start {"page":1,"limit":100}
+[2026-02-09 10:18:19] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":100}
+[2026-02-09 10:18:19] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-09 10:18:19] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-09 10:18:20] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 10:18:21] [INFO] GetEmployeeByIdUseCase start {"id":"cml8vm6pw006ucrxs25qpcwji"}
+[2026-02-09 10:18:21] [INFO] GetEmployeeByIdUseCase success {"id":"cml8vm6pw006ucrxs25qpcwji","email":"robert.taylor@evergreen.com"}
+[2026-02-09 10:18:28] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-09 10:18:28] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-09 10:18:32] [INFO] GetAllAccountUseCase start {"page":1,"limit":20}
+[2026-02-09 10:18:32] [INFO] GetAllAccountUseCase success {"total":12,"returned":12}
+[2026-02-09 10:18:38] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 10:18:38] [INFO] GetAccountByIdUseCase start {"id":"cml8vm6b7006acrxsuwy8nd7f"}
+[2026-02-09 10:18:38] [INFO] GetAccountByIdUseCase success {"id":"cml8vm6b7006acrxsuwy8nd7f","username":"superadmin"}
+[2026-02-09 10:18:44] [INFO] GetAllAccountUseCase start {"page":1,"limit":20}
+[2026-02-09 10:18:44] [INFO] GetAllAccountUseCase success {"total":12,"returned":12}
+[2026-02-09 10:20:05] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 10:20:54] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
+[2026-02-09 10:20:57] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
+[2026-02-09 10:23:18] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
+[2026-02-09 10:23:20] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
+[2026-02-09 10:27:23] [INFO] GetAllAccountUseCase start {"page":1,"limit":20}
+[2026-02-09 10:27:23] [INFO] GetAllAccountUseCase success {"total":12,"returned":12}
+[2026-02-09 10:27:25] [INFO] GetAccountByIdUseCase start {"id":"cml8vm6b7006acrxsuwy8nd7f"}
+[2026-02-09 10:27:25] [INFO] GetAccountByIdUseCase success {"id":"cml8vm6b7006acrxsuwy8nd7f","username":"superadmin"}
+[2026-02-09 10:27:26] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
