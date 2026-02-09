@@ -126,3 +126,132 @@
 [2026-02-09 11:50:04] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-09 11:50:03] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-09 11:50:04] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:49] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:49] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:50] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:50:58] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 11:51:06] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:06] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:08] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:08] [INFO] GetAllRoleUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:08] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-09 11:51:08] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:10] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:10] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:12] [INFO] GetEmployeeByIdUseCase start {"id":"cml8vm5wa0066crxsgwca542x"}
+[2026-02-09 11:51:12] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:12] [INFO] GetAllRoleUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:12] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-09 11:51:12] [INFO] GetEmployeeByIdUseCase success {"id":"cml8vm5wa0066crxsgwca542x","email":"superadmin@evergreen.com"}
+[2026-02-09 11:51:12] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:13] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:13] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:14] [INFO] GetAllAccountUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:14] [INFO] GetAllAccountUseCase success {"total":12,"returned":12}
+[2026-02-09 11:51:15] [INFO] GetAccountByIdUseCase start {"id":"cml8vm6b7006acrxsuwy8nd7f"}
+[2026-02-09 11:51:15] [INFO] GetAccountByIdUseCase success {"id":"cml8vm6b7006acrxsuwy8nd7f","username":"superadmin"}
+[2026-02-09 11:51:16] [INFO] GetAllAccountUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:16] [INFO] GetAllAccountUseCase success {"total":12,"returned":12}
+[2026-02-09 11:51:17] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:17] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:17] [INFO] GetAllAccountUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:17] [INFO] GetAllAccountUseCase success {"total":12,"returned":12}
+[2026-02-09 11:51:18] [INFO] GetAllPermissionUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:18] [INFO] GetAllPermissionUseCase success {"total":54,"returned":54}
+[2026-02-09 11:51:20] [INFO] GetAllPermissionUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:20] [INFO] GetAllPermissionUseCase success {"total":54,"returned":54}
+[2026-02-09 11:51:22] [INFO] GetPermissionByIdUseCase start {"id":"cml8vm5730000crxso89eltax"}
+[2026-02-09 11:51:22] [INFO] GetPermissionByIdUseCase success {"id":"cml8vm5730000crxso89eltax","name":"superadmin"}
+[2026-02-09 11:51:23] [INFO] GetAllPermissionUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:23] [INFO] GetAllPermissionUseCase success {"total":54,"returned":54}
+[2026-02-09 11:51:24] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:24] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-09 11:51:25] [INFO] GetDepartmentByIdUseCase start {"id":"cml8vm5i4001icrxsdkqq102h"}
+[2026-02-09 11:51:25] [INFO] GetDepartmentByIdUseCase success {"id":"cml8vm5i4001icrxsdkqq102h","name":"Executive"}
+[2026-02-09 11:51:26] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:26] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-09 11:51:29] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:29] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-09 11:51:30] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:30] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-09 11:51:31] [INFO] GetAllRoleUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:31] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:33] [INFO] GetAllRoleUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:33] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:34] [INFO] GetRoleByIdUseCase start {"id":"cml8vm5iz001qcrxseh673ewi"}
+[2026-02-09 11:51:34] [INFO] GetRoleByIdUseCase success {"id":"cml8vm5iz001qcrxseh673ewi","name":"Super Admin"}
+[2026-02-09 11:51:35] [INFO] GetAllRoleUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:35] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:35] [INFO] GetAllRoleUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:35] [INFO] GetAllPermissionUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:35] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:35] [INFO] GetAllPermissionUseCase success {"total":54,"returned":54}
+[2026-02-09 11:51:37] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:37] [INFO] GetAllRoleUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:37] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:37] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:39] [INFO] GetEmployeeRolesUseCase start {"employeeId":"cml8vm6ci006ccrxs0ixd0cm4"}
+[2026-02-09 11:51:39] [INFO] GetEmployeeRolesUseCase success {"employeeId":"cml8vm6ci006ccrxs0ixd0cm4","total":1}
+[2026-02-09 11:51:40] [INFO] GetAllRoleUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:40] [INFO] GetAllPermissionUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:40] [INFO] GetAllRoleUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:40] [INFO] GetAllPermissionUseCase success {"total":54,"returned":54}
+[2026-02-09 11:51:41] [INFO] GetRolePermissionsUseCase start {"roleId":"cml8vm5le002icrxsrp193j6h"}
+[2026-02-09 11:51:41] [INFO] GetRolePermissionsUseCase success {"roleId":"cml8vm5le002icrxsrp193j6h","total":4}
+[2026-02-09 11:51:48] [INFO] GetAllVisitorUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:48] [INFO] GetAllVisitorUseCase success {"total":0,"returned":0}
+[2026-02-09 11:51:50] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":100}
+[2026-02-09 11:51:50] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-09 11:51:54] [INFO] GetAllVisitorUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:54] [INFO] GetAllVisitorUseCase success {"total":0,"returned":0}
+[2026-02-09 11:51:55] [INFO] GetAllPatrolUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:55] [INFO] GetAllPatrolUseCase success {"total":0,"returned":0}
+[2026-02-09 11:51:57] [INFO] GetAllPatrolUseCase start {"page":1,"limit":20}
+[2026-02-09 11:51:57] [INFO] GetAllPatrolUseCase success {"total":0,"returned":0}
+[2026-02-09 11:52:03] [INFO] GetAllPatrolUseCase start {"page":1,"limit":20}
+[2026-02-09 11:52:03] [INFO] GetAllPatrolUseCase success {"total":0,"returned":0}
+[2026-02-09 11:52:06] [INFO] GetAllCatPackingItems start {"displayName":null,"number":null,"description":null,"limit":500,"inventoryPostingGroupCode":"PK"}
+[2026-02-09 11:52:07] [INFO] GetAllCatPackingItems success {"total":19,"returned":19}
+[2026-02-09 11:52:13] [INFO] GetAllCatPackingItems start {"displayName":null,"number":null,"description":null,"limit":500,"inventoryPostingGroupCode":"PK"}
+[2026-02-09 11:52:13] [INFO] GetAllCatPackingItems success {"total":19,"returned":19}
+[2026-02-09 11:52:18] [INFO] GetAllCatSupplyItems start {"displayName":null,"number":null,"description":null,"limit":500,"inventoryPostingGroupCode":"SP"}
+[2026-02-09 11:52:20] [INFO] GetAllCatSupplyItems success {"total":740,"returned":740}
+[2026-02-09 11:52:22] [INFO] GetAllCatFinishedGoodsItems start {"displayName":null,"number":null,"description":null,"includeZeroInventory":false,"limit":500,"inventoryPostingGroupCode":"FG","numberPrefix":"FG-"}
+[2026-02-09 11:52:28] [INFO] GetAllCatFinishedGoodsItems success {"total":225,"returned":225}
+[2026-02-09 11:52:28] [INFO] GetDimensionValues start {"codesCount":66,"dimensionCode":"PROJECT"}
+[2026-02-09 11:52:28] [INFO] GetDimensionId success {"dimensionCode":"PROJECT","dimensionId":"5276f03a-e5f1-eb11-a1de-002248559e6c"}
+[2026-02-09 11:52:29] [INFO] GetDimensionValues success {"source":"api","total":930}
+[2026-02-09 11:52:29] [INFO] GetDimensionValues success {"found":51,"requested":66,"totalInDimension":713}
+[2026-02-09 11:52:44] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
+[2026-02-09 11:52:46] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
+[2026-02-09 11:52:50] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-09 11:52:50] [INFO] GetAllMemoUseCase success {"total":1,"returned":1}
+[2026-02-09 12:45:45] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 12:45:45] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ED857991959TH"}
+[2026-02-09 12:45:45] [ERROR] EMSService error
+[2026-02-09 12:45:45] [ERROR] EMSService error
+[2026-02-09 12:45:45] [ERROR] EMSTrackingAPI error
+[2026-02-09 12:48:15] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 12:48:15] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ed857991962th"}
+[2026-02-09 12:48:15] [ERROR] EMSService error
+[2026-02-09 12:48:15] [ERROR] EMSService error
+[2026-02-09 12:48:15] [ERROR] EMSTrackingAPI error
+[2026-02-09 12:49:41] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 12:49:41] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ed857991962th"}
+[2026-02-09 12:49:41] [INFO] EMSService Thailand Post API request {"barcode":"ED857991962TH","apiKeyPreview":"O+KyDuD7X@...S@NUJ","apiKeyLength":61}
+[2026-02-09 12:49:42] [ERROR] EMSService error
+[2026-02-09 12:49:42] [ERROR] EMSService error
+[2026-02-09 12:49:42] [ERROR] EMSTrackingAPI error

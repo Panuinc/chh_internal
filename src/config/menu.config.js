@@ -14,6 +14,8 @@ import {
   ListOrdered,
   FileText,
   UserCircle,
+  Calculator,
+  Truck,
 } from "lucide-react";
 
 export const menuConfig = {
@@ -52,6 +54,13 @@ export const menuConfig = {
       text: "sales",
       icon: BadgeDollarSign,
       permission: "sales.view",
+    },
+    {
+      id: "accounting",
+      href: "/accounting",
+      text: "accounting",
+      icon: Calculator,
+      permission: "accounting.view",
     },
   ],
 
@@ -272,6 +281,23 @@ export const menuConfig = {
             view: "sales.memo.view",
             create: "sales.memo.create",
             edit: "sales.memo.edit",
+          },
+        },
+      ],
+    },
+    accounting: {
+      title: "accounting",
+      icon: Calculator,
+      description: "Management About accounting",
+      items: [
+        {
+          id: "checkTagEMS",
+          href: "/accounting/checkTagEMS",
+          text: "Check Tag EMS",
+          icon: Truck,
+          permission: "accounting.checkTagEMS.view",
+          actions: {
+            view: "accounting.checkTagEMS.view",
           },
         },
       ],
