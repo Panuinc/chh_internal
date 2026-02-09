@@ -351,3 +351,7 @@
 [2026-02-09 14:12:13] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-09 14:12:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-09 14:12:15] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-09 14:20:16] [INFO] EMSTrackingAPI EMS tracking request {"barcode":"ED857991959TH"}
+[2026-02-09 14:20:16] [INFO] EMSService Using cached JWT token
+[2026-02-09 14:20:16] [INFO] EMSService Tracking EMS {"barcode":"ED857991959TH"}
+[2026-02-09 14:20:16] [INFO] EMSService Track API response {"status":200,"body":"{\"response\":{\"items\":{\"ED857991959TH\":[{\"barcode\":\"ED857991959TH\",\"status\":\"103\",\"status_description\":\"รับฝาก\",\"status_date\":\"24/01/2569 15:36:38+07:00\",\"location\":\"ไทรน้อย\",\"postcode\":\"11150\",\"delivery_status\":null,\"delivery_description\":null,\"delivery_datetime\":null,\"receiver_name\":null,\"signature\":null,\"status_detail\":\"รับฝากสิ่งของ [ ที่ทำการไปรษณีย์ ไทรน้อย ]\",\"delivery_officer_name\":null,\"delivery_officer_tel\":null,\"office_name\":null,\"office_tel\":null,\"call_center_tel\":\"1545\"},{\"barcode\":\""}
