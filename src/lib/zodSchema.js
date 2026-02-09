@@ -126,6 +126,7 @@ export const STATUS_VALUES = {
   ACCOUNT: ["Active", "Inactive"],
   PERMISSION: ["Active", "Inactive"],
   DEPARTMENT: ["Active", "Inactive"],
+  ROLE: ["Active", "Inactive"],
   VISITOR: ["CheckIn", "CheckOut"],
   VISITOR_REASON: [
     "Shipping",
