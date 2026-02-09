@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { useRawMaterialItems } from "@/app/(pages)/warehouse/_hooks/useRawMaterial";
+import { useRawMaterialItems } from "@/features/warehouse";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
-import UIRawMaterial from "@/app/(pages)/warehouse/_components/rawMaterial/UIRawMaterial";
+import { RawMaterialList } from "@/features/warehouse";
 import { showToast } from "@/components";
 
 function RawMaterialContent() {
@@ -54,7 +54,7 @@ function RawMaterialContent() {
   }
 
   return (
-    <UIRawMaterial
+    <RawMaterialList
       items={items}
       loading={loading}
       onPrintWithQuantity={handlePrintWithQuantity}

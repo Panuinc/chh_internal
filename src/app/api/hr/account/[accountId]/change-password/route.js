@@ -1,4 +1,4 @@
-import { ChangePasswordUseCase } from "@/services/hr/account.service";
+import { ChangePasswordUseCase } from "@/features/hr/services/account.service";
 import { successResponse, errorResponse } from "@/lib/shared/server";
 import { createLogger } from "@/lib/logger.node";
 

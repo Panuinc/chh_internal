@@ -1,4 +1,4 @@
-import { getRawMaterialItemById } from "@/services/warehouse";
+import { getRawMaterialItemById } from "@/features/warehouse/services";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

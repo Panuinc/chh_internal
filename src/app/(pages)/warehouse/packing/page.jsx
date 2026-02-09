@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { usePackingItems } from "@/app/(pages)/warehouse/_hooks/usePacking";
+import { usePackingItems } from "@/features/warehouse";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
-import UIPacking from "@/app/(pages)/warehouse/_components/packing/UIPacking";
+import { PackingList } from "@/features/warehouse";
 import { showToast } from "@/components";
 
 function PackingContent() {
@@ -54,7 +54,7 @@ function PackingContent() {
   }
 
   return (
-    <UIPacking
+    <PackingList
       items={items}
       loading={loading}
       onPrintWithQuantity={handlePrintWithQuantity}

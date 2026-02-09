@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import UIRoleForm from "@/app/(pages)/hr/_components/role/UIRoleForm";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import { useSubmitRole } from "@/app/(pages)/hr/_hooks/useRole";
+import { RoleForm } from "@/features/hr";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useSubmitRole } from "@/features/hr";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function RoleCreate() {
@@ -31,7 +31,7 @@ export default function RoleCreate() {
   );
 
   return (
-    <UIRoleForm
+    <RoleForm
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}

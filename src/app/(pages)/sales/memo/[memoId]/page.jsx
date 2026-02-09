@@ -2,15 +2,15 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import UIMemoForm from "@/app/(pages)/sales/_components/memo/UIMemoForm";
+import { MemoForm } from "@/features/sales";
 import { Loading } from "@/components";
-import { useSessionUser } from "@/hooks/useSessionUser";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
 import {
   useMemoItem,
   useSubmitMemo,
   useApproveMemo,
   useRejectMemo,
-} from "@/app/(pages)/sales/_hooks/useMemo";
+} from "@/features/sales";
 import { useFormHandler, useMenu } from "@/hooks";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { Button } from "@heroui/button";
@@ -132,7 +132,7 @@ export default function MemoUpdate() {
 
   return (
     <>
-      <UIMemoForm
+      <MemoForm
         formHandler={formHandler}
         mode="update"
         operatedBy={userName}

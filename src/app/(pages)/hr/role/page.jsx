@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIRole from "@/app/(pages)/hr/_components/role/UIRole";
-import { useRoles } from "@/app/(pages)/hr/_hooks/useRole";
+import { RoleList, useRoles } from "@/features/hr";
 import { useMenu } from "@/hooks";
 
 export default function RolePage() {
@@ -21,7 +20,7 @@ export default function RolePage() {
   };
 
   return (
-    <UIRole
+    <RoleList
       Roles={roles}
       loading={loading}
       onAddNew={hasPermission("hr.role.create") ? handleAddNew : null}

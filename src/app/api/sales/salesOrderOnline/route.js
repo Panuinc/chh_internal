@@ -1,4 +1,4 @@
-import { getAllSalesOrdersOnline } from "@/services/sales/salesOrderOnline.service";
+import { getAllSalesOrdersOnline } from "@/features/sales/services/salesOrderOnline.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

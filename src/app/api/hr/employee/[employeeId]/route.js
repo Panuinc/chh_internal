@@ -1,7 +1,7 @@
 import {
   getEmployeeById,
   updateEmployee,
-} from "@/services/hr/employee.service";
+} from "@/features/hr/services/employee.service";
 import { withRateLimit } from "@/lib/rateLimiter";
 import { withSanitization } from "@/lib/sanitize";
 

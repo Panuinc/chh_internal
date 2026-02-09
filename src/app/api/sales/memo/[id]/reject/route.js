@@ -1,4 +1,4 @@
-import { RejectUseCase } from "@/services/sales/memo.service";
+import { RejectUseCase } from "@/features/sales/services/memo.service";
 import { successResponse } from "@/lib/shared/server";
 import { createLogger } from "@/lib/logger.node";
 import { auth } from "@/lib/auth";

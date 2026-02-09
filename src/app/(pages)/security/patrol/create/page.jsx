@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import UIPatrolForm from "@/app/(pages)/security/_components/patrol/UIPatrolForm";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import { useSubmitPatrol } from "@/app/(pages)/security/_hooks/usePatrol";
+import { PatrolForm } from "@/features/security";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useSubmitPatrol } from "@/features/security";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function PatrolCreate() {
@@ -33,7 +33,7 @@ export default function PatrolCreate() {
   );
 
   return (
-    <UIPatrolForm
+    <PatrolForm
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}

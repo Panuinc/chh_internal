@@ -2,13 +2,10 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import UIDepartmentForm from "@/app/(pages)/hr/_components/department/UIDepartmentForm";
+import { DepartmentForm } from "@/features/hr";
 import { Loading } from "@/components";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import {
-  useDepartment,
-  useSubmitDepartment,
-} from "@/app/(pages)/hr/_hooks/useDepartment";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useDepartment, useSubmitDepartment } from "@/features/hr";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function DepartmentUpdate() {
@@ -55,7 +52,7 @@ export default function DepartmentUpdate() {
   if (departmentLoading) return <Loading />;
 
   return (
-    <UIDepartmentForm
+    <DepartmentForm
       formHandler={formHandler}
       mode="update"
       operatedBy={userName}

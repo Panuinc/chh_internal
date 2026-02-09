@@ -2,7 +2,7 @@ import {
   getMemoById,
   updateMemo,
   DeleteUseCase,
-} from "@/services/sales/memo.service";
+} from "@/features/sales/services/memo.service";
 import { successResponse } from "@/lib/shared/server";
 
 export const dynamic = "force-dynamic";

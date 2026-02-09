@@ -1,7 +1,7 @@
 import {
   getVisitorById,
   updateVisitor,
-} from "@/services/security/visitor.service";
+} from "@/features/security/services/visitor.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

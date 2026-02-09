@@ -1,10 +1,10 @@
 "use client";
 
 import { useModuleMenu } from "@/hooks/useMenu";
-import UISecurity from "@/app/(pages)/security/_components/UISecurity";
+import { SecurityDashboard } from "@/features/security";
 
 export default function Security() {
   const { menu, isEmpty } = useModuleMenu("security");
 
-  return <UISecurity menu={menu} isEmpty={isEmpty} />;
+  return <SecurityDashboard menu={menu} isEmpty={isEmpty} />;
 }

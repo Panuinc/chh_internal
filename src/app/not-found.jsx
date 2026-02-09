@@ -1,5 +1,5 @@
-import UINotFound from "@/components/UINotFound";
+import { NotFound } from "@/components";
 
 export default function notFound() {
-  return <UINotFound />;
+  return <NotFound />;
 }

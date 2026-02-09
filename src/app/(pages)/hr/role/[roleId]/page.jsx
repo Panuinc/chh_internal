@@ -2,13 +2,10 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import UIRoleForm from "@/app/(pages)/hr/_components/role/UIRoleForm";
+import { RoleForm } from "@/features/hr";
 import { Loading } from "@/components";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import {
-  useRole,
-  useSubmitRole,
-} from "@/app/(pages)/hr/_hooks/useRole";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useRole, useSubmitRole } from "@/features/hr";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function RoleUpdate() {
@@ -54,7 +51,7 @@ export default function RoleUpdate() {
   if (roleLoading) return <Loading />;
 
   return (
-    <UIRoleForm
+    <RoleForm
       formHandler={formHandler}
       mode="update"
       operatedBy={userName}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import showToast from "@/components/UIToast";
+import { showToast } from "@/components/ui/Toast";
 
 const TOAST = {
   SUCCESS: "success",

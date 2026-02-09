@@ -1,7 +1,7 @@
 import {
   getDepartmentById,
   updateDepartment,
-} from "@/services/hr/department.service";
+} from "@/features/hr/services/department.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

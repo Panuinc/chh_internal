@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useEmployees } from "@/app/(pages)/hr/_hooks/useEmployee";
-import { useRoles } from "@/app/(pages)/hr/_hooks/useRole";
-import { useEmployeeRole } from "@/app/(pages)/hr/_hooks/useEmployeeRole";
+import { useEmployees } from "@/features/hr";
+import { useRoles } from "@/features/hr";
+import { useEmployeeRole } from "@/features/hr";
 import { useMenu, useSessionUser } from "@/hooks";
 import { Button } from "@heroui/button";
 import { Select, SelectItem } from "@heroui/select";

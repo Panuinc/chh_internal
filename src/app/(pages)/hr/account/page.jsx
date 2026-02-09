@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIAccount from "@/app/(pages)/hr/_components/account/UIAccount";
-import { useAccounts } from "@/app/(pages)/hr/_hooks/useAccount";
+import { AccountList, useAccounts } from "@/features/hr";
 import { useMenu } from "@/hooks";
 
 export default function AccountPage() {
@@ -21,7 +20,7 @@ export default function AccountPage() {
   };
 
   return (
-    <UIAccount
+    <AccountList
       Accounts={accounts}
       loading={loading}
       onAddNew={hasPermission("hr.account.create") ? handleAddNew : null}

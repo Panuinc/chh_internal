@@ -2,13 +2,10 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import UIPermissionForm from "@/app/(pages)/hr/_components/permission/UIPermissionForm";
+import { PermissionForm } from "@/features/hr";
 import { Loading } from "@/components";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import {
-  usePermission,
-  useSubmitPermission,
-} from "@/app/(pages)/hr/_hooks/usePermission";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { usePermission, useSubmitPermission } from "@/features/hr";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function PermissionUpdate() {
@@ -55,7 +52,7 @@ export default function PermissionUpdate() {
   if (permissionLoading) return <Loading />;
 
   return (
-    <UIPermissionForm
+    <PermissionForm
       formHandler={formHandler}
       mode="update"
       operatedBy={userName}

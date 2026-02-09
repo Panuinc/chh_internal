@@ -1,4 +1,4 @@
-import { GetNextDocumentNoUseCase } from "@/services/sales/memo.service";
+import { GetNextDocumentNoUseCase } from "@/features/sales/services/memo.service";
 import { successResponse, errorResponse } from "@/lib/shared/server";
 
 export const dynamic = "force-dynamic";

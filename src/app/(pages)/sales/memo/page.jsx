@@ -1,8 +1,7 @@
 "use client";
 import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import UIMemo from "@/app/(pages)/sales/_components/memo/UIMemo";
-import { useMemos, useApproveMemo, useRejectMemo } from "@/app/(pages)/sales/_hooks/useMemo";
+import { MemoList, useMemos, useApproveMemo, useRejectMemo } from "@/features/sales";
 import { useMenu } from "@/hooks";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { Button } from "@heroui/button";
@@ -88,7 +87,7 @@ export default function MemoPage() {
 
   return (
     <>
-      <UIMemo
+      <MemoList
         Memos={memos}
         loading={loading}
         onAddNew={hasPermission("sales.memo.create") ? handleAddNew : null}

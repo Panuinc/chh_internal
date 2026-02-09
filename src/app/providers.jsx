@@ -3,7 +3,7 @@
 import { HeroUIProvider } from "@heroui/system";
 import { ToastProvider } from "@heroui/toast";
 import { SessionProvider } from "next-auth/react";
-import { TokenRefreshProvider } from "@/components/TokenRefreshProvider";
+import { TokenRefreshProvider } from "@/components";
 
 export function Providers({ children, session }) {
   return (

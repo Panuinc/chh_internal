@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useRoles } from "@/app/(pages)/hr/_hooks/useRole";
-import { usePermissions } from "@/app/(pages)/hr/_hooks/usePermission";
-import { useRolePermission } from "@/app/(pages)/hr/_hooks/useRolePermission";
+import { useRoles } from "@/features/hr";
+import { usePermissions } from "@/features/hr";
+import { useRolePermission } from "@/features/hr";
 import { useMenu, useSessionUser } from "@/hooks";
 import { Button } from "@heroui/button";
 import { Select, SelectItem } from "@heroui/select";

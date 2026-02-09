@@ -1,7 +1,7 @@
 import {
   getAllPatrol,
   createPatrol,
-} from "@/services/security/patrol.service";
+} from "@/features/security/services/patrol.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

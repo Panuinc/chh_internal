@@ -1,7 +1,7 @@
 import {
   getAllRole,
   createRole,
-} from "@/services/hr/role.service";
+} from "@/features/hr/services/role.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

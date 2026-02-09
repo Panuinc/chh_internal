@@ -56,3 +56,4 @@
 [2026-02-09 10:27:26] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-09 10:27:27] [INFO] GetAllAccountUseCase start {"page":1,"limit":20}
 [2026-02-09 10:27:27] [INFO] GetAllAccountUseCase success {"total":12,"returned":12}
+[2026-02-09 11:28:00] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}

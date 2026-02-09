@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import UIPermissionForm from "@/app/(pages)/hr/_components/permission/UIPermissionForm";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import { useSubmitPermission } from "@/app/(pages)/hr/_hooks/usePermission";
+import { PermissionForm } from "@/features/hr";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useSubmitPermission } from "@/features/hr";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function PermissionCreate() {
@@ -31,7 +31,7 @@ export default function PermissionCreate() {
   );
 
   return (
-    <UIPermissionForm
+    <PermissionForm
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}

@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { UIDoorBom } from "@/app/(pages)/production/_components/doorBom/UIDoorBom";
+import { DoorBom } from "@/features/production";
 
 export const GLUE_THICKNESS = 1;
 export const LOCK_BLOCK_HEIGHT = 400;
@@ -1515,5 +1515,5 @@ export default function DoorConfigurator() {
     lockBlockDesc,
   };
 
-  return <UIDoorBom {...uiProps} />;
+  return <DoorBom {...uiProps} />;
 }

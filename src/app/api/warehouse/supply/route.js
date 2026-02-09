@@ -1,4 +1,4 @@
-import { getAllSupplyItems } from "@/services/warehouse";
+import { getAllSupplyItems } from "@/features/warehouse/services";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { useSupplyItems } from "@/app/(pages)/warehouse/_hooks/useSupply";
+import { useSupplyItems } from "@/features/warehouse";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
-import UISupply from "@/app/(pages)/warehouse/_components/supply/UISupply";
+import { SupplyList } from "@/features/warehouse";
 import { showToast } from "@/components";
 
 function SupplyContent() {
@@ -54,7 +54,7 @@ function SupplyContent() {
   }
 
   return (
-    <UISupply
+    <SupplyList
       items={items}
       loading={loading}
       onPrintWithQuantity={handlePrintWithQuantity}

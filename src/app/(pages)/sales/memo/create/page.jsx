@@ -2,9 +2,9 @@
 
 import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import UIMemoForm from "@/app/(pages)/sales/_components/memo/UIMemoForm";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import { useSubmitMemo, useNextDocumentNo } from "@/app/(pages)/sales/_hooks/useMemo";
+import { MemoForm } from "@/features/sales";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useSubmitMemo, useNextDocumentNo } from "@/features/sales";
 import { useFormHandler, useMenu } from "@/hooks";
 import { Loading } from "@/components";
 
@@ -30,8 +30,8 @@ export default function MemoCreate() {
   const formHandler = useFormHandler(
     {
       documentNo: documentNo || "",
-      to: "คุณจงคม ชูชัยศรี",
-      copy: "คุณนวพล ชูเกียรติ",
+      to: "à¸„à¸¸à¸“à¸ˆà¸‡à¸„à¸¡ à¸Šà¸¹à¸Šà¸±à¸¢à¸¨à¸£à¸µ",
+      copy: "à¸„à¸¸à¸“à¸™à¸§à¸žà¸¥ à¸Šà¸¹à¹€à¸à¸µà¸¢à¸£à¸•à¸´",
       subject: "",
       date: today,
       content: "",
@@ -74,7 +74,7 @@ export default function MemoCreate() {
   if (docNoLoading) return <Loading />;
 
   return (
-    <UIMemoForm
+    <MemoForm
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}

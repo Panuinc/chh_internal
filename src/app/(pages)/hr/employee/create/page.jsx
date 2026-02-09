@@ -2,11 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import UIEmployeeForm from "@/app/(pages)/hr/_components/employee/UIEmployeeForm";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import { useSubmitEmployee } from "@/app/(pages)/hr/_hooks/useEmployee";
-import { useDepartments } from "@/app/(pages)/hr/_hooks/useDepartment";
-import { useRoles } from "@/app/(pages)/hr/_hooks/useRole";
+import { EmployeeForm } from "@/features/hr";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useSubmitEmployee, useDepartments, useRoles } from "@/features/hr";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function EmployeeCreate() {
@@ -40,7 +38,7 @@ export default function EmployeeCreate() {
   );
 
   return (
-    <UIEmployeeForm
+    <EmployeeForm
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}

@@ -1,4 +1,4 @@
-import { checkoutVisitor } from "@/services/security/visitor.service";
+import { checkoutVisitor } from "@/features/security/services/visitor.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

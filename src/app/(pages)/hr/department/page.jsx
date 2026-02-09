@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIDepartment from "@/app/(pages)/hr/_components/department/UIDepartment";
-import { useDepartments } from "@/app/(pages)/hr/_hooks/useDepartment";
+import { DepartmentList, useDepartments } from "@/features/hr";
 import { useMenu } from "@/hooks";
 
 export default function DepartmentPage() {
@@ -21,7 +20,7 @@ export default function DepartmentPage() {
   };
 
   return (
-    <UIDepartment
+    <DepartmentList
       Departments={departments}
       loading={loading}
       onAddNew={hasPermission("hr.department.create") ? handleAddNew : null}

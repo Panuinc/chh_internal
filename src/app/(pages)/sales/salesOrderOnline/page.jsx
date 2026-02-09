@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import { useSalesOrdersOnline } from "@/app/(pages)/sales/_hooks/useSalesOrderOnline";
+import { useSalesOrdersOnline } from "@/features/sales";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
-import UISalesOrderOnline from "@/app/(pages)/sales/_components/salesOrderOnline/UISalesOrderOnline";
+import { SalesOrderOnlineList } from "@/features/sales";
 import { showToast } from "@/components";
 
 function SalesOrderOnlineContent() {
@@ -98,7 +98,7 @@ function SalesOrderOnlineContent() {
   }
 
   return (
-    <UISalesOrderOnline
+    <SalesOrderOnlineList
       orders={orders}
       loading={loading}
       onPrintSingle={handlePrintSingle}

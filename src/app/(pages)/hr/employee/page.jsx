@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIEmployee from "@/app/(pages)/hr/_components/employee/UIEmployee";
-import { useEmployees } from "@/app/(pages)/hr/_hooks/useEmployee";
+import { EmployeeList, useEmployees } from "@/features/hr";
 import { useMenu } from "@/hooks";
 
 export default function EmployeePage() {
@@ -21,7 +20,7 @@ export default function EmployeePage() {
   };
 
   return (
-    <UIEmployee
+    <EmployeeList
       Employees={employees}
       loading={loading}
       onAddNew={hasPermission("hr.employee.create") ? handleAddNew : null}

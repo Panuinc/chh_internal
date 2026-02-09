@@ -1,7 +1,7 @@
 import {
   getAccountById,
   updateAccount,
-} from "@/services/hr/account.service";
+} from "@/features/hr/services/account.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

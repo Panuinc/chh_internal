@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import UIDepartmentForm from "@/app/(pages)/hr/_components/department/UIDepartmentForm";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import { useSubmitDepartment } from "@/app/(pages)/hr/_hooks/useDepartment";
+import { DepartmentForm } from "@/features/hr";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useSubmitDepartment } from "@/features/hr";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function DepartmentCreate() {
@@ -31,7 +31,7 @@ export default function DepartmentCreate() {
   );
 
   return (
-    <UIDepartmentForm
+    <DepartmentForm
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}

@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIVisitor from "@/app/(pages)/security/_components/visitor/UIVisitor";
-import { useVisitors } from "@/app/(pages)/security/_hooks/useVisitor";
+import { VisitorList, useVisitors } from "@/features/security";
 import { useMenu } from "@/hooks";
 
 export default function VisitorPage() {
@@ -21,7 +20,7 @@ export default function VisitorPage() {
   };
 
   return (
-    <UIVisitor
+    <VisitorList
       Visitors={visitors}
       loading={loading}
       onAddNew={hasPermission("security.visitor.create") ? handleAddNew : null}

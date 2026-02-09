@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createRefreshToken } from "@/services/auth/refreshToken.service";
+import { createRefreshToken } from "@/features/auth/services/refreshToken.service";
 import { createLogger } from "@/lib/logger.node";
 import { withRateLimit } from "@/lib/rateLimiter";
 

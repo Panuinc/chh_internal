@@ -1,4 +1,4 @@
-import { getFinishedGoodsItemById } from "@/services/warehouse";
+import { getFinishedGoodsItemById } from "@/features/warehouse/services";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

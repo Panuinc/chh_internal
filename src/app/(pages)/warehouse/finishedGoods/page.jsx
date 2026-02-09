@@ -4,10 +4,10 @@ import React, { useCallback, useMemo } from "react";
 import {
   useFinishedGoodsItems,
   extractDimensionCodes,
-} from "@/app/(pages)/warehouse/_hooks/useFinishedGoods";
+} from "@/features/warehouse";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
-import UIFinishedGoods from "@/app/(pages)/warehouse/_components/finishedGoods/UIFinishedGoods";
+import { FinishedGoodsList } from "@/features/warehouse";
 import { showToast } from "@/components";
 
 function useProjectNames(items) {
@@ -121,7 +121,7 @@ function FinishedGoodsContent() {
   }
 
   return (
-    <UIFinishedGoods
+    <FinishedGoodsList
       items={itemsWithProject}
       loading={loading || projectNamesLoading}
       onPrintWithQuantity={handlePrintWithQuantity}

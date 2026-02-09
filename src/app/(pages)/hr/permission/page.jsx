@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIPermission from "@/app/(pages)/hr/_components/permission/UIPermission";
-import { usePermissions } from "@/app/(pages)/hr/_hooks/usePermission";
+import { PermissionList, usePermissions } from "@/features/hr";
 import { useMenu } from "@/hooks";
 
 export default function PermissionPage() {
@@ -19,7 +18,7 @@ export default function PermissionPage() {
   };
 
   return (
-    <UIPermission
+    <PermissionList
       Permissions={permissions}
       loading={loading}
       onAddNew={isSuperAdmin ? handleAddNew : null}

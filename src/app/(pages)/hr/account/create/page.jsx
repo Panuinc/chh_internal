@@ -2,10 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import UIAccountForm from "@/app/(pages)/hr/_components/account/UIAccountForm";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import { useSubmitAccount } from "@/app/(pages)/hr/_hooks/useAccount";
-import { useEmployees } from "@/app/(pages)/hr/_hooks/useEmployee";
+import { AccountForm } from "@/features/hr";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useSubmitAccount, useEmployees } from "@/features/hr";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function AccountCreate() {
@@ -40,7 +39,7 @@ export default function AccountCreate() {
   );
 
   return (
-    <UIAccountForm
+    <AccountForm
       formHandler={formHandler}
       mode="create"
       operatedBy={userName}

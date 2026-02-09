@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import UIProfile from "./_components/UIProfile";
+import { Profile } from "@/features/profile";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -27,5 +27,5 @@ export default function ProfilePage() {
     return null;
   }
 
-  return <UIProfile user={session.user} />;
+  return <Profile user={session.user} />;
 }

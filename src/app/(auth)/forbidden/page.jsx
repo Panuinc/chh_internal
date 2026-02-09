@@ -1,5 +1,5 @@
-import { UIForbidden } from "@/components";
+import { Forbidden } from "@/features/auth";
 
 export default function forbidden() {
-  return <UIForbidden />;
+  return <Forbidden />;
 }

@@ -1,7 +1,7 @@
 import {
   getPermissionById,
   updatePermission,
-} from "@/services/hr/permission.service";
+} from "@/features/hr/services/permission.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

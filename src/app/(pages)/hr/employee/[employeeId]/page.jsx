@@ -2,12 +2,10 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import UIEmployeeForm from "@/app/(pages)/hr/_components/employee/UIEmployeeForm";
+import { EmployeeForm } from "@/features/hr";
 import { Loading } from "@/components";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import { useEmployee, useSubmitEmployee } from "@/app/(pages)/hr/_hooks/useEmployee";
-import { useDepartments } from "@/app/(pages)/hr/_hooks/useDepartment";
-import { useRoles } from "@/app/(pages)/hr/_hooks/useRole";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useEmployee, useSubmitEmployee, useDepartments, useRoles } from "@/features/hr";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function EmployeeUpdate() {
@@ -63,7 +61,7 @@ export default function EmployeeUpdate() {
   if (employeeLoading) return <Loading />;
 
   return (
-    <UIEmployeeForm
+    <EmployeeForm
       formHandler={formHandler}
       mode="update"
       operatedBy={userName}

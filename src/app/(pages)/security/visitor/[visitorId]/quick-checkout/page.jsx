@@ -2,13 +2,10 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import showToast from "@/components/UIToast";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import {
-  useVisitor,
-  useCheckoutVisitor,
-} from "@/app/(pages)/security/_hooks/useVisitor";
-import UIQuickCheckout from "@/app/(pages)/security/_components/visitor/UIQuickCheckout";
+import { showToast } from "@/components";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useVisitor, useCheckoutVisitor } from "@/features/security";
+import { QuickCheckout } from "@/features/security";
 
 export default function QuickCheckoutPage() {
   const router = useRouter();
@@ -45,7 +42,7 @@ export default function QuickCheckoutPage() {
   };
 
   return (
-    <UIQuickCheckout
+    <QuickCheckout
       visitor={updatedVisitor || visitor}
       loading={visitorLoading || sessionLoading}
       checkoutLoading={checkoutLoading}

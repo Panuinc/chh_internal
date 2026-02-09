@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import UIPatrol from "@/app/(pages)/security/_components/patrol/UIPatrol";
-import { usePatrols } from "@/app/(pages)/security/_hooks/usePatrol";
+import { PatrolList, usePatrols } from "@/features/security";
 import { useMenu } from "@/hooks";
 
 export default function PatrolPage() {
@@ -16,7 +15,7 @@ export default function PatrolPage() {
   };
 
   return (
-    <UIPatrol
+    <PatrolList
       Patrols={patrols}
       loading={loading}
       onAddNew={hasPermission("security.patrol.create") ? handleAddNew : null}

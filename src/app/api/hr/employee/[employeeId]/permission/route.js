@@ -1,6 +1,6 @@
 import {
   getEmployeePermissions,
-} from "@/services/hr/employeeRole.service";
+} from "@/features/hr/services/employeeRole.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

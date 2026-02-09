@@ -1,7 +1,7 @@
 import {
   getAllMemo,
   createMemo,
-} from "@/services/sales/memo.service";
+} from "@/features/sales/services/memo.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

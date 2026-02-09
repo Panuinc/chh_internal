@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import {
   verifyRefreshToken,
   rotateRefreshToken,
-} from "@/services/auth/refreshToken.service";
+} from "@/features/auth/services/refreshToken.service";
 import { sign } from "jsonwebtoken";
 import { createLogger } from "@/lib/logger.node";
 import { withRateLimit } from "@/lib/rateLimiter";

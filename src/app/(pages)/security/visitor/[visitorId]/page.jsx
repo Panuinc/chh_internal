@@ -2,14 +2,11 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import UIVisitorForm from "@/app/(pages)/security/_components/visitor/UIVisitorForm";
+import { VisitorForm } from "@/features/security";
 import { Loading } from "@/components";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import {
-  useVisitor,
-  useSubmitVisitor,
-} from "@/app/(pages)/security/_hooks/useVisitor";
-import { useEmployees } from "@/app/(pages)/hr/_hooks/useEmployee";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useVisitor, useSubmitVisitor } from "@/features/security";
+import { useEmployees } from "@/features/hr";
 import { useFormHandler, useMenu } from "@/hooks";
 
 export default function VisitorUpdate() {
@@ -74,7 +71,7 @@ export default function VisitorUpdate() {
   if (visitorLoading) return <Loading />;
 
   return (
-    <UIVisitorForm
+    <VisitorForm
       formHandler={formHandler}
       mode="update"
       operatedBy={userName}
