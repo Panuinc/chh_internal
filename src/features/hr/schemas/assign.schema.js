@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { preprocessString } from "@/schemas/common";
+import { preprocessString } from "@/lib/zodSchema";
 
 export const assignCreateSchema = z.object({
   assignEmployeeId: preprocessString("Please provide assignEmployeeId"),

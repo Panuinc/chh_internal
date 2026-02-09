@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useMenu } from "@/hooks/useMenu";
-import UIHome from "@/app/(pages)/home/_components/UIHome";
+import { UIHome } from "@/features/home";
 
 export default function Home() {
   const { data: session } = useSession();

@@ -4,7 +4,7 @@ import {
   preprocessEmail,
   preprocessEnum,
   STATUS_VALUES,
-} from "@/schemas/common";
+} from "@/lib/zodSchema";
 
 export const employeeCreateSchema = z.object({
   employeeFirstName: preprocessString("Please provide employeeFirstName"),

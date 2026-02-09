@@ -4,7 +4,7 @@ import {
   preprocessEnum,
   STATUS_VALUES,
   preprocessFileFlexible,
-} from "@/schemas/common";
+} from "@/lib/zodSchema";
 
 export const visitorCreateSchema = z.object({
   visitorFirstName: preprocessString("Please provide visitorFirstName"),

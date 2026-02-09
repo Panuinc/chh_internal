@@ -3,7 +3,7 @@ import {
   preprocessString,
   preprocessEnum,
   STATUS_VALUES,
-} from "@/schemas/common";
+} from "@/lib/zodSchema";
 
 export const roleCreateSchema = z.object({
   roleName: preprocessString("Please provide roleName"),

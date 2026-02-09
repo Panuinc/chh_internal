@@ -121,6 +121,22 @@ export const preprocessFileFlexible = (msg = "Invalid input") =>
       { message: msg }
     );
 
+export const STATUS_VALUES = {
+  EMPLOYEE: ["Active", "Inactive"],
+  ACCOUNT: ["Active", "Inactive"],
+  PERMISSION: ["Active", "Inactive"],
+  DEPARTMENT: ["Active", "Inactive"],
+  VISITOR: ["CheckIn", "CheckOut"],
+  VISITOR_REASON: [
+    "Shipping",
+    "BillingChequeCollection",
+    "JobApplication",
+    "ProductPresentation",
+    "Meeting",
+    "Other",
+  ],
+};
+
 export const formatData = (
   items = [],
   dateFields = [],
