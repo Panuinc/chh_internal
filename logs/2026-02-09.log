@@ -434,3 +434,9 @@
 [2026-02-09 16:30:42] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
 [2026-02-09 16:30:44] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
 [2026-02-09 16:30:44] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
+[2026-02-09 16:32:38] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-09 16:32:38] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-09 16:35:36] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
+[2026-02-09 16:35:36] [INFO] GetAllSalesOrdersOnline start {"number":null,"customerNumber":null,"customerName":null,"status":null,"orderDateFrom":null,"orderDateTo":null,"limit":100,"salesperson":"ONLINE"}
+[2026-02-09 16:35:38] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
+[2026-02-09 16:35:38] [INFO] GetAllSalesOrdersOnline success {"total":45,"returned":45}
