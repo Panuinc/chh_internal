@@ -14,10 +14,8 @@ export default function UISignIn({
 }) {
   return (
     <div className="flex w-full h-full">
-      {/* Left - Form */}
       <div className="relative flex flex-col items-center justify-center w-full lg:w-[480px] lg:min-w-[480px] p-2 bg-background border-r border-default">
         <div className="w-full max-w-[340px]">
-          {/* Logo */}
           <div className="flex items-center gap-2">
             <Image
               src="/logo/logo-01.png"
@@ -31,7 +29,6 @@ export default function UISignIn({
             </span>
           </div>
 
-          {/* Heading */}
           <h1 className="text-[22px] font-semibold text-foreground">
             Welcome back
           </h1>
@@ -39,7 +36,6 @@ export default function UISignIn({
             Sign in to your account
           </p>
 
-          {/* Form */}
           <form onSubmit={onSubmit} className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
               <label className="text-[13px] font-medium text-foreground">
@@ -97,7 +93,6 @@ export default function UISignIn({
             </Button>
           </form>
 
-          {/* Footer */}
           <p className="text-[11px] text-default-400 text-center leading-relaxed">
             By continuing, you agree to EverGreen&apos;s Terms of Service
             <br />
@@ -106,14 +101,11 @@ export default function UISignIn({
         </div>
       </div>
 
-      {/* Right - Branding / Testimonial */}
       <div className="hidden lg:flex flex-1 flex-col items-center justify-center bg-default-50 p-2 relative overflow-hidden">
-        {/* Subtle decorative circles */}
         <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-default-100/60" />
         <div className="absolute -botto -left-24 w-72 h-72 rounded-full bg-default-100/60" />
 
         <div className="relative max-w-md z-10">
-          {/* Large quote marks */}
           <div className="flex gap-2">
             <svg
               width="45"
@@ -129,14 +121,12 @@ export default function UISignIn({
             </svg>
           </div>
 
-          {/* Quote text */}
           <blockquote className="text-[21px] font-medium text-foreground leading-[1.6]">
             EverGreen Internal makes managing company operations
             effortless — from sales and warehousing to production,
             everything in one place.
           </blockquote>
 
-          {/* Author */}
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-default-200 flex items-center justify-center ring-2 ring-default-100">
               <Image

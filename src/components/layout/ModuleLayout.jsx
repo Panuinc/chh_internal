@@ -19,7 +19,6 @@ export default function ModuleLayout({ children }) {
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden">
-      {/* Breadcrumb bar */}
       <div className="flex items-center p-2 h-10 border-b-1 border-default bg-background shrink-0">
         <Breadcrumbs
           color="default"
@@ -57,7 +56,6 @@ export default function ModuleLayout({ children }) {
         </Breadcrumbs>
       </div>
 
-      {/* Content */}
       <div className="flex-1 overflow-auto">{children}</div>
     </div>
   );

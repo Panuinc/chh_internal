@@ -768,7 +768,6 @@ export default function UIVisitorForm({
       <div className="flex flex-col w-full h-full overflow-auto p-2">
         <div className="w-full h-full">
           <div className="bg-background rounded-lg border border-default h-full flex flex-col">
-            {/* Card header */}
             <div className="p-2 border-b border-default">
               <h2 className="text-[13px] font-semibold text-foreground">
                 {mode === "create" ? "Register Visitor" : "Edit Visitor"}
@@ -778,7 +777,6 @@ export default function UIVisitorForm({
               </p>
             </div>
 
-            {/* Card body */}
             <form ref={formRef} onSubmit={handleSubmit} className="p-2 space-y-5 flex-1 flex flex-col">
               <div className="flex flex-col xl:flex-row gap-2">
                 <div className="flex-1">
@@ -1010,7 +1008,6 @@ export default function UIVisitorForm({
           </div>
         </div>
 
-              {/* Footer */}
               <div className="flex items-center justify-between pt-4 border-t border-default">
                 <span className="text-xs text-default-400">
                   {mode === "create" ? `Create by: ${operatedBy}` : `Update by: ${operatedBy}`}

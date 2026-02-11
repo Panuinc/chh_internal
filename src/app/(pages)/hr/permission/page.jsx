@@ -14,25 +14,20 @@ const TOAST = {
   DANGER: "danger",
 };
 
-// Inner component that uses searchParams
 function PermissionPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { hasPermission } = useMenu();
   const { userId: sessionUserId, userName } = useSessionUser();
 
-  // Get mode from query params
-  const mode = searchParams.get("mode") || "list"; // "list" | "create" | "edit"
+  const mode = searchParams.get("mode") || "list";
   const editId = searchParams.get("id");
 
-  // Refresh key for refetching list
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // List data
   const [permissions, setPermissions] = useState([]);
   const [listLoading, setListLoading] = useState(true);
 
-  // Fetch permissions
   useEffect(() => {
     const fetchPermissions = async () => {
       setListLoading(true);
@@ -51,17 +46,14 @@ function PermissionPageContent() {
     fetchPermissions();
   }, [refreshKey]);
 
-  // Edit mode: fetch permission data
   const { permission, loading: permissionLoading } = usePermission(
     mode === "edit" && editId ? editId : null,
   );
 
-  // Permission checks for list view
   if (mode === "list" && !hasPermission("hr.permission.view")) {
     return <PermissionDenied />;
   }
 
-  // Permission checks for create/edit modes
   if (mode === "create" && !hasPermission("hr.permission.create")) {
     return <PermissionDenied />;
   }
@@ -70,12 +62,10 @@ function PermissionPageContent() {
     return <PermissionDenied />;
   }
 
-  // Trigger refresh
   const triggerRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
   }, []);
 
-  // Navigation with query params
   const navigateTo = useCallback(
     (newMode, id = null) => {
       const params = new URLSearchParams();
@@ -92,7 +82,6 @@ function PermissionPageContent() {
     [router],
   );
 
-  // Submit handler for create
   const handleCreateSubmit = useCallback(
     async (formRef, formData, setErrors) => {
       const payload = {
@@ -136,7 +125,6 @@ function PermissionPageContent() {
     [sessionUserId, triggerRefresh, navigateTo],
   );
 
-  // Submit handler for update
   const handleUpdateSubmit = useCallback(
     async (formRef, formData, setErrors) => {
       if (!editId) return { success: false };
@@ -182,7 +170,6 @@ function PermissionPageContent() {
     [sessionUserId, editId, triggerRefresh, navigateTo],
   );
 
-  // Form handlers
   const createFormHandler = useFormHandler(
     { permissionName: "" },
     handleCreateSubmit,
@@ -193,7 +180,6 @@ function PermissionPageContent() {
     handleUpdateSubmit,
   );
 
-  // Update form data when permission loaded (edit mode)
   useEffect(() => {
     if (mode === "edit" && permission) {
       updateFormHandler.setFormData({
@@ -203,7 +189,6 @@ function PermissionPageContent() {
     }
   }, [mode, permission]);
 
-  // Reset forms when leaving create/edit
   useEffect(() => {
     if (mode === "list") {
       createFormHandler.setFormData({ permissionName: "" });
@@ -214,7 +199,6 @@ function PermissionPageContent() {
     }
   }, [mode]);
 
-  // Navigation handlers
   const handleAddNew = useCallback(() => {
     if (!hasPermission("hr.permission.create")) return;
     navigateTo("create");
@@ -232,7 +216,6 @@ function PermissionPageContent() {
     navigateTo("list");
   }, [navigateTo]);
 
-  // Render based on mode
   if (mode === "list") {
     return (
       <PermissionList
@@ -306,7 +289,6 @@ function PermissionPageContent() {
   return null;
 }
 
-// Main export with Suspense wrapper
 export default function PermissionPage() {
   return (
     <Suspense fallback={<Loading />}>

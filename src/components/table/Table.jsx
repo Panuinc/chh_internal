@@ -214,7 +214,6 @@ export default function DataTable({
 
   return (
     <div className="flex flex-col w-full h-full bg-background rounded-lg border border-default overflow-hidden">
-      {/* Toolbar */}
       <div className="shrink-0 flex flex-col gap-2 p-2 border-b border-default">
         <div className="flex flex-col xl:flex-row items-center gap-2">
           <Input
@@ -259,7 +258,6 @@ export default function DataTable({
         </div>
       </div>
 
-      {/* Table */}
       <div className="flex-1 min-h-0 overflow-auto">
         <Table
           selectionMode={selectionMode}
@@ -295,7 +293,6 @@ export default function DataTable({
         </Table>
       </div>
 
-      {/* Pagination */}
       <div className="shrink-0 flex items-center justify-between p-2 border-t border-default bg-default-50/50">
         <span className="text-[12px] text-default-400">
           Page {page} of {totalPages}

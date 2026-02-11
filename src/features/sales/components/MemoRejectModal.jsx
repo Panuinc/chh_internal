@@ -5,19 +5,6 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@herou
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/input";
 
-/**
- * MemoRejectModal Component
- * 
- * Modal สำหรับระบุเหตุผลในการปฏิเสธ Memo
- * 
- * @param {Object} props
- * @param {boolean} props.isOpen - สถานะเปิด/ปิด Modal
- * @param {Function} props.onClose - ฟังก์ชันปิด Modal
- * @param {string} props.rejectReason - เหตุผลการปฏิเสธ
- * @param {Function} props.onReasonChange - ฟังก์ชันเปลี่ยนเหตุผล
- * @param {Function} props.onConfirm - ฟังก์ชันยืนยันการปฏิเสธ
- * @param {boolean} props.isLoading - สถานะกำลังโหลด
- */
 export function MemoRejectModal({
   isOpen,
   onClose,

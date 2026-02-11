@@ -101,7 +101,6 @@ export default function UIProfile({ user }) {
   return (
     <div className="flex flex-col w-full h-full overflow-auto">
       <div className="w-full h-full p-2 space-y-6">
-        {/* Page header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-lg font-semibold text-foreground">Profile</h1>
@@ -121,7 +120,6 @@ export default function UIProfile({ user }) {
         </div>
 
         <div className="flex flex-col xl:flex-row gap-2">
-          {/* Profile Info Card */}
           <div className="xl:w-80 shrink-0 space-y-4">
             <div className="bg-background rounded-lg border border-default p-2">
               <div className="flex flex-col items-center gap-2">
@@ -141,7 +139,6 @@ export default function UIProfile({ user }) {
               </div>
             </div>
 
-            {/* Info items */}
             <div className="bg-background rounded-lg border border-default p-2 space-y-3">
               <div className="flex items-center gap-2 p-2 bg-default-50 rounded-md">
                 <Mail className="w-4 h-4 text-default-400" />
@@ -170,7 +167,6 @@ export default function UIProfile({ user }) {
               </div>
             </div>
 
-            {/* Permissions */}
             <div className="bg-background rounded-lg border border-default p-2">
               <p className="text-xs font-medium text-default-400 uppercase tracking-wider">Permissions</p>
               <div className="flex flex-wrap gap-2">
@@ -201,7 +197,6 @@ export default function UIProfile({ user }) {
             </div>
           </div>
 
-          {/* Change Password Form */}
           <div className="flex-1">
             <div className="bg-background rounded-lg border border-default">
               <div className="flex items-center gap-2 p-2 border-b border-default">

@@ -20,7 +20,6 @@ import {
   DropdownItem,
 } from "@heroui/react";
 
-// ─── Primary Sidebar (modules list) ──────────────────────────────
 function PrimarySidebar({
   modules,
   activeModuleId,
@@ -33,18 +32,15 @@ function PrimarySidebar({
   const pathname = usePathname();
   const isHome = pathname === "/home" || pathname === "/profile";
 
-  // ── Collapsed: icon-only rail ──
   if (collapsed) {
     return (
       <aside className="flex flex-col items-center w-[50px] h-full bg-background border-r border-default shrink-0">
-        {/* Logo */}
         <div className="flex items-center justify-center h-10 shrink-0">
           <Link href="/home">
             <Image src="/logo/logo-01.png" alt="logo" width={24} height={24} />
           </Link>
         </div>
 
-        {/* Nav icons */}
         <nav className="flex-1 flex flex-col items-center gap-2 p-2 overflow-y-auto">
           <Link href="/home" title="Home">
             <div
@@ -73,7 +69,6 @@ function PrimarySidebar({
           })}
         </nav>
 
-        {/* Bottom */}
         <div className="flex flex-col items-center gap-2 p-2 border-t border-default shrink-0">
           <button
             onClick={onToggleCollapse}
@@ -112,7 +107,6 @@ function PrimarySidebar({
     );
   }
 
-  // ── Expanded: sidebar with icons + text ──
   const groupedModules = moduleGroups
     .map((group) => ({
       ...group,
@@ -127,7 +121,6 @@ function PrimarySidebar({
 
   return (
     <aside className="flex flex-col w-[200px] h-full bg-background border-r border-default shrink-0">
-      {/* Header */}
       <div className="flex items-center justify-between p-2 h-10 shrink-0 border-b border-default">
         <Link href="/home" className="flex items-center gap-2">
           <Image src="/logo/logo-01.png" alt="logo" width={22} height={22} />
@@ -144,7 +137,6 @@ function PrimarySidebar({
         </button>
       </div>
 
-      {/* Home */}
       <div className="p-2">
         <Link href="/home" className="block w-full">
           <div
@@ -157,12 +149,10 @@ function PrimarySidebar({
         </Link>
       </div>
 
-      {/* Divider */}
       <div>
         <div className="border-t border-default" />
       </div>
 
-      {/* Module list */}
       <nav className="flex-1 overflow-y-auto p-2 space-y-3">
         {groupedModules.map((group) => (
           <div key={group.id} className="space-y-px">
@@ -223,7 +213,6 @@ function PrimarySidebar({
         )}
       </nav>
 
-      {/* Bottom: User */}
       <div className="p-2 border-t border-default shrink-0">
         <Dropdown placement="right-end">
           <DropdownTrigger>
@@ -257,7 +246,6 @@ function PrimarySidebar({
   );
 }
 
-// ─── Collapsible Menu Item (for secondary panel) ─────────────────
 function CollapsibleMenuItem({ item }) {
   const pathname = usePathname();
   const children = item.children || [];
@@ -313,7 +301,6 @@ function CollapsibleMenuItem({ item }) {
   );
 }
 
-// ─── Secondary Panel (module sub-items) ──────────────────────────
 function SecondaryPanel({ moduleId }) {
   const pathname = usePathname();
   const { menu } = useModuleMenu(moduleId);
@@ -322,14 +309,12 @@ function SecondaryPanel({ moduleId }) {
 
   return (
     <aside className="flex flex-col w-[220px] h-full bg-background border-r border-default shrink-0">
-      {/* Title */}
       <div className="p-2 h-10 flex items-center shrink-0 border-b border-default">
         <span className="text-[13px] font-semibold text-foreground capitalize truncate">
           {title}
         </span>
       </div>
 
-      {/* Sub-items */}
       <nav className="flex-1 overflow-y-auto p-2 space-y-px">
         {items.map((item) => {
           if (item.children && item.children.length > 0) {
@@ -367,7 +352,6 @@ function SecondaryPanel({ moduleId }) {
   );
 }
 
-// ─── Combined Sidebar Export ─────────────────────────────────────
 export default function Sidebar({
   userInitial = "U",
   isSigningOut = false,
@@ -385,7 +369,6 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Panel 1: Primary sidebar */}
       <PrimarySidebar
         modules={modules}
         activeModuleId={activeModuleId}
@@ -396,7 +379,6 @@ export default function Sidebar({
         onToggleCollapse={() => setCollapsed(!collapsed)}
       />
 
-      {/* Panel 2: Secondary panel (only when inside a module) */}
       {activeModuleId && !isHomePage && (
         <SecondaryPanel moduleId={activeModuleId} />
       )}

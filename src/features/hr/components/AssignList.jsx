@@ -41,7 +41,6 @@ export default function UIAssign({ Employees = [], loading, onAssign }) {
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden p-2 gap-2">
-      {/* Inline stats */}
       <div className="hidden xl:flex items-center gap-2">
         <div className="flex items-center gap-2">
           <span className="text-xs text-default-500">Total Employees</span>
@@ -57,7 +56,6 @@ export default function UIAssign({ Employees = [], loading, onAssign }) {
         </div>
       </div>
 
-      {/* Table */}
       <div className="flex-1 min-h-0 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center w-full h-full">

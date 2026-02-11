@@ -1356,8 +1356,6 @@ function SlipPreviewModal({
     onPrint,
   ]);
 
-  // Use clampedPreviewIndex directly instead of syncing via effect to avoid cascading renders
-
   if (!order) return null;
 
   return (
@@ -1804,7 +1802,6 @@ export default function UISalesOrderOnline({
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden p-2 gap-2">
-      {/* Inline stats + printer controls */}
       <div className="hidden xl:flex items-center gap-2 shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-xs text-default-500">Total Orders</span>
@@ -1852,7 +1849,6 @@ export default function UISalesOrderOnline({
         </div>
       </div>
 
-      {/* Mobile controls */}
       <div className="flex xl:hidden items-center justify-between w-full shrink-0">
         <PrinterStatusBadge />
         <div className="flex gap-2">
@@ -1877,7 +1873,6 @@ export default function UISalesOrderOnline({
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1 min-h-0 overflow-hidden overflow-y-auto">
         <div className="w-full p-2">
           <DateRangeFilter

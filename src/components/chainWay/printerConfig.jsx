@@ -376,7 +376,6 @@ export function PrinterSettings({
 
   return (
     <div className={`max-w-2xl p-2 ${className}`}>
-      {/* Header */}
       {showHeader && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -407,7 +406,6 @@ export function PrinterSettings({
         </div>
       )}
 
-      {/* Error Banner */}
       {printerError && (
         <div className="flex items-start gap-2 p-2 rounded-lg bg-red-50 border border-red-200">
           <AlertCircle className="w-4 h-4 text-danger shrink-0" />
@@ -416,7 +414,6 @@ export function PrinterSettings({
       )}
 
       <div className="space-y-4">
-        {/* Connection Status */}
         <div className="rounded-lg border border-default">
           <div className="flex items-center gap-2 p-2 border-b border-default">
             <Wifi className="w-4 h-4 text-default-500" />
@@ -475,7 +472,6 @@ export function PrinterSettings({
           </div>
         </div>
 
-        {/* Actions */}
         <div className="rounded-lg border border-default">
           <div className="flex items-center gap-2 p-2 border-b border-default">
             <Activity className="w-4 h-4 text-default-500" />

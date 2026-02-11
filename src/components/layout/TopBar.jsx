@@ -35,7 +35,6 @@ export default function TopBar({
 
   return (
     <header className="flex items-center justify-between h-10 p-2 bg-background border-b border-default shrink-0 z-30">
-      {/* Left: Hamburger (mobile) + Branding */}
       <div className="flex items-center gap-2">
         <button
           onClick={onToggleMobileSidebar}
@@ -64,21 +63,17 @@ export default function TopBar({
         </Link>
       </div>
 
-      {/* Right: DateTime, Notifications, User */}
       <div className="flex items-center gap-2">
-        {/* Date & Time */}
         <div className="hidden xl:flex items-center gap-2 text-[11px] text-default-400">
           <span>{formatDate(currentTime)}</span>
           <span className="text-default-300">|</span>
           <span className="font-mono">{formatTime(currentTime)}</span>
         </div>
 
-        {/* Notifications */}
         <button className="relative flex items-center justify-center w-8 h-8 rounded-md text-default-400 hover:bg-default-100 hover:text-default-600 transition-colors cursor-pointer">
           <Bell className="w-[15px] h-[15px]" strokeWidth={1.5} />
         </button>
 
-        {/* User info (desktop) */}
         <div className="hidden xl:flex items-center gap-2  border-l border-default">
           <div className="text-right">
             <div className="text-[11px] font-medium text-default-700 leading-tight">

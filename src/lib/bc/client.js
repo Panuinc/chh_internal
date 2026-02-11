@@ -190,7 +190,7 @@ class BCClient {
         RETRY_STATUS_CODES.includes(response.status) &&
         retryCount < MAX_RETRIES
       ) {
-        const waitTime = RETRY_DELAY_MS * Math.pow(2, retryCount); // Exponential backoff
+        const waitTime = RETRY_DELAY_MS * Math.pow(2, retryCount);
         this.log(
           `Received ${response.status}, retrying in ${waitTime}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`,
         );

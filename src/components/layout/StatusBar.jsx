@@ -10,7 +10,6 @@ export default function StatusBar() {
 
   return (
     <footer className="hidden xl:flex items-center justify-between h-7 p-2 bg-default-50 border-t border-default shrink-0">
-      {/* Left: System info */}
       <div className="flex items-center gap-2">
         <span className="text-[10px] text-default-400 font-medium">
           EverGreen Internal v1.0
@@ -22,7 +21,6 @@ export default function StatusBar() {
         </div>
       </div>
 
-      {/* Right: Environment + Module */}
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-2">
           <Monitor className="w-3 h-3 text-default-400" strokeWidth={1.5} />

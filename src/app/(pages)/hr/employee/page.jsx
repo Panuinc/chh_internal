@@ -14,25 +14,20 @@ const TOAST = {
   DANGER: "danger",
 };
 
-// Inner component that uses searchParams
 function EmployeePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { hasPermission } = useMenu();
   const { userId: sessionUserId, userName } = useSessionUser();
 
-  // Get mode from query params
-  const mode = searchParams.get("mode") || "list"; // "list" | "create" | "edit"
+  const mode = searchParams.get("mode") || "list";
   const editId = searchParams.get("id");
 
-  // Refresh key for refetching list
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // List data
   const [employees, setEmployees] = useState([]);
   const [listLoading, setListLoading] = useState(true);
 
-  // Fetch employees
   useEffect(() => {
     const fetchEmployees = async () => {
       setListLoading(true);
@@ -51,21 +46,17 @@ function EmployeePageContent() {
     fetchEmployees();
   }, [refreshKey]);
 
-  // Fetch departments and roles for forms
   const { departments } = useDepartments(undefined, true);
   const { roles } = useRoles(undefined, true);
 
-  // Edit mode: fetch employee data
   const { employee, loading: employeeLoading } = useEmployee(
     mode === "edit" && editId ? editId : null,
   );
 
-  // Permission checks for list view
   if (mode === "list" && !hasPermission("hr.employee.view")) {
     return <PermissionDenied />;
   }
 
-  // Permission checks for create/edit modes
   if (mode === "create" && !hasPermission("hr.employee.create")) {
     return <PermissionDenied />;
   }
@@ -74,12 +65,10 @@ function EmployeePageContent() {
     return <PermissionDenied />;
   }
 
-  // Trigger refresh
   const triggerRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
   }, []);
 
-  // Navigation with query params
   const navigateTo = useCallback(
     (newMode, id = null) => {
       const params = new URLSearchParams();
@@ -96,7 +85,6 @@ function EmployeePageContent() {
     [router],
   );
 
-  // Submit handler for create
   const handleCreateSubmit = useCallback(
     async (formRef, formData, setErrors) => {
       const payload = {
@@ -144,7 +132,6 @@ function EmployeePageContent() {
     [sessionUserId, triggerRefresh, navigateTo],
   );
 
-  // Submit handler for update
   const handleUpdateSubmit = useCallback(
     async (formRef, formData, setErrors) => {
       if (!editId) return { success: false };
@@ -195,7 +182,6 @@ function EmployeePageContent() {
     [sessionUserId, editId, triggerRefresh, navigateTo],
   );
 
-  // Form handlers
   const createFormHandler = useFormHandler(
     {
       employeeFirstName: "",
@@ -219,7 +205,6 @@ function EmployeePageContent() {
     handleUpdateSubmit,
   );
 
-  // Update form data when employee loaded (edit mode)
   useEffect(() => {
     if (mode === "edit" && employee) {
       updateFormHandler.setFormData({
@@ -233,7 +218,6 @@ function EmployeePageContent() {
     }
   }, [mode, employee]);
 
-  // Reset forms when leaving create/edit
   useEffect(() => {
     if (mode === "list") {
       createFormHandler.setFormData({
@@ -254,7 +238,6 @@ function EmployeePageContent() {
     }
   }, [mode]);
 
-  // Navigation handlers
   const handleAddNew = useCallback(() => {
     if (!hasPermission("hr.employee.create")) return;
     navigateTo("create");
@@ -272,7 +255,6 @@ function EmployeePageContent() {
     navigateTo("list");
   }, [navigateTo]);
 
-  // Render based on mode
   if (mode === "list") {
     return (
       <EmployeeList
@@ -350,7 +332,6 @@ function EmployeePageContent() {
   return null;
 }
 
-// Main export with Suspense wrapper
 export default function EmployeePage() {
   return (
     <Suspense fallback={<Loading />}>

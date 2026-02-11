@@ -665,7 +665,6 @@ export default function UIFinishedGoods({
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden p-2 gap-2">
-      {/* Inline stats + printer controls */}
       <div className="hidden xl:flex items-center gap-2 shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-xs text-default-500">Total Items</span>
@@ -706,7 +705,6 @@ export default function UIFinishedGoods({
         </div>
       </div>
 
-      {/* Mobile controls */}
       <div className="flex xl:hidden items-center justify-between w-full shrink-0">
         <PrinterStatusBadge />
         <div className="flex gap-2">
@@ -731,7 +729,6 @@ export default function UIFinishedGoods({
         </div>
       </div>
 
-      {/* Table */}
       <div className="flex-1 min-h-0 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center w-full h-full">

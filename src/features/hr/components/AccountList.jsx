@@ -64,7 +64,6 @@ export default function UIAccount({
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden p-2 gap-2">
-      {/* Inline stats */}
       <div className="hidden xl:flex items-center gap-2">
         <div className="flex items-center gap-2">
           <span className="text-xs text-default-500">Total Accounts</span>
@@ -80,7 +79,6 @@ export default function UIAccount({
         </div>
       </div>
 
-      {/* Table */}
       <div className="flex-1 min-h-0 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center w-full h-full">

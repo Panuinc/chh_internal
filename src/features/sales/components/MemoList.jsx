@@ -37,7 +37,6 @@ const columns = [
 ];
 
 const ActionMenu = ({ item, onEdit, onView, onApprove, onReject, canApproveSM, canApproveCEO }) => {
-  // Determine which actions are available
   const canEdit = item.memoStatus === "DRAFT" || item.memoStatus === "REJECTED";
   const canApprove = 
     (item.memoStatus === "PENDING_SALES_MANAGER" && canApproveSM) ||
@@ -163,7 +162,6 @@ export default function UIMemo({
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden p-2 gap-2">
-      {/* Inline stats */}
       <div className="hidden xl:flex items-center gap-2 shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-xs text-default-500">Total Memos</span>
@@ -171,7 +169,6 @@ export default function UIMemo({
         </div>
       </div>
 
-      {/* Table */}
       <div className="flex-1 min-h-0 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center w-full h-full">

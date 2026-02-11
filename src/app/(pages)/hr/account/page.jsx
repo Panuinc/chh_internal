@@ -2,7 +2,13 @@
 
 import { useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { AccountList, AccountForm, useAccounts, useAccount, useEmployees } from "@/features/hr";
+import {
+  AccountList,
+  AccountForm,
+  useAccounts,
+  useAccount,
+  useEmployees,
+} from "@/features/hr";
 import { Loading, PermissionDenied } from "@/components";
 import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
 import { useFormHandler, useMenu } from "@/hooks";
@@ -36,16 +42,18 @@ function AccountPageContent() {
   const isEditMode = mode === "edit";
   const isListMode = mode === "list";
 
-  const { accounts, loading: accountsLoading, refresh: refreshAccounts } = useAccounts(undefined, true);
+  const {
+    accounts,
+    loading: accountsLoading,
+    refresh: refreshAccounts,
+  } = useAccounts(undefined, true);
   const { account, loading: accountLoading } = useAccount(editId);
   const { employees } = useEmployees(undefined, true);
 
-  // Permission checks for list view
   if (isListMode && !hasPermission("hr.account.view")) {
     return <PermissionDenied />;
   }
 
-  // Permission checks for create/edit modes
   if (isCreateMode && !hasPermission("hr.account.create")) {
     return <PermissionDenied />;
   }
@@ -54,7 +62,6 @@ function AccountPageContent() {
     return <PermissionDenied />;
   }
 
-  // Navigation functions
   const navigateTo = (newMode, id = null) => {
     const params = new URLSearchParams();
     if (newMode !== "list") {
@@ -67,7 +74,6 @@ function AccountPageContent() {
     router.push(query ? `/hr/account?${query}` : "/hr/account");
   };
 
-  // Submit handlers
   const handleCreateSubmit = async (formRef, formData, setErrors) => {
     const payload = {
       accountEmployeeId: formData.accountEmployeeId,
@@ -88,7 +94,10 @@ function AccountPageContent() {
       const result = await response.json().catch(() => ({}));
 
       if (response.ok) {
-        showToast(TOAST.SUCCESS, result.message || "Account created successfully");
+        showToast(
+          TOAST.SUCCESS,
+          result.message || "Account created successfully",
+        );
         await refreshAccounts();
         navigateTo("list");
       } else {
@@ -100,7 +109,10 @@ function AccountPageContent() {
         showToast(TOAST.DANGER, result.error || "Failed to create account.");
       }
     } catch (err) {
-      showToast(TOAST.DANGER, `Failed to create account: ${getErrorMessage(err)}`);
+      showToast(
+        TOAST.DANGER,
+        `Failed to create account: ${getErrorMessage(err)}`,
+      );
     }
   };
 
@@ -125,7 +137,10 @@ function AccountPageContent() {
       const result = await response.json().catch(() => ({}));
 
       if (response.ok) {
-        showToast(TOAST.SUCCESS, result.message || "Account updated successfully");
+        showToast(
+          TOAST.SUCCESS,
+          result.message || "Account updated successfully",
+        );
         await refreshAccounts();
         navigateTo("list");
       } else {
@@ -137,11 +152,13 @@ function AccountPageContent() {
         showToast(TOAST.DANGER, result.error || "Failed to update account.");
       }
     } catch (err) {
-      showToast(TOAST.DANGER, `Failed to update account: ${getErrorMessage(err)}`);
+      showToast(
+        TOAST.DANGER,
+        `Failed to update account: ${getErrorMessage(err)}`,
+      );
     }
   };
 
-  // Form handlers
   const createFormHandler = useFormHandler(
     {
       accountEmployeeId: "",
@@ -149,7 +166,7 @@ function AccountPageContent() {
       accountPassword: "",
       accountPinNumber: "",
     },
-    handleCreateSubmit
+    handleCreateSubmit,
   );
 
   const updateFormHandler = useFormHandler(
@@ -159,10 +176,9 @@ function AccountPageContent() {
       accountPinNumber: "",
       accountStatus: "",
     },
-    handleUpdateSubmit
+    handleUpdateSubmit,
   );
 
-  // Populate update form when account data loads
   useEffect(() => {
     if (account && isEditMode) {
       updateFormHandler.setFormData({
@@ -174,7 +190,6 @@ function AccountPageContent() {
     }
   }, [account, isEditMode]);
 
-  // Event handlers
   const handleAddNew = () => {
     if (!hasPermission("hr.account.create")) return;
     navigateTo("create");
@@ -189,7 +204,6 @@ function AccountPageContent() {
     navigateTo("list");
   };
 
-  // Render list mode
   if (isListMode) {
     return (
       <AccountList
@@ -201,9 +215,10 @@ function AccountPageContent() {
     );
   }
 
-  // Render create mode
   if (isCreateMode) {
-    const availableEmployees = employees.filter((emp) => emp.employeeStatus === "Active");
+    const availableEmployees = employees.filter(
+      (emp) => emp.employeeStatus === "Active",
+    );
 
     return (
       <div className="flex flex-col w-full h-full">
@@ -228,7 +243,6 @@ function AccountPageContent() {
     );
   }
 
-  // Render edit mode
   if (isEditMode) {
     if (accountLoading) return <Loading />;
 

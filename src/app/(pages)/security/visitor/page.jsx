@@ -21,18 +21,14 @@ function VisitorPageContent() {
   const { hasPermission } = useMenu();
   const { userId: sessionUserId, userName } = useSessionUser();
 
-  // Get mode from query params
   const mode = searchParams.get("mode") || "list";
   const editId = searchParams.get("id");
 
-  // Refresh key for refetching list
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // List data
   const [visitors, setVisitors] = useState([]);
   const [listLoading, setListLoading] = useState(true);
 
-  // Fetch visitors
   useEffect(() => {
     const fetchVisitors = async () => {
       setListLoading(true);
@@ -51,20 +47,16 @@ function VisitorPageContent() {
     fetchVisitors();
   }, [refreshKey]);
 
-  // Edit mode: fetch visitor data
   const { visitor, loading: visitorLoading } = useVisitor(
     mode === "edit" && editId ? editId : null
   );
 
-  // Employees data for dropdowns
   const { employees } = useEmployees(undefined, true);
 
-  // Permission checks for list view
   if (mode === "list" && !hasPermission("security.visitor.view")) {
     return <PermissionDenied />;
   }
 
-  // Permission checks for create/edit modes
   if (mode === "create" && !hasPermission("security.visitor.create")) {
     return <PermissionDenied />;
   }
@@ -73,12 +65,10 @@ function VisitorPageContent() {
     return <PermissionDenied />;
   }
 
-  // Trigger refresh
   const triggerRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
   }, []);
 
-  // Navigation with query params
   const navigateTo = useCallback((newMode, id = null) => {
     const params = new URLSearchParams();
     if (newMode !== "list") params.set("mode", newMode);
@@ -90,7 +80,6 @@ function VisitorPageContent() {
     router.push(url);
   }, [router]);
 
-  // Submit handler for create
   const handleCreateSubmit = useCallback(async (formRef, formData, setErrors) => {
     const submitFormData = new FormData();
 
@@ -137,7 +126,6 @@ function VisitorPageContent() {
     }
   }, [sessionUserId, triggerRefresh, navigateTo]);
 
-  // Submit handler for update
   const handleUpdateSubmit = useCallback(async (formRef, formData, setErrors) => {
     if (!editId) return { success: false };
 
@@ -186,7 +174,6 @@ function VisitorPageContent() {
     }
   }, [sessionUserId, editId, triggerRefresh, navigateTo]);
 
-  // Form handlers
   const createFormHandler = useFormHandler(
     {
       visitorFirstName: "",
@@ -218,7 +205,6 @@ function VisitorPageContent() {
     handleUpdateSubmit
   );
 
-  // Update form data when visitor loaded (edit mode)
   useEffect(() => {
     if (mode === "edit" && visitor) {
       updateFormHandler.setFormData({
@@ -236,7 +222,6 @@ function VisitorPageContent() {
     }
   }, [mode, visitor]);
 
-  // Reset forms when leaving create/edit
   useEffect(() => {
     if (mode === "list") {
       createFormHandler.setFormData({
@@ -265,7 +250,6 @@ function VisitorPageContent() {
     }
   }, [mode]);
 
-  // Navigation handlers
   const handleAddNew = useCallback(() => {
     if (!hasPermission("security.visitor.create")) return;
     navigateTo("create");
@@ -280,7 +264,6 @@ function VisitorPageContent() {
     navigateTo("list");
   }, [navigateTo]);
 
-  // Render based on mode
   if (mode === "list") {
     return (
       <VisitorList

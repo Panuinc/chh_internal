@@ -7,7 +7,6 @@ import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Divider } from "@heroui/divider";
 import { Chip } from "@heroui/chip";
 import { Select, SelectItem } from "@heroui/select";
-// Textarea component not available in @heroui, using native textarea with styling
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { Loading } from "@/components";
 import {
@@ -268,7 +267,6 @@ export default function CheckTagEMS({
   return (
     <div className="flex flex-col w-full h-full overflow-auto">
       <div className="w-full h-full p-2 space-y-6">
-        {/* Header */}
         <div className="flex flex-col gap-2">
           <h1 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <Truck className="w-5 h-5 text-default-500" />
@@ -277,7 +275,6 @@ export default function CheckTagEMS({
           <p className="text-[13px] text-default-400">Check EMS parcel delivery status and record customer contact</p>
         </div>
 
-        {/* Search Form */}
         <div className="bg-background rounded-lg border border-default p-2 sticky top-2 z-10">
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
@@ -312,7 +309,6 @@ export default function CheckTagEMS({
           </form>
         </div>
 
-        {/* View All Records Button */}
         <div className="flex justify-end">
           <Button
             variant="bordered"
@@ -326,7 +322,6 @@ export default function CheckTagEMS({
           </Button>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-[13px]">
             <AlertCircle className="w-4 h-4" />
@@ -334,7 +329,6 @@ export default function CheckTagEMS({
           </div>
         )}
 
-        {/* Loading */}
         {loading && (
           <div className="flex flex-col items-center justify-center gap-2 p-2">
             <Loading />
@@ -342,10 +336,8 @@ export default function CheckTagEMS({
           </div>
         )}
 
-        {/* Results */}
         {!loading && trackingData && (
           <div className="space-y-4">
-            {/* Summary Card */}
             <div className="bg-background rounded-lg border border-default">
               <div className="flex items-center justify-between p-2 border-b border-default">
                 <div className="flex items-center gap-2">
@@ -389,7 +381,6 @@ export default function CheckTagEMS({
               </div>
             </div>
 
-            {/* Contact Status Card */}
             <div className="bg-background rounded-lg border border-default">
               <div className="flex items-center gap-2 p-2 border-b border-default">
                 <Phone className="w-4 h-4 text-default-500" />
@@ -477,7 +468,6 @@ export default function CheckTagEMS({
               </div>
             </div>
 
-            {/* Tracking History */}
             <div className="bg-background rounded-lg border border-default">
               <div className="flex items-center gap-2 p-2 border-b border-default">
                 <Clock className="w-4 h-4 text-default-500" />
@@ -557,7 +547,6 @@ export default function CheckTagEMS({
           </div>
         )}
 
-        {/* Empty State */}
         {!loading && !error && !trackingData && (
           <div className="flex flex-col items-center justify-center gap-2 p-2">
             <Package className="w-16 h-16 text-default-300" />
@@ -567,7 +556,6 @@ export default function CheckTagEMS({
         )}
       </div>
 
-      {/* Records List Modal */}
       <Modal
         isOpen={showRecordsModal}
         onClose={() => setShowRecordsModal(false)}
@@ -669,7 +657,6 @@ export default function CheckTagEMS({
         </ModalContent>
       </Modal>
 
-      {/* Update Status Modal */}
       <Modal isOpen={showUpdateModal} onClose={() => setShowUpdateModal(false)} size="md">
         <ModalContent>
           <ModalHeader>

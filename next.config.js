@@ -2,11 +2,9 @@ const nextConfig = {
   output: "standalone",
   reactCompiler: true,
   
-  // Performance optimizations
   compress: true,
   productionBrowserSourceMaps: false,
-  
-  // Image optimization
+
   images: {
     formats: ['image/webp'],
     minimumCacheTTL: 60,

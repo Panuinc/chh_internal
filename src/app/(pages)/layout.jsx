@@ -34,7 +34,6 @@ export default function PagesLayout({ children }) {
 
   return (
     <div className="flex flex-col w-full h-full">
-      {/* ERP Top Bar */}
       <TopBar
         userName={userName}
         userRole={userRole}
@@ -44,9 +43,7 @@ export default function PagesLayout({ children }) {
         }
       />
 
-      {/* Body: Sidebar + Content */}
       <div className="flex flex-1 min-h-0">
-        {/* Mobile sidebar overlay */}
         {isMobileSidebarOpen && (
           <div
             className="fixed inset-0 bg-black/20 backdrop-blur-[1px] z-40 xl:hidden"
@@ -54,7 +51,6 @@ export default function PagesLayout({ children }) {
           />
         )}
 
-        {/* Sidebar - desktop */}
         <div className="hidden xl:flex h-full">
           <Sidebar
             userInitial={userInitial}
@@ -63,7 +59,6 @@ export default function PagesLayout({ children }) {
           />
         </div>
 
-        {/* Sidebar - mobile */}
         <div
           className={`fixed inset-y-0 left-0 z-50 flex xl:hidden transition-transform duration-200 ${
             isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -76,13 +71,11 @@ export default function PagesLayout({ children }) {
           />
         </div>
 
-        {/* Main content area */}
         <main className="flex flex-col flex-1 min-w-0 overflow-auto bg-background">
           {children}
         </main>
       </div>
 
-      {/* ERP Status Bar */}
       <StatusBar />
     </div>
   );

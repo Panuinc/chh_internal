@@ -57,7 +57,6 @@ function UserInfoRow({ label, value }) {
 function ErpOverview({ data }) {
   return (
     <div className="flex flex-col gap-2">
-      {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2">
         <KpiCard
           title="Employees"
@@ -97,7 +96,6 @@ function ErpOverview({ data }) {
         />
       </div>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
         {data.charts.monthlyMemos?.length > 0 && (
           <ChartCard title="Memos by Month">
@@ -135,7 +133,6 @@ export default function UIHome({ user, modules }) {
   return (
     <div className="flex flex-col w-full h-full overflow-auto">
       <div className="w-full h-full p-2 space-y-5">
-        {/* Page header */}
         <div className="flex flex-col gap-2">
           <h1 className="text-lg font-semibold text-foreground">
              Dashboard
@@ -145,7 +142,6 @@ export default function UIHome({ user, modules }) {
           </p>
         </div>
 
-        {/* ERP Overview Analytics */}
         {loading || !data ? (
           <div className="flex items-center justify-center p-2">
             <Loading />
@@ -154,21 +150,18 @@ export default function UIHome({ user, modules }) {
           <ErpOverview data={data} />
         )}
 
-        {/* Module Navigation */}
         <div className="flex flex-col gap-2">
           <h2 className="text-[12px] font-medium text-default-500 uppercase tracking-wider">
             Modules
           </h2>
 
           <div className="flex flex-col xl:flex-row gap-2">
-            {/* User card */}
             {user && (
               <div className="xl:w-56 shrink-0">
                 <UserProfileCard user={user} />
               </div>
             )}
 
-            {/* Module grid */}
             <div className="flex-1">
               {modules.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-2">

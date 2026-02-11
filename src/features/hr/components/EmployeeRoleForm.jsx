@@ -7,27 +7,6 @@ import { Checkbox } from "@heroui/checkbox";
 import { Spinner } from "@heroui/spinner";
 import { Chip } from "@heroui/chip";
 
-/**
- * EmployeeRoleForm Component
- * 
- * Form สำหรับจัดการ Role ของ Employee
- * 
- * @param {Object} props
- * @param {Array} props.employees - รายการ Employees
- * @param {Array} props.roles - รายการ Roles ทั้งหมด
- * @param {Array} props.employeeRoles - Roles ที่ Employee มีอยู่แล้ว
- * @param {string} props.selectedEmployeeId - Employee ID ที่เลือก
- * @param {Array} props.selectedRoles - Role IDs ที่เลือก
- * @param {Function} props.onEmployeeChange - ฟังก์ชันเปลี่ยน Employee
- * @param {Function} props.onRoleToggle - ฟังก์สลับการเลือก Role
- * @param {Function} props.onSubmit - ฟังก์ชันบันทึก
- * @param {Function} props.onCancel - ฟังก์ชันยกเลิก
- * @param {boolean} props.loading - สถานะกำลังโหลด
- * @param {boolean} props.saving - สถานะกำลังบันทึก
- * @param {boolean} props.canEdit - มีสิทธิ์แก้ไขหรือไม่
- * @param {string} props.error - ข้อความ error
- * @param {Object} props.user - ข้อมูลผู้ใช้งาน
- */
 export function EmployeeRoleForm({
   employees,
   roles,
@@ -61,7 +40,6 @@ export function EmployeeRoleForm({
         }}
         className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto p-2"
       >
-        {/* Employee Selection */}
         <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit gap-2">
           <div className="flex items-center justify-center w-full h-full gap-2">
             <Select
@@ -85,14 +63,12 @@ export function EmployeeRoleForm({
           </div>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="flex items-center justify-center w-full p-2 text-danger text-sm">
             {error}
           </div>
         )}
 
-        {/* Current Roles Display */}
         {selectedEmployeeId && employeeRoles.length > 0 && (
           <div className="flex flex-col w-full gap-2">
             <label className="text-sm font-medium">Current Roles:</label>
@@ -111,7 +87,6 @@ export function EmployeeRoleForm({
           </div>
         )}
 
-        {/* Roles Selection */}
         {selectedEmployeeId && (
           <div className="flex flex-col w-full gap-2">
             <div className="flex justify-between items-center">
@@ -156,7 +131,6 @@ export function EmployeeRoleForm({
           </div>
         )}
 
-        {/* Submit Button */}
         {selectedEmployeeId && canEdit && (
           <div className="flex flex-row items-center justify-end w-full h-fit gap-2 ">
             <div className="flex items-center justify-end w-full h-full gap-2">
@@ -185,7 +159,6 @@ export function EmployeeRoleForm({
           </div>
         )}
 
-        {/* Footer */}
         <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
           <div className="flex items-end justify-center h-full p-2 gap-2 text-sm text-gray-500">
             {`Update By : ${user?.name || "-"}`}

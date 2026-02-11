@@ -35,29 +35,23 @@ function MemoPageContent() {
   const mode = searchParams.get("mode") || "list";
   const memoId = searchParams.get("id");
 
-  // List mode hooks
   const {
     memos,
     loading: listLoading,
     refetch: refetchList,
   } = useMemos();
 
-  // Create mode hooks
   const { documentNo, loading: docNoLoading } = useNextDocumentNo();
 
-  // View/Edit mode hooks
   const { memo, loading: memoLoading, refetch: refetchMemo } = useMemoItem(memoId);
 
-  // Approval/Rejection hooks
   const approveMemo = useApproveMemo();
   const rejectMemo = useRejectMemo();
 
-  // Modal state
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [selectedMemo, setSelectedMemo] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
 
-  // Permission checks
   const canCreate = hasPermission("sales.memo.create");
   const canEdit = hasPermission("sales.memo.edit");
   const canView = hasPermission("sales.memo.view");
@@ -67,7 +61,6 @@ function MemoPageContent() {
   const canApproveCEO =
     hasPermission("sales.memo.approve.ceo") || hasPermission("superadmin");
 
-  // Navigation helper
   const navigateTo = useCallback(
     (newMode, newId = null) => {
       const params = new URLSearchParams();
@@ -79,13 +72,11 @@ function MemoPageContent() {
     [router]
   );
 
-  // Refresh helper
   const triggerRefresh = useCallback(() => {
     refetchList?.();
     if (memoId) refetchMemo?.();
   }, [refetchList, refetchMemo, memoId]);
 
-  // Create mode submit handler
   const submitMemoCreate = useSubmitMemo({
     mode: "create",
     currentEmployeeId: userId,
@@ -108,7 +99,6 @@ function MemoPageContent() {
     submitMemoCreate
   );
 
-  // Update document number when loaded
   React.useEffect(() => {
     if (documentNo && mode === "create") {
       createFormHandler.setFormData((prev) => ({
@@ -119,7 +109,6 @@ function MemoPageContent() {
     }
   }, [documentNo, userName, mode, createFormHandler.setFormData]);
 
-  // View/Edit mode submit handler
   const submitMemoUpdate = useSubmitMemo({
     mode: "update",
     memoId,
@@ -141,7 +130,6 @@ function MemoPageContent() {
     submitMemoUpdate
   );
 
-  // Load memo data into form
   React.useEffect(() => {
     if (memo && mode === "view") {
       updateFormHandler.setFormData({
@@ -158,7 +146,6 @@ function MemoPageContent() {
     }
   }, [memo, mode, updateFormHandler.setFormData]);
 
-  // List mode handlers
   const handleAddNew = useCallback(() => {
     if (!canCreate) return;
     navigateTo("create");
@@ -207,7 +194,6 @@ function MemoPageContent() {
     }
   }, [selectedMemo, rejectReason, rejectMemo, triggerRefresh]);
 
-  // View/Edit mode handlers
   const handleSubmitForApprovalCreate = useCallback(async () => {
     const submitData = {
       ...createFormHandler.formData,
@@ -273,12 +259,10 @@ function MemoPageContent() {
     }
   }, [rejectMemo, memoId, rejectReason, triggerRefresh]);
 
-  // Permission checks for list view
   if (mode === "list" && !canView) {
     return <PermissionDenied />;
   }
 
-  // Permission checks for create/view modes
   if (mode === "create" && !canCreate) {
     return <PermissionDenied />;
   }
@@ -287,11 +271,9 @@ function MemoPageContent() {
     return <PermissionDenied />;
   }
 
-  // Loading states
   if (mode === "create" && docNoLoading) return <Loading />;
   if (mode === "view" && memoLoading) return <Loading />;
 
-  // Create mode
   if (mode === "create") {
     return (
       <>
@@ -314,7 +296,6 @@ function MemoPageContent() {
     );
   }
 
-  // View/Edit mode
   if (mode === "view" && memo) {
     const status = memo.memoStatus || "DRAFT";
     const isReadOnly = status === "APPROVED";
@@ -366,7 +347,6 @@ function MemoPageContent() {
     );
   }
 
-  // List mode (default)
   return (
     <>
       <MemoList

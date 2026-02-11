@@ -45,7 +45,6 @@ export default function UIMemoForm({
     (status === "PENDING_CEO" && canApproveCEO);
   const canReject = canApprove;
 
-  // Format date for display
   const formatDate = (dateStr) => {
     if (!dateStr) return null;
     const d = new Date(dateStr);
@@ -57,7 +56,6 @@ export default function UIMemoForm({
     <div className="flex flex-col w-full h-full overflow-auto p-2">
       <div className="w-full h-full">
         <div className="bg-background rounded-lg border border-default h-full flex flex-col">
-          {/* Card header */}
           <div className="p-2 border-b border-default">
             <h2 className="text-[13px] font-semibold text-foreground">
               {mode === "create" ? "Create Memo" : "Edit Memo"}
@@ -67,9 +65,7 @@ export default function UIMemoForm({
             </p>
           </div>
 
-          {/* Card body */}
           <form ref={formRef} onSubmit={handleSubmit} className="p-2 space-y-5 flex-1 flex flex-col">
-            {/* Company Header */}
             <div className="flex flex-col xl:flex-row items-center gap-2 w-full">
               <div className="flex items-center justify-center min-w-40">
                 <Image src="/logo/logo-02.png" alt="logo" width={150} height={150} />
@@ -92,7 +88,6 @@ export default function UIMemoForm({
               </div>
             </div>
 
-            {/* Status Banner */}
             {isUpdate && (
               <div className="flex items-center justify-center w-full p-2 gap-2 border-b border-default bg-default-50 rounded-lg">
                 <span className="font-bold text-default-700 text-sm">Status:</span>
@@ -107,7 +102,6 @@ export default function UIMemoForm({
               </div>
             )}
 
-            {/* Document Info */}
             <div className="flex flex-col w-full gap-2 border-b border-default pb-4">
               <div className="font-bold text-foreground text-sm">
                 To: Mr. Jongkom Chuchaisri
@@ -156,7 +150,6 @@ export default function UIMemoForm({
               </div>
             </div>
 
-            {/* Content */}
             <div className="flex flex-col w-full gap-2">
               <div className="flex-1">
                 <Input
@@ -199,9 +192,7 @@ export default function UIMemoForm({
               </div>
             </div>
 
-            {/* Approval Section */}
             <div className="flex flex-col xl:flex-row items-stretch gap-2 w-full">
-              {/* Requester */}
               <div className="flex flex-col items-center justify-center flex-1 p-2 gap-2 border border-default rounded-lg bg-default-50">
                 <div className="font-medium text-foreground text-sm">
                   {formData.requesterName || operatedBy || "-"}
@@ -214,7 +205,6 @@ export default function UIMemoForm({
                 </div>
               </div>
 
-              {/* Sales Manager */}
               <div className={`flex flex-col items-center justify-center flex-1 p-2 gap-2 border rounded-lg bg-default-50 ${
                 status === "PENDING_SALES_MANAGER" ? "border-amber-400" : "border-default"
               }`}>
@@ -233,7 +223,6 @@ export default function UIMemoForm({
                 </div>
               </div>
 
-              {/* CEO */}
               <div className={`flex flex-col items-center justify-center flex-1 p-2 gap-2 border rounded-lg bg-default-50 ${
                 status === "PENDING_CEO" ? "border-amber-400" : "border-default"
               }`}>
@@ -255,9 +244,7 @@ export default function UIMemoForm({
               </div>
             </div>
 
-            {/* Footer / Action Buttons */}
             <div className="flex items-center justify-end pt-4 border-t border-default gap-2">
-              {/* Save Draft Button */}
               {canEdit && !isReadOnly && (
                 <Button
                   type="submit"
@@ -271,7 +258,6 @@ export default function UIMemoForm({
                 </Button>
               )}
 
-              {/* Submit for Approval Button */}
               {canSubmitForApproval && onSubmitForApproval && (
                 <Button
                   type="button"
@@ -285,7 +271,6 @@ export default function UIMemoForm({
                 </Button>
               )}
 
-              {/* Approve Button */}
               {canApprove && onApprove && (
                 <Button
                   type="button"
@@ -300,7 +285,6 @@ export default function UIMemoForm({
                 </Button>
               )}
 
-              {/* Reject Button */}
               {canReject && onReject && (
                 <Button
                   type="button"

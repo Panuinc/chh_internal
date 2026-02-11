@@ -3,47 +3,38 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-// ==================== CONFIGURATION ====================
 const DEFAULT_PASSWORD = "Password123!";
 
-// ==================== PERMISSIONS ====================
 const defaultPermissions = [
   { name: "superadmin", description: "Super Admin - Full access" },
 
-  // HR Module
   { name: "hr.view", description: "View HR module" },
   { name: "hr.*", description: "Full HR access" },
 
-  // Employee
   { name: "hr.employee.view", description: "View employees" },
   { name: "hr.employee.create", description: "Create employees" },
   { name: "hr.employee.edit", description: "Edit employees" },
   { name: "hr.employee.role.view", description: "View employee roles" },
   { name: "hr.employee.role.edit", description: "Edit employee roles" },
 
-  // Department
   { name: "hr.department.view", description: "View departments" },
   { name: "hr.department.create", description: "Create departments" },
   { name: "hr.department.edit", description: "Edit departments" },
 
-  // Role
   { name: "hr.role.view", description: "View roles" },
   { name: "hr.role.create", description: "Create roles" },
   { name: "hr.role.edit", description: "Edit roles" },
   { name: "hr.role.permission.view", description: "View role permissions" },
   { name: "hr.role.permission.edit", description: "Edit role permissions" },
 
-  // Permission
   { name: "hr.permission.view", description: "View permissions" },
   { name: "hr.permission.create", description: "Create permissions" },
   { name: "hr.permission.edit", description: "Edit permissions" },
 
-  // Account
   { name: "hr.account.view", description: "View accounts" },
   { name: "hr.account.create", description: "Create accounts" },
   { name: "hr.account.edit", description: "Edit accounts" },
 
-  // Security Module
   { name: "security.view", description: "View security module" },
   { name: "security.visitor.view", description: "View visitors" },
   { name: "security.visitor.create", description: "Create visitors" },
@@ -51,7 +42,6 @@ const defaultPermissions = [
   { name: "security.patrol.view", description: "View patrols" },
   { name: "security.patrol.create", description: "Create patrols" },
 
-  // Warehouse Module
   { name: "warehouse.view", description: "View warehouse module" },
   { name: "warehouse.packing.view", description: "View packing" },
   { name: "warehouse.packing.create", description: "Create packing" },
@@ -66,13 +56,11 @@ const defaultPermissions = [
   { name: "warehouse.rawMaterial.create", description: "Create raw materials" },
   { name: "warehouse.rawMaterial.edit", description: "Edit raw materials" },
 
-  // Production Module
   { name: "production.view", description: "View production module" },
   { name: "production.doorBom.view", description: "View door BOM" },
   { name: "production.doorBom.create", description: "Create door BOM" },
   { name: "production.doorBom.edit", description: "Edit door BOM" },
 
-  // Sales Module
   { name: "sales.view", description: "View sales module" },
   { name: "sales.*", description: "Full sales access" },
   { name: "sales.memo.view", description: "View sales memos" },
@@ -84,7 +72,6 @@ const defaultPermissions = [
   { name: "sales.salesOrderOnline.edit", description: "Edit sales order online" },
 ];
 
-// ==================== DEPARTMENTS ====================
 const defaultDepartments = [
   { name: "Executive", description: "CEO and Executives" },
   { name: "Human Resources", description: "HR Department" },
@@ -96,7 +83,6 @@ const defaultDepartments = [
   { name: "Finance", description: "Accounting and Finance" },
 ];
 
-// ==================== ROLES with PERMISSIONS ====================
 const defaultRoles = [
   {
     name: "Super Admin",
@@ -209,7 +195,6 @@ const defaultRoles = [
   },
 ];
 
-// ==================== EMPLOYEES with ROLES ====================
 const defaultEmployees = [
   {
     firstName: "Super",
@@ -331,8 +316,6 @@ const defaultEmployees = [
   },
 ];
 
-// ==================== SEED FUNCTIONS ====================
-
 async function seedPermissions() {
   console.log("🔐 Seeding Permissions...");
   const permissionMap = {};
@@ -416,7 +399,6 @@ async function seedRoles(permissionMap) {
       console.log(`  ⏭️  Role exists: ${role.name}`);
     }
 
-    // Seed RolePermissions
     console.log(`     🔗 Assigning ${role.permissions.length} permissions...`);
     for (const permName of role.permissions) {
       const permissionId = permissionMap[permName];
@@ -452,7 +434,6 @@ async function seedEmployees(departmentMap, roleMap) {
   const employeeMap = {};
   const hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD, 10);
 
-  // Get Super Admin employee ID for createdBy
   const superAdmin = await prisma.employee.findFirst({
     where: { employeeEmail: "superadmin@evergreen.com" },
   });
@@ -487,7 +468,6 @@ async function seedEmployees(departmentMap, roleMap) {
       console.log(`  ⏭️  Employee exists: ${emp.firstName} ${emp.lastName}`);
     }
 
-    // Seed EmployeeRoles
     console.log(`     🔗 Assigning ${emp.roles.length} roles...`);
     for (const roleName of emp.roles) {
       const roleId = roleMap[roleName];
@@ -515,7 +495,6 @@ async function seedEmployees(departmentMap, roleMap) {
       }
     }
 
-    // Seed Account if needed
     if (emp.isAdmin) {
       const existingAccount = await prisma.account.findFirst({
         where: { accountEmployeeId: employeeId },
@@ -558,26 +537,19 @@ async function updateSuperAdminCreator(employeeMap) {
   }
 }
 
-// ==================== MAIN ====================
-
 async function main() {
   console.log("🌱 ===========================================");
   console.log("🌱 Starting RBAC Standard Seed");
   console.log("🌱 ===========================================\n");
 
-  // Step 1: Seed Permissions
   const permissionMap = await seedPermissions();
 
-  // Step 2: Seed Departments
   const departmentMap = await seedDepartments();
 
-  // Step 3: Seed Roles with Permissions
   const roleMap = await seedRoles(permissionMap);
 
-  // Step 4: Seed Employees with Roles and Accounts
   const employeeMap = await seedEmployees(departmentMap, roleMap);
 
-  // Step 5: Update Super Admin creator to self
   await updateSuperAdminCreator(employeeMap);
 
   console.log("\n🎉 ===========================================");

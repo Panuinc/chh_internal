@@ -20,17 +20,13 @@ function PatrolPageContent() {
   const { hasPermission } = useMenu();
   const { userId: sessionUserId, userName } = useSessionUser();
 
-  // Get mode from query params
   const mode = searchParams.get("mode") || "list";
 
-  // Refresh key for refetching list
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // List data
   const [patrols, setPatrols] = useState([]);
   const [listLoading, setListLoading] = useState(true);
 
-  // Fetch patrols
   useEffect(() => {
     const fetchPatrols = async () => {
       setListLoading(true);
@@ -49,22 +45,18 @@ function PatrolPageContent() {
     fetchPatrols();
   }, [refreshKey]);
 
-  // Permission checks for list view
   if (mode === "list" && !hasPermission("security.patrol.view")) {
     return <PermissionDenied />;
   }
 
-  // Permission checks for create mode
   if (mode === "create" && !hasPermission("security.patrol.create")) {
     return <PermissionDenied />;
   }
 
-  // Trigger refresh
   const triggerRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
   }, []);
 
-  // Navigation with query params
   const navigateTo = useCallback((newMode) => {
     const params = new URLSearchParams();
     if (newMode !== "list") params.set("mode", newMode);
@@ -75,7 +67,6 @@ function PatrolPageContent() {
     router.push(url);
   }, [router]);
 
-  // Submit handler for create
   const handleCreateSubmit = useCallback(async (formRef, formData, setErrors) => {
     const submitFormData = new FormData();
 
@@ -116,7 +107,6 @@ function PatrolPageContent() {
     }
   }, [sessionUserId, triggerRefresh, navigateTo]);
 
-  // Form handler
   const createFormHandler = useFormHandler(
     {
       patrolQrCodeInfo: "",
@@ -126,7 +116,6 @@ function PatrolPageContent() {
     handleCreateSubmit
   );
 
-  // Reset form when leaving create mode
   useEffect(() => {
     if (mode === "list") {
       createFormHandler.setFormData({
@@ -137,7 +126,6 @@ function PatrolPageContent() {
     }
   }, [mode]);
 
-  // Navigation handlers
   const handleAddNew = useCallback(() => {
     if (!hasPermission("security.patrol.create")) return;
     navigateTo("create");
@@ -147,7 +135,6 @@ function PatrolPageContent() {
     navigateTo("list");
   }, [navigateTo]);
 
-  // Render based on mode
   if (mode === "list") {
     return (
       <PatrolList
