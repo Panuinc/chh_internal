@@ -8,7 +8,7 @@ import {
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import { FinishedGoodsList } from "@/features/warehouse";
-import { showToast } from "@/components";
+import { showToast, PermissionDenied } from "@/components";
 
 function useProjectNames(items) {
   const [projectNames, setProjectNames] = React.useState(new Map());
@@ -111,13 +111,7 @@ function FinishedGoodsContent() {
   );
 
   if (!hasPermission("warehouse.finishedGoods.view")) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-danger">
-          You do not have permission to access this page
-        </p>
-      </div>
-    );
+    return <PermissionDenied />;
   }
 
   return (

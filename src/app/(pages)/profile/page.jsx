@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Profile } from "@/features/profile";
+import { PageLoading } from "@/components";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -16,11 +17,7 @@ export default function ProfilePage() {
   }, [status, router]);
 
   if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <PageLoading />;
   }
 
   if (!session?.user) {

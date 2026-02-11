@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { MemoForm } from "@/features/sales";
+import { MemoForm, MemoRejectModal } from "@/features/sales";
 import { Loading } from "@/components";
 import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
 import {
@@ -12,9 +12,6 @@ import {
   useRejectMemo,
 } from "@/features/sales";
 import { useFormHandler, useMenu } from "@/hooks";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
-import { Button } from "@heroui/button";
-import { Textarea } from "@heroui/input";
 
 // Helper to format Date to YYYY-MM-DD
 function formatDateForInput(dateString) {
@@ -99,20 +96,6 @@ export default function MemoUpdate() {
     }
   }, [approveMemo, memoId, refetch]);
 
-  const handleReject = useCallback(async () => {
-    if (!rejectReason.trim()) {
-      setRejectModalOpen(true);
-      return;
-    }
-    
-    const result = await rejectMemo(memoId, rejectReason);
-    if (result.success) {
-      setRejectModalOpen(false);
-      setRejectReason("");
-      refetch?.();
-    }
-  }, [rejectMemo, memoId, rejectReason, refetch]);
-
   const handleRejectConfirm = useCallback(async () => {
     if (!rejectReason.trim()) return;
     
@@ -156,33 +139,13 @@ export default function MemoUpdate() {
         isReadOnly={isReadOnly || !canEditMemo}
       />
 
-      {/* Reject Reason Modal */}
-      <Modal isOpen={rejectModalOpen} onClose={() => setRejectModalOpen(false)}>
-        <ModalContent>
-          <ModalHeader>Specify Rejection Reason</ModalHeader>
-          <ModalBody>
-            <Textarea
-              placeholder="Please specify the reason for rejection..."
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              minRows={3}
-              isRequired
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="flat" onPress={() => setRejectModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              color="danger"
-              onPress={handleRejectConfirm}
-              isDisabled={!rejectReason.trim()}
-            >
-              Reject
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <MemoRejectModal
+        isOpen={rejectModalOpen}
+        onClose={() => setRejectModalOpen(false)}
+        rejectReason={rejectReason}
+        onReasonChange={setRejectReason}
+        onConfirm={handleRejectConfirm}
+      />
     </>
   );
 }

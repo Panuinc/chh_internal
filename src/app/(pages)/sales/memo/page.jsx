@@ -1,11 +1,9 @@
 "use client";
 import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { MemoList, useMemos, useApproveMemo, useRejectMemo } from "@/features/sales";
+import { MemoList, useMemos, useApproveMemo, useRejectMemo, MemoRejectModal } from "@/features/sales";
 import { useMenu } from "@/hooks";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
-import { Button } from "@heroui/button";
-import { Textarea } from "@heroui/input";
+import { PermissionDenied } from "@/components";
 
 export default function MemoPage() {
   const router = useRouter();
@@ -20,21 +18,6 @@ export default function MemoPage() {
 
   const canApproveSM = hasPermission("sales.memo.approve.salesmanager") || hasPermission("superadmin");
   const canApproveCEO = hasPermission("sales.memo.approve.ceo") || hasPermission("superadmin");
-
-  // DEBUG: Check permission values
-  console.log("=== MEMO PAGE DEBUG ===");
-  console.log("canApproveSM:", canApproveSM);
-  console.log("canApproveCEO:", canApproveCEO);
-  console.log("Memos count:", memos?.length);
-  console.log("All memos:", memos?.map(m => ({ 
-    id: m.memoId, 
-    docNo: m.memoDocumentNo, 
-    status: m.memoStatus,
-    statusLabel: m.memoStatusLabel 
-  })));
-  console.log("Pending SM memos:", memos?.filter(m => m.memoStatus === "PENDING_SALES_MANAGER").length);
-  console.log("Pending CEO memos:", memos?.filter(m => m.memoStatus === "PENDING_CEO").length);
-  console.log("=======================");
 
   const handleAddNew = () => {
     if (!hasPermission("sales.memo.create")) return;
@@ -76,13 +59,7 @@ export default function MemoPage() {
   }, [selectedMemo, rejectReason, rejectMemo, refetch]);
 
   if (!hasPermission("sales.memo.view")) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-danger">
-          You do not have permission to access this page
-        </p>
-      </div>
-    );
+    return <PermissionDenied />;
   }
 
   return (
@@ -99,33 +76,13 @@ export default function MemoPage() {
         canApproveCEO={canApproveCEO}
       />
 
-      {/* Reject Reason Modal */}
-      <Modal isOpen={rejectModalOpen} onClose={() => setRejectModalOpen(false)}>
-        <ModalContent>
-          <ModalHeader>Specify Rejection Reason</ModalHeader>
-          <ModalBody>
-            <Textarea
-              placeholder="Please specify the reason for rejection..."
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              minRows={3}
-              isRequired
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="flat" onPress={() => setRejectModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              color="danger"
-              onPress={handleRejectConfirm}
-              isDisabled={!rejectReason.trim()}
-            >
-              Reject
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <MemoRejectModal
+        isOpen={rejectModalOpen}
+        onClose={() => setRejectModalOpen(false)}
+        rejectReason={rejectReason}
+        onReasonChange={setRejectReason}
+        onConfirm={handleRejectConfirm}
+      />
     </>
   );
 }

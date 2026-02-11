@@ -5,7 +5,7 @@ import { useSupplyItems } from "@/features/warehouse";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import { SupplyList } from "@/features/warehouse";
-import { showToast } from "@/components";
+import { showToast, PermissionDenied } from "@/components";
 
 function SupplyContent() {
   const { items, loading, refetch } = useSupplyItems({ limit: 500 });
@@ -44,13 +44,7 @@ function SupplyContent() {
   );
 
   if (!hasPermission("warehouse.supply.view")) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-danger">
-          You do not have permission to access this page
-        </p>
-      </div>
-    );
+    return <PermissionDenied />;
   }
 
   return (

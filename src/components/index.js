@@ -4,6 +4,8 @@
 export { default as Loading } from "./ui/Loading";
 export { default as LoadingState } from "./ui/LoadingState";
 export { default as NotFound } from "./ui/NotFound";
+export { default as PageLoading } from "./ui/PageLoading";
+export { default as PermissionDenied } from "./ui/PermissionDenied";
 export { showToast } from "./ui/Toast";
 export { showToast as default } from "./ui/Toast";
 

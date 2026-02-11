@@ -5,7 +5,7 @@ import { useRawMaterialItems } from "@/features/warehouse";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import { RawMaterialList } from "@/features/warehouse";
-import { showToast } from "@/components";
+import { showToast, PermissionDenied } from "@/components";
 
 function RawMaterialContent() {
   const { items, loading, refetch } = useRawMaterialItems({ limit: 500 });
@@ -44,13 +44,7 @@ function RawMaterialContent() {
   );
 
   if (!hasPermission("warehouse.rawMaterial.view")) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-danger">
-          You do not have permission to access this page
-        </p>
-      </div>
-    );
+    return <PermissionDenied />;
   }
 
   return (

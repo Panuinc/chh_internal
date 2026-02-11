@@ -13,6 +13,8 @@ export { default as PermissionList } from "./components/PermissionList";
 export { default as PermissionForm } from "./components/PermissionForm";
 export { default as AssignList } from "./components/AssignList";
 export { default as AssignForm } from "./components/AssignForm";
+export { default as RolePermissionForm } from "./components/RolePermissionForm";
+export { default as EmployeeRoleForm } from "./components/EmployeeRoleForm";
 
 // Hooks
 export * from "./hooks";

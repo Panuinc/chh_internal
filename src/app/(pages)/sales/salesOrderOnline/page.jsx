@@ -5,7 +5,7 @@ import { useSalesOrdersOnline } from "@/features/sales";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import { SalesOrderOnlineList } from "@/features/sales";
-import { showToast } from "@/components";
+import { showToast, PermissionDenied } from "@/components";
 
 function SalesOrderOnlineContent() {
   const { orders, loading, refetch } = useSalesOrdersOnline({ limit: 100 });
@@ -88,13 +88,7 @@ function SalesOrderOnlineContent() {
   );
 
   if (!hasPermission("sales.salesOrderOnline.view")) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-danger">
-          You do not have permission to access this page
-        </p>
-      </div>
-    );
+    return <PermissionDenied />;
   }
 
   return (

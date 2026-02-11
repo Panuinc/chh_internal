@@ -7,6 +7,7 @@ import {
   useEMSRecords,
 } from "@/features/accounting";
 import { useMenu } from "@/hooks";
+import { PermissionDenied } from "@/components";
 
 export default function CheckTagEMSPage() {
   const { hasPermission } = useMenu();
@@ -78,13 +79,7 @@ export default function CheckTagEMSPage() {
   }, [clearTrackingData]);
 
   if (!hasPermission("accounting.checkTagEMS.view")) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-danger">
-          You do not have permission to access this page
-        </p>
-      </div>
-    );
+    return <PermissionDenied />;
   }
 
   return (

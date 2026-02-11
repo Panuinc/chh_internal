@@ -5,7 +5,7 @@ import { usePackingItems } from "@/features/warehouse";
 import { useMenu } from "@/hooks";
 import { RFIDProvider, useRFIDContext } from "@/hooks";
 import { PackingList } from "@/features/warehouse";
-import { showToast } from "@/components";
+import { showToast, PermissionDenied } from "@/components";
 
 function PackingContent() {
   const { items, loading, refetch } = usePackingItems({ limit: 500 });
@@ -44,13 +44,7 @@ function PackingContent() {
   );
 
   if (!hasPermission("warehouse.packing.view")) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-danger">
-          You do not have permission to access this page
-        </p>
-      </div>
-    );
+    return <PermissionDenied />;
   }
 
   return (
