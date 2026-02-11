@@ -209,3 +209,12 @@
 [2026-02-11 13:31:14] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-11 13:31:14] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
 [2026-02-11 13:31:16] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 13:39:56] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 13:39:56] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-11 13:39:56] [INFO] GetAllMemoUseCase success {"total":1,"returned":1}
+[2026-02-11 13:40:02] [INFO] GetNextDocumentNoUseCase start
+[2026-02-11 13:40:02] [INFO] GetNextDocumentNoUseCase success {"nextDocumentNo":"ME-2602-0002"}
+[2026-02-11 13:40:08] [INFO] GetAllMemoUseCase start {"page":1,"limit":20}
+[2026-02-11 13:40:08] [INFO] GetAllMemoUseCase success {"total":1,"returned":1}
+[2026-02-11 13:40:16] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
+[2026-02-11 13:40:16] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
