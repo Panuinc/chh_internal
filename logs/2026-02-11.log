@@ -218,3 +218,41 @@
 [2026-02-11 13:40:08] [INFO] GetAllMemoUseCase success {"total":1,"returned":1}
 [2026-02-11 13:40:16] [INFO] GetAllEmployeeUseCase start {"page":1,"limit":20}
 [2026-02-11 13:40:16] [INFO] GetAllEmployeeUseCase success {"total":13,"returned":13}
+[2026-02-11 14:00:41] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:00:45] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:01:12] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:01:15] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:01:17] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:01:24] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:01:42] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:01:47] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:01:51] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:05:33] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:05:33] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:05:33] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-11 14:05:33] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:05:33] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-11 14:07:01] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:07:01] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-11 14:07:20] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:07:20] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-11 14:07:21] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:07:21] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-11 14:07:29] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:07:29] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-11 14:07:29] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:07:29] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-11 14:07:33] [INFO] GetDepartmentByIdUseCase start {"id":"cml8vm5i4001icrxsdkqq102h"}
+[2026-02-11 14:07:33] [INFO] GetDepartmentByIdUseCase success {"id":"cml8vm5i4001icrxsdkqq102h","name":"executive"}
+[2026-02-11 14:07:34] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:07:37] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:07:37] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-11 14:07:37] [INFO] GetDepartmentByIdUseCase start {"id":"cml8vm5i4001icrxsdkqq102h"}
+[2026-02-11 14:07:37] [INFO] GetDepartmentByIdUseCase success {"id":"cml8vm5i4001icrxsdkqq102h","name":"executive"}
+[2026-02-11 14:07:37] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:07:37] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-11 14:07:38] [INFO] Logger initialized successfully {"logDir":"E:\\chh_internal\\logs"}
+[2026-02-11 14:11:03] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:11:03] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}
+[2026-02-11 14:11:03] [INFO] GetAllDepartmentUseCase start {"page":1,"limit":20}
+[2026-02-11 14:11:03] [INFO] GetAllDepartmentUseCase success {"total":8,"returned":8}

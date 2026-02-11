@@ -1,23 +1,360 @@
 "use client";
-import React from "react";
-import { useRouter } from "next/navigation";
-import { EmployeeList, useEmployees } from "@/features/hr";
-import { useMenu } from "@/hooks";
 
-export default function EmployeePage() {
+import { useEffect, useState, useCallback, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { EmployeeList, EmployeeForm, useEmployee, useDepartments, useRoles } from "@/features/hr";
+import { Loading } from "@/components";
+import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
+import { useFormHandler, useMenu } from "@/hooks";
+import { showToast } from "@/components/ui/Toast";
+
+const API_URL = "/api/hr/employee";
+const TOAST = {
+  SUCCESS: "success",
+  DANGER: "danger",
+};
+
+// Inner component that uses searchParams
+function EmployeePageContent() {
   const router = useRouter();
-  const { employees, loading } = useEmployees();
+  const searchParams = useSearchParams();
   const { hasPermission } = useMenu();
+  const { userId: sessionUserId, userName } = useSessionUser();
 
-  const handleAddNew = () => {
+  // Get mode from query params
+  const mode = searchParams.get("mode") || "list"; // "list" | "create" | "edit"
+  const editId = searchParams.get("id");
+
+  // Refresh key for refetching list
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // List data
+  const [employees, setEmployees] = useState([]);
+  const [listLoading, setListLoading] = useState(true);
+
+  // Fetch employees
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      setListLoading(true);
+      try {
+        const response = await fetch(`${API_URL}?limit=9999`, { credentials: "include" });
+        const result = await response.json().catch(() => ({}));
+        const items = result.employees || result.data || [];
+        setEmployees(items);
+      } catch (err) {
+        showToast(TOAST.DANGER, `Error fetching employees: ${err.message}`);
+      } finally {
+        setListLoading(false);
+      }
+    };
+
+    fetchEmployees();
+  }, [refreshKey]);
+
+  // Fetch departments and roles for forms
+  const { departments } = useDepartments(undefined, true);
+  const { roles } = useRoles(undefined, true);
+
+  // Edit mode: fetch employee data
+  const { employee, loading: employeeLoading } = useEmployee(
+    mode === "edit" && editId ? editId : null,
+  );
+
+  // Permission checks for list view
+  if (mode === "list" && !hasPermission("hr.employee.view")) {
+    return <PermissionDenied />;
+  }
+
+  // Permission checks for create/edit modes
+  if (mode === "create" && !hasPermission("hr.employee.create")) {
+    return <PermissionDenied />;
+  }
+
+  if (mode === "edit" && !hasPermission("hr.employee.edit")) {
+    return <PermissionDenied />;
+  }
+
+  // Trigger refresh
+  const triggerRefresh = useCallback(() => {
+    setRefreshKey((prev) => prev + 1);
+  }, []);
+
+  // Navigation with query params
+  const navigateTo = useCallback(
+    (newMode, id = null) => {
+      const params = new URLSearchParams();
+      if (newMode !== "list") params.set("mode", newMode);
+      if (id) params.set("id", id);
+
+      const queryString = params.toString();
+      const url = queryString
+        ? `/hr/employee?${queryString}`
+        : "/hr/employee";
+
+      router.push(url);
+    },
+    [router],
+  );
+
+  // Submit handler for create
+  const handleCreateSubmit = useCallback(
+    async (formRef, formData, setErrors) => {
+      const payload = {
+        employeeFirstName: formData.employeeFirstName,
+        employeeLastName: formData.employeeLastName,
+        employeeEmail: formData.employeeEmail,
+        employeeDepartmentId: formData.employeeDepartmentId || null,
+        employeeRoleId: formData.employeeRoleId || null,
+        employeeCreatedBy: sessionUserId,
+      };
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          showToast(
+            TOAST.SUCCESS,
+            result.message || "Employee created successfully",
+          );
+          triggerRefresh();
+          navigateTo("list");
+          return { success: true };
+        } else {
+          if (result.details && typeof result.details === "object") {
+            setErrors(result.details);
+          }
+          showToast(
+            TOAST.DANGER,
+            result.error || "Failed to create employee",
+          );
+          return { success: false };
+        }
+      } catch (err) {
+        showToast(TOAST.DANGER, `Failed to create employee: ${err.message}`);
+        return { success: false };
+      }
+    },
+    [sessionUserId, triggerRefresh, navigateTo],
+  );
+
+  // Submit handler for update
+  const handleUpdateSubmit = useCallback(
+    async (formRef, formData, setErrors) => {
+      if (!editId) return { success: false };
+
+      const payload = {
+        employeeFirstName: formData.employeeFirstName,
+        employeeLastName: formData.employeeLastName,
+        employeeEmail: formData.employeeEmail,
+        employeeStatus: formData.employeeStatus,
+        employeeDepartmentId: formData.employeeDepartmentId || null,
+        employeeRoleId: formData.employeeRoleId || null,
+        employeeUpdatedBy: sessionUserId,
+      };
+
+      try {
+        const response = await fetch(`${API_URL}/${editId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          showToast(
+            TOAST.SUCCESS,
+            result.message || "Employee updated successfully",
+          );
+          triggerRefresh();
+          navigateTo("list");
+          return { success: true };
+        } else {
+          if (result.details && typeof result.details === "object") {
+            setErrors(result.details);
+          }
+          showToast(
+            TOAST.DANGER,
+            result.error || "Failed to update employee",
+          );
+          return { success: false };
+        }
+      } catch (err) {
+        showToast(TOAST.DANGER, `Failed to update employee: ${err.message}`);
+        return { success: false };
+      }
+    },
+    [sessionUserId, editId, triggerRefresh, navigateTo],
+  );
+
+  // Form handlers
+  const createFormHandler = useFormHandler(
+    {
+      employeeFirstName: "",
+      employeeLastName: "",
+      employeeEmail: "",
+      employeeDepartmentId: "",
+      employeeRoleId: "",
+    },
+    handleCreateSubmit,
+  );
+
+  const updateFormHandler = useFormHandler(
+    {
+      employeeFirstName: "",
+      employeeLastName: "",
+      employeeEmail: "",
+      employeeStatus: "",
+      employeeDepartmentId: "",
+      employeeRoleId: "",
+    },
+    handleUpdateSubmit,
+  );
+
+  // Update form data when employee loaded (edit mode)
+  useEffect(() => {
+    if (mode === "edit" && employee) {
+      updateFormHandler.setFormData({
+        employeeFirstName: employee.employeeFirstName || "",
+        employeeLastName: employee.employeeLastName || "",
+        employeeEmail: employee.employeeEmail || "",
+        employeeStatus: employee.employeeStatus || "",
+        employeeDepartmentId: employee.employeeDepartmentId || "",
+        employeeRoleId: employee.employeeRoleId || "",
+      });
+    }
+  }, [mode, employee]);
+
+  // Reset forms when leaving create/edit
+  useEffect(() => {
+    if (mode === "list") {
+      createFormHandler.setFormData({
+        employeeFirstName: "",
+        employeeLastName: "",
+        employeeEmail: "",
+        employeeDepartmentId: "",
+        employeeRoleId: "",
+      });
+      updateFormHandler.setFormData({
+        employeeFirstName: "",
+        employeeLastName: "",
+        employeeEmail: "",
+        employeeStatus: "",
+        employeeDepartmentId: "",
+        employeeRoleId: "",
+      });
+    }
+  }, [mode]);
+
+  // Navigation handlers
+  const handleAddNew = useCallback(() => {
     if (!hasPermission("hr.employee.create")) return;
-    router.push("/hr/employee/create");
-  };
+    navigateTo("create");
+  }, [hasPermission, navigateTo]);
 
-  const handleEdit = (item) => {
-    if (!hasPermission("hr.employee.edit")) return;
-    router.push(`/hr/employee/${item.employeeId}`);
-  };
+  const handleEdit = useCallback(
+    (item) => {
+      if (!hasPermission("hr.employee.edit")) return;
+      navigateTo("edit", item.employeeId);
+    },
+    [hasPermission, navigateTo],
+  );
 
-  return <EmployeeList Employees={employees} loading={loading} onAddNew={hasPermission("hr.employee.create") ? handleAddNew : null} onEdit={hasPermission("hr.employee.edit") ? handleEdit : null} />;
+  const handleBackToList = useCallback(() => {
+    navigateTo("list");
+  }, [navigateTo]);
+
+  // Render based on mode
+  if (mode === "list") {
+    return (
+      <EmployeeList
+        Employees={employees}
+        loading={listLoading}
+        onAddNew={hasPermission("hr.employee.create") ? handleAddNew : null}
+        onEdit={hasPermission("hr.employee.edit") ? handleEdit : null}
+      />
+    );
+  }
+
+  if (mode === "create") {
+    return (
+      <div className="flex flex-col w-full h-full">
+        <div className="flex items-center gap-2 p-2 border-b border-default">
+          <button
+            onClick={handleBackToList}
+            className="text-sm text-primary hover:underline"
+          >
+            ← Back to List
+          </button>
+        </div>
+        <EmployeeForm
+          formHandler={createFormHandler}
+          mode="create"
+          operatedBy={userName}
+          departments={departments}
+          roles={roles}
+        />
+      </div>
+    );
+  }
+
+  if (mode === "edit") {
+    if (employeeLoading) {
+      return (
+        <div className="flex flex-col w-full h-full">
+          <div className="flex items-center gap-2 p-2 border-b border-default">
+            <button
+              onClick={handleBackToList}
+              className="text-sm text-primary hover:underline"
+            >
+              ← Back to List
+            </button>
+          </div>
+          <div className="flex-1 flex items-center justify-center">
+            <Loading />
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col w-full h-full">
+        <div className="flex items-center gap-2 p-2 border-b border-default">
+          <button
+            onClick={handleBackToList}
+            className="text-sm text-primary hover:underline"
+          >
+            ← Back to List
+          </button>
+        </div>
+        <EmployeeForm
+          formHandler={updateFormHandler}
+          mode="update"
+          operatedBy={userName}
+          isUpdate
+          departments={departments}
+          roles={roles}
+        />
+      </div>
+    );
+  }
+
+  return null;
+}
+
+// Main export with Suspense wrapper
+export default function EmployeePage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <EmployeePageContent />
+    </Suspense>
+  );
 }
