@@ -1,17 +1,30 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import { CheckTagEMS, useCheckTagEMS, useEMSRecords } from "@/features/accounting";
+import {
+  CheckTagEMS,
+  useCheckTagEMS,
+  useEMSRecords,
+} from "@/features/accounting";
 import { useMenu } from "@/hooks";
 
 export default function CheckTagEMSPage() {
   const { hasPermission } = useMenu();
-  const { trackingData, loading, error, searchEMS, clearTrackingData } = useCheckTagEMS();
-  const { records, loading: recordsLoading, saveOrUpdate, updateRecord, findByBarcode } = useEMSRecords();
+  const { trackingData, loading, error, searchEMS, clearTrackingData } =
+    useCheckTagEMS();
+  const {
+    records,
+    loading: recordsLoading,
+    saveOrUpdate,
+    updateRecord,
+    findByBarcode,
+  } = useEMSRecords();
 
   const savedRecord = useMemo(() => {
     if (trackingData?.barcode) {
-      const existing = records.find((r) => r.emsBarcode === trackingData.barcode.toUpperCase());
+      const existing = records.find(
+        (r) => r.emsBarcode === trackingData.barcode.toUpperCase(),
+      );
       return existing || null;
     }
     return null;
@@ -67,10 +80,25 @@ export default function CheckTagEMSPage() {
   if (!hasPermission("accounting.checkTagEMS.view")) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-danger">You do not have permission to access this page</p>
+        <p className="text-danger">
+          You do not have permission to access this page
+        </p>
       </div>
     );
   }
 
-  return <CheckTagEMS trackingData={trackingData} loading={loading || recordsLoading} error={error} onSearch={handleSearch} onClearSearch={handleClearSearch} savedRecord={savedRecord} onSaveRecord={handleSaveRecord} onUpdateStatus={handleUpdateStatus} records={records} onViewRecord={handleViewRecord} />;
+  return (
+    <CheckTagEMS
+      trackingData={trackingData}
+      loading={loading || recordsLoading}
+      error={error}
+      onSearch={handleSearch}
+      onClearSearch={handleClearSearch}
+      savedRecord={savedRecord}
+      onSaveRecord={handleSaveRecord}
+      onUpdateStatus={handleUpdateStatus}
+      records={records}
+      onViewRecord={handleViewRecord}
+    />
+  );
 }
