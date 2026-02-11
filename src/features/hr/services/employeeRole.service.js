@@ -287,7 +287,6 @@ export async function SyncEmployeeRolesUseCase(data) {
     }
 
     if (roleIds.length > 0) {
-    if (roleIds.length > 0) {
       const existingRoles = await prisma.role.findMany({
         where: {
           roleId: { in: roleIds },
