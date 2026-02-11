@@ -17,7 +17,9 @@ export async function GET() {
     ] = await Promise.all([
       prisma.salesMemo.count(),
       prisma.salesMemo.count({ where: { memoStatus: "DRAFT" } }),
-      prisma.salesMemo.count({ where: { memoStatus: "PENDING_SALES_MANAGER" } }),
+      prisma.salesMemo.count({
+        where: { memoStatus: "PENDING_SALES_MANAGER" },
+      }),
       prisma.salesMemo.count({ where: { memoStatus: "PENDING_CEO" } }),
       prisma.salesMemo.count({ where: { memoStatus: "APPROVED" } }),
       prisma.salesMemo.count({ where: { memoStatus: "REJECTED" } }),
@@ -27,8 +29,20 @@ export async function GET() {
       }),
     ]);
 
-    // Aggregate by month (last 6 months)
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     const monthlyMap = {};
     const now = new Date();
 
@@ -65,7 +79,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       { status: "error", error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

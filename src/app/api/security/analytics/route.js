@@ -7,11 +7,14 @@ export const runtime = "nodejs";
 export async function GET() {
   try {
     const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
     const endOfToday = new Date(startOfToday);
     endOfToday.setDate(endOfToday.getDate() + 1);
 
-    // Get start of the week (Monday)
     const startOfWeek = new Date(startOfToday);
     const day = startOfWeek.getDay();
     const diff = day === 0 ? -6 : 1 - day;
@@ -43,7 +46,6 @@ export async function GET() {
       }),
     ]);
 
-    // Aggregate daily visitors for this week
     const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const dailyMap = {};
     for (let i = 0; i < 7; i++) {
@@ -65,9 +67,8 @@ export async function GET() {
       visitors,
     }));
 
-    const checkedOutToday = visitorsToday - checkedInToday > 0
-      ? visitorsToday - checkedInToday
-      : 0;
+    const checkedOutToday =
+      visitorsToday - checkedInToday > 0 ? visitorsToday - checkedInToday : 0;
 
     return NextResponse.json({
       status: "success",
@@ -84,7 +85,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       { status: "error", error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

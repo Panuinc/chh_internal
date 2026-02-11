@@ -5,17 +5,13 @@ import { createLogger } from "@/lib/logger.node";
 
 const logger = createLogger("EMSRecordAPI");
 
-/**
- * PUT /api/accounting/ems/records/[id]
- * Update an EMS record
- */
 export async function PUT(request, { params }) {
   try {
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -23,7 +19,6 @@ export async function PUT(request, { params }) {
     const body = await request.json();
     const { customerName, status, notes, callDate, lastTracking } = body;
 
-    // Check if record exists
     const existing = await prisma.eMSTracking.findUnique({
       where: { emsId: id },
     });
@@ -31,7 +26,7 @@ export async function PUT(request, { params }) {
     if (!existing) {
       return NextResponse.json(
         { success: false, error: "EMS record not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -79,10 +74,10 @@ export async function PUT(request, { params }) {
       },
     });
 
-    logger.info("EMS record updated", { 
-      emsId: record.emsId, 
+    logger.info("EMS record updated", {
+      emsId: record.emsId,
       barcode: record.emsBarcode,
-      updatedBy: session.user.id 
+      updatedBy: session.user.id,
     });
 
     return NextResponse.json({
@@ -90,32 +85,31 @@ export async function PUT(request, { params }) {
       data: record,
     });
   } catch (error) {
-    const errorMessage = error?.message || JSON.stringify(error) || "Unknown error";
-    logger.error("Error updating EMS record:", { error: errorMessage, stack: error?.stack });
+    const errorMessage =
+      error?.message || JSON.stringify(error) || "Unknown error";
+    logger.error("Error updating EMS record:", {
+      error: errorMessage,
+      stack: error?.stack,
+    });
     return NextResponse.json(
       { success: false, error: errorMessage },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-/**
- * DELETE /api/accounting/ems/records/[id]
- * Delete an EMS record
- */
 export async function DELETE(request, { params }) {
   try {
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     const { id } = await params;
 
-    // Check if record exists
     const existing = await prisma.eMSTracking.findUnique({
       where: { emsId: id },
     });
@@ -123,7 +117,7 @@ export async function DELETE(request, { params }) {
     if (!existing) {
       return NextResponse.json(
         { success: false, error: "EMS record not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -131,10 +125,10 @@ export async function DELETE(request, { params }) {
       where: { emsId: id },
     });
 
-    logger.info("EMS record deleted", { 
-      emsId: id, 
+    logger.info("EMS record deleted", {
+      emsId: id,
       barcode: existing.emsBarcode,
-      deletedBy: session.user.id 
+      deletedBy: session.user.id,
     });
 
     return NextResponse.json({
@@ -142,26 +136,26 @@ export async function DELETE(request, { params }) {
       message: "EMS record deleted successfully",
     });
   } catch (error) {
-    const errorMessage = error?.message || JSON.stringify(error) || "Unknown error";
-    logger.error("Error deleting EMS record:", { error: errorMessage, stack: error?.stack });
+    const errorMessage =
+      error?.message || JSON.stringify(error) || "Unknown error";
+    logger.error("Error deleting EMS record:", {
+      error: errorMessage,
+      stack: error?.stack,
+    });
     return NextResponse.json(
       { success: false, error: errorMessage },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-/**
- * GET /api/accounting/ems/records/[id]
- * Fetch an EMS record by ID
- */
 export async function GET(request, { params }) {
   try {
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -188,7 +182,7 @@ export async function GET(request, { params }) {
     if (!record) {
       return NextResponse.json(
         { success: false, error: "EMS record not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -197,11 +191,15 @@ export async function GET(request, { params }) {
       data: record,
     });
   } catch (error) {
-    const errorMessage = error?.message || JSON.stringify(error) || "Unknown error";
-    logger.error("Error fetching EMS record:", { error: errorMessage, stack: error?.stack });
+    const errorMessage =
+      error?.message || JSON.stringify(error) || "Unknown error";
+    logger.error("Error fetching EMS record:", {
+      error: errorMessage,
+      stack: error?.stack,
+    });
     return NextResponse.json(
       { success: false, error: errorMessage },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

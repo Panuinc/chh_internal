@@ -25,8 +25,20 @@ export async function GET() {
       }),
     ]);
 
-    // Aggregate by month (last 6 months)
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     const monthlyMap = {};
     const now = new Date();
 
@@ -45,9 +57,8 @@ export async function GET() {
     });
 
     const monthlyTracking = Object.values(monthlyMap);
-    const successRate = totalRecords > 0
-      ? Math.round((calledReceived / totalRecords) * 100)
-      : 0;
+    const successRate =
+      totalRecords > 0 ? Math.round((calledReceived / totalRecords) * 100) : 0;
 
     return NextResponse.json({
       status: "success",
@@ -64,7 +75,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       { status: "error", error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

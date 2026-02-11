@@ -44,7 +44,7 @@ async function fetchWithAbort(url, options, signal) {
 
   if (!response.ok) {
     throw new Error(
-      data.error || `Request failed with status ${response.status}`
+      data.error || `Request failed with status ${response.status}`,
     );
   }
 
@@ -60,7 +60,6 @@ export function useDepartments(apiUrl = API_URL, fetchAll = false) {
 
     (async () => {
       try {
-        // Fetch all by adding a large limit
         const url = fetchAll ? `${apiUrl}?limit=9999` : apiUrl;
         const result = await fetchWithAbort(url, {}, controller.signal);
 
@@ -105,7 +104,7 @@ export function useDepartment(departmentId) {
         const result = await fetchWithAbort(
           `${API_URL}/${departmentId}`,
           {},
-          controller.signal
+          controller.signal,
         );
 
         const item = result.department || result.data;
@@ -184,16 +183,16 @@ export function useSubmitDepartment({
 
           showToast(
             TOAST.DANGER,
-            result.error || "Failed to submit Department."
+            result.error || "Failed to submit Department.",
           );
         }
       } catch (err) {
         showToast(
           TOAST.DANGER,
-          `Failed to submit Department: ${getErrorMessage(err)}`
+          `Failed to submit Department: ${getErrorMessage(err)}`,
         );
       }
     },
-    [mode, departmentId, currentDepartmentId, router]
+    [mode, departmentId, currentDepartmentId, router],
   );
 }

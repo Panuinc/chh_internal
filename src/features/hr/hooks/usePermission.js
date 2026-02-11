@@ -44,7 +44,7 @@ async function fetchWithAbort(url, options, signal) {
 
   if (!response.ok) {
     throw new Error(
-      data.error || `Request failed with status ${response.status}`
+      data.error || `Request failed with status ${response.status}`,
     );
   }
 
@@ -60,7 +60,6 @@ export function usePermissions(apiUrl = API_URL, fetchAll = true) {
 
     (async () => {
       try {
-        // Fetch all permissions by adding a large limit
         const url = fetchAll ? `${apiUrl}?limit=9999` : apiUrl;
         const result = await fetchWithAbort(url, {}, controller.signal);
 
@@ -105,7 +104,7 @@ export function usePermission(permissionId) {
         const result = await fetchWithAbort(
           `${API_URL}/${permissionId}`,
           {},
-          controller.signal
+          controller.signal,
         );
 
         const item = result.permission || result.data;
@@ -184,16 +183,16 @@ export function useSubmitPermission({
 
           showToast(
             TOAST.DANGER,
-            result.error || "Failed to submit Permission."
+            result.error || "Failed to submit Permission.",
           );
         }
       } catch (err) {
         showToast(
           TOAST.DANGER,
-          `Failed to submit Permission: ${getErrorMessage(err)}`
+          `Failed to submit Permission: ${getErrorMessage(err)}`,
         );
       }
     },
-    [mode, permissionId, currentPermissionId, router]
+    [mode, permissionId, currentPermissionId, router],
   );
 }

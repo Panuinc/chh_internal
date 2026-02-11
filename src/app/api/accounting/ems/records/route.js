@@ -5,17 +5,13 @@ import { createLogger } from "@/lib/logger.node";
 
 const logger = createLogger("EMSRecordsAPI");
 
-/**
- * GET /api/accounting/ems/records
- * Fetch all EMS records
- */
 export async function GET(request) {
   try {
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -24,11 +20,11 @@ export async function GET(request) {
     const search = searchParams.get("search");
 
     const where = {};
-    
+
     if (status && status !== "ALL") {
       where.emsStatus = status;
     }
-    
+
     if (search) {
       where.OR = [
         { emsBarcode: { contains: search, mode: "insensitive" } },
@@ -60,26 +56,26 @@ export async function GET(request) {
       data: records,
     });
   } catch (error) {
-    const errorMessage = error?.message || JSON.stringify(error) || "Unknown error";
-    logger.error("Error fetching EMS records:", { error: errorMessage, stack: error?.stack });
+    const errorMessage =
+      error?.message || JSON.stringify(error) || "Unknown error";
+    logger.error("Error fetching EMS records:", {
+      error: errorMessage,
+      stack: error?.stack,
+    });
     return NextResponse.json(
       { success: false, error: errorMessage },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-/**
- * POST /api/accounting/ems/records
- * Create a new EMS record
- */
 export async function POST(request) {
   try {
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -89,20 +85,18 @@ export async function POST(request) {
     if (!barcode) {
       return NextResponse.json(
         { success: false, error: "Barcode is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Validate EMS barcode format
     const emsPattern = /^[A-Z]{2}\d{9}[A-Z]{2}$/i;
     if (!emsPattern.test(barcode.trim())) {
       return NextResponse.json(
         { success: false, error: "Invalid EMS barcode format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Check if barcode already exists
     const existing = await prisma.eMSTracking.findUnique({
       where: { emsBarcode: barcode.trim().toUpperCase() },
     });
@@ -110,7 +104,7 @@ export async function POST(request) {
     if (existing) {
       return NextResponse.json(
         { success: false, error: "EMS barcode already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -133,10 +127,10 @@ export async function POST(request) {
       },
     });
 
-    logger.info("EMS record created", { 
-      emsId: record.emsId, 
+    logger.info("EMS record created", {
+      emsId: record.emsId,
       barcode: record.emsBarcode,
-      createdBy: session.user.id 
+      createdBy: session.user.id,
     });
 
     return NextResponse.json({
@@ -147,7 +141,7 @@ export async function POST(request) {
     logger.error("Error creating EMS record:", { error: error.message });
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

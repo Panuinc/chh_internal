@@ -1,6 +1,3 @@
-// Edge-safe logger that doesn't depend on Node.js APIs
-// This file is used by middleware, client components, and Edge Runtime contexts
-
 import { getRequestId } from "@/lib/requestContext";
 
 function createConsoleLogger(useCaseName) {

@@ -45,7 +45,7 @@ async function fetchWithAbort(url, options, signal) {
 
   if (!response.ok) {
     throw new Error(
-      data.error || `Request failed with status ${response.status}`
+      data.error || `Request failed with status ${response.status}`,
     );
   }
 
@@ -61,7 +61,6 @@ export function useAccounts(apiUrl = API_URL, fetchAll = false) {
 
     (async () => {
       try {
-        // Fetch all by adding a large limit
         const url = fetchAll ? `${apiUrl}?limit=9999` : apiUrl;
         const result = await fetchWithAbort(url, {}, controller.signal);
 
@@ -106,7 +105,7 @@ export function useAccount(accountId) {
         const result = await fetchWithAbort(
           `${API_URL}/${accountId}`,
           {},
-          controller.signal
+          controller.signal,
         );
 
         const item = result.account || result.data;
@@ -193,10 +192,10 @@ export function useSubmitAccount({
       } catch (err) {
         showToast(
           TOAST.DANGER,
-          `Failed to submit Account: ${getErrorMessage(err)}`
+          `Failed to submit Account: ${getErrorMessage(err)}`,
         );
       }
     },
-    [mode, accountId, currentEmployeeId, router]
+    [mode, accountId, currentEmployeeId, router],
   );
 }

@@ -36,14 +36,12 @@ const EMPLOYEE_SELECT = {
   employeeLastName: true,
 };
 
-// Validation Schemas
 export const syncRolePermissionsSchema = z.object({
   roleId: preprocessString("Please provide roleId"),
   permissionIds: z.array(z.string()).min(0, "permissionIds must be an array"),
   updatedBy: preprocessString("Please provide the updater ID"),
 });
 
-// Repository
 export const RolePermissionRepository = {
   async findByRole(roleId) {
     return prisma.rolePermission.findMany({
@@ -105,28 +103,28 @@ export const RolePermissionRepository = {
   },
 };
 
-// Service
 export const RolePermissionService = {
   async getByRole(roleId) {
     return RolePermissionRepository.findByRole(roleId);
   },
 
   async syncPermissions(roleId, permissionIds, updatedBy) {
-    // Get current permissions for this role
-    const currentPermissions = await RolePermissionRepository.findByRole(roleId);
+    const currentPermissions =
+      await RolePermissionRepository.findByRole(roleId);
     const currentPermissionIds = currentPermissions.map(
-      (rp) => rp.rolePermissionPermissionId
+      (rp) => rp.rolePermissionPermissionId,
     );
 
-    // Calculate differences
-    const toAdd = permissionIds.filter((id) => !currentPermissionIds.includes(id));
-    const toRemove = currentPermissionIds.filter((id) => !permissionIds.includes(id));
+    const toAdd = permissionIds.filter(
+      (id) => !currentPermissionIds.includes(id),
+    );
+    const toRemove = currentPermissionIds.filter(
+      (id) => !permissionIds.includes(id),
+    );
 
     const now = getLocalNow();
 
-    // Execute changes in transaction
     await prisma.$transaction(async (tx) => {
-      // Add new permissions
       if (toAdd.length > 0) {
         const dataToCreate = toAdd.map((permissionId) => ({
           rolePermissionRoleId: roleId,
@@ -142,7 +140,6 @@ export const RolePermissionService = {
         });
       }
 
-      // Remove old permissions
       if (toRemove.length > 0) {
         await tx.rolePermission.deleteMany({
           where: {
@@ -172,7 +169,6 @@ export const RolePermissionService = {
       },
     });
 
-    // Return unique permissions
     const permissionMap = new Map();
     rolePermissions.forEach((rp) => {
       if (!permissionMap.has(rp.permission.permissionId)) {
@@ -184,7 +180,6 @@ export const RolePermissionService = {
   },
 };
 
-// Use Cases
 export async function GetByRoleUseCase(roleId) {
   const log = createLogger("GetRolePermissionsUseCase");
   log.start({ roleId });
@@ -194,7 +189,6 @@ export async function GetByRoleUseCase(roleId) {
       throw new BadRequestError("Invalid Role ID");
     }
 
-    // Check if role exists
     const role = await prisma.role.findUnique({
       where: { roleId },
       select: { roleId: true, roleName: true },
@@ -222,7 +216,6 @@ export async function SyncRolePermissionsUseCase(data) {
     const validated = validateOrThrow(syncRolePermissionsSchema, data);
     const { roleId, permissionIds, updatedBy } = validated;
 
-    // Check if role exists
     const role = await prisma.role.findUnique({
       where: { roleId },
       select: { roleId: true, roleName: true },
@@ -232,7 +225,6 @@ export async function SyncRolePermissionsUseCase(data) {
       throw new NotFoundError("Role");
     }
 
-    // Validate all permissionIds exist
     if (permissionIds.length > 0) {
       const existingPermissions = await prisma.permission.findMany({
         where: {
@@ -242,11 +234,13 @@ export async function SyncRolePermissionsUseCase(data) {
       });
 
       const existingIds = existingPermissions.map((p) => p.permissionId);
-      const invalidIds = permissionIds.filter((id) => !existingIds.includes(id));
+      const invalidIds = permissionIds.filter(
+        (id) => !existingIds.includes(id),
+      );
 
       if (invalidIds.length > 0) {
         throw new BadRequestError(
-          `Invalid permission IDs: ${invalidIds.join(", ")}`
+          `Invalid permission IDs: ${invalidIds.join(", ")}`,
         );
       }
     }
@@ -254,7 +248,7 @@ export async function SyncRolePermissionsUseCase(data) {
     const result = await RolePermissionService.syncPermissions(
       roleId,
       permissionIds,
-      updatedBy
+      updatedBy,
     );
 
     log.success(result);
@@ -265,7 +259,6 @@ export async function SyncRolePermissionsUseCase(data) {
   }
 }
 
-// API Controllers
 export async function getRolePermissions(request, roleId) {
   try {
     const result = await GetByRoleUseCase(roleId);
@@ -275,11 +268,11 @@ export async function getRolePermissions(request, roleId) {
       error.name === "NotFoundError"
         ? 404
         : error.name === "BadRequestError"
-        ? 400
-        : 500;
+          ? 400
+          : 500;
     return Response.json(
       { error: error.message || "Internal Server Error" },
-      { status }
+      { status },
     );
   }
 }
@@ -298,17 +291,17 @@ export async function syncRolePermissions(request) {
       error.name === "NotFoundError"
         ? 404
         : error.name === "BadRequestError"
-        ? 400
-        : error.name === "ValidationError"
-        ? 422
-        : 500;
+          ? 400
+          : error.name === "ValidationError"
+            ? 422
+            : 500;
 
     return Response.json(
       {
         error: error.message || "Internal Server Error",
         details: error.details || null,
       },
-      { status }
+      { status },
     );
   }
 }

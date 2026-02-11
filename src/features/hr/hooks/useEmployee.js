@@ -45,7 +45,7 @@ async function fetchWithAbort(url, options, signal) {
 
   if (!response.ok) {
     throw new Error(
-      data.error || `Request failed with status ${response.status}`
+      data.error || `Request failed with status ${response.status}`,
     );
   }
 
@@ -61,7 +61,6 @@ export function useEmployees(apiUrl = API_URL, fetchAll = false) {
 
     (async () => {
       try {
-        // Fetch all by adding a large limit
         const url = fetchAll ? `${apiUrl}?limit=9999` : apiUrl;
         const result = await fetchWithAbort(url, {}, controller.signal);
 
@@ -106,7 +105,7 @@ export function useEmployee(employeeId) {
         const result = await fetchWithAbort(
           `${API_URL}/${employeeId}`,
           {},
-          controller.signal
+          controller.signal,
         );
 
         const item = result.employee || result.data;
@@ -193,10 +192,10 @@ export function useSubmitEmployee({
       } catch (err) {
         showToast(
           TOAST.DANGER,
-          `Failed to submit Employee: ${getErrorMessage(err)}`
+          `Failed to submit Employee: ${getErrorMessage(err)}`,
         );
       }
     },
-    [mode, employeeId, currentEmployeeId, router]
+    [mode, employeeId, currentEmployeeId, router],
   );
 }

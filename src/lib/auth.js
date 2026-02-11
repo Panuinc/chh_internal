@@ -47,7 +47,6 @@ export const authOptions = {
             include: {
               accountEmployee: {
                 include: {
-                  // RBAC: Get permissions through EmployeeRole -> Role -> RolePermission -> Permission
                   employeeRoles: {
                     where: {
                       role: {
@@ -89,7 +88,6 @@ export const authOptions = {
 
           if (!valid) throw new InvalidCredentialsError();
 
-          // RBAC: Aggregate permissions from all roles
           const permissionsSet = new Set();
           account.accountEmployee.employeeRoles.forEach((employeeRole) => {
             if (employeeRole.role && employeeRole.role.rolePermissions) {

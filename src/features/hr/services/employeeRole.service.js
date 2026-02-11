@@ -30,14 +30,12 @@ const PERMISSION_SELECT = {
   permissionStatus: true,
 };
 
-// Validation Schemas
 export const syncEmployeeRolesSchema = z.object({
   employeeId: preprocessString("Please provide employeeId"),
   roleIds: z.array(z.string()).min(0, "roleIds must be an array"),
   updatedBy: preprocessString("Please provide the updater ID"),
 });
 
-// Repository
 export const EmployeeRoleRepository = {
   async findByEmployee(employeeId) {
     return prisma.employeeRole.findMany({
@@ -121,7 +119,6 @@ export const EmployeeRoleRepository = {
   },
 };
 
-// Service
 export const EmployeeRoleService = {
   async getByEmployee(employeeId) {
     return EmployeeRoleRepository.findByEmployee(employeeId);
@@ -174,19 +171,15 @@ export const EmployeeRoleService = {
   },
 
   async syncRoles(employeeId, roleIds, updatedBy) {
-    // Get current roles for this employee
     const currentRoles = await EmployeeRoleRepository.findByEmployee(employeeId);
     const currentRoleIds = currentRoles.map((er) => er.employeeRoleRoleId);
 
-    // Calculate differences
     const toAdd = roleIds.filter((id) => !currentRoleIds.includes(id));
     const toRemove = currentRoleIds.filter((id) => !roleIds.includes(id));
 
     const now = getLocalNow();
 
-    // Execute changes in transaction
     await prisma.$transaction(async (tx) => {
-      // Add new roles
       if (toAdd.length > 0) {
         const dataToCreate = toAdd.map((roleId) => ({
           employeeRoleEmployeeId: employeeId,
@@ -202,7 +195,6 @@ export const EmployeeRoleService = {
         });
       }
 
-      // Remove old roles
       if (toRemove.length > 0) {
         await tx.employeeRole.deleteMany({
           where: {
@@ -221,7 +213,6 @@ export const EmployeeRoleService = {
   },
 };
 
-// Use Cases
 export async function GetByEmployeeUseCase(employeeId) {
   const log = createLogger("GetEmployeeRolesUseCase");
   log.start({ employeeId });
@@ -231,7 +222,6 @@ export async function GetByEmployeeUseCase(employeeId) {
       throw new BadRequestError("Invalid Employee ID");
     }
 
-    // Check if employee exists
     const employee = await prisma.employee.findUnique({
       where: { employeeId },
       select: { employeeId: true, employeeFirstName: true, employeeLastName: true },
@@ -260,7 +250,6 @@ export async function GetEmployeePermissionsUseCase(employeeId) {
       throw new BadRequestError("Invalid Employee ID");
     }
 
-    // Check if employee exists
     const employee = await prisma.employee.findUnique({
       where: { employeeId },
       select: { employeeId: true, employeeFirstName: true, employeeLastName: true },
@@ -288,7 +277,6 @@ export async function SyncEmployeeRolesUseCase(data) {
     const validated = validateOrThrow(syncEmployeeRolesSchema, data);
     const { employeeId, roleIds, updatedBy } = validated;
 
-    // Check if employee exists
     const employee = await prisma.employee.findUnique({
       where: { employeeId },
       select: { employeeId: true },
@@ -298,7 +286,7 @@ export async function SyncEmployeeRolesUseCase(data) {
       throw new NotFoundError("Employee");
     }
 
-    // Validate all roleIds exist
+    if (roleIds.length > 0) {
     if (roleIds.length > 0) {
       const existingRoles = await prisma.role.findMany({
         where: {
@@ -327,7 +315,6 @@ export async function SyncEmployeeRolesUseCase(data) {
   }
 }
 
-// API Controllers
 export async function getEmployeeRoles(request, employeeId) {
   try {
     const result = await GetByEmployeeUseCase(employeeId);

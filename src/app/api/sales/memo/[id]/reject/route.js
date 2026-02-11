@@ -9,15 +9,14 @@ export const runtime = "nodejs";
 export async function POST(request, context) {
   const log = createLogger("MemoRejectAPI");
   const { id } = await context.params;
-  
+
   try {
-    // Get session to check permissions
     const session = await auth();
     if (!session?.user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const userPermissions = session.user.permissions || [];
@@ -25,7 +24,6 @@ export async function POST(request, context) {
     try {
       body = await request.json();
     } catch (e) {
-      // Empty body is fine
       body = {};
     }
 
@@ -36,15 +34,15 @@ export async function POST(request, context) {
         employeeName: session.user.name,
         ...body,
       },
-      userPermissions
+      userPermissions,
     );
 
     return successResponse({ memo: result, message: "Rejected successfully" });
   } catch (error) {
     log.error({ error: error.message });
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

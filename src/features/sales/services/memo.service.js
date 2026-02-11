@@ -24,7 +24,6 @@ const EMPLOYEE_SELECT = {
   employeeLastName: true,
 };
 
-// Status constants
 export const MEMO_STATUS = {
   DRAFT: "DRAFT",
   PENDING_SALES_MANAGER: "PENDING_SALES_MANAGER",
@@ -33,16 +32,17 @@ export const MEMO_STATUS = {
   REJECTED: "REJECTED",
 };
 
-// Status flow validation
 const STATUS_FLOW = {
   [MEMO_STATUS.DRAFT]: [MEMO_STATUS.PENDING_SALES_MANAGER],
-  [MEMO_STATUS.PENDING_SALES_MANAGER]: [MEMO_STATUS.PENDING_CEO, MEMO_STATUS.REJECTED],
+  [MEMO_STATUS.PENDING_SALES_MANAGER]: [
+    MEMO_STATUS.PENDING_CEO,
+    MEMO_STATUS.REJECTED,
+  ],
   [MEMO_STATUS.PENDING_CEO]: [MEMO_STATUS.APPROVED, MEMO_STATUS.REJECTED],
   [MEMO_STATUS.APPROVED]: [],
   [MEMO_STATUS.REJECTED]: [MEMO_STATUS.DRAFT],
 };
 
-// Required permissions for each approval step
 const APPROVAL_PERMISSIONS = {
   [MEMO_STATUS.PENDING_SALES_MANAGER]: "sales.memo.approve.salesmanager",
   [MEMO_STATUS.PENDING_CEO]: "sales.memo.approve.ceo",
@@ -56,8 +56,13 @@ export const createSchema = z.object({
   date: preprocessDate("Please provide date"),
   content: preprocessString("Please provide content"),
   requesterName: preprocessString("Please provide requesterName"),
-  requesterDate: preprocessDate("Please provide requesterDate").optional().nullable(),
-  status: z.enum(["DRAFT", "PENDING_SALES_MANAGER"]).optional().default("DRAFT"),
+  requesterDate: preprocessDate("Please provide requesterDate")
+    .optional()
+    .nullable(),
+  status: z
+    .enum(["DRAFT", "PENDING_SALES_MANAGER"])
+    .optional()
+    .default("DRAFT"),
   createdBy: preprocessString("Please provide the creator ID"),
 });
 
@@ -70,7 +75,9 @@ export const updateSchema = z.object({
   date: preprocessDate("Please provide date"),
   content: preprocessString("Please provide content"),
   requesterName: preprocessString("Please provide requesterName"),
-  requesterDate: preprocessDate("Please provide requesterDate").optional().nullable(),
+  requesterDate: preprocessDate("Please provide requesterDate")
+    .optional()
+    .nullable(),
   status: z.enum(["DRAFT", "PENDING_SALES_MANAGER"]).optional(),
   updatedBy: preprocessString("Please provide the updater ID"),
 });
@@ -198,8 +205,9 @@ export const MemoService = {
     const month = String(now.getMonth() + 1).padStart(2, "0");
     const monthPrefix = `${year}${month}`;
 
-    const latest = await MemoRepository.findLatestDocumentNoForMonth(monthPrefix);
-    
+    const latest =
+      await MemoRepository.findLatestDocumentNoForMonth(monthPrefix);
+
     if (!latest) {
       return `ME-${monthPrefix}-0001`;
     }
@@ -214,7 +222,10 @@ export const MemoService = {
   },
 };
 
-export async function GetAllUseCase(page = 1, limit = PAGINATION.DEFAULT_LIMIT) {
+export async function GetAllUseCase(
+  page = 1,
+  limit = PAGINATION.DEFAULT_LIMIT,
+) {
   const log = createLogger("GetAllMemoUseCase");
   log.start({ page, limit });
 
@@ -300,13 +311,16 @@ export async function UpdateUseCase(data) {
     if (updateData.documentNo !== existing.memoDocumentNo) {
       await MemoService.ensureDocumentNoNotDuplicate(
         updateData.documentNo,
-        memoId
+        memoId,
       );
     }
 
-    // Only allow update if status is DRAFT or REJECTED
-    if (![MEMO_STATUS.DRAFT, MEMO_STATUS.REJECTED].includes(existing.memoStatus)) {
-      throw new BadRequestError(`Cannot update memo with status: ${existing.memoStatus}`);
+    if (
+      ![MEMO_STATUS.DRAFT, MEMO_STATUS.REJECTED].includes(existing.memoStatus)
+    ) {
+      throw new BadRequestError(
+        `Cannot update memo with status: ${existing.memoStatus}`,
+      );
     }
 
     const item = await MemoService.update(memoId, {
@@ -321,7 +335,6 @@ export async function UpdateUseCase(data) {
       memoStatus: updateData.status || existing.memoStatus,
       memoUpdatedBy: updateData.updatedBy,
       memoUpdatedAt: getLocalNow(),
-      // Clear approval data when rejected memo is being resubmitted
       ...(updateData.status === MEMO_STATUS.PENDING_SALES_MANAGER && {
         memoSalesManagerId: null,
         memoSalesManagerName: null,
@@ -383,7 +396,6 @@ export async function GetNextDocumentNoUseCase() {
   }
 }
 
-// Approval/Reject Schemas
 export const approveSchema = z.object({
   memoId: preprocessString("Please provide the memo ID"),
   employeeId: preprocessString("Please provide the employee ID"),
@@ -397,33 +409,33 @@ export const rejectSchema = z.object({
   reason: preprocessString("Please provide the rejection reason"),
 });
 
-/**
- * Validate if user can approve based on current status
- */
 function validateApprovalPermission(currentStatus, userPermissions) {
   const requiredPermission = APPROVAL_PERMISSIONS[currentStatus];
-  
+
   if (!requiredPermission) {
     throw new BadRequestError(`Invalid status for approval: ${currentStatus}`);
   }
-  
-  if (!userPermissions.includes(requiredPermission) && !userPermissions.includes("superadmin")) {
-    throw new BadRequestError(`You don't have permission to approve at this stage`);
+
+  if (
+    !userPermissions.includes(requiredPermission) &&
+    !userPermissions.includes("superadmin")
+  ) {
+    throw new BadRequestError(
+      `You don't have permission to approve at this stage`,
+    );
   }
-  
+
   return requiredPermission;
 }
 
-/**
- * Get the next status after approval
- */
 function getNextStatus(currentStatus) {
   const flow = STATUS_FLOW[currentStatus];
   if (!flow || flow.length === 0) {
-    throw new BadRequestError(`Cannot approve memo with status: ${currentStatus}`);
+    throw new BadRequestError(
+      `Cannot approve memo with status: ${currentStatus}`,
+    );
   }
-  // Return the first valid next status (not rejected)
-  const nextStatus = flow.find(s => s !== MEMO_STATUS.REJECTED);
+  const nextStatus = flow.find((s) => s !== MEMO_STATUS.REJECTED);
   if (!nextStatus) {
     throw new BadRequestError(`No valid next status for: ${currentStatus}`);
   }
@@ -443,13 +455,10 @@ export async function ApproveUseCase(data, userPermissions) {
       throw new NotFoundError(ENTITY_NAME);
     }
 
-    // Validate permission based on current status
     validateApprovalPermission(existing.memoStatus, userPermissions);
 
-    // Get next status
     const nextStatus = getNextStatus(existing.memoStatus);
 
-    // Prepare update data based on current status
     const updateData = {
       memoStatus: nextStatus,
     };
@@ -487,12 +496,16 @@ export async function RejectUseCase(data, userPermissions) {
       throw new NotFoundError(ENTITY_NAME);
     }
 
-    // Can only reject if status is PENDING_SALES_MANAGER or PENDING_CEO
-    if (![MEMO_STATUS.PENDING_SALES_MANAGER, MEMO_STATUS.PENDING_CEO].includes(existing.memoStatus)) {
-      throw new BadRequestError(`Cannot reject memo with status: ${existing.memoStatus}`);
+    if (
+      ![MEMO_STATUS.PENDING_SALES_MANAGER, MEMO_STATUS.PENDING_CEO].includes(
+        existing.memoStatus,
+      )
+    ) {
+      throw new BadRequestError(
+        `Cannot reject memo with status: ${existing.memoStatus}`,
+      );
     }
 
-    // Validate permission
     validateApprovalPermission(existing.memoStatus, userPermissions);
 
     const item = await MemoService.update(memoId, {

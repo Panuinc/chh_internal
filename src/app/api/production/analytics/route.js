@@ -6,12 +6,19 @@ export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    // Production focuses on Finished Goods (FG) — the output of production
     const fgItems = await bcClient.get(
       query()
         .filter("inventoryPostingGroupCode", "eq", "FG")
-        .select("id", "number", "displayName", "inventory", "blocked", "unitCost", "unitPrice")
-        .buildPath(ENDPOINTS.ITEMS)
+        .select(
+          "id",
+          "number",
+          "displayName",
+          "inventory",
+          "blocked",
+          "unitCost",
+          "unitPrice",
+        )
+        .buildPath(ENDPOINTS.ITEMS),
     );
 
     const items = Array.isArray(fgItems) ? fgItems : [];
@@ -20,9 +27,11 @@ export async function GET() {
     const inStock = items.filter((i) => i.inventory > 0).length;
     const outOfStock = items.filter((i) => i.inventory <= 0).length;
     const blocked = items.filter((i) => i.blocked).length;
-    const totalInventory = items.reduce((sum, i) => sum + (i.inventory || 0), 0);
+    const totalInventory = items.reduce(
+      (sum, i) => sum + (i.inventory || 0),
+      0,
+    );
 
-    // Top 10 items by inventory
     const topByInventory = [...items]
       .filter((i) => i.inventory > 0)
       .sort((a, b) => b.inventory - a.inventory)
@@ -46,7 +55,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       { status: "error", error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

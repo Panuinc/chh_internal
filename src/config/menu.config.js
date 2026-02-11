@@ -18,10 +18,13 @@ import {
   Truck,
 } from "lucide-react";
 
-// Module grouping for ERP sidebar navigation
 export const moduleGroups = [
   { id: "admin", label: "Administration", moduleIds: ["hr", "security"] },
-  { id: "operations", label: "Operations", moduleIds: ["warehouse", "production"] },
+  {
+    id: "operations",
+    label: "Operations",
+    moduleIds: ["warehouse", "production"],
+  },
   { id: "business", label: "Business", moduleIds: ["sales", "accounting"] },
 ];
 

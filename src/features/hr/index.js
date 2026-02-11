@@ -1,5 +1,3 @@
-// HR Feature Public API
-// Components
 export { default as HrDashboard } from "./components/HrDashboard";
 export { default as AccountList } from "./components/AccountList";
 export { default as AccountForm } from "./components/AccountForm";
@@ -16,10 +14,6 @@ export { default as AssignForm } from "./components/AssignForm";
 export { default as RolePermissionForm } from "./components/RolePermissionForm";
 export { default as EmployeeRoleForm } from "./components/EmployeeRoleForm";
 
-// Hooks
 export * from "./hooks";
 
-// Schemas
 export * from "./schemas";
-
-// Note: Services are server-side only, import directly from @/features/hr/services/xxx

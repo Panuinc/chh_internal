@@ -44,7 +44,7 @@ async function fetchWithAbort(url, options, signal) {
 
   if (!response.ok) {
     throw new Error(
-      data.error || `Request failed with status ${response.status}`
+      data.error || `Request failed with status ${response.status}`,
     );
   }
 
@@ -60,7 +60,6 @@ export function useRoles(apiUrl = API_URL, fetchAll = false) {
 
     (async () => {
       try {
-        // Fetch all by adding a large limit
         const url = fetchAll ? `${apiUrl}?limit=9999` : apiUrl;
         const result = await fetchWithAbort(url, {}, controller.signal);
 
@@ -105,7 +104,7 @@ export function useRole(roleId) {
         const result = await fetchWithAbort(
           `${API_URL}/${roleId}`,
           {},
-          controller.signal
+          controller.signal,
         );
 
         const item = result.role || result.data;
@@ -182,18 +181,15 @@ export function useSubmitRole({
             setErrors({});
           }
 
-          showToast(
-            TOAST.DANGER,
-            result.error || "Failed to submit Role."
-          );
+          showToast(TOAST.DANGER, result.error || "Failed to submit Role.");
         }
       } catch (err) {
         showToast(
           TOAST.DANGER,
-          `Failed to submit Role: ${getErrorMessage(err)}`
+          `Failed to submit Role: ${getErrorMessage(err)}`,
         );
       }
     },
-    [mode, roleId, currentRoleId, router]
+    [mode, roleId, currentRoleId, router],
   );
 }

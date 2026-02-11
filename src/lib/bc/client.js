@@ -10,27 +10,21 @@ const tokenCache = {
   expiresAt: null,
 };
 
-// Response cache: path -> { data, timestamp }
 const responseCache = new Map();
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 นาที
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
-// รายการ endpoint ที่ไม่ควรแคช (เปลี่ยนแปลงบ่อยหรือสำคัญ)
 const NO_CACHE_PATHS = ["/salesOrders", "/customers"];
 
-// จำกัดจำนวนหน้าสูงสุดสำหรับ auto-pagination
 const MAX_PAGES = 10;
 const MAX_TOTAL_ITEMS = 5000;
 
-// Retry configuration
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
-const RETRY_STATUS_CODES = [408, 429, 500, 502, 503, 504]; // รหัสที่ควรลองใหม่ได้
-const FETCH_TIMEOUT_MS = 30000; // 30 วินาที
+const RETRY_STATUS_CODES = [408, 429, 500, 502, 503, 504];
+const FETCH_TIMEOUT_MS = 30000; 
 
-// Helper: delay แบบ async
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Helper: fetch พร้อม timeout
 async function fetchWithTimeout(url, options, timeoutMs = FETCH_TIMEOUT_MS) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -108,13 +102,11 @@ class BCClient {
     this.log("Token cache cleared");
   }
 
-  // Cache management helpers
   _getCacheKey(path) {
     return path;
   }
 
   _shouldCache(path) {
-    // ไม่แคชถ้า path อยู่ในรายการยกเว้น
     return !NO_CACHE_PATHS.some((noCache) => path.includes(noCache));
   }
 
@@ -124,7 +116,6 @@ class BCClient {
 
     if (!cached) return null;
 
-    // ตรวจสอบว่าแคสหมดอายุหรือยัง
     if (Date.now() - cached.timestamp > CACHE_TTL_MS) {
       responseCache.delete(key);
       return null;
@@ -183,7 +174,6 @@ class BCClient {
         FETCH_TIMEOUT_MS,
       );
 
-      // 401: Token หมดอายุ, ลองขอ token ใหม่ 1 ครั้ง
       if (response.status === 401 && retryCount === 0) {
         this.log("Received 401, refreshing token");
         this.clearTokenCache();
@@ -196,7 +186,6 @@ class BCClient {
         );
       }
 
-      // ถ้าเป็น error ที่ควร retry และยังไม่เกินจำนวนครั้ง
       if (
         RETRY_STATUS_CODES.includes(response.status) &&
         retryCount < MAX_RETRIES
@@ -211,7 +200,6 @@ class BCClient {
 
       return response;
     } catch (error) {
-      // AbortError = timeout
       if (error.name === "AbortError") {
         throw new BCApiError(
           `Request timeout after ${FETCH_TIMEOUT_MS}ms`,
@@ -220,7 +208,6 @@ class BCClient {
         );
       }
 
-      // Network error (เช่น connection refused) ให้ลองใหม่ได้
       if (retryCount < MAX_RETRIES) {
         const waitTime = RETRY_DELAY_MS * Math.pow(2, retryCount);
         this.log(
@@ -247,13 +234,11 @@ class BCClient {
     while (nextUrl) {
       pageCount++;
 
-      // จำกัดจำนวนหน้าสูงสุด
       if (pageCount > MAX_PAGES) {
         this.log(`Reached max page limit (${MAX_PAGES}), stopping pagination`);
         break;
       }
 
-      // จำกัดจำนวน items สูงสุด
       if (allResults.length >= MAX_TOTAL_ITEMS) {
         this.log(
           `Reached max items limit (${MAX_TOTAL_ITEMS}), stopping pagination`,
@@ -279,7 +264,6 @@ class BCClient {
       if (Array.isArray(data.value)) {
         allResults.push(...data.value);
 
-        // ตรวจสอบจำนวน items อีกครั้งหลังเพิ่มข้อมูล
         if (allResults.length >= MAX_TOTAL_ITEMS) {
           this.log(`Reached max items limit after adding page ${pageCount}`);
           break;
@@ -299,7 +283,6 @@ class BCClient {
   }
 
   async get(path, options = {}) {
-    // ตรวจสอบแคสก่อน (เฉพาะ GET ที่ไม่มี force refresh)
     if (!options.skipCache) {
       const cached = this._getCachedResponse(path);
       if (cached) return cached;
@@ -307,7 +290,6 @@ class BCClient {
 
     const result = await this.fetch(path, { ...options, method: "GET" });
 
-    // เก็บลงแคส
     this._setCachedResponse(path, result);
 
     return result;

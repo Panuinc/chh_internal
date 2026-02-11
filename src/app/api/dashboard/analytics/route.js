@@ -12,25 +12,25 @@ async function fetchBCItemCounts() {
         query()
           .filter("inventoryPostingGroupCode", "eq", "FG")
           .select("id", "inventory")
-          .buildPath(ENDPOINTS.ITEMS)
+          .buildPath(ENDPOINTS.ITEMS),
       ),
       bcClient.get(
         query()
           .filter("inventoryPostingGroupCode", "eq", "RM")
           .select("id", "inventory")
-          .buildPath(ENDPOINTS.ITEMS)
+          .buildPath(ENDPOINTS.ITEMS),
       ),
       bcClient.get(
         query()
           .filter("inventoryPostingGroupCode", "eq", "SP")
           .select("id", "inventory")
-          .buildPath(ENDPOINTS.ITEMS)
+          .buildPath(ENDPOINTS.ITEMS),
       ),
       bcClient.get(
         query()
           .filter("inventoryPostingGroupCode", "eq", "PK")
           .select("id", "inventory")
-          .buildPath(ENDPOINTS.ITEMS)
+          .buildPath(ENDPOINTS.ITEMS),
       ),
     ]);
 
@@ -46,7 +46,11 @@ async function fetchBCItemCounts() {
     return {
       warehouse: {
         totalItems: fgCount + rmCount + spCount + pkCount,
-        totalInStock: inStock(fgItems) + inStock(rmItems) + inStock(spItems) + inStock(pkItems),
+        totalInStock:
+          inStock(fgItems) +
+          inStock(rmItems) +
+          inStock(spItems) +
+          inStock(pkItems),
         finishedGoods: fgCount,
         rawMaterials: rmCount,
         supplies: spCount,
@@ -60,7 +64,14 @@ async function fetchBCItemCounts() {
     };
   } catch {
     return {
-      warehouse: { totalItems: 0, totalInStock: 0, finishedGoods: 0, rawMaterials: 0, supplies: 0, packing: 0 },
+      warehouse: {
+        totalItems: 0,
+        totalInStock: 0,
+        finishedGoods: 0,
+        rawMaterials: 0,
+        supplies: 0,
+        packing: 0,
+      },
       production: { totalProducts: 0, inStock: 0, outOfStock: 0 },
     };
   }
@@ -69,11 +80,28 @@ async function fetchBCItemCounts() {
 export async function GET() {
   try {
     const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
     const endOfToday = new Date(startOfToday);
     endOfToday.setDate(endOfToday.getDate() + 1);
 
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
 
     const [
       totalEmployees,
@@ -105,7 +133,9 @@ export async function GET() {
       }),
       prisma.patrol.count(),
       prisma.salesMemo.count(),
-      prisma.salesMemo.count({ where: { memoStatus: "PENDING_SALES_MANAGER" } }),
+      prisma.salesMemo.count({
+        where: { memoStatus: "PENDING_SALES_MANAGER" },
+      }),
       prisma.salesMemo.count({ where: { memoStatus: "PENDING_CEO" } }),
       prisma.salesMemo.count({ where: { memoStatus: "APPROVED" } }),
       prisma.eMSTracking.count(),
@@ -125,7 +155,6 @@ export async function GET() {
       fetchBCItemCounts(),
     ]);
 
-    // Monthly memos (last 6 months)
     const monthlyMap = {};
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -139,7 +168,8 @@ export async function GET() {
     });
 
     const pendingMemos = pendingSalesManager + pendingCeo;
-    const emsSuccessRate = totalEMS > 0 ? Math.round((emsReceived / totalEMS) * 100) : 0;
+    const emsSuccessRate =
+      totalEMS > 0 ? Math.round((emsReceived / totalEMS) * 100) : 0;
 
     return NextResponse.json({
       status: "success",
@@ -180,7 +210,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       { status: "error", error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
