@@ -11,3 +11,5 @@ export {
   useApproveMemo,
   useRejectMemo,
 } from "./useMemo";
+
+export { useSalesAnalytics } from "./useSalesAnalytics";

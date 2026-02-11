@@ -21,7 +21,7 @@ export default function MemoPage() {
   const canApproveSM = hasPermission("sales.memo.approve.salesmanager") || hasPermission("superadmin");
   const canApproveCEO = hasPermission("sales.memo.approve.ceo") || hasPermission("superadmin");
 
-  // DEBUG: ตรวจสอบค่า permissions
+  // DEBUG: Check permission values
   console.log("=== MEMO PAGE DEBUG ===");
   console.log("canApproveSM:", canApproveSM);
   console.log("canApproveCEO:", canApproveCEO);
@@ -102,10 +102,10 @@ export default function MemoPage() {
       {/* Reject Reason Modal */}
       <Modal isOpen={rejectModalOpen} onClose={() => setRejectModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>ระบุเหตุผลการปฏิเสธ</ModalHeader>
+          <ModalHeader>Specify Rejection Reason</ModalHeader>
           <ModalBody>
             <Textarea
-              placeholder="กรุณาระบุเหตุผลการปฏิเสธ..."
+              placeholder="Please specify the reason for rejection..."
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               minRows={3}
@@ -114,14 +114,14 @@ export default function MemoPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setRejectModalOpen(false)}>
-              ยกเลิก
+              Cancel
             </Button>
-            <Button 
-              color="danger" 
+            <Button
+              color="danger"
               onPress={handleRejectConfirm}
               isDisabled={!rejectReason.trim()}
             >
-              ปฏิเสธ
+              Reject
             </Button>
           </ModalFooter>
         </ModalContent>

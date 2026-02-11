@@ -13,12 +13,11 @@ export function showToast(type, message) {
     title,
     description: message,
     color,
-    variant: "solid",
+    variant: "flat",
     timeout: 3000,
     classNames: {
-      content: "text-background",
-      title: "text-background",
-      description: "text-background",
+      title: "text-sm font-medium",
+      description: "text-xs",
     },
   });
 }

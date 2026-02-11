@@ -1,48 +1,59 @@
-import { ModulePage, SubMenu } from "@/components";
-import { AlertCircle } from "lucide-react";
+import { ModulePage, KpiCard, ChartCard, MiniBarChart } from "@/components";
+import { AlertCircle, Users, UserCheck, Shield, Activity } from "lucide-react";
+import { useSecurityAnalytics } from "@/features/security/hooks";
 
-function SecuritySidebar() {
-  const stats = {
-    totalEmployees: 150,
-    departments: 8,
-    pendingApprovals: 5,
-  };
-
+function SecurityAnalytics({ data }) {
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-b-1 border-default">
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
-        Quick Stats
+    <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <KpiCard
+          title="Visitors Today"
+          value={data.visitorsToday}
+          icon={Users}
+        />
+        <KpiCard
+          title="Active Visitors"
+          value={data.checkedIn}
+          icon={UserCheck}
+          subValue="Currently checked in"
+        />
+        <KpiCard
+          title="Patrols Today"
+          value={data.patrolsToday}
+          icon={Shield}
+        />
+        <KpiCard
+          title="Total Patrols"
+          value={data.totalPatrols}
+          icon={Activity}
+        />
       </div>
 
-      <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
-        <StatItem label="Total Employees" value={stats.totalEmployees} />
-        <StatItem label="Departments" value={stats.departments} />
-        <StatItem label="Pending Approvals" value={stats.pendingApprovals} />
-      </div>
+      {data.dailyVisitors?.length > 0 && (
+        <ChartCard title="Daily Visitors (This Week)">
+          <MiniBarChart
+            data={data.dailyVisitors}
+            dataKey="visitors"
+            xKey="name"
+            height={200}
+            color="#404040"
+            formatter={(v) => `${v} visitors`}
+          />
+        </ChartCard>
+      )}
     </div>
   );
 }
 
-function StatItem({ label, value }) {
-  return (
-    <div className="flex items-center justify-between w-full h-full gap-2 border-b-1 border-default">
-      <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-        {label}
-      </div>
-      <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-        {value}
-      </div>
-    </div>
-  );
-}
+export default function UISecurity({ menu }) {
+  const { data, loading } = useSecurityAnalytics();
 
-export default function UISecurity({ menu, isEmpty }) {
   if (!menu) {
     return (
-      <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 border-default">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 border-default">
-          <AlertCircle />
-          <span>Module configuration not found</span>
+      <div className="flex items-center justify-center w-full h-full p-2">
+        <div className="flex items-center gap-2 p-2 bg-default-50 rounded-lg border border-default">
+          <AlertCircle className="w-4 h-4 text-default-400" />
+          <span className="text-[13px] text-default-500">Module configuration not found</span>
         </div>
       </div>
     );
@@ -55,22 +66,8 @@ export default function UISecurity({ menu, isEmpty }) {
       icon={<Icon />}
       title={menu.title}
       description={menu.description}
-      sidebar={<SecuritySidebar />}
-    >
-      {isEmpty ? (
-        <div className="col-span-full text-center justify-center w-full p-2 gap-2">
-          No accessible menu items. Please contact administrator.
-        </div>
-      ) : (
-        menu.items.map((item) => (
-          <SubMenu
-            key={item.id}
-            href={item.href}
-            text={item.text}
-            icon={item.icon}
-          />
-        ))
-      )}
-    </ModulePage>
+      showSidebar={false}
+      analytics={loading || !data ? null : <SecurityAnalytics data={data} />}
+    />
   );
 }

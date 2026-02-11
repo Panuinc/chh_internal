@@ -27,14 +27,8 @@ export default function DepartmentCreate() {
     {
       departmentName: "",
     },
-    submitDepartment
+    submitDepartment,
   );
 
-  return (
-    <DepartmentForm
-      formHandler={formHandler}
-      mode="create"
-      operatedBy={userName}
-    />
-  );
+  return <DepartmentForm formHandler={formHandler} mode="create" operatedBy={userName} />;
 }

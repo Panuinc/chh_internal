@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import { Button } from "@heroui/button";
 import { Spinner } from "@heroui/spinner";
 import { Tooltip } from "@heroui/tooltip";
+import { Chip } from "@heroui/chip";
 import {
   Printer,
   RefreshCw,
@@ -14,121 +15,27 @@ import {
   Zap,
   Wifi,
   Activity,
+  Radio,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import { useRFIDSafe } from "@/hooks";
 
-function StatusBadge({ connected, loading }) {
+function StatusDot({ connected, loading }) {
   if (loading) {
     return (
-      <div className="flex items-center gap-2 p-2 rounded-xl bg-warning/10 border-1 border-warning/30">
-        <RefreshCw className="text-warning animate-spin" />
-        <span className="text-sm text-warning">กำลังตรวจสอบ...</span>
-      </div>
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warning opacity-75" />
+        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-warning" />
+      </span>
     );
   }
-
   return (
-    <div
-      className={`flex items-center gap-2 p-2 rounded-xl border-1 ${
-        connected
-          ? "bg-success/10 border-success/30"
-          : "bg-default border-default"
+    <span
+      className={`inline-flex h-2.5 w-2.5 rounded-full ${
+        connected ? "bg-success" : "bg-default-300"
       }`}
-    >
-      <span
-        className={`w-2 h-2 rounded-xl ${
-          connected ? "bg-success" : "bg-foreground/30"
-        }`}
-      />
-      <span
-        className={`text-sm ${connected ? "text-success" : "text-foreground/50"}`}
-      >
-        {connected ? "เชื่อมต่อแล้ว" : "ไม่ได้เชื่อมต่อ"}
-      </span>
-    </div>
-  );
-}
-
-function AlertBox({ children, type = "error" }) {
-  const styles = {
-    error: {
-      bg: "bg-danger/10",
-      border: "border-danger/30",
-      text: "text-danger",
-    },
-    warning: {
-      bg: "bg-warning/10",
-      border: "border-warning/30",
-      text: "text-warning",
-    },
-    success: {
-      bg: "bg-success/10",
-      border: "border-success/30",
-      text: "text-success",
-    },
-  };
-
-  const s = styles[type];
-
-  return (
-    <div
-      className={`flex items-start gap-2 p-2 rounded-xl ${s.bg} border-1 ${s.border}`}
-    >
-      <AlertCircle className={`${s.text} mt-0.5 flex-shrink-0`} />
-      <span className={`text-sm ${s.text}`}>{children}</span>
-    </div>
-  );
-}
-
-function ActionBtn({
-  children,
-  icon: Icon,
-  variant = "secondary",
-  loading,
-  ...props
-}) {
-  const variants = {
-    primary: "bg-primary text-background",
-    secondary: "bg-background text-foreground/70 border-1 border-default",
-    danger: "bg-background text-danger border-1 border-danger/30",
-    ghost: "bg-transparent text-foreground/60",
-  };
-
-  return (
-    <Button
-      size="md"
-      isLoading={loading}
-      spinner={<Spinner size="md" color="current" />}
-      startContent={!loading && Icon && <Icon />}
-      className={`${variants[variant]} text-sm h-9 p-2`}
-      {...props}
-    >
-      {children}
-    </Button>
-  );
-}
-
-function StatusTile({ label, active }) {
-  return (
-    <div
-      className={`p-2 rounded-xl border-1 ${
-        active
-          ? "bg-success/10 border-success/30"
-          : "bg-danger/10 border-danger/30"
-      }`}
-    >
-      <div className="flex items-center gap-2 mb-1">
-        <span
-          className={`w-2 h-2 rounded-xl ${active ? "bg-success" : "bg-danger/70"}`}
-        />
-        <span className="text-xs text-foreground/50">{label}</span>
-      </div>
-      <p
-        className={`text-sm font-medium ${active ? "text-success" : "text-danger"}`}
-      >
-        {active ? "พร้อม" : "ไม่พร้อม"}
-      </p>
-    </div>
+    />
   );
 }
 
@@ -137,16 +44,27 @@ export function PrinterStatusBadge({ className = "" }) {
 
   return (
     <div className={`inline-flex items-center gap-2 ${className}`}>
-      <StatusBadge connected={isConnected} loading={printerLoading} />
+      <div className="flex items-center gap-2 p-2 rounded-md bg-default-50 border border-default">
+        <StatusDot connected={isConnected} loading={printerLoading} />
+        <span className="text-xs text-default-600">
+          {printerLoading
+            ? "Checking..."
+            : isConnected
+              ? "Printer Online"
+              : "Printer Offline"}
+        </span>
+      </div>
       <Button
-        color="default"
-        size="md"
-        radius="md"
+        isIconOnly
+        size="sm"
+        variant="light"
         onPress={refreshPrinter}
-        disabled={printerLoading}
-        className="p-2 hover:bg-default text-foreground/40 disabled:opacity-50 rounded-xl"
+        isDisabled={printerLoading}
+        className="text-default-400 w-7 h-7 min-w-7"
       >
-        <RefreshCw className={printerLoading ? "animate-spin" : ""} />
+        <RefreshCw
+          className={`w-3.5 h-3.5 ${printerLoading ? "animate-spin" : ""}`}
+        />
       </Button>
     </div>
   );
@@ -178,50 +96,54 @@ export function PrinterControls({ compact = false, className = "" }) {
   if (compact) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <StatusBadge connected={isConnected} loading={printerLoading} />
+        <PrinterStatusBadge />
         <div className="flex gap-2">
-          <Tooltip content="ทดสอบการเชื่อมต่อ">
+          <Tooltip content="Test Connection">
             <Button
               isIconOnly
-              size="md"
+              size="sm"
               variant="light"
               isLoading={actionLoading === "test"}
               onPress={() => handleAction("test", testConnection)}
+              className="w-7 h-7 min-w-7"
             >
-              <Wifi />
+              <Wifi className="w-3.5 h-3.5" />
             </Button>
           </Tooltip>
-          <Tooltip content="ปรับเทียบ">
+          <Tooltip content="Calibrate">
             <Button
               isIconOnly
-              size="md"
+              size="sm"
               variant="light"
               isLoading={actionLoading === "calibrate"}
               onPress={() => handleAction("calibrate", calibrate)}
+              className="w-7 h-7 min-w-7"
             >
-              <Gauge />
+              <Gauge className="w-3.5 h-3.5" />
             </Button>
           </Tooltip>
-          <Tooltip content="ยกเลิกงานพิมพ์">
+          <Tooltip content="Cancel Jobs">
             <Button
               isIconOnly
-              size="md"
+              size="sm"
               variant="light"
               isLoading={actionLoading === "cancel"}
               onPress={() => handleAction("cancel", cancelAllJobs)}
+              className="w-7 h-7 min-w-7"
             >
-              <StopCircle />
+              <StopCircle className="w-3.5 h-3.5" />
             </Button>
           </Tooltip>
-          <Tooltip content="รีเซ็ต">
+          <Tooltip content="Reset">
             <Button
               isIconOnly
-              size="md"
+              size="sm"
               variant="light"
               isLoading={actionLoading === "reset"}
               onPress={() => handleAction("reset", resetPrinter)}
+              className="w-7 h-7 min-w-7"
             >
-              <RotateCcw />
+              <RotateCcw className="w-3.5 h-3.5" />
             </Button>
           </Tooltip>
         </div>
@@ -230,58 +152,89 @@ export function PrinterControls({ compact = false, className = "" }) {
   }
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-3 ${className}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Printer className="text-foreground/50" />
-          <span className="font-medium text-foreground/80">
+          <Printer className="w-4 h-4 text-default-500" />
+          <span className="text-[13px] font-semibold text-foreground">
             Printer Controls
           </span>
         </div>
-        <StatusBadge connected={isConnected} loading={printerLoading} />
+        <PrinterStatusBadge />
       </div>
 
-      {printerError && <AlertBox type="error">{printerError}</AlertBox>}
+      {printerError && (
+        <div className="flex items-start gap-2 p-2 rounded-md bg-danger-50 border border-danger-200">
+          <AlertCircle className="w-4 h-4 text-danger shrink-0" />
+          <span className="text-xs text-danger">{printerError}</span>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2">
-        <ActionBtn
-          variant="primary"
-          icon={Wifi}
-          loading={actionLoading === "test"}
+        <Button
+          size="sm"
+          radius="sm"
+          isLoading={actionLoading === "test"}
+          startContent={
+            !actionLoading && <Wifi className="w-3.5 h-3.5" />
+          }
           onPress={() => handleAction("test", testConnection)}
+          className="bg-foreground text-background text-xs font-medium"
         >
-          ทดสอบ
-        </ActionBtn>
-        <ActionBtn
-          icon={Gauge}
-          loading={actionLoading === "calibrate"}
+          Test
+        </Button>
+        <Button
+          size="sm"
+          radius="sm"
+          variant="bordered"
+          isLoading={actionLoading === "calibrate"}
+          startContent={
+            !actionLoading && <Gauge className="w-3.5 h-3.5" />
+          }
           onPress={() => handleAction("calibrate", calibrate)}
+          className="border-default text-default-700 text-xs"
         >
-          ปรับเทียบ
-        </ActionBtn>
-        <ActionBtn
-          icon={StopCircle}
-          loading={actionLoading === "cancel"}
+          Calibrate
+        </Button>
+        <Button
+          size="sm"
+          radius="sm"
+          variant="bordered"
+          isLoading={actionLoading === "cancel"}
+          startContent={
+            !actionLoading && <StopCircle className="w-3.5 h-3.5" />
+          }
           onPress={() => handleAction("cancel", cancelAllJobs)}
+          className="border-default text-default-700 text-xs"
         >
-          ยกเลิกงาน
-        </ActionBtn>
-        <ActionBtn
-          variant="ghost"
-          icon={RotateCcw}
-          loading={actionLoading === "reset"}
+          Cancel Jobs
+        </Button>
+        <Button
+          size="sm"
+          radius="sm"
+          variant="light"
+          isLoading={actionLoading === "reset"}
+          startContent={
+            !actionLoading && <RotateCcw className="w-3.5 h-3.5" />
+          }
           onPress={() => handleAction("reset", resetPrinter)}
+          className="text-default-500 text-xs"
         >
-          Soft Reset
-        </ActionBtn>
-        <ActionBtn
-          variant="danger"
-          icon={Zap}
-          loading={actionLoading === "fullReset"}
+          Reset
+        </Button>
+        <Button
+          size="sm"
+          radius="sm"
+          variant="bordered"
+          isLoading={actionLoading === "fullReset"}
+          startContent={
+            !actionLoading && <Zap className="w-3.5 h-3.5" />
+          }
           onPress={() => handleAction("fullReset", fullReset)}
+          className="border-danger-200 text-danger text-xs"
         >
           Full Reset
-        </ActionBtn>
+        </Button>
       </div>
     </div>
   );
@@ -290,7 +243,7 @@ export function PrinterControls({ compact = false, className = "" }) {
 export function PrinterSettings({
   className = "",
   showHeader = true,
-  title = "ควบคุมเครื่องพิมพ์",
+  title = "Printer Control",
   subtitle = "ChainWay RFID Printer",
 }) {
   const {
@@ -339,146 +292,238 @@ export function PrinterSettings({
     }
   }, []);
 
+  const testRFIDWrite = useCallback(async () => {
+    try {
+      const response = await fetch("/api/chainWay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "command",
+          command:
+            "^XA^RS8^RFW,H,,,A^FD112233445566778899AABBCC^FS^FO50,50^A0N,30,30^FDTEST RFID^FS^PQ1^XZ",
+        }),
+      });
+      const result = await response.json();
+      alert(
+        result.success
+          ? "Sent successfully! Check the printer"
+          : `Error: ${result.error}`,
+      );
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    }
+  }, []);
+
+  const actions = [
+    {
+      key: "test",
+      label: "Test Connection",
+      description: "Verify printer is reachable",
+      icon: Wifi,
+      fn: testConnection,
+      color: "text-primary",
+    },
+    {
+      key: "rfidTest",
+      label: "Test RFID Write",
+      description: "Send a test RFID tag write",
+      icon: Radio,
+      fn: testRFIDWrite,
+      color: "text-warning",
+    },
+    {
+      key: "rfidCalibrate",
+      label: "RFID Calibrate",
+      description: "Calibrate RFID antenna (1-5 min)",
+      icon: Activity,
+      fn: rfidCalibrate,
+      color: "text-warning",
+    },
+    {
+      key: "calibrate",
+      label: "Calibrate",
+      description: "Calibrate label sensor",
+      icon: Gauge,
+      fn: calibrate,
+      color: "text-primary",
+    },
+    {
+      key: "cancel",
+      label: "Cancel Jobs",
+      description: "Cancel all pending print jobs",
+      icon: StopCircle,
+      fn: cancelAllJobs,
+      color: "text-default-500",
+    },
+    {
+      key: "reset",
+      label: "Soft Reset",
+      description: "Reset printer without clearing config",
+      icon: RotateCcw,
+      fn: resetPrinter,
+      color: "text-default-500",
+    },
+    {
+      key: "fullReset",
+      label: "Full Reset",
+      description: "Factory reset all printer settings",
+      icon: Zap,
+      fn: fullReset,
+      color: "text-danger",
+      danger: true,
+    },
+  ];
+
   return (
-    <div className={`max-w-2xl mx-auto ${className}`}>
+    <div className={`max-w-2xl p-2 ${className}`}>
+      {/* Header */}
       {showHeader && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Printer className="text-foreground/60" />
+            <div className="w-9 h-9 rounded-lg bg-default-100 flex items-center justify-center">
+              <Printer className="w-4.5 h-4.5 text-default-600" />
+            </div>
             <div>
-              <h1 className="text-xl font-semibold text-foreground">{title}</h1>
+              <h1 className="text-sm font-semibold text-foreground">
+                {title}
+              </h1>
               {subtitle && (
-                <p className="text-sm text-foreground/50">{subtitle}</p>
+                <p className="text-xs text-default-400">{subtitle}</p>
               )}
             </div>
           </div>
-          <StatusBadge connected={isConnected} loading={printerLoading} />
+          <Button
+            isIconOnly
+            size="sm"
+            variant="light"
+            onPress={refreshPrinter}
+            isDisabled={printerLoading}
+            className="text-default-400"
+          >
+            <RefreshCw
+              className={`w-4 h-4 ${printerLoading ? "animate-spin" : ""}`}
+            />
+          </Button>
         </div>
       )}
 
+      {/* Error Banner */}
       {printerError && (
-        <div className="mb-4">
-          <AlertBox type="error">{printerError}</AlertBox>
+        <div className="flex items-start gap-2 p-2 rounded-lg bg-red-50 border border-red-200">
+          <AlertCircle className="w-4 h-4 text-danger shrink-0" />
+          <span className="text-[13px] text-danger">{printerError}</span>
         </div>
       )}
 
-      <div className="space-y-6">
-        <div className="p-2 rounded-xl border-1 border-default">
-          <div className="flex items-center gap-2 mb-4">
-            <Wifi className="text-foreground/50" />
-            <h3 className="text-sm font-semibold text-foreground/80">
-              สถานะการเชื่อมต่อ
-            </h3>
+      <div className="space-y-4">
+        {/* Connection Status */}
+        <div className="rounded-lg border border-default">
+          <div className="flex items-center gap-2 p-2 border-b border-default">
+            <Wifi className="w-4 h-4 text-default-500" />
+            <span className="text-[13px] font-semibold text-foreground">
+              Connection
+            </span>
           </div>
-
-          <div className="flex items-center justify-between p-2 rounded-xl bg-default">
-            <div className="flex items-center gap-2">
-              <div
-                className={`w-3 h-3 rounded-xl ${isConnected ? "bg-success" : "bg-foreground/30"}`}
-              />
-              <div>
-                <p className="font-medium text-foreground/80">
-                  {isConnected ? "เชื่อมต่อสำเร็จ" : "ไม่ได้เชื่อมต่อ"}
-                </p>
+          <div className="p-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    isConnected
+                      ? "bg-success/10"
+                      : "bg-default-100"
+                  }`}
+                >
+                  {printerLoading ? (
+                    <Spinner size="sm" color="warning" />
+                  ) : isConnected ? (
+                    <CheckCircle2 className="w-5 h-5 text-success" />
+                  ) : (
+                    <XCircle className="w-5 h-5 text-default-400" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-[13px] font-medium text-foreground">
+                    {printerLoading
+                      ? "Checking connection..."
+                      : isConnected
+                        ? "Connected"
+                        : "Disconnected"}
+                  </p>
+                  <p className="text-xs text-default-400">
+                    {isConnected
+                      ? "Printer is ready to receive commands"
+                      : "Unable to reach the printer"}
+                  </p>
+                </div>
               </div>
+              <Button
+                size="sm"
+                radius="sm"
+                isLoading={actionLoading === "test"}
+                startContent={
+                  !(actionLoading === "test") && (
+                    <Wifi className="w-3.5 h-3.5" />
+                  )
+                }
+                onPress={() => handleAction("test", testConnection)}
+                className="bg-foreground text-background text-xs font-medium"
+              >
+                Test
+              </Button>
             </div>
-            <ActionBtn
-              variant="primary"
-              icon={Wifi}
-              loading={actionLoading === "test"}
-              onPress={() => handleAction("test", testConnection)}
-            >
-              ทดสอบ
-            </ActionBtn>
           </div>
         </div>
 
-        <div className="p-2 rounded-xl border-1 border-default">
-          <div className="flex items-center gap-2 mb-4">
-            <Activity className="text-foreground/50" />
-            <h3 className="text-sm font-semibold text-foreground/80">
-              ควบคุมเครื่องพิมพ์
-            </h3>
+        {/* Actions */}
+        <div className="rounded-lg border border-default">
+          <div className="flex items-center gap-2 p-2 border-b border-default">
+            <Activity className="w-4 h-4 text-default-500" />
+            <span className="text-[13px] font-semibold text-foreground">
+              Actions
+            </span>
           </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <Button
-              variant="bordered"
-              className="flex flex-col h-20 gap-2 border-warning/30"
-              onPress={async () => {
-                try {
-                  const response = await fetch("/api/chainWay", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      action: "command",
-                      command:
-                        "^XA^RS8^RFW,H,,,A^FD112233445566778899AABBCC^FS^FO50,50^A0N,30,30^FDTEST RFID^FS^PQ1^XZ",
-                    }),
-                  });
-                  const result = await response.json();
-                  alert(
-                    result.success
-                      ? "ส่งสำเร็จ! ดูที่เครื่องพิมพ์"
-                      : `Error: ${result.error}`,
-                  );
-                } catch (err) {
-                  alert(`Error: ${err.message}`);
-                }
-              }}
-            >
-              <Activity className="text-warning" />
-              <span className="text-xs">Test RFID</span>
-            </Button>
-            <Button
-              variant="bordered"
-              className="flex flex-col h-20 gap-2"
-              isLoading={actionLoading === "rfidCalibrate"}
-              onPress={() => handleAction("rfidCalibrate", rfidCalibrate)}
-            >
-              <Activity className="text-warning" />
-              <span className="text-xs">RFID Calibrate</span>
-            </Button>
-
-            <Button
-              variant="bordered"
-              className="flex flex-col h-20 gap-2"
-              isLoading={actionLoading === "calibrate"}
-              onPress={() => handleAction("calibrate", calibrate)}
-            >
-              <Gauge className="text-primary" />
-              <span className="text-xs">ปรับเทียบ</span>
-            </Button>
-
-            <Button
-              variant="bordered"
-              className="flex flex-col h-20 gap-2"
-              isLoading={actionLoading === "cancel"}
-              onPress={() => handleAction("cancel", cancelAllJobs)}
-            >
-              <StopCircle className="text-secondary" />
-              <span className="text-xs">ยกเลิกงาน</span>
-            </Button>
-
-            <Button
-              variant="bordered"
-              className="flex flex-col h-20 gap-2"
-              isLoading={actionLoading === "reset"}
-              onPress={() => handleAction("reset", resetPrinter)}
-            >
-              <RotateCcw className="text-foreground/60" />
-              <span className="text-xs">Soft Reset</span>
-            </Button>
-
-            <Button
-              variant="bordered"
-              className="flex flex-col h-20 gap-2 border-danger/30"
-              isLoading={actionLoading === "fullReset"}
-              onPress={() => handleAction("fullReset", fullReset)}
-            >
-              <Zap className="text-danger" />
-              <span className="text-xs text-danger">Full Reset</span>
-            </Button>
+          <div className="divide-y divide-default-100">
+            {actions.map((action) => {
+              const Icon = action.icon;
+              const isLoading = actionLoading === action.key;
+              return (
+                <div
+                  key={action.key}
+                  className="flex items-center justify-between p-2 hover:bg-default-50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-md bg-default-50 border border-default flex items-center justify-center">
+                      <Icon className={`w-4 h-4 ${action.color}`} />
+                    </div>
+                    <div>
+                      <p
+                        className={`text-[13px] font-medium ${action.danger ? "text-danger" : "text-foreground"}`}
+                      >
+                        {action.label}
+                      </p>
+                      <p className="text-xs text-default-400">
+                        {action.description}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    radius="sm"
+                    variant={action.danger ? "bordered" : "bordered"}
+                    isLoading={isLoading}
+                    onPress={() => handleAction(action.key, action.fn)}
+                    className={
+                      action.danger
+                        ? "border-danger-200 text-danger text-xs min-w-16"
+                        : "border-default text-default-700 text-xs min-w-16"
+                    }
+                  >
+                    Run
+                  </Button>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

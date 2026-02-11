@@ -36,7 +36,7 @@ export default function AccountUpdate() {
       accountPinNumber: "",
       accountStatus: "",
     },
-    submitAccount
+    submitAccount,
   );
 
   const { setFormData } = formHandler;
@@ -54,13 +54,5 @@ export default function AccountUpdate() {
 
   if (accountLoading) return <Loading />;
 
-  return (
-    <AccountForm
-      formHandler={formHandler}
-      mode="update"
-      operatedBy={userName}
-      account={account}
-      isUpdate
-    />
-  );
+  return <AccountForm formHandler={formHandler} mode="update" operatedBy={userName} account={account} isUpdate />;
 }

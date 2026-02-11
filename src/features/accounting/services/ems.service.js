@@ -3,15 +3,15 @@
  * 
  * API Documentation: https://track.thailandpost.co.th/developerGuide
  * 
- * Thailand Post Tracking API v1 (REST) ใช้งาน 2 ขั้นตอน:
- * 1. ขอ JWT Token: POST /authenticate/token 
+ * Thailand Post Tracking API v1 (REST) requires 2 steps:
+ * 1. Request JWT Token: POST /authenticate/token
  *    - Header: Authorization: Token {static-token}
  *    - Response: {"token": "eyJ0eXAiOiJKV1QiLCJhbG...", "expire": "..."}
- * 
+ *
  * 2. Track Parcel: POST /track
- *    - Header: Authorization: Token {jwt-token} (ไม่ใช่ Bearer!)
- * 
- * Status Codes: ดูจากเอกสาร Thailand Post
+ *    - Header: Authorization: Token {jwt-token} (not Bearer!)
+ *
+ * Status Codes: See Thailand Post documentation
  */
 
 import { createLogger } from "@/lib/logger.node";
@@ -44,7 +44,7 @@ async function getJWTToken() {
   const cleanToken = staticToken.replace(/^["']|["']$/g, "").trim();
   const maskedKey = cleanToken.substring(0, 15) + "..." + cleanToken.substring(cleanToken.length - 10);
   
-  // Debug: แสดง token ที่จะส่งไป (ระวัง security ใน production)
+  // Debug: Show token being sent (be careful with security in production)
   logger.info("Requesting JWT token from Thailand Post", { 
     apiKeyPreview: maskedKey,
     tokenLength: cleanToken.length,
@@ -108,7 +108,7 @@ export async function trackEMS(barcode) {
     const response = await fetch(`${THAILAND_POST_API_BASE}/track`, {
       method: "POST",
       headers: {
-        // สำคัญ! ใช้ "Token" ไม่ใช่ "Bearer"
+        // Important! Use "Token" not "Bearer"
         "Authorization": `Token ${jwtToken}`,
         "Content-Type": "application/json",
       },
@@ -214,44 +214,44 @@ export function isValidEMSBarcode(barcode) {
 }
 
 /**
- * Get status description in Thai
+ * Get status description in English
  * @param {string} statusCode - Delivery status code
  * @returns {string} Status description
  */
 export function getStatusDescription(statusCode) {
   const descriptions = {
-    "101": "เตรียมการฝากส่ง",
-    "102": "รับฝากผ่านตัวแทน",
-    "103": "รับฝาก",
-    "104": "ผู้ฝากส่งขอถอนคืน/ยกเลิก",
-    "201": "ออกจากที่ทำการ",
-    "202": "ดำเนินพิธีการศุลกากร",
-    "203": "ส่งคืนต้นทาง",
-    "204": "ถึงที่แลกเปลี่ยนระหว่างประเทศขาออก",
-    "205": "ถึงที่แลกเปลี่ยนระหว่างประเทศขาเข้า",
-    "206": "ถึงที่ทำการไปรษณีย์",
-    "208": "ส่งออกจากที่แลกเปลี่ยนขาออก",
-    "209": "ยกเลิกการส่งออก",
-    "210": "ยกเลิกการนำเข้า",
-    "211": "รับเข้า ณ ศูนย์คัดแยก",
-    "212": "ส่งมอบให้สายการบิน",
-    "213": "สายการบินรับมอบ",
-    "214": "ส่งข้อมูลให้ประเทศปลายทาง",
-    "215": "ได้รับอนุญาตให้นำเข้าประเทศปลายทาง",
-    "216": "ถึงสนามบิน",
-    "217": "อยู่ระหว่างขนส่งที่ประเทศกลางทาง",
-    "218": "ถึงคลังสินค้าสายการบินปลายทาง",
-    "219": "สายการบินส่งมอบการไปรษณีย์ปลายทาง",
-    "220": "ถึงที่ทำการ/ศูนย์ไปรษณีย์",
-    "301": "อยู่ระหว่างการนำจ่าย",
-    "302": "นำจ่าย ณ จุดรับสิ่งของ",
-    "303": "เจ้าหน้าที่ติดต่อผู้รับ",
-    "304": "เจ้าหน้าที่ติดต่อผู้รับไม่ได้",
-    "401": "นำจ่ายไม่สำเร็จ",
-    "402": "ปิดประกาศ ณ ที่ทำการรับฝาก",
-    "501": "นำจ่ายสำเร็จ",
-    "901": "โอนเงินให้ผู้ขายเรียบร้อย",
+    "101": "Preparing for Shipment",
+    "102": "Received via Agent",
+    "103": "Received",
+    "104": "Sender Requested Withdrawal/Cancellation",
+    "201": "Departed from Post Office",
+    "202": "Customs Processing",
+    "203": "Returned to Origin",
+    "204": "Arrived at International Outbound Exchange",
+    "205": "Arrived at International Inbound Exchange",
+    "206": "Arrived at Post Office",
+    "208": "Dispatched from Outbound Exchange",
+    "209": "Export Cancelled",
+    "210": "Import Cancelled",
+    "211": "Received at Sorting Center",
+    "212": "Handed to Airline",
+    "213": "Airline Received",
+    "214": "Data Sent to Destination Country",
+    "215": "Import Approved at Destination Country",
+    "216": "Arrived at Airport",
+    "217": "In Transit at Intermediate Country",
+    "218": "Arrived at Destination Airline Warehouse",
+    "219": "Airline Delivered to Destination Post",
+    "220": "Arrived at Post Office/Postal Center",
+    "301": "Out for Delivery",
+    "302": "Delivered at Collection Point",
+    "303": "Officer Contacting Recipient",
+    "304": "Officer Unable to Contact Recipient",
+    "401": "Delivery Unsuccessful",
+    "402": "Notice Posted at Receiving Post Office",
+    "501": "Delivered Successfully",
+    "901": "Payment Transferred to Seller",
   };
-  
-  return descriptions[statusCode] || "ไม่ทราบสถานะ";
+
+  return descriptions[statusCode] || "Unknown Status";
 }

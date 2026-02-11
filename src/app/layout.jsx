@@ -2,21 +2,21 @@ if (typeof window === "undefined") {
   require("@/lib/env");
 }
 
-import { Montserrat, Noto_Sans_Thai as notoSansThai } from "next/font/google";
+import { Inter, Noto_Sans_Thai as notoSansThai } from "next/font/google";
 import "@/style/globals.css";
 import { Providers } from "./providers";
 
-const montserrat = Montserrat({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-en",
-  weight: ["400"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
 const notoThai = notoSansThai({
   subsets: ["thai"],
   variable: "--font-th",
-  weight: ["400"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -33,14 +33,14 @@ export default function RootLayout({ children }) {
       </head>
       <body
         className={`
-          ${montserrat.variable}
+          ${inter.variable}
           ${notoThai.variable}
           font-system
           antialiased
         `}
       >
         <Providers>
-          <div className="flex items-center justify-center w-full h-screen gap-2 bg-background text-foreground text-xs">
+          <div className="flex w-full h-screen bg-default text-foreground text-sm">
             {children}
           </div>
         </Providers>

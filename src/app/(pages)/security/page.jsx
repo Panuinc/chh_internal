@@ -4,7 +4,7 @@ import { useModuleMenu } from "@/hooks/useMenu";
 import { SecurityDashboard } from "@/features/security";
 
 export default function Security() {
-  const { menu, isEmpty } = useModuleMenu("security");
+  const { menu } = useModuleMenu("security");
 
-  return <SecurityDashboard menu={menu} isEmpty={isEmpty} />;
+  return <SecurityDashboard menu={menu} />;
 }

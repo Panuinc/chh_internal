@@ -4,7 +4,7 @@
 export { default as useChainWay } from "./useChainWay";
 export { useRFIDContext, RFIDProvider, useRFIDSafe } from "./useChainWay";
 export { useFormHandler } from "./useFormHandler";
-export { default as useMenu } from "./useMenu";
+export { default as useMenu, useModuleMenu } from "./useMenu";
 export { useTokenRefresh } from "./useTokenRefresh";
 
 // Re-export from features for backward compatibility during migration

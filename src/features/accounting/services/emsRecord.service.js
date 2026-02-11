@@ -3,9 +3,9 @@ const logDebug = (message, meta) => console.log(`[EMSRecordService] ${message}`,
 const logError = (message, meta) => console.error(`[EMSRecordService] ${message}`, meta || "");
 
 /**
- * ดึงรายการ EMS records ทั้งหมด
- * @param {Object} filters - ตัวกรอง { status, search }
- * @returns {Promise<Array>} รายการ EMS records
+ * Fetch all EMS records
+ * @param {Object} filters - Filters { status, search }
+ * @returns {Promise<Array>} List of EMS records
  */
 export async function getEMSRecords(filters = {}) {
   try {
@@ -46,9 +46,9 @@ export async function getEMSRecords(filters = {}) {
 }
 
 /**
- * สร้าง EMS record ใหม่
- * @param {Object} record - ข้อมูล EMS record
- * @returns {Promise<Object>} EMS record ที่สร้าง
+ * Create a new EMS record
+ * @param {Object} record - EMS record data
+ * @returns {Promise<Object>} Created EMS record
  */
 export async function createEMSRecord(record) {
   try {
@@ -75,10 +75,10 @@ export async function createEMSRecord(record) {
 }
 
 /**
- * อัพเดท EMS record
- * @param {string} id - ID ของ EMS record
- * @param {Object} updates - ข้อมูลที่ต้องการอัพเดท
- * @returns {Promise<Object>} EMS record ที่อัพเดท
+ * Update an EMS record
+ * @param {string} id - EMS record ID
+ * @param {Object} updates - Data to update
+ * @returns {Promise<Object>} Updated EMS record
  */
 export async function updateEMSRecord(id, updates) {
   try {
@@ -105,8 +105,8 @@ export async function updateEMSRecord(id, updates) {
 }
 
 /**
- * ลบ EMS record
- * @param {string} id - ID ของ EMS record
+ * Delete an EMS record
+ * @param {string} id - EMS record ID
  * @returns {Promise<void>}
  */
 export async function deleteEMSRecord(id) {
@@ -130,8 +130,8 @@ export async function deleteEMSRecord(id) {
 }
 
 /**
- * ดึงข้อมูล EMS record ตาม ID
- * @param {string} id - ID ของ EMS record
+ * Fetch an EMS record by ID
+ * @param {string} id - EMS record ID
  * @returns {Promise<Object>} EMS record
  */
 export async function getEMSRecordById(id) {
@@ -152,9 +152,9 @@ export async function getEMSRecordById(id) {
 }
 
 /**
- * ดึงข้อมูล EMS record ตาม barcode
- * @param {string} barcode - Barcode ของ EMS
- * @returns {Promise<Object|null>} EMS record หรือ null ถ้าไม่พบ
+ * Fetch an EMS record by barcode
+ * @param {string} barcode - EMS barcode
+ * @returns {Promise<Object|null>} EMS record or null if not found
  */
 export async function getEMSRecordByBarcode(barcode) {
   try {
@@ -168,10 +168,10 @@ export async function getEMSRecordByBarcode(barcode) {
 }
 
 /**
- * บันทึกหรืออัพเดท EMS record หลังจากตรวจสอบสถานะ
- * @param {string} barcode - Barcode ของ EMS
- * @param {Object} trackingData - ข้อมูล tracking จากไปรษณีย์
- * @param {Object} options - ตัวเลือกเพิ่มเติม { customerName, status, notes }
+ * Save or update an EMS record after checking status
+ * @param {string} barcode - EMS barcode
+ * @param {Object} trackingData - Tracking data from Thailand Post
+ * @param {Object} options - Additional options { customerName, status, notes }
  * @returns {Promise<Object>} EMS record
  */
 export async function saveOrUpdateEMSRecord(barcode, trackingData, options = {}) {
@@ -200,12 +200,12 @@ export async function saveOrUpdateEMSRecord(barcode, trackingData, options = {})
 }
 
 /**
- * อัพเดทสถานะการติดต่อลูกค้า
- * @param {string} id - ID ของ EMS record
- * @param {string} status - สถานะใหม่
- * @param {string} notes - บันทึกเพิ่มเติม
- * @param {Date} callDate - วันที่โทร
- * @returns {Promise<Object>} EMS record ที่อัพเดท
+ * Update customer contact status
+ * @param {string} id - EMS record ID
+ * @param {string} status - New status
+ * @param {string} notes - Additional notes
+ * @param {Date} callDate - Call date
+ * @returns {Promise<Object>} Updated EMS record
  */
 export async function updateEMSContactStatus(id, status, notes, callDate) {
   try {
@@ -227,19 +227,19 @@ export async function updateEMSContactStatus(id, status, notes, callDate) {
 }
 
 /**
- * รายการสถานะ EMS Tracking ที่ใช้ได้
+ * Available EMS Tracking status options
  */
 export const EMS_STATUS_OPTIONS = [
-  { value: "NOT_CALLED", label: "ยังไม่ได้โทรถาม", color: "default" },
-  { value: "CALLED_NOT_RECEIVED", label: "โทรแล้ว - ยังไม่ได้รับ", color: "danger" },
-  { value: "CALLED_RECEIVED", label: "โทรแล้ว - ได้รับแล้ว", color: "success" },
-  { value: "CANNOT_CONTACT", label: "ติดต่อไม่ได้", color: "warning" },
+  { value: "NOT_CALLED", label: "Not Called", color: "default" },
+  { value: "CALLED_NOT_RECEIVED", label: "Called - Not Received", color: "danger" },
+  { value: "CALLED_RECEIVED", label: "Called - Received", color: "success" },
+  { value: "CANNOT_CONTACT", label: "Cannot Contact", color: "warning" },
 ];
 
 /**
- * แปลงสถานะเป็นข้อความภาษาไทย
- * @param {string} status - สถานะ
- * @returns {string} ข้อความภาษาไทย
+ * Convert status to label text
+ * @param {string} status - Status value
+ * @returns {string} Status label
  */
 export function getEMSStatusLabel(status) {
   const option = EMS_STATUS_OPTIONS.find((opt) => opt.value === status);
@@ -247,8 +247,8 @@ export function getEMSStatusLabel(status) {
 }
 
 /**
- * แปลงสถานะเป็น color
- * @param {string} status - สถานะ
+ * Convert status to color
+ * @param {string} status - Status value
  * @returns {string} color
  */
 export function getEMSStatusColor(status) {

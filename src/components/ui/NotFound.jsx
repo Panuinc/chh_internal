@@ -6,30 +6,25 @@ import React from "react";
 
 export default function UINotFound() {
   return (
-    <div className="flex flex-col items-center justify-center w-full xl:w-[80%] h-full p-2 gap-2 overflow-auto">
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
-        <Image src="/icon/icon-ghost.png" alt="logo" width={250} height={250} />
+    <div className="flex flex-col items-center justify-center w-full h-full bg-default-100">
+      <div className="flex flex-col items-center gap-2 max-w-md text-center">
+        <Image src="/icon/icon-ghost.png" alt="not found" width={100} height={100} />
+        <h1 className="text-lg font-semibold text-foreground">
+          Page not found
+        </h1>
+        <p className="text-[13px] text-default-400 leading-relaxed">
+          We couldn&apos;t find the page you were looking for. It may have been moved or deleted.
+        </p>
+        <Link href="/home">
+          <Button
+            size="sm"
+            radius="sm"
+            className="bg-foreground text-background font-medium hover:bg-default-800"
+          >
+            Back to Dashboard
+          </Button>
+        </Link>
       </div>
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-5xl font-black">
-        Whoops!
-      </div>
-      <div className="flex items-center justify-center text-center w-6/12 h-fit p-2 gap-2 opacity-50">
-        We Couldn&apos;t find the page you were looking for.
-      </div>
-      <Link
-        href="/home"
-        className="flex items-center justify-center text-center w-4/12 h-fit p-2 gap-2"
-      >
-        <Button
-          color="primary"
-          variant="shadow"
-          size="md"
-          radius="md"
-          className="w-full text-background"
-        >
-          Home
-        </Button>
-      </Link>
     </div>
   );
 }

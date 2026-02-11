@@ -18,18 +18,21 @@ export default function ModuleLayout({ children }) {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full overflow-hidden">
-      <div className="flex items-center justify-start w-full h-fit gap-2">
+    <div className="flex flex-col w-full h-full overflow-hidden">
+      {/* Breadcrumb bar */}
+      <div className="flex items-center p-2 h-10 border-b-1 border-default bg-background shrink-0">
         <Breadcrumbs
           color="default"
           variant="light"
-          size="md"
-          className="flex items-center justify-start w-full h-full p-2 gap-2 border-1 border-default"
+          size="sm"
+          classNames={{
+            list: "gap-2",
+          }}
         >
           <BreadcrumbItem>
             <Link
               href="/home"
-              className="flex items-center justify-center w-full h-full p-2 gap-2"
+              className="text-[12px] text-default-400 hover:text-foreground transition-colors"
             >
               Home
             </Link>
@@ -38,20 +41,24 @@ export default function ModuleLayout({ children }) {
           {breadcrumbItems.map((item, index) => (
             <BreadcrumbItem key={item.href}>
               {index === breadcrumbItems.length - 1 ? (
-                <span className="flex items-center justify-center w-full h-full p-2 gap-2 font-black">
+                <span className="text-[12px] text-foreground font-medium">
                   {item.name}
                 </span>
               ) : (
-                <Link href={item.href}>{item.name}</Link>
+                <Link
+                  href={item.href}
+                  className="text-[12px] text-default-400 hover:text-foreground transition-colors"
+                >
+                  {item.name}
+                </Link>
               )}
             </BreadcrumbItem>
           ))}
         </Breadcrumbs>
       </div>
 
-      <div className="flex items-center justify-center w-full h-full gap-2 overflow-hidden">
-        {children}
-      </div>
+      {/* Content */}
+      <div className="flex-1 overflow-auto">{children}</div>
     </div>
   );
 }

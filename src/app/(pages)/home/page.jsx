@@ -11,7 +11,7 @@ export default function Home() {
   const currentUser = session?.user
     ? {
         ...session.user,
-        avatar: "/images/images.jpg",
+        avatar: "/images/images.png",
       }
     : null;
 

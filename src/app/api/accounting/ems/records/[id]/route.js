@@ -7,7 +7,7 @@ const logger = createLogger("EMSRecordAPI");
 
 /**
  * PUT /api/accounting/ems/records/[id]
- * อัพเดท EMS record
+ * Update an EMS record
  */
 export async function PUT(request, { params }) {
   try {
@@ -101,7 +101,7 @@ export async function PUT(request, { params }) {
 
 /**
  * DELETE /api/accounting/ems/records/[id]
- * ลบ EMS record
+ * Delete an EMS record
  */
 export async function DELETE(request, { params }) {
   try {
@@ -153,7 +153,7 @@ export async function DELETE(request, { params }) {
 
 /**
  * GET /api/accounting/ems/records/[id]
- * ดึงข้อมูล EMS record ตาม ID
+ * Fetch an EMS record by ID
  */
 export async function GET(request, { params }) {
   try {

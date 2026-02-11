@@ -16,13 +16,12 @@ const ActionMenu = ({ item, onEdit }) => (
     <DropdownTrigger>
       <Button
         isIconOnly
-        color="default"
-        variant="shadow"
-        size="md"
-        radius="md"
-        className="text-foreground"
+        variant="light"
+        size="sm"
+        radius="sm"
+        className="text-default-400 hover:text-default-700"
       >
-        <Settings2 />
+        <Settings2 className="w-[14px] h-[14px]" />
       </Button>
     </DropdownTrigger>
     <DropdownMenu>
@@ -38,10 +37,10 @@ const ActionMenu = ({ item, onEdit }) => (
 const StatusChip = ({ value, colorMap }) => (
   <Chip
     color={colorMap[value] || "default"}
-    variant="shadow"
-    size="md"
-    radius="md"
-    className="capitalize text-background"
+    variant="flat"
+    size="sm"
+    radius="full"
+    className="capitalize text-[11px]"
   >
     {value}
   </Chip>
@@ -55,12 +54,11 @@ const StatusFilterDropdown = ({
   <Dropdown>
     <DropdownTrigger>
       <Button
-        endContent={<ChevronDown />}
-        color="default"
-        variant="shadow"
-        size="md"
-        radius="md"
-        className="w-full xl:w-42 text-foreground"
+        endContent={<ChevronDown className="w-3 h-3" />}
+        variant="bordered"
+        size="sm"
+        radius="sm"
+        className="w-full xl:w-32 border-default text-default-600 text-[12px] h-[34px]"
       >
         Status
       </Button>
@@ -73,7 +71,7 @@ const StatusFilterDropdown = ({
       onSelectionChange={setStatusFilter}
     >
       {statusOptions.map((status) => (
-        <DropdownItem key={status.uid} className="capitalize">
+        <DropdownItem key={status.uid} className="capitalize text-[13px]">
           {capitalize(status.name)}
         </DropdownItem>
       ))}
@@ -82,10 +80,10 @@ const StatusFilterDropdown = ({
 );
 
 const RowsPerPageSelector = ({ onChange }) => (
-  <label className="flex items-center justify-between w-fit h-full p-2 gap-2 whitespace-nowrap">
-    Rows per page:
+  <label className="flex items-center gap-2 text-[12px] text-default-500 whitespace-nowrap">
+    Rows:
     <select
-      className="flex items-center justify-between w-fit h-full p-2 gap-2"
+      className="p-2 border border-default rounded text-[12px] text-default-600 bg-background focus:outline-none focus:border-default"
       onChange={onChange}
       defaultValue="5"
     >
@@ -203,7 +201,7 @@ export default function DataTable({
 
       if (columnKey === "actions") {
         return (
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <div className="flex items-center justify-center">
             <ActionMenu item={item} onEdit={onEdit} />
           </div>
         );
@@ -215,20 +213,24 @@ export default function DataTable({
   );
 
   return (
-    <div className="flex flex-col w-full h-full p-2 gap-2 border-1 border-default overflow-hidden">
-      <div className="flex-shrink-0 flex flex-col items-center justify-center w-full h-fit gap-2">
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full gap-2">
+    <div className="flex flex-col w-full h-full bg-background rounded-lg border border-default overflow-hidden">
+      {/* Toolbar */}
+      <div className="shrink-0 flex flex-col gap-2 p-2 border-b border-default">
+        <div className="flex flex-col xl:flex-row items-center gap-2">
           <Input
             isClearable
             placeholder={searchPlaceholder}
-            startContent={<Search />}
+            startContent={<Search className="w-[14px] h-[14px] text-default-400" />}
             value={filterValue}
             onValueChange={setFilterValue}
-            color="default"
             variant="bordered"
-            size="md"
-            radius="md"
+            size="sm"
+            radius="sm"
             className="w-full"
+            classNames={{
+              inputWrapper: "border-default hover:border-default shadow-none h-[34px]",
+              input: "text-[13px]",
+            }}
           />
           {statusOptions.length > 0 && (
             <StatusFilterDropdown
@@ -239,33 +241,33 @@ export default function DataTable({
           )}
           {onAddNew && (
             <Button
-              endContent={<Plus />}
+              endContent={<Plus className="w-[14px] h-[14px]" />}
               onPress={onAddNew}
-              color="primary"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-full xl:w-42 text-background"
+              size="sm"
+              radius="sm"
+              className="w-full xl:w-auto bg-foreground text-background text-[12px] font-medium hover:bg-default-800 h-[34px]"
             >
               Create
             </Button>
           )}
         </div>
-        <div className="flex flex-row items-center justify-between w-full h-full gap-2">
-          <div className="xl:flex items-center justify-between w-full h-full p-2 gap-2 hidden">
-            Total {data.length} {itemName}
-          </div>
+        <div className="flex items-center justify-between">
+          <span className="hidden xl:block text-[12px] text-default-400">
+            {data.length} {itemName}
+          </span>
           <RowsPerPageSelector onChange={handleRowsPerPageChange} />
         </div>
       </div>
-      <div className="flex-1 min-h-0 overflow-auto gap-2">
+
+      {/* Table */}
+      <div className="flex-1 min-h-0 overflow-auto">
         <Table
           selectionMode={selectionMode}
           selectedKeys={selectedKeys}
           onSelectionChange={onSelectionChange}
-          classNames={{ wrapper: "min-h-full" }}
-          size="md"
-          radius="md"
+          classNames={{ wrapper: "min-h-full shadow-none rounded-none" }}
+          size="sm"
+          radius="none"
           shadow="none"
         >
           <TableHeader columns={columns}>
@@ -273,7 +275,7 @@ export default function DataTable({
               <TableColumn
                 key={column.uid}
                 align={column.uid === "actions" ? "center" : "start"}
-                className="p-2 gap-2 bg-default"
+                className="p-2 bg-default-50 text-[11px] font-medium text-default-400 uppercase tracking-wider"
               >
                 {column.name}
               </TableColumn>
@@ -281,9 +283,9 @@ export default function DataTable({
           </TableHeader>
           <TableBody emptyContent={emptyContent} items={paginatedItems}>
             {(item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item.id} className="hover:bg-default-50 transition-colors">
                 {(columnKey) => (
-                  <TableCell className="border-b-1 border-default">
+                  <TableCell className="p-2 text-[13px] text-default-600">
                     {renderCell(item, columnKey)}
                   </TableCell>
                 )}
@@ -292,21 +294,25 @@ export default function DataTable({
           </TableBody>
         </Table>
       </div>
-      <div className="flex-shrink-0 flex flex-row items-center justify-center w-full h-fit gap-2">
-        <div className="flex items-center justify-end w-full h-full p-2 gap-2">
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color="default"
-            size="md"
-            radius="md"
-            page={page}
-            total={totalPages}
-            onChange={setPage}
-            classNames={{ cursor: "text-foreground" }}
-          />
-        </div>
+
+      {/* Pagination */}
+      <div className="shrink-0 flex items-center justify-between p-2 border-t border-default bg-default-50/50">
+        <span className="text-[12px] text-default-400">
+          Page {page} of {totalPages}
+        </span>
+        <Pagination
+          isCompact
+          showControls
+          color="default"
+          size="sm"
+          radius="sm"
+          page={page}
+          total={totalPages}
+          onChange={setPage}
+          classNames={{
+            cursor: "bg-foreground text-background",
+          }}
+        />
       </div>
     </div>
   );

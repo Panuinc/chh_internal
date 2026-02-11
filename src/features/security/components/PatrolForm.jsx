@@ -7,6 +7,12 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure
 import { Html5Qrcode } from "html5-qrcode";
 import { QrCode, Camera, RefreshCw } from "lucide-react";
 
+const textareaClassNames = {
+  label: "text-default-600 text-xs font-medium",
+  input: "text-sm",
+  inputWrapper: "border-default hover:border-default shadow-none",
+};
+
 function QrScannerModal({ isOpen, onClose, onScan, label }) {
   const html5QrCodeRef = useRef(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -65,14 +71,14 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
         errorStr.includes("NotAllowedError") ||
         errorStr.includes("Permission")
       ) {
-        setError("กรุณาอนุญาตการเข้าถึงกล้อง");
+        setError("Please allow camera access");
       } else if (
         errorStr.includes("NotFoundError") ||
         errorStr.includes("not found")
       ) {
-        setError("ไม่พบกล้องในอุปกรณ์นี้");
+        setError("No camera found on this device");
       } else {
-        setError("ไม่สามารถเปิดกล้องได้: " + (err.message || err));
+        setError("Unable to open camera: " + (err.message || err));
       }
     }
   }, [onScan, onClose, stopScanner]);
@@ -106,18 +112,18 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
       backdrop="blur"
     >
       <ModalContent>
-        <ModalHeader className="flex flex-row items-center justify-start w-full h-fit p-2 gap-2">
-          <QrCode />
+        <ModalHeader className="flex flex-row items-center gap-2">
+          <QrCode size={18} />
           {label}
         </ModalHeader>
-        <ModalBody className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2">
+        <ModalBody className="flex flex-col items-center justify-center w-full gap-2">
           {error && (
-            <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-danger">
+            <div className="text-danger text-sm p-2 bg-danger-50 rounded-lg w-full text-center">
               {error}
             </div>
           )}
 
-          <div className="relative flex flex-col items-center justify-center w-full h-fit p-2 gap-2 bg-black rounded-xl overflow-hidden">
+          <div className="relative flex flex-col items-center justify-center w-full bg-black rounded-lg overflow-hidden">
             <div
               id="qr-reader"
               className="w-full"
@@ -125,29 +131,27 @@ function QrScannerModal({ isOpen, onClose, onScan, label }) {
             />
 
             {!isScanning && !error && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-black/80">
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-1 border-white"></div>
-                <span className="text-white">กำลังเปิดกล้อง...</span>
+                <span className="text-white text-sm">Opening camera...</span>
               </div>
             )}
           </div>
 
           {isScanning && (
-            <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
-              วาง QR Code ให้อยู่ในกรอบสี่เหลี่ยม
+            <div className="text-[12px] text-default-400 text-center">
+              Position the QR Code within the frame
             </div>
           )}
         </ModalBody>
-        <ModalFooter className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
+        <ModalFooter>
           <Button
-            color="danger"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-full text-background"
+            size="sm"
+            radius="sm"
+            className="bg-default-200 text-default-700 font-medium hover:bg-default-300"
             onPress={handleClose}
           >
-            ยกเลิก
+            Cancel
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -203,18 +207,18 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
                 setIsStreaming(true);
               })
               .catch((err) => {
-                setError("ไม่สามารถเล่นวิดีโอได้");
+                setError("Unable to play video");
               });
           }
         };
       }
     } catch (err) {
       if (err.name === "NotAllowedError") {
-        setError("กรุณาอนุญาตการเข้าถึงกล้อง");
+        setError("Please allow camera access");
       } else if (err.name === "NotFoundError") {
-        setError("ไม่พบกล้องในอุปกรณ์นี้");
+        setError("No camera found on this device");
       } else {
-        setError("ไม่สามารถเข้าถึงกล้องได้: " + err.message);
+        setError("Unable to access camera: " + err.message);
       }
     }
   }, []);
@@ -274,18 +278,18 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
       backdrop="blur"
     >
       <ModalContent>
-        <ModalHeader className="flex flex-row items-center justify-start w-full h-fit p-2 gap-2">
-          <Camera />
+        <ModalHeader className="flex flex-row items-center gap-2">
+          <Camera size={18} />
           {label}
         </ModalHeader>
-        <ModalBody className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2">
+        <ModalBody className="flex flex-col items-center justify-center w-full gap-2">
           {error && (
-            <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-danger">
+            <div className="text-danger text-sm p-2 bg-danger-50 rounded-lg w-full text-center">
               {error}
             </div>
           )}
 
-          <div className="relative flex flex-col items-center justify-center w-full aspect-video bg-black rounded-xl overflow-hidden">
+          <div className="relative flex flex-col items-center justify-center w-full aspect-video bg-black rounded-lg overflow-hidden">
             <video
               ref={videoRef}
               autoPlay
@@ -296,9 +300,9 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
             <canvas ref={canvasRef} className="hidden" />
 
             {!isStreaming && !error && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-black">
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-1 border-white"></div>
-                <span className="text-white">กำลังเปิดกล้อง...</span>
+                <span className="text-white text-sm">Opening camera...</span>
               </div>
             )}
 
@@ -306,34 +310,30 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-2 left-4 w-12 h-12 border-l-2 border-t-1 border-white/50 rounded-tl-lg"></div>
                 <div className="absolute top-2 right-4 w-12 h-12 border-r-2 border-t-1 border-white/50 rounded-tr-lg"></div>
-                <div className="absolute bottom-4 left-4 w-12 h-12 border-l-2 border-b-1 border-white/50 rounded-bl-lg"></div>
-                <div className="absolute bottom-4 right-4 w-12 h-12 border-r-2 border-b-1 border-white/50 rounded-br-lg"></div>
+                <div className="absolute botto left-4 w-12 h-12 border-l-2 border-b-1 border-white/50 rounded-bl-lg"></div>
+                <div className="absolute botto right-4 w-12 h-12 border-r-2 border-b-1 border-white/50 rounded-br-lg"></div>
               </div>
             )}
           </div>
         </ModalBody>
-        <ModalFooter className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
+        <ModalFooter>
           <Button
-            color="danger"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-full text-background"
+            size="sm"
+            radius="sm"
+            className="bg-default-200 text-default-700 font-medium hover:bg-default-300"
             onPress={handleClose}
           >
-            ยกเลิก
+            Cancel
           </Button>
           <Button
-            color="primary"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-full text-background"
+            size="sm"
+            radius="sm"
+            className="bg-foreground text-background font-medium hover:bg-default-800"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
-            startContent={<Camera />}
+            startContent={<Camera size={14} />}
           >
-            ถ่ายรูป
+            Capture
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -343,73 +343,65 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
 
 function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
-      <div className="flex items-center justify-center w-full h-fit gap-2 font-semibold">
-        <QrCode />
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border border-default">
+      <div className="flex items-center justify-center w-full gap-2 text-sm font-medium text-default-700">
+        <QrCode size={16} />
         {label}
       </div>
 
       {qrCodeInfo ? (
-        <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
-          <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
-            <div className="flex items-center justify-center w-full h-fit text-success">
-              สแกนสำเร็จ
+        <div className="flex flex-col items-center justify-center w-full gap-2">
+          <div className="flex flex-col items-center justify-center w-full gap-2">
+            <div className="text-xs text-green-600 font-medium">
+              Scan Successful
             </div>
-            <div className="flex items-center justify-center w-full h-fit p-2 bg-default rounded-xl break-all">
+            <div className="w-full p-2 bg-default-50 rounded-lg text-sm text-foreground break-all text-center">
               {qrCodeInfo}
             </div>
           </div>
-          <div className="flex flex-row items-center justify-center w-full h-fit gap-2">
+          <div className="flex gap-2">
             <Button
               type="button"
-              color="primary"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-full text-background"
+              size="sm"
+              radius="sm"
+              className="bg-foreground text-background font-medium hover:bg-default-800"
               onPress={onOpenScanner}
-              startContent={<RefreshCw />}
+              startContent={<RefreshCw size={14} />}
             >
-              สแกนใหม่
+              Rescan
             </Button>
             <Button
               type="button"
-              color="danger"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-full text-background"
+              size="sm"
+              radius="sm"
+              className="bg-default-200 text-default-700 font-medium hover:bg-default-300"
               onPress={onClear}
             >
-              ล้าง
+              Clear
             </Button>
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full h-fit gap-2 p-2">
-          <div className="flex items-center justify-center w-20 h-20">
-            <QrCode />
+        <div className="flex flex-col items-center justify-center gap-2 p-2">
+          <div className="w-16 h-16 rounded-full bg-default-100 flex items-center justify-center">
+            <QrCode className="text-default-400" size={20} />
           </div>
-          <div className="flex items-center justify-center w-full h-fit">
-            ยังไม่ได้สแกน QR Code
-          </div>
+          <p className="text-[12px] text-default-400">QR Code not scanned yet</p>
           <Button
             type="button"
-            color="primary"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-6/12 text-background"
+            size="sm"
+            radius="sm"
+            className="bg-foreground text-background font-medium hover:bg-default-800"
             onPress={onOpenScanner}
-            startContent={<QrCode />}
+            startContent={<QrCode size={14} />}
           >
-            สแกน QR Code
+            Scan QR Code
           </Button>
         </div>
       )}
 
       {error && (
-        <div className="flex items-center justify-center w-full h-fit text-danger">
+        <div className="text-danger text-xs">
           {error?.[0] || error}
         </div>
       )}
@@ -425,72 +417,64 @@ function PhotoCaptureCard({
   error,
 }) {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2">
-      <div className="flex items-center justify-center w-full h-fit gap-2 font-semibold">
-        <Camera />
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border border-default">
+      <div className="flex items-center justify-center w-full gap-2 text-sm font-medium text-default-700">
+        <Camera size={16} />
         {label}
       </div>
 
       {capturedImage ? (
-        <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
-          <div className="flex items-center justify-center w-full h-fit">
+        <div className="flex flex-col items-center justify-center w-full gap-2">
+          <div className="flex items-center justify-center w-full">
             <Image
               src={capturedImage}
               alt="Captured"
-              className="max-w-full max-h-48 object-contain rounded-xl shadow-md"
+              className="max-w-full max-h-48 object-contain rounded-lg"
             />
           </div>
-          <div className="flex flex-row items-center justify-center w-full h-fit gap-2">
+          <div className="flex gap-2">
             <Button
               type="button"
-              color="primary"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-full text-background"
+              size="sm"
+              radius="sm"
+              className="bg-foreground text-background font-medium hover:bg-default-800"
               onPress={onOpenCamera}
-              startContent={<RefreshCw />}
+              startContent={<RefreshCw size={14} />}
             >
-              ถ่ายใหม่
+              Retake
             </Button>
             <Button
               type="button"
-              color="danger"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-full text-background"
+              size="sm"
+              radius="sm"
+              className="bg-default-200 text-default-700 font-medium hover:bg-default-300"
               onPress={onClear}
             >
-              ลบ
+              Delete
             </Button>
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full h-fit gap-2 p-2">
-          <div className="flex items-center justify-center w-20 h-20">
-            <Camera />
+        <div className="flex flex-col items-center justify-center gap-2 p-2">
+          <div className="w-16 h-16 rounded-full bg-default-100 flex items-center justify-center">
+            <Camera className="text-default-400" size={20} />
           </div>
-          <div className="flex items-center justify-center w-full h-fit">
-            ยังไม่มีรูปภาพ
-          </div>
+          <p className="text-[12px] text-default-400">No photo yet</p>
           <Button
             type="button"
-            color="primary"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-6/12 text-background"
+            size="sm"
+            radius="sm"
+            className="bg-foreground text-background font-medium hover:bg-default-800"
             onPress={onOpenCamera}
-            startContent={<Camera />}
+            startContent={<Camera size={14} />}
           >
-            เปิดกล้อง
+            Open Camera
           </Button>
         </div>
       )}
 
       {error && (
-        <div className="flex items-center justify-center w-full h-fit text-danger">
+        <div className="text-danger text-xs">
           {error?.[0] || error}
         </div>
       )}
@@ -533,24 +517,30 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
 
   return (
     <>
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit}
-        className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto"
-      >
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-b-1 xl:border-b-0 xl:border-r-2 border-default">
-            <QrCodeCard
-              label="สแกน QR Code"
+      <div className="flex flex-col w-full h-full overflow-auto p-2">
+        <div className="w-full h-full">
+          <div className="bg-background rounded-lg border border-default h-full flex flex-col">
+            {/* Card header */}
+            <div className="p-2 border-b border-default">
+              <h2 className="text-[13px] font-semibold text-foreground">Patrol Record</h2>
+              <p className="text-[12px] text-default-400">Scan QR Code and take a photo of the checkpoint</p>
+            </div>
+
+            {/* Card body */}
+            <form ref={formRef} onSubmit={handleSubmit} className="p-2 space-y-5 flex-1 flex flex-col">
+              <div className="flex flex-col xl:flex-row gap-2">
+                <div className="flex-1">
+                  <QrCodeCard
+              label="Scan QR Code"
               qrCodeInfo={formData.patrolQrCodeInfo}
               onOpenScanner={qrModal.onOpen}
               onClear={handleClearQr}
               error={errors.patrolQrCodeInfo}
             />
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <div className="flex-1">
             <PhotoCaptureCard
-              label="ถ่ายรูป"
+              label="Take Photo"
               capturedImage={capturedPicture}
               onOpenCamera={cameraModal.onOpen}
               onClear={handleClearPicture}
@@ -559,61 +549,58 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
           </div>
         </div>
 
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+        <div className="flex flex-col xl:flex-row gap-2 w-full">
+          <div className="flex-1">
             <Textarea
               name="patrolNote"
-              label="บันทึกเพิ่มเติม"
+              label="Additional Notes"
               labelPlacement="outside"
-              placeholder="กรอกบันทึกเพิ่มเติม (ถ้ามี)"
-              color="default"
+              placeholder="Enter additional notes (if any)"
               variant="bordered"
               size="md"
-              radius="md"
+              radius="sm"
               minRows={3}
               maxRows={6}
               value={formData.patrolNote || ""}
               onChange={handleChange("patrolNote")}
               isInvalid={!!errors.patrolNote}
               errorMessage={errors.patrolNote?.[0] || errors.patrolNote}
+              classNames={textareaClassNames}
             />
           </div>
         </div>
 
-        <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-end w-full h-full p-2 gap-2">
-            <Button
-              type="submit"
-              color="primary"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-2/12 text-background"
-            >
-              บันทึก
-            </Button>
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-4 border-t border-default">
+                <span className="text-xs text-default-400">
+                  Created by: {operatedBy}
+                </span>
+                <Button
+                  type="submit"
+                  size="sm"
+                  radius="sm"
+                  className="bg-foreground text-background font-medium hover:bg-default-800"
+                >
+                  Save
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
-
-        <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
-          <div className="flex items-end justify-center h-full p-2 gap-2">
-            สร้างโดย : {operatedBy}
-          </div>
-        </div>
-      </form>
+      </div>
 
       <QrScannerModal
         isOpen={qrModal.isOpen}
         onClose={qrModal.onClose}
         onScan={handleQrScan}
-        label="สแกน QR Code"
+        label="Scan QR Code"
       />
 
       <CameraModal
         isOpen={cameraModal.isOpen}
         onClose={cameraModal.onClose}
         onCapture={handlePictureCapture}
-        label="ถ่ายรูป"
+        label="Take Photo"
       />
     </>
   );

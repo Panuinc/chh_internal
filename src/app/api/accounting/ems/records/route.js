@@ -7,7 +7,7 @@ const logger = createLogger("EMSRecordsAPI");
 
 /**
  * GET /api/accounting/ems/records
- * ดึงรายการ EMS records ทั้งหมด
+ * Fetch all EMS records
  */
 export async function GET(request) {
   try {
@@ -71,7 +71,7 @@ export async function GET(request) {
 
 /**
  * POST /api/accounting/ems/records
- * สร้าง EMS record ใหม่
+ * Create a new EMS record
  */
 export async function POST(request) {
   try {

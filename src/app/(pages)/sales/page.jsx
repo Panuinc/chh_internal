@@ -4,7 +4,7 @@ import { useModuleMenu } from "@/hooks/useMenu";
 import { SalesDashboard } from "@/features/sales";
 
 export default function Sales() {
-  const { menu, isEmpty } = useModuleMenu("sales");
+  const { menu } = useModuleMenu("sales");
 
-  return <SalesDashboard menu={menu} isEmpty={isEmpty} />;
+  return <SalesDashboard menu={menu} />;
 }

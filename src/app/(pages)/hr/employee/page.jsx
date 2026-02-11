@@ -19,12 +19,5 @@ export default function EmployeePage() {
     router.push(`/hr/employee/${item.employeeId}`);
   };
 
-  return (
-    <EmployeeList
-      Employees={employees}
-      loading={loading}
-      onAddNew={hasPermission("hr.employee.create") ? handleAddNew : null}
-      onEdit={hasPermission("hr.employee.edit") ? handleEdit : null}
-    />
-  );
+  return <EmployeeList Employees={employees} loading={loading} onAddNew={hasPermission("hr.employee.create") ? handleAddNew : null} onEdit={hasPermission("hr.employee.edit") ? handleEdit : null} />;
 }

@@ -44,7 +44,7 @@ function SalesOrderOnlineContent() {
             if (result.success) {
               showToast(
                 "success",
-                `พิมพ์ใบปะหน้า ${result.printed} ใบสำเร็จ (${order.number})`,
+                `Printed ${result.printed} packing slips successfully (${order.number})`,
               );
             } else {
               throw new Error(result.error || "Print failed");

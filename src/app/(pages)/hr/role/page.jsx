@@ -19,12 +19,5 @@ export default function RolePage() {
     router.push(`/hr/role/${item.roleId}`);
   };
 
-  return (
-    <RoleList
-      Roles={roles}
-      loading={loading}
-      onAddNew={hasPermission("hr.role.create") ? handleAddNew : null}
-      onEdit={hasPermission("hr.role.edit") ? handleEdit : null}
-    />
-  );
+  return <RoleList Roles={roles} loading={loading} onAddNew={hasPermission("hr.role.create") ? handleAddNew : null} onEdit={hasPermission("hr.role.edit") ? handleEdit : null} />;
 }

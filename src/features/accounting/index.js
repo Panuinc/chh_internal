@@ -2,6 +2,7 @@
 
 // Components
 export { default as CheckTagEMS } from "./components/CheckTagEMS";
+export { default as AccountingDashboard } from "./components/AccountingDashboard";
 
 // Hooks
 export * from "./hooks";

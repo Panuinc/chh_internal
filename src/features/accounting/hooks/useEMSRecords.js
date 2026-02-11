@@ -15,7 +15,7 @@ import {
 } from "@/features/accounting/services/emsRecord.service";
 
 /**
- * Hook สำหรับจัดการ EMS Records
+ * Hook for managing EMS Records
  */
 export function useEMSRecords() {
   const [records, setRecords] = useState([]);
@@ -26,7 +26,7 @@ export function useEMSRecords() {
     search: "",
   });
 
-  // ดึงรายการ EMS records
+  // Fetch EMS records
   const fetchRecords = useCallback(async (newFilters = null) => {
     setLoading(true);
     setError(null);
@@ -45,7 +45,7 @@ export function useEMSRecords() {
     }
   }, [filters]);
 
-  // สร้าง EMS record ใหม่
+  // Create new EMS record
   const createRecord = useCallback(async (record) => {
     setLoading(true);
     setError(null);
@@ -63,7 +63,7 @@ export function useEMSRecords() {
     }
   }, []);
 
-  // อัพเดท EMS record
+  // Update EMS record
   const updateRecord = useCallback(async (id, updates) => {
     setLoading(true);
     setError(null);
@@ -83,7 +83,7 @@ export function useEMSRecords() {
     }
   }, []);
 
-  // ลบ EMS record
+  // Delete EMS record
   const deleteRecord = useCallback(async (id) => {
     setLoading(true);
     setError(null);
@@ -101,7 +101,7 @@ export function useEMSRecords() {
     }
   }, []);
 
-  // ค้นหา EMS record ตาม barcode
+  // Find EMS record by barcode
   const findByBarcode = useCallback(async (barcode) => {
     try {
       return await getEMSRecordByBarcode(barcode);
@@ -112,14 +112,14 @@ export function useEMSRecords() {
     }
   }, []);
 
-  // บันทึกหรืออัพเดท EMS record หลังจากตรวจสอบสถานะ
+  // Save or update EMS record after checking status
   const saveOrUpdate = useCallback(async (barcode, trackingData, options = {}) => {
     setLoading(true);
     setError(null);
 
     try {
       const data = await saveOrUpdateEMSRecord(barcode, trackingData, options);
-      // อัพเดทรายการถ้ามีอยู่แล้ว หรือเพิ่มใหม่ถ้าไม่มี
+      // Update the list if it already exists, or add new if not
       setRecords((prev) => {
         const exists = prev.find((r) => r.emsId === data.emsId);
         if (exists) {
@@ -137,7 +137,7 @@ export function useEMSRecords() {
     }
   }, []);
 
-  // อัพเดทสถานะการติดต่อลูกค้า
+  // Update customer contact status
   const updateContactStatus = useCallback(async (id, status, notes, callDate) => {
     setLoading(true);
     setError(null);
@@ -157,15 +157,15 @@ export function useEMSRecords() {
     }
   }, []);
 
-  // อัพเดท filters
+  // Update filters
   const updateFilters = useCallback((newFilters) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   }, []);
 
-  // โหลดข้อมูลเมื่อ filters เปลี่ยน
+  // Load data when filters change
   useEffect(() => {
     fetchRecords();
-  }, [filters.status, filters.search]);
+  }, [fetchRecords, filters.status, filters.search]);
 
   return {
     records,
@@ -188,7 +188,7 @@ export function useEMSRecords() {
 }
 
 /**
- * Hook สำหรับดึงข้อมูล EMS Record ตาม barcode (ใช้ร่วมกับการค้นหา)
+ * Hook for fetching an EMS Record by barcode (used with search)
  */
 export function useEMSRecordByBarcode(barcode) {
   const [record, setRecord] = useState(null);

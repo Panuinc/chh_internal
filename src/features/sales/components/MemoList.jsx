@@ -8,11 +8,11 @@ import { Chip } from "@heroui/chip";
 import { Settings2, CheckCircle, XCircle, Eye } from "lucide-react";
 
 const STATUS_LABELS = {
-  DRAFT: "ร่าง",
-  PENDING_SALES_MANAGER: "รอผจก.ฝ่ายขาย",
-  PENDING_CEO: "รอ CEO",
-  APPROVED: "อนุมัติแล้ว",
-  REJECTED: "ปฏิเสธ",
+  DRAFT: "Draft",
+  PENDING_SALES_MANAGER: "Pending Sales Manager",
+  PENDING_CEO: "Pending CEO",
+  APPROVED: "Approved",
+  REJECTED: "Rejected",
 };
 
 const STATUS_COLORS = {
@@ -63,12 +63,12 @@ const ActionMenu = ({ item, onEdit, onView, onApprove, onReject, canApproveSM, c
       <DropdownMenu>
         {onView && (
           <DropdownItem key="view" onPress={() => onView(item)} startContent={<Eye className="w-4 h-4" />}>
-            ดูรายละเอียด
+            View Details
           </DropdownItem>
         )}
         {canEdit && onEdit && (
           <DropdownItem key="edit" onPress={() => onEdit(item)}>
-            แก้ไข
+            Edit
           </DropdownItem>
         )}
         {canApprove && onApprove && (
@@ -79,7 +79,7 @@ const ActionMenu = ({ item, onEdit, onView, onApprove, onReject, canApproveSM, c
             color="success"
             startContent={<CheckCircle className="w-4 h-4" />}
           >
-            อนุมัติ
+            Approve
           </DropdownItem>
         )}
         {canReject && onReject && (
@@ -90,7 +90,7 @@ const ActionMenu = ({ item, onEdit, onView, onApprove, onReject, canApproveSM, c
             color="danger"
             startContent={<XCircle className="w-4 h-4" />}
           >
-            ปฏิเสธ
+            Reject
           </DropdownItem>
         )}
       </DropdownMenu>
@@ -123,10 +123,10 @@ export default function UIMemo({
           ? `${memo.updatedByEmployee.employeeFirstName} ${memo.updatedByEmployee.employeeLastName}`
           : memo.memoUpdatedBy || "-",
         memoDateFormatted: memo.memoDate
-          ? new Date(memo.memoDate).toLocaleDateString("th-TH")
+          ? new Date(memo.memoDate).toLocaleDateString("en-US")
           : "-",
         memoCreatedAtFormatted: memo.memoCreatedAt
-          ? new Date(memo.memoCreatedAt).toLocaleString("th-TH")
+          ? new Date(memo.memoCreatedAt).toLocaleString("en-US")
           : "-",
       }))
     : [];
@@ -162,21 +162,19 @@ export default function UIMemo({
   };
 
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
-      <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Total Memos
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {total}
-          </div>
+    <div className="flex flex-col w-full h-full overflow-hidden p-2 gap-2">
+      {/* Inline stats */}
+      <div className="hidden xl:flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Total Memos</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{total}</span>
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
+      {/* Table */}
+      <div className="flex-1 min-h-0 overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center w-full h-full gap-2">
+          <div className="flex items-center justify-center w-full h-full">
             <Loading />
           </div>
         ) : (

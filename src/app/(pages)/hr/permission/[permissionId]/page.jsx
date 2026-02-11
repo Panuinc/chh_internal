@@ -15,8 +15,7 @@ export default function PermissionUpdate() {
   const { permissionId } = useParams();
   const { userId: sessionUserId, userName } = useSessionUser();
 
-  const { permission, loading: permissionLoading } =
-    usePermission(permissionId);
+  const { permission, loading: permissionLoading } = usePermission(permissionId);
 
   useEffect(() => {
     if (!hasPermission("permission.update")) {
@@ -35,7 +34,7 @@ export default function PermissionUpdate() {
       permissionName: "",
       permissionStatus: "",
     },
-    submitPermission
+    submitPermission,
   );
 
   const { setFormData } = formHandler;
@@ -51,12 +50,5 @@ export default function PermissionUpdate() {
 
   if (permissionLoading) return <Loading />;
 
-  return (
-    <PermissionForm
-      formHandler={formHandler}
-      mode="update"
-      operatedBy={userName}
-      isUpdate
-    />
-  );
+  return <PermissionForm formHandler={formHandler} mode="update" operatedBy={userName} isUpdate />;
 }

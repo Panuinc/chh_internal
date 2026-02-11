@@ -2,9 +2,7 @@
 
 import React, { useEffect } from "react";
 import { Avatar } from "@heroui/avatar";
-import { Badge } from "@heroui/badge";
 import { Chip } from "@heroui/chip";
-import { Card, CardBody, CardHeader } from "@heroui/card";
 import { User, Mail, Shield, Key, Home } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@heroui/button";
@@ -101,123 +99,126 @@ export default function UIProfile({ user }) {
   }, [success, setFormData, resetState]);
 
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-start w-full h-full gap-2 overflow-auto">
-      {/* Profile Info Card */}
-      <div className="flex flex-col items-center justify-start w-full xl:w-4/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto">
-        <div className="flex flex-col items-center justify-center w-full h-fit p-4 gap-4">
-          {/* Avatar Section */}
-          <div className="flex flex-col items-center gap-3">
-            <Avatar
-              name={initials}
-              className="w-24 h-24 text-2xl"
-              color="primary"
-              isBordered
-            />
-            <div className="text-center">
-              <h2 className="text-xl font-semibold">{displayName}</h2>
-              <p className="text-default-500 text-sm">@{username}</p>
-            </div>
-            {isSuperAdmin && (
-              <Badge color="danger" content="ADMIN" placement="bottom-right">
-                <span className="sr-only">Super Admin</span>
-              </Badge>
-            )}
+    <div className="flex flex-col w-full h-full overflow-auto">
+      <div className="w-full h-full p-2 space-y-6">
+        {/* Page header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold text-foreground">Profile</h1>
+            <p className="text-[13px] text-default-400">Manage your account settings</p>
           </div>
-        </div>
-
-        {/* Info Grid */}
-        <div className="flex flex-col w-full h-fit p-2 gap-2">
-          <div className="flex items-center gap-3 p-3 bg-default-100 rounded-lg">
-            <Mail className="w-5 h-5 text-default-500" />
-            <div>
-              <p className="text-xs text-default-500">Email</p>
-              <p className="text-sm font-medium">{email || "N/A"}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 p-3 bg-default-100 rounded-lg">
-            <Key className="w-5 h-5 text-default-500" />
-            <div>
-              <p className="text-xs text-default-500">Username</p>
-              <p className="text-sm font-medium">{username}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 p-3 bg-default-100 rounded-lg">
-            <Shield className="w-5 h-5 text-default-500" />
-            <div className="flex-1">
-              <p className="text-xs text-default-500">Role</p>
-              <p className="text-sm font-medium">
-                {isSuperAdmin ? "Super Administrator" : "User"}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Permissions */}
-        <div className="flex flex-col w-full h-fit p-2 gap-2">
-          <p className="text-xs text-default-500 px-2">Permissions</p>
-          <div className="flex flex-wrap gap-2 px-2">
-            {isSuperAdmin ? (
-              <Chip size="sm" variant="flat" color="danger">
-                All Permissions (Super Admin)
-              </Chip>
-            ) : (
-              <>
-                {permissions.slice(0, 8).map((permission) => (
-                  <Chip
-                    key={permission}
-                    size="sm"
-                    variant="flat"
-                    color="primary"
-                  >
-                    {permission}
-                  </Chip>
-                ))}
-                {permissions.length > 8 && (
-                  <Chip size="sm" variant="flat" color="default">
-                    +{permissions.length - 8} more
-                  </Chip>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Back to Home Button */}
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 mt-4">
-          <Link href="/home" className="w-full">
+          <Link href="/home">
             <Button
-              color="primary"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-6/12 text-background"
-              startContent={<Home className="w-4 h-4" />}
+              size="sm"
+              radius="sm"
+              variant="bordered"
+              className="border-default text-default-700 hover:bg-default-50"
+              startContent={<Home className="w-3.5 h-3.5" />}
             >
-              Back to Home
+              Dashboard
             </Button>
           </Link>
         </div>
-      </div>
 
-      {/* Change Password Form */}
-      <div className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-r-2 border-default overflow-auto">
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <div className="flex items-center gap-2">
-              <User className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold">Change Password</h3>
+        <div className="flex flex-col xl:flex-row gap-2">
+          {/* Profile Info Card */}
+          <div className="xl:w-80 shrink-0 space-y-4">
+            <div className="bg-background rounded-lg border border-default p-2">
+              <div className="flex flex-col items-center gap-2">
+                <Avatar
+                  name={initials}
+                  className="w-16 h-16 text-lg bg-foreground text-background"
+                />
+                <div className="text-center">
+                  <h2 className="text-base font-semibold text-foreground">{displayName}</h2>
+                  <p className="text-xs text-default-500">@{username}</p>
+                  {isSuperAdmin && (
+                    <Chip size="sm" variant="flat" color="danger">
+                      Super Admin
+                    </Chip>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Info items */}
+            <div className="bg-background rounded-lg border border-default p-2 space-y-3">
+              <div className="flex items-center gap-2 p-2 bg-default-50 rounded-md">
+                <Mail className="w-4 h-4 text-default-400" />
+                <div>
+                  <p className="text-[11px] text-default-400">Email</p>
+                  <p className="text-[12px] font-medium text-default-700">{email || "N/A"}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 p-2 bg-default-50 rounded-md">
+                <Key className="w-4 h-4 text-default-400" />
+                <div>
+                  <p className="text-[11px] text-default-400">Username</p>
+                  <p className="text-[12px] font-medium text-default-700">{username}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 p-2 bg-default-50 rounded-md">
+                <Shield className="w-4 h-4 text-default-400" />
+                <div>
+                  <p className="text-[11px] text-default-400">Role</p>
+                  <p className="text-[12px] font-medium text-default-700">
+                    {isSuperAdmin ? "Super Administrator" : "User"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Permissions */}
+            <div className="bg-background rounded-lg border border-default p-2">
+              <p className="text-xs font-medium text-default-400 uppercase tracking-wider">Permissions</p>
+              <div className="flex flex-wrap gap-2">
+                {isSuperAdmin ? (
+                  <Chip size="sm" variant="flat" color="danger" className="text-xs">
+                    All Permissions (Super Admin)
+                  </Chip>
+                ) : (
+                  <>
+                    {permissions.slice(0, 8).map((permission) => (
+                      <Chip
+                        key={permission}
+                        size="sm"
+                        variant="flat"
+                        className="text-xs bg-default-100 text-default-600"
+                      >
+                        {permission}
+                      </Chip>
+                    ))}
+                    {permissions.length > 8 && (
+                      <Chip size="sm" variant="flat" className="text-xs bg-default-100 text-default-500">
+                        +{permissions.length - 8} more
+                      </Chip>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Change Password Form */}
+          <div className="flex-1">
+            <div className="bg-background rounded-lg border border-default">
+              <div className="flex items-center gap-2 p-2 border-b border-default">
+                <User className="w-4 h-4 text-default-500" />
+                <h3 className="text-[13px] font-semibold text-foreground">Change Password</h3>
+              </div>
+              <div className="p-2">
+                <ChangePasswordForm
+                  formHandler={formHandler}
+                  operatedBy={displayName}
+                  success={success}
+                  isLoading={isLoading}
+                />
+              </div>
             </div>
           </div>
         </div>
-
-        <ChangePasswordForm
-          formHandler={formHandler}
-          operatedBy={displayName}
-          success={success}
-          isLoading={isLoading}
-        />
       </div>
     </div>
   );

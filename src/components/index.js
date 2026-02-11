@@ -11,6 +11,12 @@ export { showToast as default } from "./ui/Toast";
 export { default as ModuleLayout } from "./layout/ModuleLayout";
 export { default as ModulePage } from "./layout/ModulePage";
 export { default as SubMenu } from "./layout/SubMenu";
+export { default as Sidebar } from "./layout/Sidebar";
+export { default as TopBar } from "./layout/TopBar";
+export { default as StatusBar } from "./layout/StatusBar";
+
+// Chart Components
+export { KpiCard, MiniBarChart, ChartCard, StatItem } from "./charts";
 
 // Table Components
 export { default as DataTable } from "./table/Table";

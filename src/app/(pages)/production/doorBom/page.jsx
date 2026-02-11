@@ -19,85 +19,85 @@ export const NO_RAIL_CORE_TYPES = ["foam", "particle_solid", "honeycomb"];
 export const SURFACE_MATERIALS = [
   { value: "upvc", label: "UPVC" },
   { value: "wpc", label: "WPC" },
-  { value: "laminate", label: "ลามิเนต" },
-  { value: "plywood", label: "ไม้อัด" },
-  { value: "melamine", label: "เมลามีน" },
+  { value: "laminate", label: "Laminate" },
+  { value: "plywood", label: "Plywood" },
+  { value: "melamine", label: "Melamine" },
 ];
 
 export const FRAME_TYPES = [
-  { value: "rubberwood", label: "ยางพารา" },
-  { value: "sadao", label: "สะเดา" },
+  { value: "rubberwood", label: "Rubberwood" },
+  { value: "sadao", label: "Sadao" },
   { value: "lvl", label: "LVL" },
 ];
 
 export const DOUBLE_FRAME_SIDES = [
-  { key: "top", label: "บน" },
-  { key: "bottom", label: "ล่าง" },
-  { key: "left", label: "ซ้าย" },
-  { key: "center", label: "กลาง" },
-  { key: "right", label: "ขวา" },
-  { key: "all", label: "ทั้งหมด" },
+  { key: "top", label: "Top" },
+  { key: "bottom", label: "Bottom" },
+  { key: "left", label: "Left" },
+  { key: "center", label: "Center" },
+  { key: "right", label: "Right" },
+  { key: "all", label: "All" },
 ];
 
 export const LOCK_BLOCK_PIECES_OPTIONS = [
-  { value: "1", label: "1 ชิ้น" },
-  { value: "2", label: "2 ชิ้น" },
-  { value: "3", label: "3 ชิ้น" },
-  { value: "4", label: "4 ชิ้น" },
+  { value: "1", label: "1 Piece" },
+  { value: "2", label: "2 Pieces" },
+  { value: "3", label: "3 Pieces" },
+  { value: "4", label: "4 Pieces" },
 ];
 
 export const LOCK_BLOCK_POSITIONS = [
-  { value: "left", left: true, right: false, label: "ซ้าย" },
-  { value: "right", left: false, right: true, label: "ขวา" },
-  { value: "both", left: true, right: true, label: "ทั้งสอง" },
+  { value: "left", left: true, right: false, label: "Left" },
+  { value: "right", left: false, right: true, label: "Right" },
+  { value: "both", left: true, right: true, label: "Both" },
 ];
 
 export const DOUBLE_FRAME_COUNT_OPTIONS = [
-  { value: "0", label: "ไม่เบิ้ล" },
-  { value: "1", label: "1 ชั้น" },
-  { value: "2", label: "2 ชั้น" },
-  { value: "3", label: "3 ชั้น" },
+  { value: "0", label: "No Double" },
+  { value: "1", label: "1 Layer" },
+  { value: "2", label: "2 Layers" },
+  { value: "3", label: "3 Layers" },
 ];
 
 export const CORE_TYPES = [
   {
     value: "foam",
-    label: "EPS Foam (โฟม)",
+    label: "EPS Foam",
     type: "solid",
     thickness: null,
     spacing: null,
   },
   {
     value: "plywood_strips",
-    label: "Plywood Strips (ไม้อัดซี่)",
+    label: "Plywood Strips",
     type: "strips",
     thickness: 4,
     spacing: 40,
   },
   {
     value: "particle_solid",
-    label: "Particle Board (ปาติเกิ้ลตัน)",
+    label: "Particle Board (Solid)",
     type: "solid",
     thickness: null,
     spacing: null,
   },
   {
     value: "rockwool",
-    label: "Rockwool (ใยแก้ว)",
+    label: "Rockwool",
     type: "solid",
     thickness: null,
     spacing: null,
   },
   {
     value: "honeycomb",
-    label: "Honeycomb (รังผึ้ง)",
+    label: "Honeycomb",
     type: "solid",
     thickness: null,
     spacing: null,
   },
   {
     value: "particle_strips",
-    label: "Particle Strips (ปาติเกิ้ลซี่)",
+    label: "Particle Strips",
     type: "strips",
     thickness: 12,
     spacing: null,
@@ -107,92 +107,92 @@ export const CORE_TYPES = [
 export const ERP_FRAMES = {
   rubberwood: [
     {
-      code: "RM-14-01-26-30-200",
-      desc: "ไม้ยางพาราจ๊อย 26x30x2040mm",
+      code: "R-01-26-30-200",
+      desc: "Rubberwood Finger Joint 26x30x2040mm",
       thickness: 26,
       width: 30,
       length: 2040,
     },
     {
-      code: "RM-14-01-26-30-230",
-      desc: "ไม้ยางพาราจ๊อย 26x30x2310mm",
+      code: "R-01-26-30-230",
+      desc: "Rubberwood Finger Joint 26x30x2310mm",
       thickness: 26,
       width: 30,
       length: 2310,
     },
     {
-      code: "RM-14-01-26-30-250",
-      desc: "ไม้ยางพาราจ๊อย 26x30x2510mm",
+      code: "R-01-26-30-250",
+      desc: "Rubberwood Finger Joint 26x30x2510mm",
       thickness: 26,
       width: 30,
       length: 2510,
     },
     {
-      code: "RM-14-01-26-32-200",
-      desc: "ไม้ยางพาราจ๊อย 26x32x2040mm",
+      code: "R-01-26-32-200",
+      desc: "Rubberwood Finger Joint 26x32x2040mm",
       thickness: 26,
       width: 32,
       length: 2040,
     },
     {
-      code: "RM-14-01-26-32-230",
-      desc: "ไม้ยางพาราจ๊อย 26x32x2310mm",
+      code: "R-01-26-32-230",
+      desc: "Rubberwood Finger Joint 26x32x2310mm",
       thickness: 26,
       width: 32,
       length: 2310,
     },
     {
-      code: "RM-14-01-26-32-250",
-      desc: "ไม้ยางพาราจ๊อย 26x32x2510mm",
+      code: "R-01-26-32-250",
+      desc: "Rubberwood Finger Joint 26x32x2510mm",
       thickness: 26,
       width: 32,
       length: 2510,
     },
     {
-      code: "RM-14-01-28-50-200",
-      desc: "ไม้ยางพาราจ๊อย 28x50x2040mm",
+      code: "R-01-28-50-200",
+      desc: "Rubberwood Finger Joint 28x50x2040mm",
       thickness: 28,
       width: 50,
       length: 2040,
     },
     {
-      code: "RM-14-01-28-50-230",
-      desc: "ไม้ยางพาราจ๊อย 28x50x2310mm",
+      code: "R-01-28-50-230",
+      desc: "Rubberwood Finger Joint 28x50x2310mm",
       thickness: 28,
       width: 50,
       length: 2310,
     },
     {
-      code: "RM-14-01-28-50-230B",
-      desc: "ไม้ยางพาราจ๊อยB 28x50x2310mm",
+      code: "R-01-28-50-230B",
+      desc: "Rubberwood Finger Joint B 28x50x2310mm",
       thickness: 28,
       width: 50,
       length: 2310,
     },
     {
-      code: "RM-14-01-28-50-250",
-      desc: "ไม้ยางพาราจ๊อย 28x50x2510mm",
+      code: "R-01-28-50-250",
+      desc: "Rubberwood Finger Joint 28x50x2510mm",
       thickness: 28,
       width: 50,
       length: 2510,
     },
     {
-      code: "RM-14-01-32-50-200",
-      desc: "ไม้ยางพาราจ๊อย 32x50x2040mm",
+      code: "R-01-32-50-200",
+      desc: "Rubberwood Finger Joint 32x50x2040mm",
       thickness: 32,
       width: 50,
       length: 2040,
     },
     {
-      code: "RM-14-01-32-50-230",
-      desc: "ไม้ยางพาราจ๊อย 32x50x2310mm",
+      code: "R-01-32-50-230",
+      desc: "Rubberwood Finger Joint 32x50x2310mm",
       thickness: 32,
       width: 50,
       length: 2310,
     },
     {
-      code: "RM-14-01-32-50-250",
-      desc: "ไม้ยางพาราจ๊อย 32x50x2510mm",
+      code: "R-01-32-50-250",
+      desc: "Rubberwood Finger Joint 32x50x2510mm",
       thickness: 32,
       width: 50,
       length: 2510,
@@ -200,29 +200,29 @@ export const ERP_FRAMES = {
   ],
   sadao: [
     {
-      code: "RM-14-04-32-50-200",
-      desc: "ไม้สะเดาจ๊อย 32x50x2040mm",
+      code: "R-04-32-50-200",
+      desc: "Sadao Finger Joint 32x50x2040mm",
       thickness: 32,
       width: 50,
       length: 2040,
     },
     {
-      code: "RM-14-04-32-50-225",
-      desc: "ไม้สะเดาจ๊อย 32x50x2250mm",
+      code: "R-04-32-50-225",
+      desc: "Sadao Finger Joint 32x50x2250mm",
       thickness: 32,
       width: 50,
       length: 2250,
     },
     {
-      code: "RM-14-04-32-50-230",
-      desc: "ไม้สะเดาจ๊อย 32x50x2300mm",
+      code: "R-04-32-50-230",
+      desc: "Sadao Finger Joint 32x50x2300mm",
       thickness: 32,
       width: 50,
       length: 2300,
     },
     {
-      code: "RM-14-04-32-50-250",
-      desc: "ไม้สะเดาจ๊อย 32x50x2500mm",
+      code: "R-04-32-50-250",
+      desc: "Sadao Finger Joint 32x50x2500mm",
       thickness: 32,
       width: 50,
       length: 2500,
@@ -230,43 +230,43 @@ export const ERP_FRAMES = {
   ],
   lvl: [
     {
-      code: "RM-16-19-2.9-3.4-258",
-      desc: "ไม้อัด LVL 29x34x2580mm",
+      code: "R-19-2.9-3.4-258",
+      desc: "Plywood LVL 29x34x2580mm",
       thickness: 29,
       width: 34,
       length: 2580,
     },
     {
-      code: "RM-16-19-2.9-3.5-202",
-      desc: "ไม้อัด LVL 29x35x2020mm",
+      code: "R-19-2.9-3.5-202",
+      desc: "Plywood LVL 29x35x2020mm",
       thickness: 29,
       width: 35,
       length: 2020,
     },
     {
-      code: "RM-16-19-2.9-3.5-244",
-      desc: "ไม้อัด LVL 29x35x2440mm",
+      code: "R-19-2.9-3.5-244",
+      desc: "Plywood LVL 29x35x2440mm",
       thickness: 29,
       width: 35,
       length: 2440,
     },
     {
-      code: "RM-16-19-2.9-3.5-258",
-      desc: "ไม้อัด LVL 29x35x2580mm",
+      code: "R-19-2.9-3.5-258",
+      desc: "Plywood LVL 29x35x2580mm",
       thickness: 29,
       width: 35,
       length: 2580,
     },
     {
-      code: "RM-16-19-3.2-3.5-202",
-      desc: "ไม้อัด LVL 32x35x2020mm",
+      code: "R-19-3.2-3.5-202",
+      desc: "Plywood LVL 32x35x2020mm",
       thickness: 32,
       width: 35,
       length: 2020,
     },
     {
-      code: "RM-16-19-3.2-3.5-244",
-      desc: "ไม้อัด LVL 32x35x2440mm",
+      code: "R-19-3.2-3.5-244",
+      desc: "Plywood LVL 32x35x2440mm",
       thickness: 32,
       width: 35,
       length: 2440,
@@ -423,9 +423,9 @@ export const useFrameSelection = (
 
     const createDisplaySize = (f, isFlipped, planeAmount, needSplice) => {
       const parts = [];
-      if (isFlipped) parts.push("พลิก");
-      if (planeAmount > 0) parts.push(`ไส ${planeAmount}mm`);
-      if (needSplice) parts.push("ต่อ 2 ท่อน");
+      if (isFlipped) parts.push("Flipped");
+      if (planeAmount > 0) parts.push(`Plane ${planeAmount}mm`);
+      if (needSplice) parts.push("Spliced 2 pcs");
       const suffix = parts.length > 0 ? ` (${parts.join("+")})` : "";
       return isFlipped
         ? `${f.width}×${f.thickness}×${f.length}${suffix}`
@@ -573,8 +573,8 @@ export const useFrameSelection = (
       noMatch: true,
       reason:
         maxLength > 0
-          ? `ไม่มีไม้ที่ใช้ได้ (ต้องการ ≥${requiredLength}mm, ต่อได้สูงสุด ${maxSpliceLength}mm)`
-          : `ไม่มีไม้ความหนา ${requiredThickness}mm`,
+          ? `No suitable timber available (requires ≥${requiredLength}mm, max splice length ${maxSpliceLength}mm)`
+          : `No timber with thickness ${requiredThickness}mm available`,
     };
   }, [frameType, doorThickness, surfaceThickness, doorHeight]);
 };
@@ -770,14 +770,14 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
     const stileLength = H;
     if (needSplice && stileLength > stockLength) {
       const pieceLength = Math.ceil(stileLength / 2) + spliceOverlap / 2;
-      addPiece("โครงตั้ง (ท่อน 1)", pieceLength, 2, "secondary", true);
-      addPiece("โครงตั้ง (ท่อน 2)", pieceLength, 2, "warning", true);
+      addPiece("Stile (Piece 1)", pieceLength, 2, "secondary", true);
+      addPiece("Stile (Piece 2)", pieceLength, 2, "warning", true);
     } else {
-      addPiece("โครงตั้ง", stileLength, 2, "secondary");
+      addPiece("Stile", stileLength, 2, "secondary");
     }
 
     const railLength = W - 2 * F;
-    addPiece("โครงนอน", railLength, 2, "primary");
+    addPiece("Rail", railLength, 2, "primary");
 
     const clearHeight = H - 2 * F;
     const clearWidth = W - 2 * F;
@@ -789,21 +789,21 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
         if (needSplice && clearHeight > stockLength) {
           const pieceLength = Math.ceil(clearHeight / 2) + spliceOverlap / 2;
           addPiece(
-            "เบิ้ลโครงตั้งซ้าย (ท่อน 1)",
+            "Double Stile Left (Piece 1)",
             pieceLength,
             count,
             "warning",
             true,
           );
           addPiece(
-            "เบิ้ลโครงตั้งซ้าย (ท่อน 2)",
+            "Double Stile Left (Piece 2)",
             pieceLength,
             count,
             "secondary",
             true,
           );
         } else {
-          addPiece("เบิ้ลโครงตั้งซ้าย", clearHeight, count, "warning");
+          addPiece("Double Stile Left", clearHeight, count, "warning");
         }
       }
 
@@ -811,31 +811,31 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
         if (needSplice && clearHeight > stockLength) {
           const pieceLength = Math.ceil(clearHeight / 2) + spliceOverlap / 2;
           addPiece(
-            "เบิ้ลโครงตั้งขวา (ท่อน 1)",
+            "Double Stile Right (Piece 1)",
             pieceLength,
             count,
             "warning",
             true,
           );
           addPiece(
-            "เบิ้ลโครงตั้งขวา (ท่อน 2)",
+            "Double Stile Right (Piece 2)",
             pieceLength,
             count,
             "secondary",
             true,
           );
         } else {
-          addPiece("เบิ้ลโครงตั้งขวา", clearHeight, count, "warning");
+          addPiece("Double Stile Right", clearHeight, count, "warning");
         }
       }
 
       if (doubleFrame.center) {
         if (needSplice && clearHeight > stockLength) {
           const pieceLength = Math.ceil(clearHeight / 2) + spliceOverlap / 2;
-          addPiece("โครงกลาง (ท่อน 1)", pieceLength, count, "warning", true);
-          addPiece("โครงกลาง (ท่อน 2)", pieceLength, count, "secondary", true);
+          addPiece("Center Stile (Piece 1)", pieceLength, count, "warning", true);
+          addPiece("Center Stile (Piece 2)", pieceLength, count, "secondary", true);
         } else {
-          addPiece("โครงกลาง", clearHeight, count, "warning");
+          addPiece("Center Stile", clearHeight, count, "warning");
         }
       }
 
@@ -843,14 +843,14 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
         let topLength = clearWidth;
         if (doubleFrame.left) topLength -= F * count;
         if (doubleFrame.right) topLength -= F * count;
-        addPiece("เบิ้ลโครงบน", topLength, count, "secondary");
+        addPiece("Double Rail Top", topLength, count, "secondary");
       }
 
       if (doubleFrame.bottom) {
         let bottomLength = clearWidth;
         if (doubleFrame.left) bottomLength -= F * count;
         if (doubleFrame.right) bottomLength -= F * count;
-        addPiece("เบิ้ลโครงล่าง", bottomLength, count, "secondary");
+        addPiece("Double Rail Bottom", bottomLength, count, "secondary");
       }
     }
 
@@ -862,7 +862,7 @@ export const useCuttingPlan = (results, currentFrame, coreType) => {
         if (doubleFrame.left) damLength -= F * doubleFrame.count;
         if (doubleFrame.right) damLength -= F * doubleFrame.count;
       }
-      addPiece("ไม้ดาม", damLength, railCount, "primary");
+      addPiece("Cross Rail", damLength, railCount, "primary");
     }
 
     if (lockBlockCount > 0) {
@@ -1042,7 +1042,7 @@ export const useCoreCalculation = (results, coreType) => {
 
         if (lockBlockYTop > topOffset) {
           pieces.push({
-            name: "ไส้ส่วนบน",
+            name: "Core Upper Section",
             x: leftOffset,
             y: topOffset,
             width: coreWidth,
@@ -1056,7 +1056,7 @@ export const useCoreCalculation = (results, coreType) => {
             const middleWidth = coreWidth - solidLockBlockWidth * 2;
             if (middleWidth > 0) {
               pieces.push({
-                name: "ไส้ส่วนกลาง",
+                name: "Core Middle Section",
                 x: leftOffset + solidLockBlockWidth,
                 y: lockBlockYTop,
                 width: middleWidth,
@@ -1065,7 +1065,7 @@ export const useCoreCalculation = (results, coreType) => {
             }
           } else if (lockBlockLeft) {
             pieces.push({
-              name: "ไส้ส่วนกลาง",
+              name: "Core Middle Section",
               x: leftOffset + solidLockBlockWidth,
               y: lockBlockYTop,
               width: coreWidth - solidLockBlockWidth,
@@ -1073,7 +1073,7 @@ export const useCoreCalculation = (results, coreType) => {
             });
           } else if (lockBlockRight) {
             pieces.push({
-              name: "ไส้ส่วนกลาง",
+              name: "Core Middle Section",
               x: leftOffset,
               y: lockBlockYTop,
               width: coreWidth - solidLockBlockWidth,
@@ -1084,7 +1084,7 @@ export const useCoreCalculation = (results, coreType) => {
 
         if (lockBlockYBottom < H - bottomOffset) {
           pieces.push({
-            name: "ไส้ส่วนล่าง",
+            name: "Core Lower Section",
             x: leftOffset,
             y: lockBlockYBottom,
             width: coreWidth,
@@ -1093,7 +1093,7 @@ export const useCoreCalculation = (results, coreType) => {
         }
       } else if (isFullPanelCore && !hasLockBlock) {
         pieces.push({
-          name: "ไส้เต็มบาน",
+          name: "Full Panel Core",
           x: leftOffset,
           y: topOffset,
           width: coreWidth,
@@ -1111,14 +1111,14 @@ export const useCoreCalculation = (results, coreType) => {
           ) {
             if (lockBlockLeft && lockBlockRight) {
               pieces.push({
-                name: `ไส้แถว ${rowIdx + 1} (ซ้าย)`,
+                name: `Core Row ${rowIdx + 1} (Left)`,
                 x: leftOffset + solidLockBlockWidth,
                 y: row.top,
                 width: (coreWidth - solidLockBlockWidth * 2) / 2,
                 height: row.height,
               });
               pieces.push({
-                name: `ไส้แถว ${rowIdx + 1} (ขวา)`,
+                name: `Core Row ${rowIdx + 1} (Right)`,
                 x:
                   W -
                   rightOffset -
@@ -1130,7 +1130,7 @@ export const useCoreCalculation = (results, coreType) => {
               });
             } else if (lockBlockLeft) {
               pieces.push({
-                name: `ไส้แถว ${rowIdx + 1}`,
+                name: `Core Row ${rowIdx + 1}`,
                 x: leftOffset + solidLockBlockWidth,
                 y: row.top,
                 width: coreWidth - solidLockBlockWidth,
@@ -1138,7 +1138,7 @@ export const useCoreCalculation = (results, coreType) => {
               });
             } else if (lockBlockRight) {
               pieces.push({
-                name: `ไส้แถว ${rowIdx + 1}`,
+                name: `Core Row ${rowIdx + 1}`,
                 x: leftOffset,
                 y: row.top,
                 width: coreWidth - solidLockBlockWidth,
@@ -1147,7 +1147,7 @@ export const useCoreCalculation = (results, coreType) => {
             }
           } else {
             pieces.push({
-              name: `ไส้แถว ${rowIdx + 1}`,
+              name: `Core Row ${rowIdx + 1}`,
               x: leftOffset,
               y: row.top,
               width: coreWidth,
@@ -1287,7 +1287,7 @@ export const useCoreCalculation = (results, coreType) => {
                 y: row.top,
                 width: stripThickness,
                 height: pieceHeight,
-                name: `ซี่ C${col + 1}-R${rowIdx + 1}a`,
+                name: `Strip C${col + 1}-R${rowIdx + 1}a`,
               });
           }
           if (lockBlockYBottom < row.bottom) {
@@ -1301,7 +1301,7 @@ export const useCoreCalculation = (results, coreType) => {
                 y: lockBlockYBottom,
                 width: stripThickness,
                 height: pieceHeight,
-                name: `ซี่ C${col + 1}-R${rowIdx + 1}b`,
+                name: `Strip C${col + 1}-R${rowIdx + 1}b`,
               });
           }
         } else {
@@ -1313,7 +1313,7 @@ export const useCoreCalculation = (results, coreType) => {
             y: row.top,
             width: stripThickness,
             height: row.height,
-            name: `ซี่ C${col + 1}-R${rowIdx + 1}`,
+            name: `Strip C${col + 1}-R${rowIdx + 1}`,
           });
         }
       });
@@ -1329,7 +1329,7 @@ export const useCoreCalculation = (results, coreType) => {
               y: yCenter - stripThickness / 2,
               width: coreWidth,
               height: stripThickness,
-              name: `ไม้ดามปาติเกิ้ล ${idx + 1}`,
+              name: `Particle Cross Rail ${idx + 1}`,
             };
           })
         : [];
@@ -1436,17 +1436,17 @@ export default function DoorConfigurator() {
     const df = results.doubleFrame;
     if (!df?.hasAny || !df.count) return "";
     const sideLabels = {
-      top: "บน",
-      bottom: "ล่าง",
-      left: "ซ้าย",
-      center: "กลาง",
-      right: "ขวา",
+      top: "Top",
+      bottom: "Bottom",
+      left: "Left",
+      center: "Center",
+      right: "Right",
     };
     const sides = Object.entries(sideLabels)
       .filter(([key]) => df[key])
       .map(([_, label]) => label);
     return sides.length
-      ? `เบิ้ลโครงด้าน ${sides.join(", ")} จำนวน ${df.count} ชั้น/ด้าน`
+      ? `Double frame on ${sides.join(", ")} side(s), ${df.count} layer(s)/side`
       : "";
   }, [results]);
 
@@ -1469,11 +1469,11 @@ export default function DoorConfigurator() {
 
   const lockBlockDesc =
     lockBlockLeft && lockBlockRight
-      ? `ซ้าย ${piecesPerSide} + ขวา ${piecesPerSide}`
+      ? `Left ${piecesPerSide} + Right ${piecesPerSide}`
       : lockBlockLeft
-        ? `ซ้าย ${piecesPerSide}`
+        ? `Left ${piecesPerSide}`
         : lockBlockRight
-          ? `ขวา ${piecesPerSide}`
+          ? `Right ${piecesPerSide}`
           : "-";
 
   const uiProps = {

@@ -94,18 +94,18 @@ function formatNumber(value) {
 function getMonthName(dateString) {
   const date = new Date(dateString);
   const months = [
-    "ม.ค.",
-    "ก.พ.",
-    "มี.ค.",
-    "เม.ย.",
-    "พ.ค.",
-    "มิ.ย.",
-    "ก.ค.",
-    "ส.ค.",
-    "ก.ย.",
-    "ต.ค.",
-    "พ.ย.",
-    "ธ.ค.",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
   return months[date.getMonth()];
 }
@@ -148,12 +148,12 @@ function calculateOrderStats(orders) {
       const itemNumber = line.itemNumber || line.lineObjectNumber || "Unknown";
       const description = line.description || "";
 
-      let category = "อื่นๆ";
+      let category = "Others";
       if (description.includes("WPC") || itemNumber.includes("WPC")) {
         category =
           description.includes("วงกบ") || itemNumber.includes("FRAME")
-            ? "วงกบ WPC"
-            : "บานประตู WPC";
+            ? "WPC Frame"
+            : "WPC Door Panel";
       } else if (
         description.includes("uPVC") ||
         description.includes("UPVC") ||
@@ -161,10 +161,10 @@ function calculateOrderStats(orders) {
       ) {
         category =
           description.includes("วงกบ") || itemNumber.includes("FRAME")
-            ? "วงกบ uPVC"
-            : "บานประตู uPVC";
+            ? "uPVC Frame"
+            : "uPVC Door Panel";
       } else if (description.includes("วงกบ") || itemNumber.includes("FRAME")) {
-        category = "วงกบ";
+        category = "Frame";
       }
 
       productStats[category] =
@@ -204,7 +204,7 @@ function calculateOrderStats(orders) {
       color: ["#006FEE", "#17C964", "#F5A524", "#9353D3", "#F31260"][index % 5],
     }));
 
-  const channelStats = { Facebook: 0, Line: 0, Website: 0, อื่นๆ: 0 };
+  const channelStats = { Facebook: 0, Line: 0, Website: 0, Others: 0 };
   orders.forEach((order) => {
     const extDoc = (order.externalDocumentNumber || "").toLowerCase();
     const customerName = (order.customerName || "").toLowerCase();
@@ -220,7 +220,7 @@ function calculateOrderStats(orders) {
     } else if (extDoc.includes("web") || customerName.includes("web")) {
       channelStats.Website++;
     } else {
-      channelStats["อื่นๆ"]++;
+      channelStats["Others"]++;
     }
   });
 
@@ -243,7 +243,7 @@ function calculateOrderStats(orders) {
   orders.forEach((order) => {
     const date = new Date(order.orderDate);
     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    const monthLabel = `${getMonthName(order.orderDate)} ${date.getFullYear() + 543}`;
+    const monthLabel = `${getMonthName(order.orderDate)} ${date.getFullYear()}`;
 
     if (!monthStats[monthKey]) {
       monthStats[monthKey] = { month: monthLabel, sales: 0, orders: 0 };
@@ -280,8 +280,8 @@ function MonthlySalesChart({ data }) {
 
   if (chartData.length === 0) {
     return (
-      <div className="w-full h-64 flex items-center justify-center text-foreground/50">
-        ไม่มีข้อมูลยอดขาย
+      <div className="w-full h-64 flex items-center justify-center text-default-400">
+        No sales data available
       </div>
     );
   }
@@ -301,7 +301,7 @@ function MonthlySalesChart({ data }) {
             tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
           />
           <Tooltip
-            formatter={(value) => `${formatCurrency(value)} บาท`}
+            formatter={(value) => `${formatCurrency(value)} THB`}
             contentStyle={{
               backgroundColor: "#fff",
               border: "1px solid #e5e7eb",
@@ -311,13 +311,13 @@ function MonthlySalesChart({ data }) {
           <Legend />
           <Bar
             dataKey="sales"
-            name="ยอดขายจริง"
+            name="Actual Sales"
             fill="#006FEE"
             radius={[4, 4, 0, 0]}
           />
           <Bar
             dataKey="target"
-            name="เป้าหมาย"
+            name="Target"
             fill="#F5A524"
             radius={[4, 4, 0, 0]}
             opacity={0.3}
@@ -331,8 +331,8 @@ function MonthlySalesChart({ data }) {
 function ProductSalesChart({ data }) {
   if (data.length === 0) {
     return (
-      <div className="w-full h-64 flex items-center justify-center text-foreground/50">
-        ไม่มีข้อมูลผลิตภัณฑ์
+      <div className="w-full h-64 flex items-center justify-center text-default-400">
+        No product data available
       </div>
     );
   }
@@ -354,14 +354,14 @@ function ProductSalesChart({ data }) {
           />
           <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" />
           <Tooltip
-            formatter={(value) => `${value} ชิ้น`}
+            formatter={(value) => `${value} pcs`}
             contentStyle={{
               backgroundColor: "#fff",
               border: "1px solid #e5e7eb",
               borderRadius: "8px",
             }}
           />
-          <Bar dataKey="quantity" name="จำนวน" radius={[4, 4, 0, 0]}>
+          <Bar dataKey="quantity" name="Quantity" radius={[4, 4, 0, 0]}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
@@ -375,8 +375,8 @@ function ProductSalesChart({ data }) {
 function ChannelSalesChart({ data }) {
   if (data.length === 0) {
     return (
-      <div className="w-full h-64 flex items-center justify-center text-foreground/50">
-        ไม่มีข้อมูลช่องทาง
+      <div className="w-full h-64 flex items-center justify-center text-default-400">
+        No channel data available
       </div>
     );
   }
@@ -392,14 +392,14 @@ function ChannelSalesChart({ data }) {
           <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#6b7280" />
           <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" />
           <Tooltip
-            formatter={(value) => `${value} ออเดอร์`}
+            formatter={(value) => `${value} orders`}
             contentStyle={{
               backgroundColor: "#fff",
               border: "1px solid #e5e7eb",
               borderRadius: "8px",
             }}
           />
-          <Bar dataKey="orders" name="จำนวนออเดอร์" radius={[4, 4, 0, 0]}>
+          <Bar dataKey="orders" name="Order Count" radius={[4, 4, 0, 0]}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
@@ -413,8 +413,8 @@ function ChannelSalesChart({ data }) {
 function Top10SKUChart({ data }) {
   if (data.length === 0) {
     return (
-      <div className="w-full h-64 flex items-center justify-center text-foreground/50">
-        ไม่มีข้อมูล SKU
+      <div className="w-full h-64 flex items-center justify-center text-default-400">
+        No SKU data available
       </div>
     );
   }
@@ -443,8 +443,8 @@ function Top10SKUChart({ data }) {
             />
             <Tooltip
               formatter={(value, name, props) => {
-                if (name === "quantity") return [`${value} ชิ้น`, "จำนวนขาย"];
-                return [formatCurrency(value) + " บาท", "รายได้"];
+                if (name === "quantity") return [`${value} pcs`, "Sales Qty"];
+                return [formatCurrency(value) + " THB", "Revenue"];
               }}
               labelFormatter={(label) => `${label}`}
               contentStyle={{
@@ -463,47 +463,47 @@ function Top10SKUChart({ data }) {
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 overflow-x-auto">
+      <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-default/50">
-              <th className="px-3 py-2 text-left font-medium">อันดับ</th>
-              <th className="px-3 py-2 text-left font-medium">รหัส SKU</th>
-              <th className="px-3 py-2 text-left font-medium">รายละเอียด</th>
-              <th className="px-3 py-2 text-right font-medium">จำนวน</th>
-              <th className="px-3 py-2 text-right font-medium">รายได้</th>
+            <tr className="bg-default-50">
+              <th className="p-2 text-left font-medium">Rank</th>
+              <th className="p-2 text-left font-medium">SKU Code</th>
+              <th className="p-2 text-left font-medium">Description</th>
+              <th className="p-2 text-right font-medium">Quantity</th>
+              <th className="p-2 text-right font-medium">Revenue</th>
             </tr>
           </thead>
           <tbody>
             {data.map((item, index) => (
               <tr
                 key={item.name}
-                className="border-b border-default/50 hover:bg-default/30"
+                className="border-b border-default hover:bg-default-50"
               >
-                <td className="px-3 py-2">
+                <td className="p-2">
                   <span
                     className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
                       index === 0
-                        ? "bg-warning/20 text-warning"
+                        ? "bg-amber-50 text-warning"
                         : index === 1
-                          ? "bg-default/40 text-foreground"
+                          ? "bg-default-100 text-foreground"
                           : index === 2
-                            ? "bg-danger/10 text-danger"
-                            : "bg-default/20 text-foreground/60"
+                            ? "bg-red-50 text-danger"
+                            : "bg-default-50 text-default-500"
                     }`}
                   >
                     {index + 1}
                   </span>
                 </td>
-                <td className="px-3 py-2 font-mono text-xs">{item.name}</td>
-                <td className="px-3 py-2 text-foreground/80">
+                <td className="p-2 font-mono text-xs">{item.name}</td>
+                <td className="p-2 text-default-700">
                   {item.description}
                 </td>
-                <td className="px-3 py-2 text-right font-medium">
-                  {item.quantity} ชิ้น
+                <td className="p-2 text-right font-medium">
+                  {item.quantity} pcs
                 </td>
-                <td className="px-3 py-2 text-right">
-                  {formatCurrency(item.revenue)} บาท
+                <td className="p-2 text-right">
+                  {formatCurrency(item.revenue)} THB
                 </td>
               </tr>
             ))}
@@ -570,11 +570,11 @@ function DateRangeFilter({
   onQuickSelect,
 }) {
   const quickSelectOptions = [
-    { label: "วันนี้", value: "today" },
-    { label: "สัปดาห์นี้", value: "thisWeek" },
-    { label: "เดือนนี้", value: "thisMonth" },
-    { label: "เดือนที่แล้ว", value: "lastMonth" },
-    { label: "ทั้งหมด", value: "all" },
+    { label: "Today", value: "today" },
+    { label: "This Week", value: "thisWeek" },
+    { label: "This Month", value: "thisMonth" },
+    { label: "Last Month", value: "lastMonth" },
+    { label: "All", value: "all" },
   ];
 
   const handleQuickSelect = (value) => {
@@ -619,11 +619,11 @@ function DateRangeFilter({
   const hasFilter = fromDate || toDate;
 
   return (
-    <div className="flex flex-col gap-3 p-4 bg-default/30 rounded-xl border border-default">
+    <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg border border-default">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-primary" />
-          <span className="font-medium">กรองข้อมูลตามช่วงเวลา</span>
+          <Filter className="w-4 h-4 text-foreground" />
+          <span className="font-medium">Filter by Date Range</span>
         </div>
         {hasFilter && (
           <Button
@@ -633,7 +633,7 @@ function DateRangeFilter({
             startContent={<X className="w-4 h-4" />}
             onPress={onClear}
           >
-            ล้างตัวกรอง
+            Clear Filter
           </Button>
         )}
       </div>
@@ -652,43 +652,43 @@ function DateRangeFilter({
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-foreground/60">
-            วันที่เริ่มต้น (From)
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-default-500">
+            Start Date (From)
           </label>
           <Input
             type="date"
             value={fromDate}
             onChange={(e) => onFromDateChange(e.target.value)}
-            placeholder="เลือกวันที่เริ่มต้น"
-            startContent={<Calendar className="w-4 h-4 text-foreground/50" />}
+            placeholder="Select start date"
+            startContent={<Calendar className="w-4 h-4 text-default-400" />}
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-foreground/60">
-            วันที่สิ้นสุด (To)
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-default-500">
+            End Date (To)
           </label>
           <Input
             type="date"
             value={toDate}
             onChange={(e) => onToDateChange(e.target.value)}
-            placeholder="เลือกวันที่สิ้นสุด"
-            startContent={<Calendar className="w-4 h-4 text-foreground/50" />}
+            placeholder="Select end date"
+            startContent={<Calendar className="w-4 h-4 text-default-400" />}
           />
         </div>
       </div>
 
       {hasFilter && (
-        <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-lg">
-          <Calendar className="w-4 h-4 text-primary" />
-          <span className="text-sm text-primary">
-            กำลังแสดงข้อมูล:{" "}
+        <div className="flex items-center gap-2 p-2 bg-default-50 rounded-lg">
+          <Calendar className="w-4 h-4 text-foreground" />
+          <span className="text-sm text-foreground">
+            Showing data:{" "}
             {fromDate
-              ? new Date(fromDate).toLocaleDateString("th-TH")
-              : "ทั้งหมด"}
+              ? new Date(fromDate).toLocaleDateString("en-US")
+              : "All"}
             {" - "}
-            {toDate ? new Date(toDate).toLocaleDateString("th-TH") : "ปัจจุบัน"}
+            {toDate ? new Date(toDate).toLocaleDateString("en-US") : "Present"}
           </span>
         </div>
       )}
@@ -697,9 +697,9 @@ function DateRangeFilter({
 }
 
 const customerSatisfactionStatus = {
-  message: "จะดำเนินการภายในเดือนกุมภาพันธ์ สัปดาห์ที่ 3",
-  effectiveDate: "ต้นเดือนมีนาคม 2568",
-  description: "แบบฟอร์มสแกนคิวอาร์โค้ดที่ปริ้นติดใบแปะหน้า",
+  message: "Will be implemented in February, Week 3",
+  effectiveDate: "Early March 2025",
+  description: "QR code scan form printed on packing slip label",
 };
 
 function ExecutiveSummaryCard({
@@ -712,30 +712,30 @@ function ExecutiveSummaryCard({
   color = "primary",
 }) {
   const colorClasses = {
-    primary: "bg-primary/10 border-primary/30 text-primary",
-    success: "bg-success/10 border-success/30 text-success",
-    warning: "bg-warning/10 border-warning/30 text-warning",
-    danger: "bg-danger/10 border-danger/30 text-danger",
-    default: "bg-default/50 border-default text-foreground",
+    primary: "bg-default-50 border-default text-foreground",
+    success: "bg-default-50 border-default text-foreground",
+    warning: "bg-default-50 border-default text-foreground",
+    danger: "bg-default-50 border-default text-foreground",
+    default: "bg-default-50 border-default text-foreground",
   };
 
   return (
     <div
-      className={`flex flex-col p-4 rounded-xl border ${colorClasses[color]} min-h-[120px]`}
+      className={`flex flex-col p-2 rounded-lg border ${colorClasses[color]} min-h-[120px]`}
     >
       <div className="flex items-start justify-between">
         <div className="flex flex-col">
           <span className="text-xs opacity-70">{title}</span>
-          <span className="text-2xl font-bold mt-1">{value}</span>
+          <span className="text-2xl font-bold">{value}</span>
           {subValue && (
-            <span className="text-xs opacity-60 mt-1">{subValue}</span>
+            <span className="text-xs opacity-60">{subValue}</span>
           )}
         </div>
         {Icon && <Icon className="w-5 h-5 opacity-60" />}
       </div>
       {trend && (
         <div
-          className={`flex items-center gap-1 mt-2 text-xs ${trend === "up" ? "text-success" : "text-danger"}`}
+          className={`flex items-center gap-2 text-xs ${trend === "up" ? "text-success" : "text-danger"}`}
         >
           {trend === "up" ? (
             <TrendingUp className="w-3 h-3" />
@@ -752,12 +752,12 @@ function ExecutiveSummaryCard({
 function ChannelBadge({ icon: Icon, label, count, total }) {
   const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
   return (
-    <div className="flex items-center gap-2 p-2 bg-default/50 rounded-lg">
-      <Icon className="w-4 h-4 text-foreground/60" />
+    <div className="flex items-center gap-2 p-2 bg-background border border-default rounded-lg">
+      <Icon className="w-4 h-4 text-default-500" />
       <div className="flex flex-col">
-        <span className="text-xs text-foreground/60">{label}</span>
+        <span className="text-xs text-default-500">{label}</span>
         <span className="text-sm font-medium">
-          {count} ออเดอร์ ({percentage}%)
+          {count} orders ({percentage}%)
         </span>
       </div>
     </div>
@@ -813,7 +813,7 @@ function OrderLinesTable({ lines }) {
           <div className="flex flex-col">
             <span>{item.description}</span>
             {item.description2 && (
-              <span className="text-xs text-foreground/60">
+              <span className="text-xs text-default-500">
                 {item.description2}
               </span>
             )}
@@ -846,9 +846,9 @@ function OrderLinesTable({ lines }) {
 
       {commentLines.length > 0 && (
         <div className="flex flex-col pt-3">
-          <p className="text-sm font-medium mb-2">หมายเหตุ:</p>
+          <p className="text-sm font-medium">Remarks:</p>
           {commentLines.map((line) => (
-            <p key={line.id} className="text-sm text-foreground/70">
+            <p key={line.id} className="text-sm text-default-600">
               {line.description} {line.description2}
             </p>
           ))}
@@ -877,7 +877,7 @@ function OrderDetailModal({
         <ModalHeader className="flex flex-col gap-2">
           <h3 className="text-lg font-semibold">Sales Order: {order.number}</h3>
           {order.externalDocumentNumber && (
-            <span className="text-sm text-foreground/60">
+            <span className="text-sm text-default-500">
               Ref: {order.externalDocumentNumber}
             </span>
           )}
@@ -886,20 +886,20 @@ function OrderDetailModal({
         <ModalBody className="gap-2">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             <div className="flex items-start gap-2">
-              <User className="text-foreground/50 mt-1" />
+              <User className="text-default-400" />
               <div className="flex flex-col">
-                <p className="text-xs text-foreground/60">Customer</p>
+                <p className="text-xs text-default-500">Customer</p>
                 <p className="font-medium">{order.customerName}</p>
-                <p className="text-sm text-foreground/70">
+                <p className="text-sm text-default-600">
                   {order.customerNumber}
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-2">
-              <Calendar className="text-foreground/50 mt-1" />
+              <Calendar className="text-default-400" />
               <div className="flex flex-col">
-                <p className="text-xs text-foreground/60">Dates</p>
+                <p className="text-xs text-default-500">Dates</p>
                 <p className="text-sm">Order: {order.orderDate}</p>
                 <p className="text-sm">
                   Delivery: {order.requestedDeliveryDate}
@@ -908,15 +908,15 @@ function OrderDetailModal({
             </div>
 
             <div className="flex items-start gap-2">
-              <MapPin className="text-foreground/50 mt-1" />
+              <MapPin className="text-default-400" />
               <div className="flex flex-col">
-                <p className="text-xs text-foreground/60">Ship To</p>
+                <p className="text-xs text-default-500">Ship To</p>
                 <p className="text-sm">{order.shipToName}</p>
-                <p className="text-sm text-foreground/70">
+                <p className="text-sm text-default-600">
                   {order.shipToAddressLine1}
                 </p>
                 {order.shipToCity && (
-                  <p className="text-sm text-foreground/70">
+                  <p className="text-sm text-default-600">
                     {order.shipToCity} {order.shipToPostCode}
                   </p>
                 )}
@@ -927,8 +927,8 @@ function OrderDetailModal({
           <Divider />
 
           <div className="flex flex-col">
-            <div className="flex items-center gap-2 mb-3">
-              <Package className="text-foreground/50" />
+            <div className="flex items-center gap-2">
+              <Package className="text-default-400" />
               <span className="font-medium">
                 Order Lines ({lineCount} items)
               </span>
@@ -950,7 +950,7 @@ function OrderDetailModal({
                   {formatCurrency(order.totalTaxAmount)}
                 </span>
               </p>
-              <p className="text-lg font-bold text-primary">
+              <p className="text-lg font-bold text-foreground">
                 Total: {formatCurrency(order.totalAmountIncludingTax)}{" "}
                 {order.currencyCode}
               </p>
@@ -958,12 +958,12 @@ function OrderDetailModal({
           </div>
 
           {!isConnected && (
-            <div className="flex flex-col gap-2 p-2 bg-danger/10 rounded-xl border border-danger/30">
+            <div className="flex flex-col gap-2 p-2 bg-red-50 rounded-lg border border-red-200">
               <p className="text-sm text-danger font-medium">
                 ⚠️ Printer Not Connected
               </p>
-              <p className="text-xs text-danger/80">
-                กรุณาเชื่อมต่อเครื่องพิมพ์ RFID ก่อนทำการพิมพ์
+              <p className="text-xs text-red-400">
+                Please connect the RFID printer before printing
               </p>
             </div>
           )}
@@ -975,7 +975,7 @@ function OrderDetailModal({
             variant="shadow"
             size="md"
             radius="md"
-            className="w-full text-background"
+            className="w-full text-white"
             onPress={onClose}
           >
             Close
@@ -985,7 +985,7 @@ function OrderDetailModal({
             variant="shadow"
             size="md"
             radius="md"
-            className="w-full text-background"
+            className="w-full text-white"
             startContent={<Printer />}
             isDisabled={!isConnected || printing || lineCount === 0}
             onPress={() => {
@@ -993,7 +993,7 @@ function OrderDetailModal({
               onOpenPreview(order);
             }}
           >
-            ใบปะหน้า
+            Packing Slip
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -1010,11 +1010,11 @@ function ItemQuantitySelector({
   onReset,
 }) {
   return (
-    <div className="flex flex-col w-full p-3 bg-default/25 border-1 border-default rounded-xl">
-      <div className="flex items-center justify-between mb-3">
+    <div className="flex flex-col w-full p-2 bg-default-50/50 rounded-lg">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Package className="text-foreground/60" />
-          <span className="text-sm font-semibold">เลือกสินค้าที่จะพิมพ์</span>
+          <Package className="text-default-500" />
+          <span className="text-sm font-semibold">Select Items to Print</span>
         </div>
         <Button
           size="md"
@@ -1023,7 +1023,7 @@ function ItemQuantitySelector({
           startContent={<RotateCcw />}
           onPress={onReset}
         >
-          รีเซ็ต
+          Reset
         </Button>
       </div>
 
@@ -1036,10 +1036,10 @@ function ItemQuantitySelector({
           return (
             <div
               key={item.itemNumber || idx}
-              className={`flex items-center gap-3 p-2 rounded-lg border ${
+              className={`flex items-center gap-2 p-2 rounded-lg ${
                 isSelected
-                  ? "bg-primary/5 border-primary/30"
-                  : "bg-default/50 border-default"
+                  ? "bg-background border border-default shadow-sm"
+                  : "bg-default-50/50 border border-default"
               }`}
             >
               <Checkbox
@@ -1049,17 +1049,17 @@ function ItemQuantitySelector({
                 }
                 size="md"
                 color="primary"
-                className="text-background"
+                className="text-white"
               />
 
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
                   {item.description}
                 </p>
-                <p className="text-xs text-foreground/60">{item.itemNumber}</p>
+                <p className="text-xs text-default-500">{item.itemNumber}</p>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <Button
                   isIconOnly
                   size="md"
@@ -1104,7 +1104,7 @@ function ItemQuantitySelector({
                   <Plus />
                 </Button>
 
-                <span className="text-xs text-foreground/50 w-12 text-right">
+                <span className="text-xs text-default-400 w-12 text-right">
                   / {maxQty}
                 </span>
               </div>
@@ -1176,6 +1176,7 @@ function SlipPreviewModal({
     if (order?.number !== prevOrderRef.current) {
       prevOrderRef.current = order?.number;
       queueMicrotask(() => {
+        if (!order) return;
         setPreviewIndex(0);
         setUseCustomAddress(false);
         setCustomAddress({
@@ -1370,10 +1371,10 @@ function SlipPreviewModal({
       <ModalContent>
         <ModalHeader className="flex flex-col items-center justify-start w-full h-fit p-2 gap-2">
           <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            ใบปะหน้า - {order.number}
+            Packing Slip - {order.number}
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-sm text-foreground/70">
-            จะพิมพ์ทั้งหมด {totalPieces} ใบ (1 ใบ = 1 ชิ้น)
+          <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-sm text-default-600">
+            Will print {totalPieces} slips total (1 slip = 1 piece)
           </div>
           {totalPieces > 0 && (
             <div className="flex items-center justify-center w-full gap-2">
@@ -1387,7 +1388,7 @@ function SlipPreviewModal({
                 <ChevronLeft />
               </Button>
               <span className="text-sm font-medium">
-                ดูตัวอย่างใบที่ {currentPiece} / {totalPieces}
+                Preview slip {currentPiece} / {totalPieces}
               </span>
               <Button
                 isIconOnly
@@ -1402,7 +1403,7 @@ function SlipPreviewModal({
           )}
         </ModalHeader>
 
-        <ModalBody className="flex flex-col items-center justify-start w-full h-fit p-2 gap-4">
+        <ModalBody className="flex flex-col items-center justify-start w-full h-fit p-2 gap-2">
           <ItemQuantitySelector
             items={itemLines}
             selectedItems={selectedItems}
@@ -1413,10 +1414,10 @@ function SlipPreviewModal({
           />
 
           {totalPieces > 0 ? (
-            <div className="flex flex-col w-full bg-default rounded-xl p-2 gap-2">
-              <div className="flex flex-col w-full bg-background rounded-xl overflow-hidden">
-                <div className="flex flex-row items-stretch border-b-1 border-default">
-                  <div className="flex items-center justify-center w-[15%] p-2 border-r-2 border-default">
+            <div className="flex flex-col w-full bg-default-100 rounded-lg p-2 gap-2">
+              <div className="flex flex-col w-full bg-background rounded-lg overflow-hidden">
+                <div className="flex flex-row items-stretch border-b border-default">
+                  <div className="flex items-center justify-center w-[15%] p-2 border-r border-default">
                     <Image
                       src="/logo/logo-03.png"
                       alt="Logo"
@@ -1428,25 +1429,25 @@ function SlipPreviewModal({
 
                   <div className="flex flex-col justify-center flex-1 p-2 text-sm">
                     <div className="flex gap-2">
-                      <span className="font-semibold w-16">ผู้ส่ง:</span>
+                      <span className="font-semibold w-16">Sender:</span>
                       <span>{COMPANY_INFO.name}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-semibold w-16">ที่อยู่:</span>
+                      <span className="font-semibold w-16">Address:</span>
                       <span>{COMPANY_INFO.address1}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-semibold w-16">โทร:</span>
+                      <span className="font-semibold w-16">Tel:</span>
                       <span>{COMPANY_INFO.phone}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-center w-[15%] p-2 border-l-2 border-default text-xl font-bold">
+                  <div className="flex items-center justify-center w-[15%] p-2 border-l border-default text-xl font-bold">
                     {currentPiece}/{totalPieces}
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center w-full p-2 border-b-1 border-default bg-white">
+                <div className="flex flex-col items-center justify-center w-full p-2 border-b border-default bg-background">
                   <Barcode
                     value={previewBarcodeValue}
                     format="CODE128"
@@ -1462,15 +1463,15 @@ function SlipPreviewModal({
                   />
                 </div>
 
-                <div className="flex flex-col p-2 border-b-1 border-default gap-2">
+                <div className="flex flex-col p-2 border-b border-default gap-2">
                   <div className="flex gap-2">
-                    <span className="font-semibold w-12 text-sm">ผู้รับ:</span>
+                    <span className="font-semibold w-12 text-sm">To:</span>
                     <span className="font-bold text-base">
                       {displayAddress.shipToName}
                     </span>
                   </div>
                   <div className="flex gap-2 text-xs">
-                    <span className="font-semibold w-12">ที่อยู่:</span>
+                    <span className="font-semibold w-12">Addr:</span>
                     <div className="flex flex-col">
                       <span>{displayAddress.shipToAddressLine1}</span>
                       {displayAddress.shipToAddressLine2 && (
@@ -1486,31 +1487,31 @@ function SlipPreviewModal({
                     </div>
                   </div>
                   <div className="flex gap-2 text-xs">
-                    <span className="font-semibold w-12">โทร:</span>
+                    <span className="font-semibold w-12">Tel:</span>
                     <span>{displayAddress.phoneNumber || "-"}</span>
                   </div>
                 </div>
 
-                <div className="flex p-2 bg-default text-xs font-semibold">
+                <div className="flex p-2 bg-default-100 text-xs font-semibold">
                   <span className="w-10 text-center">#</span>
-                  <span className="flex-1">รายการสินค้า</span>
-                  <span className="w-16 text-right">จำนวน</span>
+                  <span className="flex-1">Item</span>
+                  <span className="w-16 text-right">Qty</span>
                 </div>
 
                 <div className="flex flex-col h-40 overflow-auto">
                   {currentItem ? (
-                    <div className="flex p-2 text-sm border-b-1 border-default bg-primary/5">
+                    <div className="flex p-2 text-sm border-b border-default bg-default-50">
                       <span className="w-10 text-center font-bold">1</span>
                       <div className="flex-1 flex flex-col">
                         <span className="whitespace-pre-wrap break-words font-medium">
                           {currentItem.description}
                         </span>
                         {currentItem.description2 && (
-                          <span className="text-xs text-foreground/60 mt-1">
+                          <span className="text-xs text-default-500">
                             {currentItem.description2}
                           </span>
                         )}
-                        <span className="text-xs text-foreground/50 mt-1">
+                        <span className="text-xs text-default-400">
                           Item: {currentItem.itemNumber}
                         </span>
                       </div>
@@ -1519,22 +1520,22 @@ function SlipPreviewModal({
                       </span>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center h-full text-foreground/50">
-                      ไม่มีสินค้า
+                    <div className="flex items-center justify-center h-full text-default-400">
+                      No items
                     </div>
                   )}
                 </div>
 
-                <div className="flex border-t-1 border-default">
+                <div className="flex border-t border-default">
                   <div className="flex flex-col flex-1 p-2 text-lg text-danger gap-2">
                     <p className="font-bold">
-                      ❗กรุณาถ่ายวิดีโอขณะแกะพัสดุ
-                      เพื่อใช้เป็นหลักฐานการเคลมสินค้า ไม่มีหลักฐานงดเคลมทุกกรณี
+                      ❗Please record a video while unboxing the parcel
+                      for use as evidence for product claims. No evidence, no claims accepted.
                     </p>
                   </div>
 
                   <div className="flex items-center justify-center p-2">
-                    <div className="flex flex-col items-center justify-center w-20 h-20 rounded-xl bg-default">
+                    <div className="flex flex-col items-center justify-center w-20 h-20 rounded-lg bg-default-100">
                       <Image
                         src="/qrcode/lineEvergreen.png"
                         alt="Logo"
@@ -1548,43 +1549,43 @@ function SlipPreviewModal({
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center w-full h-40 bg-default/50 rounded-xl">
-              <p className="text-foreground/50">
-                กรุณาเลือกสินค้าอย่างน้อย 1 รายการ
+            <div className="flex items-center justify-center w-full h-40 bg-default-50 rounded-lg">
+              <p className="text-default-400">
+                Please select at least 1 item
               </p>
             </div>
           )}
 
-          <div className="flex flex-col w-full p-2 bg-default/50 rounded-xl">
-            <p className="text-sm font-semibold mb-2">
-              สรุปรายการที่จะพิมพ์ ({filteredItems.length} รายการ, {totalPieces}{" "}
-              ใบ):
+          <div className="flex flex-col w-full p-2 bg-default-50 rounded-lg">
+            <p className="text-sm font-semibold">
+              Print Summary ({filteredItems.length} items, {totalPieces}{" "}
+              slips):
             </p>
             <div className="flex flex-col gap-2 text-xs max-h-32 overflow-auto">
               {filteredItems.map((item, idx) => (
                 <div key={idx} className="flex justify-between">
                   <span className="truncate flex-1">{item.description}</span>
-                  <span className="ml-2 font-medium">x{item.quantity} ใบ</span>
+                  <span className="font-medium">x{item.quantity} slips</span>
                 </div>
               ))}
               {filteredItems.length === 0 && (
-                <p className="text-foreground/50">ไม่มีรายการที่เลือก</p>
+                <p className="text-default-400">No items selected</p>
               )}
             </div>
           </div>
 
-          <div className="flex flex-col w-full p-3 bg-default/25 border-1 border-default rounded-xl">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="flex flex-col w-full p-2 bg-default-50 border border-default rounded-lg">
+            <div className="flex items-center gap-2">
               <Checkbox
                 isSelected={useCustomAddress}
                 onValueChange={setUseCustomAddress}
                 size="md"
                 color="secondary"
-                className="text-background"
+                className="text-white"
               >
                 <span className="text-sm font-semibold flex items-center gap-2">
                   <Edit3 />
-                  แก้ไขที่อยู่จัดส่ง
+                  Edit Shipping Address
                 </span>
               </Checkbox>
             </div>
@@ -1592,13 +1593,13 @@ function SlipPreviewModal({
             {useCustomAddress && (
               <div className="flex flex-col gap-2">
                 <Input
-                  label="ชื่อผู้รับ"
+                  label="Recipient Name"
                   size="md"
                   value={customAddress.shipToName}
                   onValueChange={(v) => handleAddressChange("shipToName", v)}
                 />
                 <Input
-                  label="ที่อยู่ บรรทัด 1"
+                  label="Address Line 1"
                   size="md"
                   value={customAddress.shipToAddressLine1}
                   onValueChange={(v) =>
@@ -1606,7 +1607,7 @@ function SlipPreviewModal({
                   }
                 />
                 <Input
-                  label="เบอร์โทรศัพท์"
+                  label="Phone Number"
                   size="md"
                   value={customAddress.phoneNumber}
                   onValueChange={(v) => handleAddressChange("phoneNumber", v)}
@@ -1623,23 +1624,23 @@ function SlipPreviewModal({
               variant="shadow"
               size="md"
               radius="md"
-              className="flex-1 text-background"
+              className="flex-1 text-white"
               onPress={onClose}
             >
-              ปิด
+              Close
             </Button>
             <Button
               color="primary"
               variant="shadow"
               size="md"
               radius="md"
-              className="flex-1 text-background"
+              className="flex-1 text-white"
               startContent={<Printer />}
               onPress={handlePrint}
               isLoading={printing}
               isDisabled={totalPieces === 0}
             >
-              {printing ? "กำลังพิมพ์..." : `พิมพ์ ${totalPieces} ใบ`}
+              {printing ? "Printing..." : `Print ${totalPieces} Slips`}
             </Button>
           </div>
         </ModalFooter>
@@ -1788,7 +1789,7 @@ export default function UISalesOrderOnline({
               <span className="truncate max-w-[200px]">
                 {item.customerName}
               </span>
-              <span className="text-xs text-foreground/60">
+              <span className="text-xs text-default-500">
                 {item.customerNumber}
               </span>
             </div>
@@ -1802,112 +1803,83 @@ export default function UISalesOrderOnline({
   );
 
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
-      <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <span className="font-medium">Printer</span>
-            <Button
-              isIconOnly
-              variant="light"
-              size="md"
-              onPress={openSettings}
-              title="Printer Settings"
-            >
-              <Settings />
-            </Button>
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <PrinterStatusBadge />
-          </div>
+    <div className="flex flex-col w-full h-full overflow-hidden p-2 gap-2">
+      {/* Inline stats + printer controls */}
+      <div className="hidden xl:flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Total Orders</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{total}</span>
         </div>
-
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Total Items</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{totalItems}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Total Amount</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{formatCurrency(totalAmount)}</span>
+        </div>
         {(fromDate || toDate) && (
-          <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default bg-primary/10">
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-primary text-sm">
-              <Filter className="w-4 h-4" />
-              กรองข้อมูล
-            </div>
-            <div className="flex items-center justify-center w-full h-full p-2 gap-2 text-xs text-primary/80">
-              {fromDate && new Date(fromDate).toLocaleDateString("th-TH")}
+          <div className="flex items-center gap-2">
+            <Filter className="w-3 h-3 text-default-500" />
+            <span className="text-xs text-default-500">
+              {fromDate && new Date(fromDate).toLocaleDateString("en-US")}
               {fromDate && toDate && " - "}
-              {toDate && new Date(toDate).toLocaleDateString("th-TH")}
-            </div>
+              {toDate && new Date(toDate).toLocaleDateString("en-US")}
+            </span>
+            <span className="text-xs font-semibold text-amber-700 bg-amber-50 p-2 rounded">of {orders.length}</span>
           </div>
         )}
-
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Total Orders
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {total}
-          </div>
-          {(fromDate || toDate) && (
-            <div className="text-xs text-foreground/50">
-              จาก {orders.length} รายการ
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Total Items
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {totalItems}
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Total Amount
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {formatCurrency(totalAmount)}
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
+        <div className="flex items-center gap-2">
+          <PrinterStatusBadge />
           <Button
+            isIconOnly
             variant="light"
-            size="md"
+            size="sm"
+            onPress={openSettings}
+            title="Printer Settings"
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+          <Button
+            isIconOnly
+            variant="light"
+            size="sm"
             onPress={onRefresh}
             isDisabled={loading}
-            className="w-full"
           >
-            <RefreshCw className={loading ? "animate-spin" : ""} />
-            <span className="ml-2">Refresh</span>
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden overflow-y-auto">
-        <div className="flex xl:hidden items-center justify-between w-full p-2">
-          <PrinterStatusBadge />
-          <div className="flex gap-2">
-            <Button
-              isIconOnly
-              variant="light"
-              size="md"
-              onPress={openSettings}
-              title="Printer Settings"
-            >
-              <Settings />
-            </Button>
-            <Button
-              isIconOnly
-              variant="light"
-              size="md"
-              onPress={onRefresh}
-              isDisabled={loading}
-            >
-              <RefreshCw className={loading ? "animate-spin" : ""} />
-            </Button>
-          </div>
+      {/* Mobile controls */}
+      <div className="flex xl:hidden items-center justify-between w-full shrink-0">
+        <PrinterStatusBadge />
+        <div className="flex gap-2">
+          <Button
+            isIconOnly
+            variant="light"
+            size="md"
+            onPress={openSettings}
+            title="Printer Settings"
+          >
+            <Settings />
+          </Button>
+          <Button
+            isIconOnly
+            variant="light"
+            size="md"
+            onPress={onRefresh}
+            isDisabled={loading}
+          >
+            <RefreshCw className={loading ? "animate-spin" : ""} />
+          </Button>
         </div>
+      </div>
 
-        <div className="w-full p-4">
+      {/* Content */}
+      <div className="flex-1 min-h-0 overflow-hidden overflow-y-auto">
+        <div className="w-full p-2">
           <DateRangeFilter
             fromDate={fromDate}
             toDate={toDate}
@@ -1924,63 +1896,63 @@ export default function UISalesOrderOnline({
           />
         </div>
 
-        <div className="flex flex-col w-full p-4 gap-4">
+        <div className="flex flex-col w-full p-2 gap-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-primary" />
+              <BarChart3 className="w-5 h-5 text-foreground" />
               <h2 className="text-lg font-semibold">
-                สรุปภาพรวมประจำเดือน (Executive Summary)
+                Monthly Executive Summary
               </h2>
             </div>
             {(fromDate || toDate) && (
               <Chip color="primary" variant="flat" size="sm">
-                กรองข้อมูล: {filteredOrders.length} รายการ
+                Filtered: {filteredOrders.length} records
               </Chip>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
             <ExecutiveSummaryCard
-              title="ยอดขายออนไลน์รวม"
-              value={`${formatNumber(stats.totalAmount)} บาท`}
-              subValue={`เป้าหมาย: ${formatNumber(1500000)} บาท (${stats.totalAmount > 0 ? ((stats.totalAmount / 1500000) * 100).toFixed(1) : 0}%)`}
+              title="Total Online Sales"
+              value={`${formatNumber(stats.totalAmount)} THB`}
+              subValue={`Target: ${formatNumber(1500000)} THB (${stats.totalAmount > 0 ? ((stats.totalAmount / 1500000) * 100).toFixed(1) : 0}%)`}
               icon={ShoppingCart}
               color="primary"
             />
 
             <ExecutiveSummaryCard
-              title="จำนวนออเดอร์"
-              value={`${formatNumber(stats.totalOrders)} ออเดอร์`}
+              title="Order Count"
+              value={`${formatNumber(stats.totalOrders)} Orders`}
               icon={Calendar}
               color="default"
             />
 
             <ExecutiveSummaryCard
-              title="จำนวนสินค้า"
-              value={`${formatNumber(stats.totalItems)} ชิ้น`}
+              title="Total Items"
+              value={`${formatNumber(stats.totalItems)} pcs`}
               icon={Package}
               color="success"
             />
 
             <ExecutiveSummaryCard
-              title="ราคาเฉลี่ยต่อออเดอร์"
-              value={`${formatNumber(Math.round(stats.avgOrderValue))} บาท`}
-              subValue={`จาก ${stats.totalOrders} ออเดอร์`}
+              title="Average Order Value"
+              value={`${formatNumber(Math.round(stats.avgOrderValue))} THB`}
+              subValue={`From ${stats.totalOrders} orders`}
               icon={Target}
               color="warning"
             />
           </div>
 
-          <div className="flex flex-col gap-3 p-4 bg-default/30 rounded-xl border border-default">
+          <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
             <div className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-foreground/70" />
-              <span className="font-medium">จำนวนออเดอร์และรายละเอียด</span>
+              <ShoppingCart className="w-4 h-4 text-default-600" />
+              <span className="font-medium">Order Count and Details</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
-                <span className="text-sm text-foreground/60">
-                  แยกตามช่องทาง
+                <span className="text-sm text-default-500">
+                  By Channel
                 </span>
                 {stats.channelBreakdown.length > 0 ? (
                   stats.channelBreakdown.map((channel) => (
@@ -1999,15 +1971,15 @@ export default function UISalesOrderOnline({
                     />
                   ))
                 ) : (
-                  <div className="text-sm text-foreground/50">
-                    ไม่มีข้อมูลช่องทาง
+                  <div className="text-sm text-default-400">
+                    No channel data
                   </div>
                 )}
               </div>
 
               <div className="flex flex-col gap-2">
-                <span className="text-sm text-foreground/60">แยกตามสินค้า</span>
-                <div className="flex flex-col gap-1 p-2 bg-default/50 rounded-lg">
+                <span className="text-sm text-default-500">By Product</span>
+                <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg">
                   {stats.productBreakdown.length > 0 ? (
                     stats.productBreakdown.map((product) => (
                       <div
@@ -2016,37 +1988,37 @@ export default function UISalesOrderOnline({
                       >
                         <span>{product.name}</span>
                         <span className="font-medium">
-                          {product.quantity} ชิ้น
+                          {product.quantity} pcs
                         </span>
                       </div>
                     ))
                   ) : (
-                    <div className="text-sm text-foreground/50">
-                      ไม่มีข้อมูลสินค้า
+                    <div className="text-sm text-default-400">
+                      No product data
                     </div>
                   )}
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
-                <span className="text-sm text-foreground/60">
-                  แยกตามประเภทลูกค้า
+                <span className="text-sm text-default-500">
+                  By Customer Type
                 </span>
-                <div className="flex flex-col gap-1 p-2 bg-default/50 rounded-lg">
+                <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg">
                   <div className="flex justify-between text-sm">
                     <span>Owner (B2C)</span>
                     <span className="font-medium">
-                      {stats.uniqueCustomers} ราย
+                      {stats.uniqueCustomers} customers
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>ลูกค้าใหม่ (ประมาณการ)</span>
-                    <span className="font-medium">{stats.newLeads} ราย</span>
+                    <span>New Customers (Est.)</span>
+                    <span className="font-medium">{stats.newLeads} customers</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>ลูกค้าซ้ำ (ประมาณการ)</span>
+                    <span>Repeat Customers (Est.)</span>
                     <span className="font-medium">
-                      {stats.repeatCustomers} ราย
+                      {stats.repeatCustomers} customers
                     </span>
                   </div>
                 </div>
@@ -2054,131 +2026,131 @@ export default function UISalesOrderOnline({
             </div>
           </div>
 
-          <div className="p-4 bg-default/30 rounded-xl border border-default">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-4 h-4 text-primary" />
+          <div className="p-2 bg-default-50/50 rounded-lg">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-foreground" />
               <span className="font-medium">
-                กราฟเปรียบเทียบยอดขาย (ธ.ค. vs ม.ค.)
+                Sales Comparison Chart (Monthly)
               </span>
             </div>
             <MonthlySalesChart data={stats.monthlyData} />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="flex flex-col gap-2 p-4 bg-primary/5 rounded-xl border border-primary/20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
               <div className="flex items-center gap-2">
-                <MousePointerClick className="w-4 h-4 text-primary" />
+                <MousePointerClick className="w-4 h-4 text-foreground" />
                 <span className="font-medium">Conversion Rate</span>
                 <Chip color="warning" variant="flat" size="sm">
                   Coming Soon
                 </Chip>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-sm text-foreground/60">
-                  อัตราการแปลงจากผู้เข้าชมเป็นลูกค้า - กำลังพัฒนา
+                <span className="text-sm text-default-500">
+                  Visitor to customer conversion rate - Under development
                 </span>
               </div>
-              <p className="text-xs text-foreground/50">
-                * จะเชื่อมต่อกับข้อมูล Analytics ในอนาคต
+              <p className="text-xs text-default-400">
+                * Will integrate with Analytics data in the future
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 p-4 bg-warning/5 rounded-xl border border-warning/20">
+            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
               <div className="flex items-center gap-2">
                 <Smile className="w-4 h-4 text-warning" />
                 <span className="font-medium">Customer Satisfaction Score</span>
-                <span className="px-2 py-0.5 text-xs bg-warning/20 text-warning rounded-full">
+                <span className="p-2 text-xs bg-amber-50 text-warning rounded-full">
                   Coming Soon
                 </span>
               </div>
-              <p className="text-sm text-foreground/70">
+              <p className="text-sm text-default-600">
                 {customerSatisfactionStatus.message}
               </p>
-              <p className="text-xs text-foreground/50">
-                เริ่มใช้งาน: {customerSatisfactionStatus.effectiveDate}
+              <p className="text-xs text-default-400">
+                Effective: {customerSatisfactionStatus.effectiveDate}
               </p>
-              <p className="text-xs text-foreground/50">
+              <p className="text-xs text-default-400">
                 {customerSatisfactionStatus.description}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col w-full p-4 gap-4 border-t border-default">
+        <div className="flex flex-col w-full p-2 gap-2 border-t border-default">
           <div className="flex items-center gap-2">
             <Target className="w-5 h-5 text-success" />
             <h2 className="text-lg font-semibold">
-              ผลการดำเนินงานด้านการขาย (Sales Performance)
+              Sales Performance
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
             <ExecutiveSummaryCard
-              title="จำนวนลีดใหม่ (New Leads)"
-              value={`${stats.uniqueCustomers} ราย`}
-              subValue={`ลูกค้าใหม่ ~${stats.newLeads} ราย | ลูกค้าซ้ำ ~${stats.repeatCustomers} ราย`}
+              title="New Leads"
+              value={`${stats.uniqueCustomers} customers`}
+              subValue={`New ~${stats.newLeads} | Repeat ~${stats.repeatCustomers} customers`}
               icon={Users}
               color="success"
             />
 
             <ExecutiveSummaryCard
-              title="อัตราการปิดการขาย (Closing Rate)"
+              title="Closing Rate"
               value={`${stats.uniqueCustomers > 0 ? ((stats.totalOrders / stats.uniqueCustomers) * 100).toFixed(1) : 0}%`}
-              subValue={`ปิดการขายสำเร็จ ${stats.totalOrders} จาก ${stats.uniqueCustomers} ลูกค้า`}
+              subValue={`Closed ${stats.totalOrders} out of ${stats.uniqueCustomers} customers`}
               icon={Target}
               color="primary"
             />
 
             <ExecutiveSummaryCard
-              title="จำนวนลูกค้าซ้ำ (ประมาณการ)"
-              value={`${stats.repeatCustomers} คน`}
-              subValue="ลูกค้าที่ซื้อซ้ำ"
+              title="Repeat Customers (Est.)"
+              value={`${stats.repeatCustomers} customers`}
+              subValue="Customers who made repeat purchases"
               icon={Repeat}
               color="warning"
             />
 
             <ExecutiveSummaryCard
-              title="สรุปยอดออเดอร์รวม"
-              value={`${stats.totalOrders} ออเดอร์`}
-              subValue={`มูลค่ารวม ${formatNumber(stats.totalAmount)} บาท`}
+              title="Total Orders Summary"
+              value={`${stats.totalOrders} Orders`}
+              subValue={`Total value ${formatNumber(stats.totalAmount)} THB`}
               icon={ShoppingCart}
               color="default"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-default/30 rounded-xl border border-default">
-              <div className="flex items-center gap-2 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="p-2 bg-default-50/50 rounded-lg">
+              <div className="flex items-center gap-2">
                 <Package className="w-4 h-4 text-success" />
-                <span className="font-medium">ยอดขายแยกตามผลิตภัณฑ์</span>
+                <span className="font-medium">Sales by Product</span>
               </div>
               <ProductSalesChart data={stats.productBreakdown} />
             </div>
 
-            <div className="p-4 bg-default/30 rounded-xl border border-default">
-              <div className="flex items-center gap-2 mb-4">
-                <Globe className="w-4 h-4 text-primary" />
-                <span className="font-medium">ยอดขายแยกตามช่องทาง</span>
+            <div className="p-2 bg-default-50/50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-foreground" />
+                <span className="font-medium">Sales by Channel</span>
               </div>
               <ChannelSalesChart data={stats.channelBreakdown} />
             </div>
           </div>
 
-          <div className="p-4 bg-default/30 rounded-xl border border-default">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="p-2 bg-default-50/50 rounded-lg">
+            <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-danger" />
               <h3 className="font-semibold text-lg">
-                Top 10 SKU ขายดีประจำเดือน
+                Top 10 Best Selling SKUs of the Month
               </h3>
             </div>
             <Top10SKUChart data={stats.topSKUs} />
           </div>
         </div>
 
-        <div className="flex flex-col w-full p-4 gap-2">
+        <div className="flex flex-col w-full p-2 gap-2">
           <div className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-foreground/70" />
-            <h2 className="text-lg font-semibold">รายการคำสั่งซื้อ</h2>
+            <Package className="w-5 h-5 text-default-600" />
+            <h2 className="text-lg font-semibold">Order List</h2>
           </div>
           {loading ? (
             <div className="flex items-center justify-center w-full h-64 gap-2">
@@ -2208,7 +2180,7 @@ export default function UISalesOrderOnline({
             <PrinterSettings
               onClose={closeSettings}
               showHeader={true}
-              title="ควบคุมเครื่องพิมพ์"
+              title="Printer Control"
               subtitle="ChainWay RFID Printer"
             />
           </ModalBody>

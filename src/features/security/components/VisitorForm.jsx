@@ -8,98 +8,109 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure
 import { Camera, FileText, RefreshCw, Plus, X } from "lucide-react";
 
 const contactReasonOptions = [
-  { key: "Shipping", label: "การจัดส่ง" },
-  { key: "BillingChequeCollection", label: "รับเช็ค/วางบิล" },
-  { key: "JobApplication", label: "สมัครงาน" },
-  { key: "ProductPresentation", label: "นำเสนอสินค้า" },
-  { key: "Meeting", label: "ประชุม" },
-  { key: "Other", label: "อื่นๆ" },
+  { key: "Shipping", label: "Shipping" },
+  { key: "BillingChequeCollection", label: "Cheque Collection / Billing" },
+  { key: "JobApplication", label: "Job Application" },
+  { key: "ProductPresentation", label: "Product Presentation" },
+  { key: "Meeting", label: "Meeting" },
+  { key: "Other", label: "Other" },
 ];
 
 const statusOptions = [
-  { key: "CheckIn", label: "เข้า" },
-  { key: "CheckOut", label: "ออก" },
+  { key: "CheckIn", label: "Check In" },
+  { key: "CheckOut", label: "Check Out" },
 ];
 
 const thaiProvinces = [
-  { key: "กรุงเทพมหานคร", label: "กรุงเทพมหานคร" },
-  { key: "กระบี่", label: "กระบี่" },
-  { key: "กาญจนบุรี", label: "กาญจนบุรี" },
-  { key: "กาฬสินธุ์", label: "กาฬสินธุ์" },
-  { key: "กำแพงเพชร", label: "กำแพงเพชร" },
-  { key: "ขอนแก่น", label: "ขอนแก่น" },
-  { key: "จันทบุรี", label: "จันทบุรี" },
-  { key: "ฉะเชิงเทรา", label: "ฉะเชิงเทรา" },
-  { key: "ชลบุรี", label: "ชลบุรี" },
-  { key: "ชัยนาท", label: "ชัยนาท" },
-  { key: "ชัยภูมิ", label: "ชัยภูมิ" },
-  { key: "ชุมพร", label: "ชุมพร" },
-  { key: "เชียงราย", label: "เชียงราย" },
-  { key: "เชียงใหม่", label: "เชียงใหม่" },
-  { key: "ตรัง", label: "ตรัง" },
-  { key: "ตราด", label: "ตราด" },
-  { key: "ตาก", label: "ตาก" },
-  { key: "นครนายก", label: "นครนายก" },
-  { key: "นครปฐม", label: "นครปฐม" },
-  { key: "นครพนม", label: "นครพนม" },
-  { key: "นครราชสีมา", label: "นครราชสีมา" },
-  { key: "นครศรีธรรมราช", label: "นครศรีธรรมราช" },
-  { key: "นครสวรรค์", label: "นครสวรรค์" },
-  { key: "นนทบุรี", label: "นนทบุรี" },
-  { key: "นราธิวาส", label: "นราธิวาส" },
-  { key: "น่าน", label: "น่าน" },
-  { key: "บึงกาฬ", label: "บึงกาฬ" },
-  { key: "บุรีรัมย์", label: "บุรีรัมย์" },
-  { key: "ปทุมธานี", label: "ปทุมธานี" },
-  { key: "ประจวบคีรีขันธ์", label: "ประจวบคีรีขันธ์" },
-  { key: "ปราจีนบุรี", label: "ปราจีนบุรี" },
-  { key: "ปัตตานี", label: "ปัตตานี" },
-  { key: "พระนครศรีอยุธยา", label: "พระนครศรีอยุธยา" },
-  { key: "พังงา", label: "พังงา" },
-  { key: "พัทลุง", label: "พัทลุง" },
-  { key: "พิจิตร", label: "พิจิตร" },
-  { key: "พิษณุโลก", label: "พิษณุโลก" },
-  { key: "เพชรบุรี", label: "เพชรบุรี" },
-  { key: "เพชรบูรณ์", label: "เพชรบูรณ์" },
-  { key: "แพร่", label: "แพร่" },
-  { key: "พะเยา", label: "พะเยา" },
-  { key: "ภูเก็ต", label: "ภูเก็ต" },
-  { key: "มหาสารคาม", label: "มหาสารคาม" },
-  { key: "มุกดาหาร", label: "มุกดาหาร" },
-  { key: "แม่ฮ่องสอน", label: "แม่ฮ่องสอน" },
-  { key: "ยโสธร", label: "ยโสธร" },
-  { key: "ยะลา", label: "ยะลา" },
-  { key: "ร้อยเอ็ด", label: "ร้อยเอ็ด" },
-  { key: "ระนอง", label: "ระนอง" },
-  { key: "ระยอง", label: "ระยอง" },
-  { key: "ราชบุรี", label: "ราชบุรี" },
-  { key: "ลพบุรี", label: "ลพบุรี" },
-  { key: "ลำปาง", label: "ลำปาง" },
-  { key: "ลำพูน", label: "ลำพูน" },
-  { key: "เลย", label: "เลย" },
-  { key: "ศรีสะเกษ", label: "ศรีสะเกษ" },
-  { key: "สกลนคร", label: "สกลนคร" },
-  { key: "สงขลา", label: "สงขลา" },
-  { key: "สตูล", label: "สตูล" },
-  { key: "สมุทรปราการ", label: "สมุทรปราการ" },
-  { key: "สมุทรสงคราม", label: "สมุทรสงคราม" },
-  { key: "สมุทรสาคร", label: "สมุทรสาคร" },
-  { key: "สระแก้ว", label: "สระแก้ว" },
-  { key: "สระบุรี", label: "สระบุรี" },
-  { key: "สิงห์บุรี", label: "สิงห์บุรี" },
-  { key: "สุโขทัย", label: "สุโขทัย" },
-  { key: "สุพรรณบุรี", label: "สุพรรณบุรี" },
-  { key: "สุราษฎร์ธานี", label: "สุราษฎร์ธานี" },
-  { key: "สุรินทร์", label: "สุรินทร์" },
-  { key: "หนองคาย", label: "หนองคาย" },
-  { key: "หนองบัวลำภู", label: "หนองบัวลำภู" },
-  { key: "อ่างทอง", label: "อ่างทอง" },
-  { key: "อุดรธานี", label: "อุดรธานี" },
-  { key: "อุทัยธานี", label: "อุทัยธานี" },
-  { key: "อุตรดิตถ์", label: "อุตรดิตถ์" },
-  { key: "อุบลราชธานี", label: "อุบลราชธานี" },
-  { key: "อำนาจเจริญ", label: "อำนาจเจริญ" },
+  { key: "กรุงเทพมหานคร", label: "Bangkok" },
+  { key: "กระบี่", label: "Krabi" },
+  { key: "กาญจนบุรี", label: "Kanchanaburi" },
+  { key: "กาฬสินธุ์", label: "Kalasin" },
+  { key: "กำแพงเพชร", label: "Kamphaeng Phet" },
+  { key: "ขอนแก่น", label: "Khon Kaen" },
+  { key: "จันทบุรี", label: "Chanthaburi" },
+  { key: "ฉะเชิงเทรา", label: "Chachoengsao" },
+  { key: "ชลบุรี", label: "Chon Buri" },
+  { key: "ชัยนาท", label: "Chai Nat" },
+  { key: "ชัยภูมิ", label: "Chaiyaphum" },
+  { key: "ชุมพร", label: "Chumphon" },
+  { key: "เชียงราย", label: "Chiang Rai" },
+  { key: "เชียงใหม่", label: "Chiang Mai" },
+  { key: "ตรัง", label: "Trang" },
+  { key: "ตราด", label: "Trat" },
+  { key: "ตาก", label: "Tak" },
+  { key: "นครนายก", label: "Nakhon Nayok" },
+  { key: "นครปฐม", label: "Nakhon Pathom" },
+  { key: "นครพนม", label: "Nakhon Phanom" },
+  { key: "นครราชสีมา", label: "Nakhon Ratchasima" },
+  { key: "นครศรีธรรมราช", label: "Nakhon Si Thammarat" },
+  { key: "นครสวรรค์", label: "Nakhon Sawan" },
+  { key: "นนทบุรี", label: "Nonthaburi" },
+  { key: "นราธิวาส", label: "Narathiwat" },
+  { key: "น่าน", label: "Nan" },
+  { key: "บึงกาฬ", label: "Bueng Kan" },
+  { key: "บุรีรัมย์", label: "Buri Ram" },
+  { key: "ปทุมธานี", label: "Pathum Thani" },
+  { key: "ประจวบคีรีขันธ์", label: "Prachuap Khiri Khan" },
+  { key: "ปราจีนบุรี", label: "Prachin Buri" },
+  { key: "ปัตตานี", label: "Pattani" },
+  { key: "พระนครศรีอยุธยา", label: "Phra Nakhon Si Ayutthaya" },
+  { key: "พังงา", label: "Phang Nga" },
+  { key: "พัทลุง", label: "Phatthalung" },
+  { key: "พิจิตร", label: "Phichit" },
+  { key: "พิษณุโลก", label: "Phitsanulok" },
+  { key: "เพชรบุรี", label: "Phetchaburi" },
+  { key: "เพชรบูรณ์", label: "Phetchabun" },
+  { key: "แพร่", label: "Phrae" },
+  { key: "พะเยา", label: "Phayao" },
+  { key: "ภูเก็ต", label: "Phuket" },
+  { key: "มหาสารคาม", label: "Maha Sarakham" },
+  { key: "มุกดาหาร", label: "Mukdahan" },
+  { key: "แม่ฮ่องสอน", label: "Mae Hong Son" },
+  { key: "ยโสธร", label: "Yasothon" },
+  { key: "ยะลา", label: "Yala" },
+  { key: "ร้อยเอ็ด", label: "Roi Et" },
+  { key: "ระนอง", label: "Ranong" },
+  { key: "ระยอง", label: "Rayong" },
+  { key: "ราชบุรี", label: "Ratchaburi" },
+  { key: "ลพบุรี", label: "Lop Buri" },
+  { key: "ลำปาง", label: "Lampang" },
+  { key: "ลำพูน", label: "Lamphun" },
+  { key: "เลย", label: "Loei" },
+  { key: "ศรีสะเกษ", label: "Si Sa Ket" },
+  { key: "สกลนคร", label: "Sakon Nakhon" },
+  { key: "สงขลา", label: "Songkhla" },
+  { key: "สตูล", label: "Satun" },
+  { key: "สมุทรปราการ", label: "Samut Prakan" },
+  { key: "สมุทรสงคราม", label: "Samut Songkhram" },
+  { key: "สมุทรสาคร", label: "Samut Sakhon" },
+  { key: "สระแก้ว", label: "Sa Kaeo" },
+  { key: "สระบุรี", label: "Saraburi" },
+  { key: "สิงห์บุรี", label: "Sing Buri" },
+  { key: "สุโขทัย", label: "Sukhothai" },
+  { key: "สุพรรณบุรี", label: "Suphan Buri" },
+  { key: "สุราษฎร์ธานี", label: "Surat Thani" },
+  { key: "สุรินทร์", label: "Surin" },
+  { key: "หนองคาย", label: "Nong Khai" },
+  { key: "หนองบัวลำภู", label: "Nong Bua Lam Phu" },
+  { key: "อ่างทอง", label: "Ang Thong" },
+  { key: "อุดรธานี", label: "Udon Thani" },
+  { key: "อุทัยธานี", label: "Uthai Thani" },
+  { key: "อุตรดิตถ์", label: "Uttaradit" },
+  { key: "อุบลราชธานี", label: "Ubon Ratchathani" },
+  { key: "อำนาจเจริญ", label: "Amnat Charoen" },
 ];
+
+const inputClassNames = {
+  label: "text-default-600 text-xs font-medium",
+  input: "text-sm",
+  inputWrapper: "border-default hover:border-default shadow-none",
+};
+
+const selectClassNames = {
+  label: "text-default-600 text-xs font-medium",
+  trigger: "border-default hover:border-default shadow-none",
+};
 
 function CameraModal({ isOpen, onClose, onCapture, label }) {
   const videoRef = useRef(null);
@@ -129,17 +140,17 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
               setIsStreaming(true);
             })
             .catch((err) => {
-              setError("ไม่สามารถเล่นวิดีโอได้");
+              setError("Unable to play video");
             });
         };
       }
     } catch (err) {
       if (err.name === "NotAllowedError") {
-        setError("กรุณาอนุญาตการเข้าถึงกล้อง");
+        setError("Please allow camera access");
       } else if (err.name === "NotFoundError") {
-        setError("ไม่พบกล้องในอุปกรณ์นี้");
+        setError("No camera found on this device");
       } else {
-        setError("ไม่สามารถเข้าถึงกล้องได้: " + err.message);
+        setError("Unable to access camera: " + err.message);
       }
     }
   }, []);
@@ -225,11 +236,11 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
         <ModalBody>
           <div className="flex flex-col items-center justify-center w-full gap-2">
             {error && (
-              <div className="text-danger text-sm p-2 bg-danger-50 rounded-xl w-full text-center">
+              <div className="text-danger text-sm p-2 bg-danger-50 rounded-lg w-full text-center">
                 {error}
               </div>
             )}
-            <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden">
+            <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
               <video
                 ref={videoRef}
                 autoPlay
@@ -247,8 +258,8 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
                 <div className="absolute inset-0 pointer-events-none">
                   <div className="absolute top-2 left-4 w-16 h-16 border-l-4 border-t-4 border-white/50 rounded-tl-lg"></div>
                   <div className="absolute top-2 right-4 w-16 h-16 border-r-4 border-t-4 border-white/50 rounded-tr-lg"></div>
-                  <div className="absolute bottom-4 left-4 w-16 h-16 border-l-4 border-b-4 border-white/50 rounded-bl-lg"></div>
-                  <div className="absolute bottom-4 right-4 w-16 h-16 border-r-4 border-b-4 border-white/50 rounded-br-lg"></div>
+                  <div className="absolute botto left-4 w-16 h-16 border-l-4 border-b-4 border-white/50 rounded-bl-lg"></div>
+                  <div className="absolute botto right-4 w-16 h-16 border-r-4 border-b-4 border-white/50 rounded-br-lg"></div>
                 </div>
               )}
             </div>
@@ -256,29 +267,25 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
         </ModalBody>
         <ModalFooter>
           <Button
-            color="danger"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-2/12 text-background"
+            size="sm"
+            radius="sm"
+            className="bg-default-200 text-default-700 font-medium hover:bg-default-300"
             onPress={() => {
               stopCamera();
               onClose();
             }}
           >
-            ยกเลิก
+            Cancel
           </Button>
           <Button
-            color="primary"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-2/12 text-background"
+            size="sm"
+            radius="sm"
+            className="bg-foreground text-background font-medium hover:bg-default-800"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
-            startContent={<Camera />}
+            startContent={<Camera size={14} />}
           >
-            ถ่ายรูป
+            Capture
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -321,17 +328,17 @@ function MultiCameraModal({
               setIsStreaming(true);
             })
             .catch((err) => {
-              setError("ไม่สามารถเล่นวิดีโอได้");
+              setError("Unable to play video");
             });
         };
       }
     } catch (err) {
       if (err.name === "NotAllowedError") {
-        setError("กรุณาอนุญาตการเข้าถึงกล้อง");
+        setError("Please allow camera access");
       } else if (err.name === "NotFoundError") {
-        setError("ไม่พบกล้องในอุปกรณ์นี้");
+        setError("No camera found on this device");
       } else {
-        setError("ไม่สามารถเข้าถึงกล้องได้: " + err.message);
+        setError("Unable to access camera: " + err.message);
       }
     }
   }, []);
@@ -427,7 +434,7 @@ function MultiCameraModal({
             {label}
             {capturedImages.length > 0 && (
               <span className="text-sm text-default-500">
-                ({capturedImages.length} รูป)
+                ({capturedImages.length} photo(s))
               </span>
             )}
           </div>
@@ -435,11 +442,11 @@ function MultiCameraModal({
         <ModalBody>
           <div className="flex flex-col items-center justify-center w-full gap-2">
             {error && (
-              <div className="text-danger text-sm p-2 bg-danger-50 rounded-xl w-full text-center">
+              <div className="text-danger text-sm p-2 bg-danger-50 rounded-lg w-full text-center">
                 {error}
               </div>
             )}
-            <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden">
+            <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
               <video
                 ref={videoRef}
                 autoPlay
@@ -457,15 +464,15 @@ function MultiCameraModal({
                 <div className="absolute inset-0 pointer-events-none">
                   <div className="absolute top-2 left-4 w-16 h-16 border-l-4 border-t-4 border-white/50 rounded-tl-lg"></div>
                   <div className="absolute top-2 right-4 w-16 h-16 border-r-4 border-t-4 border-white/50 rounded-tr-lg"></div>
-                  <div className="absolute bottom-4 left-4 w-16 h-16 border-l-4 border-b-4 border-white/50 rounded-bl-lg"></div>
-                  <div className="absolute bottom-4 right-4 w-16 h-16 border-r-4 border-b-4 border-white/50 rounded-br-lg"></div>
+                  <div className="absolute botto left-4 w-16 h-16 border-l-4 border-b-4 border-white/50 rounded-bl-lg"></div>
+                  <div className="absolute botto right-4 w-16 h-16 border-r-4 border-b-4 border-white/50 rounded-br-lg"></div>
                 </div>
               )}
             </div>
             {capturedImages.length > 0 && (
               <div className="w-full">
-                <div className="text-sm text-default-600 mb-2">
-                  รูปที่ถ่ายแล้ว:
+                <div className="text-sm text-default-600">
+                  Captured photos:
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {capturedImages.map((img, index) => (
@@ -473,19 +480,17 @@ function MultiCameraModal({
                       <Image
                         src={img.preview}
                         alt={`Document ${index + 1}`}
-                        className="w-24 h-24 object-cover rounded-xl"
+                        className="w-24 h-24 object-cover rounded-lg"
                       />
                       <Button
                         type="button"
-                        color="danger"
-                        variant="shadow"
-                        size="md"
-                        radius="md"
+                        size="sm"
+                        radius="sm"
                         isIconOnly
-                        className="w-2/12 text-background absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="bg-foreground text-background absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                         onPress={() => removeImage(index)}
                       >
-                        <X />
+                        <X size={12} />
                       </Button>
                     </div>
                   ))}
@@ -496,29 +501,25 @@ function MultiCameraModal({
         </ModalBody>
         <ModalFooter>
           <Button
-            color="danger"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-2/12 text-background"
+            size="sm"
+            radius="sm"
+            className="bg-default-200 text-default-700 font-medium hover:bg-default-300"
             onPress={() => {
               stopCamera();
               onClose();
             }}
           >
-            เสร็จสิ้น
+            Done
           </Button>
           <Button
-            color="primary"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-2/12 text-background"
+            size="sm"
+            radius="sm"
+            className="bg-foreground text-background font-medium hover:bg-default-800"
             onPress={capturePhoto}
             isDisabled={!isStreaming}
-            startContent={<Camera />}
+            startContent={<Camera size={14} />}
           >
-            ถ่ายรูป
+            Capture
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -538,9 +539,9 @@ function PhotoCaptureCard({
     capturedImage || (existingImage ? `/api/uploads/${existingImage}` : null);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-t-1 border-b-1 border-default">
-      <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
-        <Camera />
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border border-default">
+      <div className="flex items-center justify-center w-full gap-2 text-sm font-medium text-default-700">
+        <Camera size={16} />
         {label}
       </div>
       {displayImage ? (
@@ -549,57 +550,51 @@ function PhotoCaptureCard({
             <Image
               src={displayImage}
               alt="Captured"
-              className="max-w-full max-h-48 object-contain rounded-xl shadow-md"
+              className="max-w-full max-h-48 object-contain rounded-lg"
             />
           </div>
           <div className="flex gap-2">
             <Button
               type="button"
-              color="primary"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-full text-background"
+              size="sm"
+              radius="sm"
+              className="bg-foreground text-background font-medium hover:bg-default-800"
               onPress={onOpenCamera}
-              startContent={<RefreshCw />}
+              startContent={<RefreshCw size={14} />}
             >
-              ถ่ายใหม่
+              Retake
             </Button>
             <Button
               type="button"
-              color="danger"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-full text-background"
+              size="sm"
+              radius="sm"
+              className="bg-default-200 text-default-700 font-medium hover:bg-default-300"
               onPress={onClear}
             >
-              ลบ
+              Delete
             </Button>
           </div>
         </div>
       ) : (
         <div className="flex flex-col items-center gap-2 p-2">
-          <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
-            <Camera className="text-default-400" />
+          <div className="w-16 h-16 rounded-full bg-default-100 flex items-center justify-center">
+            <Camera className="text-default-400" size={20} />
           </div>
-          <p className="text-sm text-default-500">ยังไม่มีรูปภาพ</p>
+          <p className="text-[12px] text-default-400">No photo yet</p>
           <Button
             type="button"
-            color="primary"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-full text-background"
+            size="sm"
+            radius="sm"
+            className="bg-foreground text-background font-medium hover:bg-default-800"
             onPress={onOpenCamera}
-            startContent={<Camera />}
+            startContent={<Camera size={14} />}
           >
-            เปิดกล้อง
+            Open Camera
           </Button>
         </div>
       )}
       {error && (
-        <div className="text-danger text-sm">{error?.[0] || error}</div>
+        <div className="text-danger text-xs">{error?.[0] || error}</div>
       )}
     </div>
   );
@@ -629,13 +624,13 @@ function DocumentCaptureCard({
       : parsedExistingImages.map((path) => `/api/uploads/${path}`);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 border-t-1 border-b-1 border-default">
-      <div className="flex items-center justify-center w-full gap-2 font-semibold text-default-700">
-        <FileText />
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border border-default">
+      <div className="flex items-center justify-center w-full gap-2 text-sm font-medium text-default-700">
+        <FileText size={16} />
         {label}
         {displayImages.length > 0 && (
-          <span className="text-sm text-default-500">
-            ({displayImages.length} รูป)
+          <span className="text-[12px] text-default-400">
+            ({displayImages.length} photo(s))
           </span>
         )}
       </div>
@@ -647,20 +642,18 @@ function DocumentCaptureCard({
                 <Image
                   src={src}
                   alt={`Document ${index + 1}`}
-                  className="w-24 h-24 object-cover rounded-xl shadow-md"
+                  className="w-24 h-24 object-cover rounded-lg"
                 />
                 {capturedImages.length > 0 && (
                   <Button
                     type="button"
-                    color="danger"
-                    variant="shadow"
-                    size="md"
-                    radius="md"
+                    size="sm"
+                    radius="sm"
                     isIconOnly
-                    className="w-2/12 text-background absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="bg-foreground text-background absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                     onPress={() => onRemove(index)}
                   >
-                    <X />
+                    <X size={12} />
                   </Button>
                 )}
               </div>
@@ -669,53 +662,47 @@ function DocumentCaptureCard({
           <div className="flex gap-2">
             <Button
               type="button"
-              color="primary"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-full text-background"
+              size="sm"
+              radius="sm"
+              className="bg-foreground text-background font-medium hover:bg-default-800"
               onPress={onOpenCamera}
-              startContent={<Plus />}
+              startContent={<Plus size={14} />}
             >
-              เพิ่มรูป
+              Add Photo
             </Button>
             {capturedImages.length > 0 && (
               <Button
                 type="button"
-                color="danger"
-                variant="shadow"
-                size="md"
-                radius="md"
-                className="w-full text-background"
+                size="sm"
+                radius="sm"
+                className="bg-default-200 text-default-700 font-medium hover:bg-default-300"
                 onPress={onClear}
               >
-                ล้างทั้งหมด
+                Clear All
               </Button>
             )}
           </div>
         </div>
       ) : (
         <div className="flex flex-col items-center gap-2 p-2">
-          <div className="w-20 h-20 rounded-full bg-default-100 flex items-center justify-center">
-            <FileText className="text-default-400" />
+          <div className="w-16 h-16 rounded-full bg-default-100 flex items-center justify-center">
+            <FileText className="text-default-400" size={20} />
           </div>
-          <p className="text-sm text-default-500">ยังไม่มีเอกสาร</p>
+          <p className="text-[12px] text-default-400">No documents yet</p>
           <Button
             type="button"
-            color="primary"
-            variant="shadow"
-            size="md"
-            radius="md"
-            className="w-full text-background"
+            size="sm"
+            radius="sm"
+            className="bg-foreground text-background font-medium hover:bg-default-800"
             onPress={onOpenCamera}
-            startContent={<Camera />}
+            startContent={<Camera size={14} />}
           >
-            เปิดกล้อง
+            Open Camera
           </Button>
         </div>
       )}
       {error && (
-        <div className="text-danger text-sm">{error?.[0] || error}</div>
+        <div className="text-danger text-xs">{error?.[0] || error}</div>
       )}
     </div>
   );
@@ -778,23 +765,32 @@ export default function UIVisitorForm({
 
   return (
     <>
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit}
-        className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto"
-      >
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <Input
-              name="visitorFirstName"
+      <div className="flex flex-col w-full h-full overflow-auto p-2">
+        <div className="w-full h-full">
+          <div className="bg-background rounded-lg border border-default h-full flex flex-col">
+            {/* Card header */}
+            <div className="p-2 border-b border-default">
+              <h2 className="text-[13px] font-semibold text-foreground">
+                {mode === "create" ? "Register Visitor" : "Edit Visitor"}
+              </h2>
+              <p className="text-[12px] text-default-400">
+                {mode === "create" ? "Add a new visitor record" : "Edit visitor information"}
+              </p>
+            </div>
+
+            {/* Card body */}
+            <form ref={formRef} onSubmit={handleSubmit} className="p-2 space-y-5 flex-1 flex flex-col">
+              <div className="flex flex-col xl:flex-row gap-2">
+                <div className="flex-1">
+                  <Input
+                    name="visitorFirstName"
               type="text"
-              label="ชื่อ"
+              label="First Name"
               labelPlacement="outside"
-              placeholder="กรอกชื่อ"
-              color="default"
+              placeholder="Enter first name"
               variant="bordered"
               size="md"
-              radius="md"
+              radius="sm"
               isRequired
               value={formData.visitorFirstName || ""}
               onChange={handleChange("visitorFirstName")}
@@ -802,19 +798,19 @@ export default function UIVisitorForm({
               errorMessage={
                 errors.visitorFirstName?.[0] || errors.visitorFirstName
               }
+              classNames={inputClassNames}
             />
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <div className="flex-1">
             <Input
               name="visitorLastName"
               type="text"
-              label="นามสกุล"
+              label="Last Name"
               labelPlacement="outside"
-              placeholder="กรอกนามสกุล"
-              color="default"
+              placeholder="Enter last name"
               variant="bordered"
               size="md"
-              radius="md"
+              radius="sm"
               isRequired
               value={formData.visitorLastName || ""}
               onChange={handleChange("visitorLastName")}
@@ -822,40 +818,40 @@ export default function UIVisitorForm({
               errorMessage={
                 errors.visitorLastName?.[0] || errors.visitorLastName
               }
+              classNames={inputClassNames}
             />
           </div>
         </div>
 
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+        <div className="flex flex-col xl:flex-row gap-2 w-full">
+          <div className="flex-1">
             <Input
               name="visitorCompany"
               type="text"
-              label="บริษัท"
+              label="Company"
               labelPlacement="outside"
-              placeholder="กรอกชื่อบริษัท"
-              color="default"
+              placeholder="Enter company name"
               variant="bordered"
               size="md"
-              radius="md"
+              radius="sm"
               isRequired
               value={formData.visitorCompany || ""}
               onChange={handleChange("visitorCompany")}
               isInvalid={!!errors.visitorCompany}
               errorMessage={errors.visitorCompany?.[0] || errors.visitorCompany}
+              classNames={inputClassNames}
             />
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <div className="flex-1">
             <Input
               name="visitorCarRegistration"
               type="text"
-              label="ทะเบียนรถ"
+              label="License Plate"
               labelPlacement="outside"
-              placeholder="กรอกทะเบียนรถ"
-              color="default"
+              placeholder="Enter license plate"
               variant="bordered"
               size="md"
-              radius="md"
+              radius="sm"
               isRequired
               value={formData.visitorCarRegistration || ""}
               onChange={handleChange("visitorCarRegistration")}
@@ -864,21 +860,21 @@ export default function UIVisitorForm({
                 errors.visitorCarRegistration?.[0] ||
                 errors.visitorCarRegistration
               }
+              classNames={inputClassNames}
             />
           </div>
         </div>
 
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+        <div className="flex flex-col xl:flex-row gap-2 w-full">
+          <div className="flex-1">
             <Select
               name="visitorProvince"
-              label="จังหวัด"
+              label="Province"
               labelPlacement="outside"
-              placeholder="กรุณาเลือก"
-              color="default"
+              placeholder="Please select"
               variant="bordered"
               size="md"
-              radius="md"
+              radius="sm"
               isRequired
               selectedKeys={
                 formData.visitorProvince ? [formData.visitorProvince] : []
@@ -890,22 +886,22 @@ export default function UIVisitorForm({
               errorMessage={
                 errors.visitorProvince?.[0] || errors.visitorProvince
               }
+              classNames={selectClassNames}
             >
               {thaiProvinces.map((province) => (
                 <SelectItem key={province.key}>{province.label}</SelectItem>
               ))}
             </Select>
           </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+          <div className="flex-1">
             <Select
               name="visitorContactUserId"
-              label="ผู้ติดต่อ"
+              label="Contact Person"
               labelPlacement="outside"
-              placeholder="กรุณาเลือก"
-              color="default"
+              placeholder="Please select"
               variant="bordered"
               size="md"
-              radius="md"
+              radius="sm"
               isRequired
               selectedKeys={
                 formData.visitorContactUserId
@@ -919,6 +915,7 @@ export default function UIVisitorForm({
               errorMessage={
                 errors.visitorContactUserId?.[0] || errors.visitorContactUserId
               }
+              classNames={selectClassNames}
             >
               {employees.map((emp) => (
                 <SelectItem key={emp.employeeId}>
@@ -929,17 +926,16 @@ export default function UIVisitorForm({
           </div>
         </div>
 
-        <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
+        <div className="flex flex-col xl:flex-row gap-2 w-full">
+          <div className="flex-1">
             <Select
               name="visitorContactReason"
-              label="เหตุผลการติดต่อ"
+              label="Contact Reason"
               labelPlacement="outside"
-              placeholder="กรุณาเลือก"
-              color="default"
+              placeholder="Please select"
               variant="bordered"
               size="md"
-              radius="md"
+              radius="sm"
               isRequired
               selectedKeys={
                 formData.visitorContactReason
@@ -953,6 +949,7 @@ export default function UIVisitorForm({
               errorMessage={
                 errors.visitorContactReason?.[0] || errors.visitorContactReason
               }
+              classNames={selectClassNames}
             >
               {contactReasonOptions.map((option) => (
                 <SelectItem key={option.key}>{option.label}</SelectItem>
@@ -961,16 +958,15 @@ export default function UIVisitorForm({
           </div>
 
           {isUpdate && (
-            <div className="flex items-center justify-center w-full xl:w-6/12 h-full p-2 gap-2">
+            <div className="flex-1">
               <Select
                 name="visitorStatus"
-                label="สถานะผู้เยี่ยมชม"
+                label="Visitor Status"
                 labelPlacement="outside"
-                placeholder="กรุณาเลือก"
-                color="default"
+                placeholder="Please select"
                 variant="bordered"
                 size="md"
-                radius="md"
+                radius="sm"
                 isRequired
                 selectedKeys={
                   formData.visitorStatus ? [formData.visitorStatus] : []
@@ -980,6 +976,7 @@ export default function UIVisitorForm({
                 }
                 isInvalid={!!errors.visitorStatus}
                 errorMessage={errors.visitorStatus?.[0] || errors.visitorStatus}
+                classNames={selectClassNames}
               >
                 {statusOptions.map((option) => (
                   <SelectItem key={option.key}>{option.label}</SelectItem>
@@ -989,10 +986,10 @@ export default function UIVisitorForm({
           )}
         </div>
 
-        <div className="flex flex-col xl:flex-row items-start justify-center w-full h-fit">
-          <div className="w-full xl:w-6/12">
+        <div className="flex flex-col xl:flex-row gap-2 w-full">
+          <div className="flex-1">
             <PhotoCaptureCard
-              label="รูปถ่ายผู้เข้าเยี่ยม"
+              label="Visitor Photo"
               capturedImage={capturedPhoto}
               existingImage={existingPhoto}
               onOpenCamera={photoModal.onOpen}
@@ -1000,9 +997,9 @@ export default function UIVisitorForm({
               error={errors.visitorPhoto}
             />
           </div>
-          <div className="w-full xl:w-6/12">
+          <div className="flex-1">
             <DocumentCaptureCard
-              label="รูปถ่ายเอกสาร"
+              label="Document Photos"
               capturedImages={capturedDocuments}
               existingImages={existingDocumentPhotos}
               onOpenCamera={docModal.onOpen}
@@ -1013,42 +1010,37 @@ export default function UIVisitorForm({
           </div>
         </div>
 
-        <div className="flex flex-row items-center justify-end w-full h-fit p-2 gap-2">
-          <div className="flex items-center justify-end w-full h-full p-2 gap-2">
-            <Button
-              type="submit"
-              color="primary"
-              variant="shadow"
-              size="md"
-              radius="md"
-              className="w-2/12 text-background"
-            >
-              บันทึก
-            </Button>
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-4 border-t border-default">
+                <span className="text-xs text-default-400">
+                  {mode === "create" ? `Create by: ${operatedBy}` : `Update by: ${operatedBy}`}
+                </span>
+                <Button
+                  type="submit"
+                  size="sm"
+                  radius="sm"
+                  className="bg-foreground text-background font-medium hover:bg-default-800"
+                >
+                  Save
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
-
-        <div className="flex flex-row items-center justify-end w-full h-full p-2 gap-2">
-          <div className="flex items-end justify-center h-full p-2 gap-2">
-            {mode === "create"
-              ? `Create By : ${operatedBy}`
-              : `Update By : ${operatedBy}`}
-          </div>
-        </div>
-      </form>
+      </div>
 
       <CameraModal
         isOpen={photoModal.isOpen}
         onClose={photoModal.onClose}
         onCapture={handlePhotoCapture}
-        label="ถ่ายรูปผู้เข้าเยี่ยม"
+        label="Capture Visitor Photo"
       />
 
       <MultiCameraModal
         isOpen={docModal.isOpen}
         onClose={docModal.onClose}
         onCapture={handleDocumentPhotosCapture}
-        label="ถ่ายรูปเอกสาร"
+        label="Capture Document Photo"
         capturedImages={capturedDocuments}
         setCapturedImages={setCapturedDocuments}
       />

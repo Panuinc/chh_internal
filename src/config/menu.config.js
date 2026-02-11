@@ -18,6 +18,13 @@ import {
   Truck,
 } from "lucide-react";
 
+// Module grouping for ERP sidebar navigation
+export const moduleGroups = [
+  { id: "admin", label: "Administration", moduleIds: ["hr", "security"] },
+  { id: "operations", label: "Operations", moduleIds: ["warehouse", "production"] },
+  { id: "business", label: "Business", moduleIds: ["sales", "accounting"] },
+];
+
 export const menuConfig = {
   modules: [
     {
@@ -72,15 +79,29 @@ export const menuConfig = {
       items: [
         {
           id: "employee",
-          href: "/hr/employee",
           text: "Employee",
           icon: Users,
           permission: "hr.employee.view",
-          actions: {
-            view: "hr.employee.view",
-            create: "hr.employee.create",
-            edit: "hr.employee.edit",
-          },
+          children: [
+            {
+              id: "employeeList",
+              href: "/hr/employee",
+              text: "Employee List",
+              permission: "hr.employee.view",
+              actions: {
+                view: "hr.employee.view",
+                create: "hr.employee.create",
+                edit: "hr.employee.edit",
+              },
+            },
+            {
+              id: "employeeRole",
+              href: "/hr/employee/role",
+              text: "Employee Roles",
+              permission: "hr.employee.role.view",
+              requireSuperAdmin: true,
+            },
+          ],
         },
 
         {
@@ -120,33 +141,29 @@ export const menuConfig = {
 
         {
           id: "role",
-          href: "/hr/role",
           text: "Role",
           icon: ScrollText,
           permission: "hr.role.view",
-          actions: {
-            view: "hr.role.view",
-            create: "hr.role.create",
-            edit: "hr.role.edit",
-          },
-        },
-
-        {
-          id: "rolePermission",
-          href: "/hr/role/permission",
-          text: "Role Permissions",
-          icon: Key,
-          permission: "hr.role.permission.view",
-          requireSuperAdmin: true,
-        },
-
-        {
-          id: "employeeRole",
-          href: "/hr/employee/role",
-          text: "Employee Roles",
-          icon: Users,
-          permission: "hr.employee.role.view",
-          requireSuperAdmin: true,
+          children: [
+            {
+              id: "roleList",
+              href: "/hr/role",
+              text: "Role List",
+              permission: "hr.role.view",
+              actions: {
+                view: "hr.role.view",
+                create: "hr.role.create",
+                edit: "hr.role.edit",
+              },
+            },
+            {
+              id: "rolePermission",
+              href: "/hr/role/permission",
+              text: "Role Permissions",
+              permission: "hr.role.permission.view",
+              requireSuperAdmin: true,
+            },
+          ],
         },
       ],
     },
@@ -319,7 +336,16 @@ export function getProtectedRoutes() {
 
   Object.values(menuConfig.submenus).forEach((submenu) => {
     submenu.items.forEach((item) => {
-      if (item.href && item.permission) {
+      if (item.children) {
+        item.children.forEach((child) => {
+          if (child.href && child.permission) {
+            routes[child.href] = {
+              permission: child.permission,
+              requireSuperAdmin: child.requireSuperAdmin || false,
+            };
+          }
+        });
+      } else if (item.href && item.permission) {
         routes[item.href] = {
           permission: item.permission,
           requireSuperAdmin: item.requireSuperAdmin || false,
@@ -348,6 +374,18 @@ export function getAllDefinedPermissions() {
       if (item.actions) {
         Object.values(item.actions).forEach((action) => {
           permissions.add(action);
+        });
+      }
+      if (item.children) {
+        item.children.forEach((child) => {
+          if (child.permission) {
+            permissions.add(child.permission);
+          }
+          if (child.actions) {
+            Object.values(child.actions).forEach((action) => {
+              permissions.add(action);
+            });
+          }
         });
       }
     });

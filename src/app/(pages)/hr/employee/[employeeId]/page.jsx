@@ -16,8 +16,8 @@ export default function EmployeeUpdate() {
   const { userId: sessionUserId, userName } = useSessionUser();
 
   const { employee, loading: employeeLoading } = useEmployee(employeeId);
-  const { departments } = useDepartments(undefined, true); // fetchAll = true
-  const { roles } = useRoles(undefined, true); // fetchAll = true
+  const { departments } = useDepartments(undefined, true);
+  const { roles } = useRoles(undefined, true);
 
   useEffect(() => {
     if (!hasPermission("hr.employee.edit")) {
@@ -40,7 +40,7 @@ export default function EmployeeUpdate() {
       employeeDepartmentId: "",
       employeeRoleId: "",
     },
-    submitEmployee
+    submitEmployee,
   );
 
   const { setFormData } = formHandler;
@@ -60,14 +60,5 @@ export default function EmployeeUpdate() {
 
   if (employeeLoading) return <Loading />;
 
-  return (
-    <EmployeeForm
-      formHandler={formHandler}
-      mode="update"
-      operatedBy={userName}
-      isUpdate
-      departments={departments}
-      roles={roles}
-    />
-  );
+  return <EmployeeForm formHandler={formHandler} mode="update" operatedBy={userName} isUpdate departments={departments} roles={roles} />;
 }

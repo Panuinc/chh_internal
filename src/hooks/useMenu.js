@@ -114,7 +114,17 @@ export function useMenu() {
 
       return {
         ...submenu,
-        items: submenu.items.filter((item) => canAccessMenuItem(item)),
+        items: submenu.items
+          .filter((item) => canAccessMenuItem(item))
+          .map((item) => {
+            if (!item.children) return item;
+            return {
+              ...item,
+              children: item.children.filter((child) =>
+                canAccessMenuItem(child)
+              ),
+            };
+          }),
       };
     },
     [canAccessMenuItem]
@@ -134,11 +144,23 @@ export function useMenu() {
         submenu.items
           .filter((item) => canAccessMenuItem(item))
           .forEach((item) => {
-            accessible.push({
-              type: "submenu",
-              parentId: module.id,
-              ...item,
-            });
+            if (item.children) {
+              item.children
+                .filter((child) => canAccessMenuItem(child))
+                .forEach((child) => {
+                  accessible.push({
+                    type: "submenu",
+                    parentId: module.id,
+                    ...child,
+                  });
+                });
+            } else {
+              accessible.push({
+                type: "submenu",
+                parentId: module.id,
+                ...item,
+              });
+            }
           });
       }
     });

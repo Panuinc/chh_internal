@@ -5,12 +5,12 @@ import { DataTable } from "@/components";
 import { Loading } from "@/components";
 
 const columns = [
-  { name: "ลำดับ", uid: "patrolIndex" },
-  { name: "ข้อมูล QR Code", uid: "patrolQrCodeInfo" },
-  { name: "หมายเหตุ", uid: "patrolNote" },
-  { name: "รูปภาพ", uid: "patrolPicturePreview" },
-  { name: "สร้างโดย", uid: "patrolCreatedByName" },
-  { name: "วันที่สร้าง", uid: "patrolCreatedAt" },
+  { name: "#", uid: "patrolIndex" },
+  { name: "QR Code Info", uid: "patrolQrCodeInfo" },
+  { name: "Notes", uid: "patrolNote" },
+  { name: "Photo", uid: "patrolPicturePreview" },
+  { name: "Created By", uid: "patrolCreatedByName" },
+  { name: "Created At", uid: "patrolCreatedAt" },
 ];
 
 export default function UIPatrol({ Patrols = [], loading, onAddNew }) {
@@ -44,30 +44,28 @@ export default function UIPatrol({ Patrols = [], loading, onAddNew }) {
     : [];
 
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
-      <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            จำนวนการลาดตระเวนทั้งหมด
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {total}
-          </div>
+    <div className="flex flex-col w-full h-full overflow-hidden p-2 gap-2">
+      {/* Inline stats */}
+      <div className="hidden xl:flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Total Patrols</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{total}</span>
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
+      {/* Table */}
+      <div className="flex-1 min-h-0 overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center w-full h-full gap-2">
+          <div className="flex items-center justify-center w-full h-full">
             <Loading />
           </div>
         ) : (
           <DataTable
             columns={columns}
             data={normalized}
-            searchPlaceholder="ค้นหาด้วยข้อมูล QR code หรือหมายเหตุ..."
-            emptyContent="ไม่พบข้อมูลการลาดตระเวน"
-            itemName="การลาดตระเวน"
+            searchPlaceholder="Search by QR code info or notes..."
+            emptyContent="No patrol records found"
+            itemName="Patrol"
             onAddNew={onAddNew}
           />
         )}

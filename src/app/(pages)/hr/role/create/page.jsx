@@ -27,14 +27,8 @@ export default function RoleCreate() {
     {
       roleName: "",
     },
-    submitRole
+    submitRole,
   );
 
-  return (
-    <RoleForm
-      formHandler={formHandler}
-      mode="create"
-      operatedBy={userName}
-    />
-  );
+  return <RoleForm formHandler={formHandler} mode="create" operatedBy={userName} />;
 }

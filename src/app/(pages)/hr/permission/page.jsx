@@ -17,12 +17,5 @@ export default function PermissionPage() {
     router.push(`/hr/permission/${item.permissionId}`);
   };
 
-  return (
-    <PermissionList
-      Permissions={permissions}
-      loading={loading}
-      onAddNew={isSuperAdmin ? handleAddNew : null}
-      onEdit={isSuperAdmin ? handleEdit : null}
-    />
-  );
+  return <PermissionList Permissions={permissions} loading={loading} onAddNew={isSuperAdmin ? handleAddNew : null} onEdit={isSuperAdmin ? handleEdit : null} />;
 }

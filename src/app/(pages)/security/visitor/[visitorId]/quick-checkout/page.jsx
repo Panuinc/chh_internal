@@ -21,7 +21,7 @@ export default function QuickCheckoutPage() {
     if (!visitor) return;
 
     if (!userId) {
-      showToast("warning", "กรุณาเข้าสู่ระบบก่อน");
+      showToast("warning", "Please log in first");
       router.push(
         `/login?callbackUrl=/security/visitor/${visitorId}/quick-checkout`
       );

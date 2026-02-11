@@ -13,84 +13,149 @@ export default function UISignIn({
   onSubmit,
 }) {
   return (
-    <div className="flex flex-row items-center justify-center w-full h-full gap-2">
-      <div className="flex flex-col items-center justify-center w-full xl:w-[30%] h-full p-2 gap-2 xl:border-1 xl:border-default">
-        <div className="flex items-end justify-center w-full h-fit p-2 gap-2 text-2xl font-black">
-          Ever
-          <span className="text-primary text-5xl">
-            G
-            <span className="relative inline-block">
-              r
-              <svg
-                className="absolute -top-4 -right-1 w-7 h-7 text-primary"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z" />
-              </svg>
+    <div className="flex w-full h-full">
+      {/* Left - Form */}
+      <div className="relative flex flex-col items-center justify-center w-full lg:w-[480px] lg:min-w-[480px] p-2 bg-background border-r border-default">
+        <div className="w-full max-w-[340px]">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <Image
+              src="/logo/logo-01.png"
+              alt="logo"
+              width={32}
+              height={32}
+              className="rounded-md"
+            />
+            <span className="text-lg font-bold text-foreground tracking-tight">
+              EverGreen
             </span>
-            een
-          </span>
-          Internal
-        </div>
-
-        <form
-          onSubmit={onSubmit}
-          className="flex flex-col items-center justify-center w-full p-2 gap-2"
-        >
-          <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
-            <Input
-              type="text"
-              label="รหัสผู้ใช้งาน"
-              labelPlacement="outside"
-              placeholder="Enter your username"
-              color="default"
-              variant="bordered"
-              size="md"
-              radius="md"
-              isRequired
-              value={username}
-              onChange={(e) => onUsernameChange(e.target.value)}
-              isDisabled={isLoading}
-            />
           </div>
 
-          <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
-            <Input
-              type="password"
-              label="รหัสผ่าน"
-              labelPlacement="outside"
-              placeholder="Enter your password"
-              color="default"
-              variant="bordered"
-              size="md"
-              radius="md"
-              isRequired
-              value={password}
-              onChange={(e) => onPasswordChange(e.target.value)}
-              isDisabled={isLoading}
-            />
-          </div>
+          {/* Heading */}
+          <h1 className="text-[22px] font-semibold text-foreground">
+            Welcome back
+          </h1>
+          <p className="text-[13px] text-default-500">
+            Sign in to your account
+          </p>
 
-          <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
+          {/* Form */}
+          <form onSubmit={onSubmit} className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] font-medium text-foreground">
+                Username
+              </label>
+              <Input
+                type="text"
+                placeholder="Enter your username"
+                variant="bordered"
+                size="md"
+                radius="sm"
+                isRequired
+                value={username}
+                onChange={(e) => onUsernameChange(e.target.value)}
+                isDisabled={isLoading}
+                classNames={{
+                  input: "text-[13px]",
+                  inputWrapper:
+                    "border-default hover:border-default focus-within:!border-foreground shadow-none h-[38px] transition-colors",
+                }}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] font-medium text-foreground">
+                Password
+              </label>
+              <Input
+                type="password"
+                placeholder="Enter your password"
+                variant="bordered"
+                size="md"
+                radius="sm"
+                isRequired
+                value={password}
+                onChange={(e) => onPasswordChange(e.target.value)}
+                isDisabled={isLoading}
+                classNames={{
+                  input: "text-[13px]",
+                  inputWrapper:
+                    "border-default hover:border-default focus-within:!border-foreground shadow-none h-[38px] transition-colors",
+                }}
+              />
+            </div>
+
             <Button
               type="submit"
-              color="primary"
-              variant="shadow"
               size="md"
-              radius="md"
-              className="w-6/12 text-background"
+              radius="sm"
+              className="w-full bg-foreground text-background text-[13px] font-medium hover:bg-default-800 h-[38px] transition-colors"
               isLoading={isLoading}
-              spinner={<Spinner size="md" color="current" />}
+              spinner={<Spinner size="sm" color="white" />}
             >
-              {isLoading ? "กำลัง เข้าสู่ระบบ ..." : "เข้าสู่ระบบ"}
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
-          </div>
-        </form>
+          </form>
+
+          {/* Footer */}
+          <p className="text-[11px] text-default-400 text-center leading-relaxed">
+            By continuing, you agree to EverGreen&apos;s Terms of Service
+            <br />
+            and Privacy Policy.
+          </p>
+        </div>
       </div>
 
-      <div className="xl:flex items-center justify-center xl:w-[70%] h-full p-2 gap-2 hidden">
-        <Image src="/images/index.png" alt="logo" width={450} height={450} />
+      {/* Right - Branding / Testimonial */}
+      <div className="hidden lg:flex flex-1 flex-col items-center justify-center bg-default-50 p-2 relative overflow-hidden">
+        {/* Subtle decorative circles */}
+        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-default-100/60" />
+        <div className="absolute -botto -left-24 w-72 h-72 rounded-full bg-default-100/60" />
+
+        <div className="relative max-w-md z-10">
+          {/* Large quote marks */}
+          <div className="flex gap-2">
+            <svg
+              width="45"
+              height="36"
+              viewBox="0 0 45 36"
+              fill="none"
+              className="text-default-300"
+            >
+              <path
+                d="M13.415 36C9.48833 36 6.35 34.8267 4 32.48C1.33333 29.8133 0 26.2 0 21.64C0 17.72 1.17333 13.8 3.52 9.88C5.86667 5.64 9.33 2.34667 13.91 0L17.09 4.44C14.1033 6.14667 11.7567 8.33333 10.05 11C8.34333 13.6667 7.49 16.0133 7.49 18.04C7.49 18.68 7.56667 19.16 7.72 19.48C8.04 19.16 8.68 19 9.64 19C11.6667 19 13.415 19.72 14.885 21.16C16.355 22.6 17.09 24.44 17.09 26.68C17.09 29.24 16.275 31.32 14.645 32.92C13.335 34.84 13.415 36 13.415 36ZM38.415 36C34.4883 36 31.35 34.8267 29 32.48C26.3333 29.8133 25 26.2 25 21.64C25 17.72 26.1733 13.8 28.52 9.88C30.8667 5.64 34.33 2.34667 38.91 0L42.09 4.44C39.1033 6.14667 36.7567 8.33333 35.05 11C33.3433 13.6667 32.49 16.0133 32.49 18.04C32.49 18.68 32.5667 19.16 32.72 19.48C33.04 19.16 33.68 19 34.64 19C36.6667 19 38.415 19.72 39.885 21.16C41.355 22.6 42.09 24.44 42.09 26.68C42.09 29.24 41.275 31.32 39.645 32.92C38.335 34.84 38.415 36 38.415 36Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+
+          {/* Quote text */}
+          <blockquote className="text-[21px] font-medium text-foreground leading-[1.6]">
+            EverGreen Internal makes managing company operations
+            effortless — from sales and warehousing to production,
+            everything in one place.
+          </blockquote>
+
+          {/* Author */}
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-default-200 flex items-center justify-center ring-2 ring-default-100">
+              <Image
+                src="/logo/logo-01.png"
+                alt="avatar"
+                width={22}
+                height={22}
+              />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                C.H.H. Industry Co., Ltd.
+              </p>
+              <p className="text-xs text-default-500">
+                @EverGreenInternal
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

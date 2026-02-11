@@ -40,17 +40,7 @@ function SignInContent() {
     }
   };
 
-  return (
-    <SignInComponent
-      username={username}
-      password={password}
-      isLoading={isLoading}
-      error={error}
-      onUsernameChange={setUsername}
-      onPasswordChange={setPassword}
-      onSubmit={handleSubmit}
-    />
-  );
+  return <SignInComponent username={username} password={password} isLoading={isLoading} error={error} onUsernameChange={setUsername} onPasswordChange={setPassword} onSubmit={handleSubmit} />;
 }
 
 export default function SignIn() {

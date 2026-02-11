@@ -59,37 +59,27 @@ export default function UIDepartment({
     : [];
 
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
-      <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Total Departments
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {total}
-          </div>
+    <div className="flex flex-col w-full h-full overflow-hidden p-2 gap-2">
+      {/* Inline stats */}
+      <div className="hidden xl:flex items-center gap-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Total Departments</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{total}</span>
         </div>
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Active Departments
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {active}
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Active</span>
+          <span className="text-xs font-semibold text-green-700 bg-green-50 p-2 rounded">{active}</span>
         </div>
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Inactive Departments
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {inactive}
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Inactive</span>
+          <span className="text-xs font-semibold text-red-700 bg-red-50 p-2 rounded">{inactive}</span>
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
+      {/* Table */}
+      <div className="flex-1 min-h-0 overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center w-full h-full gap-2">
+          <div className="flex items-center justify-center w-full h-full">
             <Loading />
           </div>
         ) : (

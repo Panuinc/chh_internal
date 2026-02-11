@@ -11,7 +11,7 @@ export default function AccountCreate() {
   const router = useRouter();
   const { hasPermission } = useMenu();
   const { userId, userName } = useSessionUser();
-  const { employees } = useEmployees(undefined, true); // fetchAll = true
+  const { employees } = useEmployees(undefined, true);
 
   useEffect(() => {
     if (!hasPermission("hr.account.create")) {
@@ -31,19 +31,10 @@ export default function AccountCreate() {
       accountPassword: "",
       accountPinNumber: "",
     },
-    submitAccount
+    submitAccount,
   );
 
-  const availableEmployees = employees.filter(
-    (emp) => emp.employeeStatus === "Active"
-  );
+  const availableEmployees = employees.filter((emp) => emp.employeeStatus === "Active");
 
-  return (
-    <AccountForm
-      formHandler={formHandler}
-      mode="create"
-      operatedBy={userName}
-      employees={availableEmployees}
-    />
-  );
+  return <AccountForm formHandler={formHandler} mode="create" operatedBy={userName} employees={availableEmployees} />;
 }

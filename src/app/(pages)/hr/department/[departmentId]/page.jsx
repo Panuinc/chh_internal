@@ -15,8 +15,7 @@ export default function DepartmentUpdate() {
   const { departmentId } = useParams();
   const { userId: sessionUserId, userName } = useSessionUser();
 
-  const { department, loading: departmentLoading } =
-    useDepartment(departmentId);
+  const { department, loading: departmentLoading } = useDepartment(departmentId);
 
   useEffect(() => {
     if (!hasPermission("hr.department.edit")) {
@@ -35,7 +34,7 @@ export default function DepartmentUpdate() {
       departmentName: "",
       departmentStatus: "",
     },
-    submitDepartment
+    submitDepartment,
   );
 
   const { setFormData } = formHandler;
@@ -51,12 +50,5 @@ export default function DepartmentUpdate() {
 
   if (departmentLoading) return <Loading />;
 
-  return (
-    <DepartmentForm
-      formHandler={formHandler}
-      mode="update"
-      operatedBy={userName}
-      isUpdate
-    />
-  );
+  return <DepartmentForm formHandler={formHandler} mode="update" operatedBy={userName} isUpdate />;
 }

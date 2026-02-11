@@ -71,41 +71,41 @@ function RFIDLabelCard({
   return (
     <div
       className={`
-        flex flex-col w-full bg-background rounded-xl border-1
+        flex flex-col w-full bg-background rounded-lg border
         transition-all duration-200
         ${isActive ? "border-default shadow-md scale-[1.02]" : "border-default"}
       `}
     >
-      <div className="flex items-center justify-between p-3 border-b border-default bg-default/30">
+      <div className="flex items-center justify-between p-2 border-b border-default bg-default-50">
         <div className="flex items-center gap-2">
-          <Tag className="text-primary" />
+          <Tag className="text-foreground" />
           <span className="font-mono font-bold text-lg">{shortItemNumber}</span>
         </div>
-        <Chip size="md" color={isActive ? "primary" : "default"} variant="flat">
+        <Chip size="md" color={isActive ? "default" : "default"} variant="flat">
           {sequenceText}
         </Chip>
       </div>
 
-      <div className="flex items-center justify-center p-2 border-b border-default bg-primary/5">
+      <div className="flex items-center justify-center p-2 border-b border-default bg-default-50">
         <div className="flex items-center gap-2">
-          <Building2 className="w-4 h-4 text-primary" />
+          <Building2 className="w-4 h-4 text-default-500" />
           <span className="text-sm font-medium">{projectName || "-"}</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-center p-3 min-h-[60px] border-b border-default">
-        <p className="text-center text-base font-medium text-foreground/90 line-clamp-2">
+      <div className="flex items-center justify-center p-2 min-h-[60px] border-b border-default">
+        <p className="text-center text-base font-medium text-foreground line-clamp-2">
           {displayName}
         </p>
       </div>
 
-      <div className="flex flex-col p-3 bg-default/20">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-semibold text-foreground/60">
+      <div className="flex flex-col p-2 bg-default-50">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-default-500">
             RFID EPC:
           </span>
         </div>
-        <div className="font-mono text-xs text-foreground/70 break-all bg-default/50 rounded-xl p-2">
+        <div className="font-mono text-xs text-default-500 break-all bg-default-100 rounded-lg p-2">
           {epc}
         </div>
       </div>
@@ -199,10 +199,10 @@ function RFIDLabelPreviewModal({
       <ModalContent>
         <ModalHeader className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <Tag className="text-primary" />
-            <span>พิมพ์ RFID Label</span>
+            <Tag className="text-foreground" />
+            <span>Print RFID Label</span>
           </div>
-          <p className="text-sm font-normal text-foreground/60">
+          <p className="text-sm font-normal text-default-500">
             {item.number} - {item.displayName}
           </p>
           {item.projectName && (
@@ -214,10 +214,10 @@ function RFIDLabelPreviewModal({
         </ModalHeader>
 
         <ModalBody className="gap-2">
-          <div className="flex flex-col gap-2 p-2 bg-default/30 rounded-xl">
+          <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold">
-                จำนวนที่ต้องการพิมพ์
+                Print Quantity
               </span>
               <div className="flex items-center gap-2">
                 <Button
@@ -252,8 +252,8 @@ function RFIDLabelPreviewModal({
                 </Button>
               </div>
             </div>
-            <p className="text-xs text-foreground/60">
-              ประเภท: {printTypeLabel} • จะพิมพ์ทั้งหมด {totalLabels} ใบ
+            <p className="text-xs text-default-500">
+              Type: {printTypeLabel} • Total to print: {totalLabels} labels
             </p>
           </div>
 
@@ -261,8 +261,8 @@ function RFIDLabelPreviewModal({
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-foreground/70">
-                ตัวอย่างที่ {currentPreviewIndex + 1} / {totalLabels}
+              <span className="text-sm text-default-500">
+                Preview {currentPreviewIndex + 1} / {totalLabels}
               </span>
 
               {totalLabels > 1 && (
@@ -302,47 +302,47 @@ function RFIDLabelPreviewModal({
 
           <Divider />
 
-          <div className="flex flex-col gap-2 p-2 bg-default/30 rounded-xl">
+          <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-foreground/60">Item Number:</span>
+              <span className="text-default-500">Item Number:</span>
               <span className="font-mono font-medium">{item.number}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-foreground/60">Display Name:</span>
+              <span className="text-default-500">Display Name:</span>
               <span className="font-medium truncate max-w-[60%]">
                 {item.displayName}
               </span>
             </div>
             {item.projectName && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-foreground/60">Project:</span>
+                <span className="text-default-500">Project:</span>
                 <span className="font-medium">{item.projectName}</span>
               </div>
             )}
             <div className="flex items-center justify-between text-sm">
-              <span className="text-foreground/60">Category:</span>
+              <span className="text-default-500">Category:</span>
               <span>{item.inventoryPostingGroupCode || "-"}</span>
             </div>
             <Divider />
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold">จำนวนที่พิมพ์</span>
+              <span className="text-sm font-semibold">Print Count</span>
               <Chip size="md" color="success" variant="solid">
-                {totalLabels} ใบ
+                {totalLabels} labels
               </Chip>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 p-2 bg-warning/10 rounded-xl border border-warning/30">
+          <div className="flex flex-col gap-2 p-2 bg-amber-50 rounded-lg border border-amber-200">
             <p className="text-sm text-warning-600 font-medium">
-              ⚠️ ข้อควรทราบ
+              Important Notes
             </p>
             <ul className="text-xs text-warning-600/80 list-disc list-inside space-y-1">
               <li>
-                Label แต่ละใบจะมี RFID EPC ไม่ซ้ำกัน (sequence 1/{totalLabels},
+                Each label will have a unique RFID EPC (sequence 1/{totalLabels},
                 2/{totalLabels}, ...)
               </li>
-              <li>ตรวจสอบให้แน่ใจว่าเครื่องพิมพ์ RFID พร้อมใช้งาน</li>
-              <li>EPC จะถูกเขียนลง RFID Tag อัตโนมัติ</li>
+              <li>Make sure the RFID printer is ready before printing</li>
+              <li>EPC will be automatically written to the RFID Tag</li>
             </ul>
           </div>
         </ModalBody>
@@ -352,9 +352,9 @@ function RFIDLabelPreviewModal({
             color="danger"
             variant="shadow"
             onPress={onClose}
-            className="w-full text-background"
+            className="w-full text-white"
           >
-            ยกเลิก
+            Cancel
           </Button>
           <Button
             color="primary"
@@ -363,9 +363,9 @@ function RFIDLabelPreviewModal({
             onPress={handleConfirm}
             isLoading={printing}
             isDisabled={totalLabels === 0}
-            className="w-full text-background"
+            className="w-full text-white"
           >
-            {printing ? "กำลังพิมพ์..." : `พิมพ์ ${totalLabels} ใบ`}
+            {printing ? "Printing..." : `Print ${totalLabels} labels`}
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -395,7 +395,7 @@ function ItemDetailModal({
       <ModalContent>
         <ModalHeader className="flex flex-col gap-2">
           <h3 className="text-lg font-semibold">Item Details</h3>
-          <span className="text-sm text-foreground/60 font-mono">
+          <span className="text-sm text-default-500 font-mono">
             {item.number}
           </span>
         </ModalHeader>
@@ -403,25 +403,25 @@ function ItemDetailModal({
         <ModalBody className="gap-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div className="flex items-start gap-2">
-              <Hash className="text-foreground/50 mt-1 w-5 h-5" />
+              <Hash className="text-default-400 w-5 h-5" />
               <div className="flex flex-col">
-                <p className="text-xs text-foreground/60">Item Number</p>
+                <p className="text-xs text-default-500">Item Number</p>
                 <p className="font-mono font-medium">{item.number}</p>
               </div>
             </div>
 
             <div className="flex items-start gap-2">
-              <Package className="text-foreground/50 mt-1 w-5 h-5" />
+              <Package className="text-default-400 w-5 h-5" />
               <div className="flex flex-col">
-                <p className="text-xs text-foreground/60">Display Name</p>
+                <p className="text-xs text-default-500">Display Name</p>
                 <p className="font-medium">{item.displayName || "-"}</p>
               </div>
             </div>
 
             <div className="flex items-start gap-2">
-              <Building2 className="text-foreground/50 mt-1 w-5 h-5" />
+              <Building2 className="text-default-400 w-5 h-5" />
               <div className="flex flex-col">
-                <p className="text-xs text-foreground/60">Project</p>
+                <p className="text-xs text-default-500">Project</p>
                 <p className={`font-medium ${item.projectName ? "" : ""}`}>
                   {item.projectName || item.projectCode || "-"}
                 </p>
@@ -429,17 +429,17 @@ function ItemDetailModal({
             </div>
 
             <div className="flex items-start gap-2">
-              <Layers className="text-foreground/50 mt-1 w-5 h-5" />
+              <Layers className="text-default-400 w-5 h-5" />
               <div className="flex flex-col">
-                <p className="text-xs text-foreground/60">Category</p>
+                <p className="text-xs text-default-500">Category</p>
                 <p>{item.inventoryPostingGroupCode || "-"}</p>
               </div>
             </div>
 
             <div className="flex items-start gap-2">
-              <Tag className="text-foreground/50 mt-1 w-5 h-5" />
+              <Tag className="text-default-400 w-5 h-5" />
               <div className="flex flex-col">
-                <p className="text-xs text-foreground/60">Unit</p>
+                <p className="text-xs text-default-500">Unit</p>
                 <p>{item.unitOfMeasureCode || "-"}</p>
               </div>
             </div>
@@ -449,9 +449,9 @@ function ItemDetailModal({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div className="flex items-start gap-2">
-              <DollarSign className="text-foreground/50 mt-1 w-5 h-5" />
+              <DollarSign className="text-default-400 w-5 h-5" />
               <div className="flex flex-col">
-                <p className="text-xs text-foreground/60">Unit Price</p>
+                <p className="text-xs text-default-500">Unit Price</p>
                 <p className="font-medium text-lg">
                   {formatCurrency(item.unitPrice)} THB
                 </p>
@@ -459,11 +459,11 @@ function ItemDetailModal({
             </div>
 
             <div className="flex items-start gap-2">
-              <Package className="text-foreground/50 mt-1 w-5 h-5" />
+              <Package className="text-default-400 w-5 h-5" />
               <div className="flex flex-col">
-                <p className="text-xs text-foreground/60">Inventory</p>
+                <p className="text-xs text-default-500">Inventory</p>
                 <p
-                  className={`font-medium text-lg ${item.inventory > 0 ? "text-success" : "text-foreground/50"}`}
+                  className={`font-medium text-lg ${item.inventory > 0 ? "text-success" : "text-default-400"}`}
                 >
                   {item.inventory?.toLocaleString("th-TH") || "0"}
                 </p>
@@ -471,8 +471,8 @@ function ItemDetailModal({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 p-2 bg-default/30 rounded-xl">
-            <span className="text-sm text-foreground/60">Status:</span>
+          <div className="flex items-center gap-2 p-2 bg-default-50 rounded-lg">
+            <span className="text-sm text-default-500">Status:</span>
             <Chip
               size="md"
               color={item.blocked ? "danger" : "success"}
@@ -483,12 +483,12 @@ function ItemDetailModal({
           </div>
 
           {!isConnected && (
-            <div className="flex flex-col gap-2 p-2 bg-danger/10 rounded-xl border border-danger/30">
+            <div className="flex flex-col gap-2 p-2 bg-red-50 rounded-lg border border-red-200">
               <p className="text-sm text-danger font-medium">
                 ⚠️ Printer Not Connected
               </p>
               <p className="text-xs text-danger/80">
-                กรุณาเชื่อมต่อเครื่องพิมพ์ RFID ก่อนทำการพิมพ์
+                Please connect the RFID printer before printing
               </p>
             </div>
           )}
@@ -500,7 +500,7 @@ function ItemDetailModal({
             variant="shadow"
             size="md"
             radius="md"
-            className="w-full text-background"
+            className="w-full text-white"
             onPress={onClose}
           >
             Close
@@ -510,7 +510,7 @@ function ItemDetailModal({
             variant="shadow"
             size="md"
             radius="md"
-            className="w-full text-background"
+            className="w-full text-white"
             startContent={<Printer />}
             isDisabled={!isConnected || printing}
             onPress={() => {
@@ -627,7 +627,7 @@ export default function UIFinishedGoods({
         return (
           <span
             className={
-              item.inventory > 0 ? "text-success" : "text-foreground/50"
+              item.inventory > 0 ? "text-success" : "text-default-400"
             }
           >
             {item.inventoryDisplay}
@@ -638,7 +638,7 @@ export default function UIFinishedGoods({
       if (columnKey === "projectName") {
         return (
           <span
-            className={item.projectName ? "font-medium" : "text-foreground/50"}
+            className={item.projectName ? "font-medium" : "text-default-400"}
           >
             {item.projectNameDisplay}
           </span>
@@ -664,104 +664,77 @@ export default function UIFinishedGoods({
   );
 
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full overflow-hidden">
-      <div className="xl:flex flex-col items-center justify-start w-full xl:w-[20%] h-full gap-2 border-1 border-default overflow-auto hidden">
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <span className="font-medium">Printer</span>
-            <Button
-              isIconOnly
-              variant="light"
-              size="md"
-              onPress={openSettings}
-              title="Printer Settings"
-            >
-              <Settings />
-            </Button>
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <PrinterStatusBadge />
-          </div>
+    <div className="flex flex-col w-full h-full overflow-hidden p-2 gap-2">
+      {/* Inline stats + printer controls */}
+      <div className="hidden xl:flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Total Items</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{total}</span>
         </div>
-
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Total Items
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {total}
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Active</span>
+          <span className="text-xs font-semibold text-green-700 bg-green-50 p-2 rounded">{active}</span>
         </div>
-
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Active Items
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {active}
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Blocked</span>
+          <span className="text-xs font-semibold text-red-700 bg-red-50 p-2 rounded">{blocked}</span>
         </div>
-
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            Blocked Items
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            {blocked}
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-default-500">Projects</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{uniqueProjects}</span>
         </div>
-
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <Building2 />
-            <span>Projects</span>
-          </div>
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2 font-medium">
-            {uniqueProjects}
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center justify-center w-full h-fit p-2 gap-2 border-b-1 border-default">
+        <div className="flex items-center gap-2">
+          <PrinterStatusBadge />
           <Button
+            isIconOnly
             variant="light"
-            size="md"
+            size="sm"
+            onPress={openSettings}
+            title="Printer Settings"
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+          <Button
+            isIconOnly
+            variant="light"
+            size="sm"
             onPress={onRefresh}
             isDisabled={loading}
-            className="w-full"
           >
-            <RefreshCw className={loading ? "animate-spin" : ""} />
-            <span className="ml-2">Refresh</span>
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-start w-full xl:w-[80%] h-full gap-2 overflow-hidden">
-        <div className="flex xl:hidden items-center justify-between w-full p-2">
-          <PrinterStatusBadge />
-          <div className="flex gap-2">
-            <Button
-              isIconOnly
-              variant="light"
-              size="md"
-              onPress={openSettings}
-              title="Printer Settings"
-            >
-              <Settings />
-            </Button>
-            <Button
-              isIconOnly
-              variant="light"
-              size="md"
-              onPress={onRefresh}
-              isDisabled={loading}
-            >
-              <RefreshCw className={loading ? "animate-spin" : ""} />
-            </Button>
-          </div>
+      {/* Mobile controls */}
+      <div className="flex xl:hidden items-center justify-between w-full shrink-0">
+        <PrinterStatusBadge />
+        <div className="flex gap-2">
+          <Button
+            isIconOnly
+            variant="light"
+            size="sm"
+            onPress={openSettings}
+            title="Printer Settings"
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+          <Button
+            isIconOnly
+            variant="light"
+            size="sm"
+            onPress={onRefresh}
+            isDisabled={loading}
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
         </div>
+      </div>
 
+      {/* Table */}
+      <div className="flex-1 min-h-0 overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center w-full h-full gap-2">
+          <div className="flex items-center justify-center w-full h-full">
             <Loading />
           </div>
         ) : (
@@ -789,7 +762,7 @@ export default function UIFinishedGoods({
             <PrinterSettings
               onClose={closeSettings}
               showHeader={true}
-              title="ควบคุมเครื่องพิมพ์"
+              title="Printer Control"
               subtitle="ChainWay RFID Printer"
             />
           </ModalBody>

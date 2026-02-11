@@ -4,7 +4,7 @@ import { useModuleMenu } from "@/hooks/useMenu";
 import { WarehouseDashboard } from "@/features/warehouse";
 
 export default function Warehouse() {
-  const { menu, isEmpty } = useModuleMenu("warehouse");
+  const { menu } = useModuleMenu("warehouse");
 
-  return <WarehouseDashboard menu={menu} isEmpty={isEmpty} />;
+  return <WarehouseDashboard menu={menu} />;
 }

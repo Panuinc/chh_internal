@@ -8,40 +8,35 @@ export default function SubMenu({
   className = "",
 }) {
   const baseClasses =
-    "flex flex-col items-center justify-center w-32 h-32 p-2 gap-2 border-1 border-default shadow-md rounded-xl transition-all duration-200";
+    "flex flex-col items-center justify-center gap-2 p-2 bg-background border border-default rounded-lg transition-all duration-100 hover:shadow-sm"; 
 
-  const enabledClasses = "hover:scale-110 hover:shadow-md cursor-pointer";
-  const disabledClasses = "opacity-50 cursor-not-allowed";
+  const enabledClasses = "hover:border-default cursor-pointer group";
+  const disabledClasses = "opacity-40 cursor-not-allowed";
 
   const combinedClasses = `${baseClasses} ${
     disabled ? disabledClasses : enabledClasses
   } ${className}`;
 
-  if (disabled) {
-    return (
-      <div className={combinedClasses}>
-        {Icon && (
-          <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-            <Icon />
-          </div>
-        )}
-        <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-center">
-          {text}
+  const content = (
+    <>
+      {Icon && (
+        <div className={`flex items-center justify-center w-9 h-9 rounded-md bg-default-100 text-default-500 ${!disabled ? "group-hover:bg-default-200 group-hover:text-default-700" : ""} transition-colors`}>
+          <Icon className="w-4 h-4" strokeWidth={1.5} />
         </div>
-      </div>
-    );
+      )}
+      <span className="text-[12px] font-medium text-default-600 text-center leading-tight">
+        {text}
+      </span>
+    </>
+  );
+
+  if (disabled) {
+    return <div className={combinedClasses}>{content}</div>;
   }
 
   return (
     <Link href={href} className={combinedClasses}>
-      {Icon && (
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          <Icon />
-        </div>
-      )}
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2 text-center">
-        {text}
-      </div>
+      {content}
     </Link>
   );
 }

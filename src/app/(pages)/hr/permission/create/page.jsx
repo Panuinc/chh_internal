@@ -27,14 +27,8 @@ export default function PermissionCreate() {
     {
       permissionName: "",
     },
-    submitPermission
+    submitPermission,
   );
 
-  return (
-    <PermissionForm
-      formHandler={formHandler}
-      mode="create"
-      operatedBy={userName}
-    />
-  );
+  return <PermissionForm formHandler={formHandler} mode="create" operatedBy={userName} />;
 }

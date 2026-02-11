@@ -102,19 +102,19 @@ export const DATE_FORMATS = {
 
 export const MESSAGES = {
   SUCCESS: {
-    FETCH: "ดึงข้อมูลสำเร็จ",
-    CREATE: "สร้างข้อมูลสำเร็จ",
-    UPDATE: "อัปเดตข้อมูลสำเร็จ",
-    DELETE: "ลบข้อมูลสำเร็จ",
-    UPLOAD: "อัปโหลดไฟล์สำเร็จ",
+    FETCH: "Data fetched successfully",
+    CREATE: "Data created successfully",
+    UPDATE: "Data updated successfully",
+    DELETE: "Data deleted successfully",
+    UPLOAD: "File uploaded successfully",
   },
   ERROR: {
-    GENERIC: "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
-    NOT_FOUND: "ไม่พบข้อมูล",
-    UNAUTHORIZED: "ไม่มีสิทธิ์เข้าถึง",
-    VALIDATION: "ข้อมูลไม่ถูกต้อง",
-    SERVER_ERROR: "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์",
-    RATE_LIMIT: "คำขอมากเกินไป กรุณารอสักครู่",
+    GENERIC: "An error occurred. Please try again.",
+    NOT_FOUND: "Data not found",
+    UNAUTHORIZED: "Unauthorized access",
+    VALIDATION: "Invalid data",
+    SERVER_ERROR: "A server error occurred",
+    RATE_LIMIT: "Too many requests. Please wait a moment.",
   },
 };
 

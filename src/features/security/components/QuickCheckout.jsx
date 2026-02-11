@@ -1,17 +1,15 @@
 import Image from "next/image";
 import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Chip } from "@heroui/chip";
-import { Divider } from "@heroui/divider";
 import { Spinner } from "@heroui/spinner";
 
 const CONTACT_REASON_MAP = {
-  Shipping: "📦 การจัดส่ง",
-  BillingChequeCollection: "💰 รับเช็ค/วางบิล",
-  JobApplication: "📝 สมัครงาน",
-  ProductPresentation: "📊 นำเสนอสินค้า",
-  Meeting: "🤝 ประชุม",
-  Other: "📋 อื่นๆ",
+  Shipping: "Shipping",
+  BillingChequeCollection: "Cheque Collection / Billing",
+  JobApplication: "Job Application",
+  ProductPresentation: "Product Presentation",
+  Meeting: "Meeting",
+  Other: "Other",
 };
 
 function formatDateTime(dateStr) {
@@ -40,8 +38,8 @@ export default function UIQuickCheckout({
 }) {
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-2">
-        <Spinner size="md" label="กำลังโหลด..." />
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner size="md" label="Loading..." />
       </div>
     );
   }
@@ -49,24 +47,24 @@ export default function UIQuickCheckout({
   if (!visitor) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full p-2">
-        <Card className="w-full p-2 gap-2">
-          <CardBody className="text-center p-2 gap-2">
-            <div className="text-6xl mb-4">🔍</div>
-            <h2 className="text-xl font-bold text-danger mb-2">
-              ไม่พบข้อมูลผู้เยี่ยม
+        <div className="w-full max-w-md bg-background rounded-lg border border-default p-2">
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-default-100 flex items-center justify-center">
+              <span className="text-2xl">?</span>
+            </div>
+            <h2 className="text-lg font-semibold text-foreground">
+              Visitor not found
             </h2>
             <Button
-              color="danger"
-              variant="solid"
-              size="md"
-              radius="md"
-              className="w-full text-background"
+              size="sm"
+              radius="sm"
+              className="w-full bg-foreground text-background font-medium hover:bg-default-800"
               onPress={onGoBack}
             >
-              กลับหน้าหลัก
+              Back to Home
             </Button>
-          </CardBody>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -75,54 +73,55 @@ export default function UIQuickCheckout({
   const showCheckoutTime = success || isAlreadyCheckedOut;
 
   return (
-    <div className="flex flex-col items-center justify-center w-full p-2 gap-2">
-      <Card className="w-full max-w-md shadow-md">
-        <CardHeader className="flex flex-col items-center pb-0 pt-6">
+    <div className="flex flex-col items-center justify-center w-full p-2">
+      <div className="w-full max-w-md bg-background rounded-lg border border-default overflow-hidden">
+        <div className="flex flex-col items-center p-2">
           <HeaderContent
             success={success}
             isAlreadyCheckedOut={isAlreadyCheckedOut}
           />
-        </CardHeader>
+        </div>
 
-        <CardBody className="p-2">
+        <div className="p-2 space-y-4">
           {visitor.visitorPhoto && (
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center">
               <Image
                 src={`/api/uploads/${visitor.visitorPhoto}`}
                 alt="Visitor"
                 width={96}
                 height={96}
-                className="rounded-full object-cover shadow-md"
+                className="rounded-full object-cover border border-default"
               />
             </div>
           )}
 
-          <div className="text-center mb-4">
-            <h2 className="text-xl font-bold">
+          <div className="text-center space-y-1">
+            <h2 className="text-lg font-semibold text-foreground">
               {visitor.visitorFirstName} {visitor.visitorLastName}
             </h2>
-            <p className="text-default-600">{visitor.visitorCompany}</p>
+            <p className="text-[13px] text-default-400">{visitor.visitorCompany}</p>
             <Chip
               color={showCheckoutTime ? "default" : "success"}
               variant="flat"
-              className="mt-2"
+              size="sm"
+              className=""
             >
               {success ? "CheckOut" : visitor.visitorStatus}
             </Chip>
           </div>
 
-          <Divider className="my-4" />
+          <div className="border-t border-default" />
 
           <VisitorDetails
             visitor={visitor}
             showCheckoutTime={showCheckoutTime}
           />
 
-          <Divider className="my-4" />
+          <div className="border-t border-default" />
 
           {!isLoggedIn && !isAlreadyCheckedOut && !success && (
-            <div className="bg-warning-50 text-warning-700 p-2 rounded-xl mb-4 text-center text-sm">
-              ⚠️ คุณยังไม่ได้เข้าสู่ระบบ กดปุ่ม Checkout จะพาไปหน้า Login
+            <div className="bg-amber-50 text-amber-700 p-2 rounded-lg text-center text-xs border border-amber-200">
+              You are not logged in. Pressing Checkout will redirect you to the Login page.
             </div>
           )}
 
@@ -133,8 +132,8 @@ export default function UIQuickCheckout({
             onCheckout={onCheckout}
             onGoBack={onGoBack}
           />
-        </CardBody>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -143,8 +142,10 @@ function HeaderContent({ success, isAlreadyCheckedOut }) {
   if (success) {
     return (
       <>
-        <div className="text-6xl mb-2">✅</div>
-        <h1 className="text-2xl font-bold text-success">Checkout สำเร็จ!</h1>
+        <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center">
+          <span className="text-green-600 text-xl font-bold">OK</span>
+        </div>
+        <h1 className="text-lg font-semibold text-green-600">Checkout Successful!</h1>
       </>
     );
   }
@@ -152,9 +153,11 @@ function HeaderContent({ success, isAlreadyCheckedOut }) {
   if (isAlreadyCheckedOut) {
     return (
       <>
-        <div className="text-6xl mb-2">⚪</div>
-        <h1 className="text-2xl font-bold text-default-500">
-          Checked Out แล้ว
+        <div className="w-14 h-14 rounded-full bg-default-100 flex items-center justify-center">
+          <span className="text-default-400 text-xl font-bold">--</span>
+        </div>
+        <h1 className="text-lg font-semibold text-default-500">
+          Already Checked Out
         </h1>
       </>
     );
@@ -162,43 +165,39 @@ function HeaderContent({ success, isAlreadyCheckedOut }) {
 
   return (
     <>
-      <div className="text-6xl mb-2">👋</div>
-      <h1 className="text-2xl font-bold">Quick Checkout</h1>
+      <div className="w-14 h-14 rounded-full bg-default-100 flex items-center justify-center">
+        <span className="text-default-600 text-xl font-bold">Hi</span>
+      </div>
+      <h1 className="text-lg font-semibold text-foreground">Quick Checkout</h1>
     </>
   );
 }
 
 function VisitorDetails({ visitor, showCheckoutTime }) {
   return (
-    <div className="space-y-3">
+    <div className="bg-background rounded-lg border border-default p-2 space-y-0">
       <DetailRow
-        icon="🚗"
-        label="ทะเบียนรถ"
+        label="License Plate"
         value={`${visitor.visitorCarRegistration} (${visitor.visitorProvince})`}
       />
       <DetailRow
-        icon="📌"
-        label="เหตุผล"
+        label="Reason"
         value={
           CONTACT_REASON_MAP[visitor.visitorContactReason] ||
           visitor.visitorContactReason
         }
       />
       <DetailRow
-        icon="👤"
-        label="ติดต่อ"
+        label="Contact"
         value={getContactUserName(visitor)}
-        valueClassName="text-success"
       />
       <DetailRow
-        icon="🕐"
-        label="เข้า"
+        label="Check In"
         value={formatDateTime(visitor.visitorCreatedAt)}
       />
       {showCheckoutTime && visitor.visitorUpdatedAt && (
         <DetailRow
-          icon="🕐"
-          label="ออก"
+          label="Check Out"
           value={formatDateTime(visitor.visitorUpdatedAt)}
         />
       )}
@@ -206,13 +205,11 @@ function VisitorDetails({ visitor, showCheckoutTime }) {
   );
 }
 
-function DetailRow({ icon, label, value, valueClassName = "" }) {
+function DetailRow({ label, value }) {
   return (
-    <div className="flex justify-between">
-      <span className="text-default-500">
-        {icon} {label}
-      </span>
-      <span className={`font-medium ${valueClassName}`}>{value}</span>
+    <div className="flex items-center justify-between p-2 border-b border-default last:border-b-0">
+      <span className="text-[12px] text-default-400">{label}</span>
+      <span className="text-[13px] font-medium text-default-700">{value}</span>
     </div>
   );
 }
@@ -228,28 +225,28 @@ function ActionButtons({
     <div className="flex flex-col gap-2">
       {!isAlreadyCheckedOut && !success ? (
         <Button
-          color="warning"
-          size="md"
-          className="w-full font-bold"
+          size="sm"
+          radius="sm"
+          className="w-full bg-foreground text-background font-medium hover:bg-default-800"
           isLoading={checkoutLoading}
           onPress={onCheckout}
         >
-          ✅ Checkout ผู้เยี่ยม
+          Checkout Visitor
         </Button>
       ) : (
-        <div className="text-center text-default-500 p-2">
-          ผู้เยี่ยมได้ออกจากพื้นที่แล้ว
+        <div className="text-center text-xs text-default-500 p-2">
+          Visitor has already left the premises
         </div>
       )}
 
       <Button
-        color="default"
+        size="sm"
+        radius="sm"
         variant="flat"
-        size="md"
-        className="w-full"
+        className="w-full bg-default-100 text-default-700 font-medium hover:bg-default-200"
         onPress={onGoBack}
       >
-        กลับหน้ารายการ
+        Back to List
       </Button>
     </div>
   );

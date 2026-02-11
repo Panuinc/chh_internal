@@ -1,48 +1,60 @@
-import { ModulePage, SubMenu } from "@/components";
-import { AlertCircle } from "lucide-react";
+import { ModulePage, KpiCard, ChartCard, MiniBarChart } from "@/components";
+import { AlertCircle, Package, PackageCheck, PackageX, Ban } from "lucide-react";
+import { useProductionAnalytics } from "@/features/production/hooks";
 
-function ProductionSidebar() {
-  const stats = {
-    totalEmployees: 150,
-    departments: 8,
-    pendingApprovals: 5,
-  };
-
+function ProductionAnalytics({ data }) {
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full p-2 gap-2 border-1 border-default">
-      <div className="flex items-center justify-center w-full h-fit p-2 gap-2">
-        Quick Stats
+    <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <KpiCard
+          title="Total Products"
+          value={data.totalProducts}
+          icon={Package}
+        />
+        <KpiCard
+          title="In Stock"
+          value={data.inStock}
+          icon={PackageCheck}
+          subValue={`${data.totalInventory} units total`}
+        />
+        <KpiCard
+          title="Out of Stock"
+          value={data.outOfStock}
+          icon={PackageX}
+          subValue="Needs production"
+        />
+        <KpiCard
+          title="Blocked"
+          value={data.blocked}
+          icon={Ban}
+        />
       </div>
 
-      <div className="flex flex-col items-center justify-center w-full h-fit gap-2">
-        <StatItem label="Total Employees" value={stats.totalEmployees} />
-        <StatItem label="Departments" value={stats.departments} />
-        <StatItem label="Pending Approvals" value={stats.pendingApprovals} />
-      </div>
+      {data.topByInventory?.length > 0 && (
+        <ChartCard title="Top Products by Inventory">
+          <MiniBarChart
+            data={data.topByInventory}
+            dataKey="count"
+            xKey="name"
+            height={200}
+            color="#404040"
+            formatter={(v) => `${v} units`}
+          />
+        </ChartCard>
+      )}
     </div>
   );
 }
 
-function StatItem({ label, value }) {
-  return (
-    <div className="flex items-center justify-between w-full h-full gap-2 border-b-1 border-default">
-      <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-        {label}
-      </div>
-      <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-        {value}
-      </div>
-    </div>
-  );
-}
+export default function UIProduction({ menu }) {
+  const { data, loading } = useProductionAnalytics();
 
-export default function UIProduction({ menu, isEmpty }) {
   if (!menu) {
     return (
-      <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 border-default">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 border-default">
-          <AlertCircle />
-          <span>Module configuration not found</span>
+      <div className="flex items-center justify-center w-full h-full p-2">
+        <div className="flex items-center gap-2 p-2 bg-default-50 rounded-lg border border-default">
+          <AlertCircle className="w-4 h-4 text-default-400" />
+          <span className="text-[13px] text-default-500">Module configuration not found</span>
         </div>
       </div>
     );
@@ -55,22 +67,8 @@ export default function UIProduction({ menu, isEmpty }) {
       icon={<Icon />}
       title={menu.title}
       description={menu.description}
-      sidebar={<ProductionSidebar />}
-    >
-      {isEmpty ? (
-        <div className="col-span-full text-center justify-center w-full p-2 gap-2">
-          No accessible menu items. Please contact administrator.
-        </div>
-      ) : (
-        menu.items.map((item) => (
-          <SubMenu
-            key={item.id}
-            href={item.href}
-            text={item.text}
-            icon={item.icon}
-          />
-        ))
-      )}
-    </ModulePage>
+      showSidebar={false}
+      analytics={loading || !data ? null : <ProductionAnalytics data={data} />}
+    />
   );
 }

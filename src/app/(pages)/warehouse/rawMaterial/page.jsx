@@ -30,11 +30,11 @@ function RawMaterialContent() {
           const totalPrinted = result.results?.[0]?.labels?.length || quantity;
           showToast(
             "success",
-            `พิมพ์ ${item.number} สำเร็จ ${totalPrinted} ใบ`,
+            `Printed ${item.number} successfully: ${totalPrinted} labels`,
           );
         } else {
           const errorMsg = result?.results?.[0]?.error || "Unknown error";
-          showToast("danger", `พิมพ์ไม่สำเร็จ: ${errorMsg}`);
+          showToast("danger", `Print failed: ${errorMsg}`);
         }
       } catch (err) {
         showToast("danger", `Print failed: ${err.message}`);

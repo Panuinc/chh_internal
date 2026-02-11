@@ -9,3 +9,5 @@ export {
   usePatrols,
   useSubmitPatrol,
 } from "./usePatrol";
+
+export { useSecurityAnalytics } from "./useSecurityAnalytics";

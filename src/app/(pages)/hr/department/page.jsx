@@ -19,12 +19,5 @@ export default function DepartmentPage() {
     router.push(`/hr/department/${item.departmentId}`);
   };
 
-  return (
-    <DepartmentList
-      Departments={departments}
-      loading={loading}
-      onAddNew={hasPermission("hr.department.create") ? handleAddNew : null}
-      onEdit={hasPermission("hr.department.edit") ? handleEdit : null}
-    />
-  );
+  return <DepartmentList Departments={departments} loading={loading} onAddNew={hasPermission("hr.department.create") ? handleAddNew : null} onEdit={hasPermission("hr.department.edit") ? handleEdit : null} />;
 }

@@ -19,12 +19,5 @@ export default function AccountPage() {
     router.push(`/hr/account/${item.accountId}`);
   };
 
-  return (
-    <AccountList
-      Accounts={accounts}
-      loading={loading}
-      onAddNew={hasPermission("hr.account.create") ? handleAddNew : null}
-      onEdit={hasPermission("hr.account.edit") ? handleEdit : null}
-    />
-  );
+  return <AccountList Accounts={accounts} loading={loading} onAddNew={hasPermission("hr.account.create") ? handleAddNew : null} onEdit={hasPermission("hr.account.edit") ? handleEdit : null} />;
 }

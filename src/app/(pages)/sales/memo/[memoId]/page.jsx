@@ -159,10 +159,10 @@ export default function MemoUpdate() {
       {/* Reject Reason Modal */}
       <Modal isOpen={rejectModalOpen} onClose={() => setRejectModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>ระบุเหตุผลการปฏิเสธ</ModalHeader>
+          <ModalHeader>Specify Rejection Reason</ModalHeader>
           <ModalBody>
             <Textarea
-              placeholder="กรุณาระบุเหตุผลการปฏิเสธ..."
+              placeholder="Please specify the reason for rejection..."
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               minRows={3}
@@ -171,14 +171,14 @@ export default function MemoUpdate() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setRejectModalOpen(false)}>
-              ยกเลิก
+              Cancel
             </Button>
-            <Button 
-              color="danger" 
+            <Button
+              color="danger"
               onPress={handleRejectConfirm}
               isDisabled={!rejectReason.trim()}
             >
-              ปฏิเสธ
+              Reject
             </Button>
           </ModalFooter>
         </ModalContent>

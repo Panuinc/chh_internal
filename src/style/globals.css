@@ -5,25 +5,26 @@
 @custom-variant dark (&:is(.dark *));
 
 .font-system {
-  font-family: var(--font-en), var(--font-th), sans-serif;
+  font-family: var(--font-en), var(--font-th), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.border-default-200 {
-  border: 2px solid #ededed;
+.border-default {
+  border: 1px solid #DFDFDF;
 }
 
-.border-default-100 {
-  border: 2px solid #ededed;
+.border-default {
+  border: 1px solid #EBEBEB;
 }
 
 .bg-content1 {
-  background-color: #ffffff;
+  background-color: #FCFCFC;
 }
 
+/* Icon sizing */
 svg.lucide {
-  width: 20px;
-  height: 20px;
-  stroke-width: 1px;
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.5px;
 }
 
 ::-webkit-scrollbar {
@@ -31,6 +32,20 @@ svg.lucide {
   height: 0px;
 }
 
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #DFDFDF;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B0B0B0;
+}
+
+/* Animations */
 @keyframes logo {
   0% {
     transform: scale(1);
@@ -44,4 +59,21 @@ svg.lucide {
     transform: scale(1);
     opacity: 0.6;
   }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Selection styling */
+::selection {
+  background-color: #DFDFDF;
+  color: #171717;
 }

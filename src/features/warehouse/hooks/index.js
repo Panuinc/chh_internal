@@ -18,3 +18,5 @@ export {
   useSupplyItems,
   useSupplyItem,
 } from "./useSupply.js";
+
+export { useWarehouseAnalytics } from "./useWarehouseAnalytics.js";

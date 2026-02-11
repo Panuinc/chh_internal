@@ -18,8 +18,8 @@ export default function EmployeeCreate() {
     }
   }, [hasPermission, router]);
 
-  const { departments } = useDepartments(undefined, true); // fetchAll = true
-  const { roles } = useRoles(undefined, true); // fetchAll = true
+  const { departments } = useDepartments(undefined, true);
+  const { roles } = useRoles(undefined, true);
 
   const submitEmployee = useSubmitEmployee({
     mode: "create",
@@ -34,16 +34,8 @@ export default function EmployeeCreate() {
       employeeDepartmentId: "",
       employeeRoleId: "",
     },
-    submitEmployee
+    submitEmployee,
   );
 
-  return (
-    <EmployeeForm
-      formHandler={formHandler}
-      mode="create"
-      operatedBy={userName}
-      departments={departments}
-      roles={roles}
-    />
-  );
+  return <EmployeeForm formHandler={formHandler} mode="create" operatedBy={userName} departments={departments} roles={roles} />;
 }

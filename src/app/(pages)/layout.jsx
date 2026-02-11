@@ -1,21 +1,14 @@
 "use client";
 import { useState } from "react";
-import { LogOut, User } from "lucide-react";
-import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
-import Link from "next/link";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Avatar,
-} from "@heroui/react";
-import { LoadingState } from "@/components";
+import { LoadingState, Sidebar } from "@/components";
+import TopBar from "@/components/layout/TopBar";
+import StatusBar from "@/components/layout/StatusBar";
 
 export default function PagesLayout({ children }) {
   const { data: session, status } = useSession();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -31,50 +24,66 @@ export default function PagesLayout({ children }) {
     session?.user?.name?.charAt(0).toUpperCase() ||
     "U";
 
+  const userName =
+    session?.user?.name ||
+    (session?.user?.firstName && session?.user?.lastName
+      ? `${session.user.firstName} ${session.user.lastName}`
+      : session?.user?.firstName || "User");
+
+  const userRole = session?.user?.isSuperAdmin ? "Administrator" : "User";
+
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full">
-      <header className="flex flex-row items-center justify-between w-full h-fit p-2 gap-2 border-b-1 border-default">
-        <Link
-          href="/home"
-          className="flex items-center justify-start w-full xl:min-w-12 h-12 p-2 gap-2"
-        >
-          <Image src="/logo/logo-02.png" alt="logo" width={125} height={125} />
-        </Link>
+    <div className="flex flex-col w-full h-full">
+      {/* ERP Top Bar */}
+      <TopBar
+        userName={userName}
+        userRole={userRole}
+        isMobileSidebarOpen={isMobileSidebarOpen}
+        onToggleMobileSidebar={() =>
+          setIsMobileSidebarOpen(!isMobileSidebarOpen)
+        }
+      />
 
-        <div className="xl:flex items-center justify-center w-full h-full p-2 gap-2 hidden"></div>
+      {/* Body: Sidebar + Content */}
+      <div className="flex flex-1 min-h-0">
+        {/* Mobile sidebar overlay */}
+        {isMobileSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/20 backdrop-blur-[1px] z-40 xl:hidden"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+        )}
 
-        <Dropdown placement="bottom-end">
-          <DropdownTrigger>
-            <div className="flex items-center justify-center aspect-square h-full p-2 gap-2 bg-primary text-background shadow-md rounded-xl cursor-pointer hover:bg-primary/50 transition-colors">
-              <span className="text-lg font-semibold">{userInitial}</span>
-            </div>
-          </DropdownTrigger>
-          <DropdownMenu aria-label="User menu" variant="flat">
-            <DropdownItem key="profile" href="/profile" startContent={<User className="w-4 h-4" />}>
-              Profile
-            </DropdownItem>
-            <DropdownItem
-              key="logout"
-              color="danger"
-              onPress={!isSigningOut ? handleSignOut : undefined}
-              isDisabled={isSigningOut}
-              startContent={<LogOut className="w-4 h-4" />}
-            >
-              {isSigningOut ? "Signing out..." : "Log out"}
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-      </header>
-
-      <main className="flex items-center justify-center w-full h-full gap-2 overflow-hidden">
-        {children}
-      </main>
-
-      <footer className="flex flex-row items-center justify-center w-full h-fit p-2 gap-2 border-t-1 border-default">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2">
-          EVERGREEN BY CHH
+        {/* Sidebar - desktop */}
+        <div className="hidden xl:flex h-full">
+          <Sidebar
+            userInitial={userInitial}
+            isSigningOut={isSigningOut}
+            onSignOut={handleSignOut}
+          />
         </div>
-      </footer>
+
+        {/* Sidebar - mobile */}
+        <div
+          className={`fixed inset-y-0 left-0 z-50 flex xl:hidden transition-transform duration-200 ${
+            isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <Sidebar
+            userInitial={userInitial}
+            isSigningOut={isSigningOut}
+            onSignOut={handleSignOut}
+          />
+        </div>
+
+        {/* Main content area */}
+        <main className="flex flex-col flex-1 min-w-0 overflow-auto bg-background">
+          {children}
+        </main>
+      </div>
+
+      {/* ERP Status Bar */}
+      <StatusBar />
     </div>
   );
 }

@@ -7,35 +7,42 @@ export default function ModulePage({
   description = "Your tools. Your workflow. Your operations.",
   sidebar,
   children,
+  analytics,
   showHeader = true,
   showSidebar = true,
 }) {
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center w-full h-full">
-      {showSidebar && (
-        <div className="flex flex-col items-center justify-center w-full xl:w-[20%] h-full gap-2">
-          {sidebar || <div>No sidebar content</div>}
-        </div>
-      )}
-
-      <div
-        className={`flex flex-col items-center justify-center w-full ${
-          showSidebar ? "xl:w-[80%]" : "xl:w-[80%]"
-        } h-full overflow-hidden`}
-      >
+    <div className="flex flex-col w-full h-full overflow-auto">
+      <div className="w-full h-full p-2">
+        {/* Page header */}
         {showHeader && (
-          <div className="xl:flex flex-col items-center justify-start w-full h-fit p-2 gap-2 border-1 border-default hidden">
-            <div className="flex items-center justify-start w-full h-fit p-2 gap-2 text-2xl font-black">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
               {icon} {title}
             </div>
-            <div className="flex items-center justify-start w-full h-fit p-2 gap-2 opacity-80">
+            <p className="text-[13px] text-default-400">
               {description}
-            </div>
+            </p>
           </div>
         )}
 
-        <div className="grid grid-cols-2 xl:grid-cols-4 place-items-center w-full h-full p-2 gap-2 border-1 border-default overflow-auto">
-          {children}
+        {/* Analytics section */}
+        {analytics && <div className="w-full">{analytics}</div>}
+
+        <div className="flex flex-col xl:flex-row gap-2">
+          {/* Sidebar stats */}
+          {showSidebar && sidebar && (
+            <div className="xl:w-56 shrink-0">
+              {sidebar}
+            </div>
+          )}
+
+          {/* Content grid */}
+          <div className="flex-1">
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-2">
+              {children}
+            </div>
+          </div>
         </div>
       </div>
     </div>

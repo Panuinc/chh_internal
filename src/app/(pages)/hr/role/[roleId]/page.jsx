@@ -34,7 +34,7 @@ export default function RoleUpdate() {
       roleName: "",
       roleStatus: "",
     },
-    submitRole
+    submitRole,
   );
 
   const { setFormData } = formHandler;
@@ -50,12 +50,5 @@ export default function RoleUpdate() {
 
   if (roleLoading) return <Loading />;
 
-  return (
-    <RoleForm
-      formHandler={formHandler}
-      mode="update"
-      operatedBy={userName}
-      isUpdate
-    />
-  );
+  return <RoleForm formHandler={formHandler} mode="update" operatedBy={userName} isUpdate />;
 }
