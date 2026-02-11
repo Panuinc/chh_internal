@@ -71,12 +71,12 @@ function RFIDLabelCard({
   return (
     <div
       className={`
-        flex flex-col w-full bg-background rounded-lg border
+        flex flex-col w-full bg-background rounded-lg border-1
         transition-all duration-200
         ${isActive ? "border-default shadow-md scale-[1.02]" : "border-default"}
       `}
     >
-      <div className="flex items-center justify-between p-2 border-b border-default bg-default-50">
+      <div className="flex items-center justify-between p-2 border-b-1 border-default bg-default-50">
         <div className="flex items-center gap-2">
           <Tag className="text-foreground" />
           <span className="font-mono font-bold text-lg">{shortItemNumber}</span>
@@ -86,14 +86,14 @@ function RFIDLabelCard({
         </Chip>
       </div>
 
-      <div className="flex items-center justify-center p-2 border-b border-default bg-default-50">
+      <div className="flex items-center justify-center p-2 border-b-1 border-default bg-default-50">
         <div className="flex items-center gap-2">
           <Building2 className="w-4 h-4 text-default-500" />
           <span className="text-sm font-medium">{projectName || "-"}</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-center p-2 min-h-[60px] border-b border-default">
+      <div className="flex items-center justify-center p-2 min-h-[60px] border-b-1 border-default">
         <p className="text-center text-base font-medium text-foreground line-clamp-2">
           {displayName}
         </p>

@@ -47,7 +47,7 @@ export default function UIQuickCheckout({
   if (!visitor) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full p-2">
-        <div className="w-full max-w-md bg-background rounded-lg border border-default p-2">
+        <div className="w-full max-w-md bg-background rounded-lg border-1 border-default p-2">
           <div className="text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-default-100 flex items-center justify-center">
               <span className="text-2xl">?</span>
@@ -74,7 +74,7 @@ export default function UIQuickCheckout({
 
   return (
     <div className="flex flex-col items-center justify-center w-full p-2">
-      <div className="w-full max-w-md bg-background rounded-lg border border-default overflow-hidden">
+      <div className="w-full max-w-md bg-background rounded-lg border-1 border-default overflow-hidden">
         <div className="flex flex-col items-center p-2">
           <HeaderContent
             success={success}
@@ -90,7 +90,7 @@ export default function UIQuickCheckout({
                 alt="Visitor"
                 width={96}
                 height={96}
-                className="rounded-full object-cover border border-default"
+                className="rounded-full object-cover border-1 border-default"
               />
             </div>
           )}
@@ -110,14 +110,14 @@ export default function UIQuickCheckout({
             </Chip>
           </div>
 
-          <div className="border-t border-default" />
+          <div className="border-t-1 border-default" />
 
           <VisitorDetails
             visitor={visitor}
             showCheckoutTime={showCheckoutTime}
           />
 
-          <div className="border-t border-default" />
+          <div className="border-t-1 border-default" />
 
           {!isLoggedIn && !isAlreadyCheckedOut && !success && (
             <div className="bg-amber-50 text-amber-700 p-2 rounded-lg text-center text-xs border border-amber-200">
@@ -175,7 +175,7 @@ function HeaderContent({ success, isAlreadyCheckedOut }) {
 
 function VisitorDetails({ visitor, showCheckoutTime }) {
   return (
-    <div className="bg-background rounded-lg border border-default p-2 space-y-0">
+    <div className="bg-background rounded-lg border-1 border-default p-2 space-y-0">
       <DetailRow
         label="License Plate"
         value={`${visitor.visitorCarRegistration} (${visitor.visitorProvince})`}
@@ -207,7 +207,7 @@ function VisitorDetails({ visitor, showCheckoutTime }) {
 
 function DetailRow({ label, value }) {
   return (
-    <div className="flex items-center justify-between p-2 border-b border-default last:border-b-0">
+    <div className="flex items-center justify-between p-2 border-b-1 border-default last:border-b-0">
       <span className="text-[12px] text-default-400">{label}</span>
       <span className="text-[13px] font-medium text-default-700">{value}</span>
     </div>

@@ -275,7 +275,7 @@ export default function CheckTagEMS({
           <p className="text-[13px] text-default-400">Check EMS parcel delivery status and record customer contact</p>
         </div>
 
-        <div className="bg-background rounded-lg border border-default p-2 sticky top-2 z-10">
+        <div className="bg-background rounded-lg border-1 border-default p-2 sticky top-2 z-10">
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
               type="text"
@@ -338,8 +338,8 @@ export default function CheckTagEMS({
 
         {!loading && trackingData && (
           <div className="space-y-4">
-            <div className="bg-background rounded-lg border border-default">
-              <div className="flex items-center justify-between p-2 border-b border-default">
+            <div className="bg-background rounded-lg border-1 border-default">
+              <div className="flex items-center justify-between p-2 border-b-1 border-default">
                 <div className="flex items-center gap-2">
                   <Package className="w-4 h-4 text-default-500" />
                   <span className="text-[13px] font-semibold text-foreground">Parcel Information</span>
@@ -381,8 +381,8 @@ export default function CheckTagEMS({
               </div>
             </div>
 
-            <div className="bg-background rounded-lg border border-default">
-              <div className="flex items-center gap-2 p-2 border-b border-default">
+            <div className="bg-background rounded-lg border-1 border-default">
+              <div className="flex items-center gap-2 p-2 border-b-1 border-default">
                 <Phone className="w-4 h-4 text-default-500" />
                 <span className="text-[13px] font-semibold text-foreground">Customer Contact Record</span>
                 {savedRecord && (
@@ -445,7 +445,7 @@ export default function CheckTagEMS({
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-medium text-default-600">Additional Notes</label>
                   <textarea
-                    className="w-full p-2 border border-default rounded-md bg-background text-[13px] focus:outline-none focus:ring-1 focus:ring-default-300 focus:border-default min-h-[80px] placeholder:text-default-400"
+                    className="w-full p-2 border-1 border-default rounded-md bg-background text-[13px] focus:outline-none focus:ring-1 focus:ring-default-300 focus:border-default min-h-[80px] placeholder:text-default-400"
                     placeholder="Record details of conversation with customer..."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
@@ -468,8 +468,8 @@ export default function CheckTagEMS({
               </div>
             </div>
 
-            <div className="bg-background rounded-lg border border-default">
-              <div className="flex items-center gap-2 p-2 border-b border-default">
+            <div className="bg-background rounded-lg border-1 border-default">
+              <div className="flex items-center gap-2 p-2 border-b-1 border-default">
                 <Clock className="w-4 h-4 text-default-500" />
                 <span className="text-[13px] font-semibold text-foreground">Tracking History</span>
               </div>
@@ -578,7 +578,7 @@ export default function CheckTagEMS({
             ) : (
               <div className="space-y-3">
                 {records?.map((record) => (
-                  <div key={record.emsId} className="bg-background rounded-md border border-default p-2">
+                  <div key={record.emsId} className="bg-background rounded-md border-1 border-default p-2">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -699,7 +699,7 @@ export default function CheckTagEMS({
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-medium text-default-600">Additional Notes</label>
                   <textarea
-                    className="w-full p-2 border border-default rounded-md bg-background text-[13px] focus:outline-none focus:ring-1 focus:ring-default-300 focus:border-default min-h-[80px] placeholder:text-default-400"
+                    className="w-full p-2 border-1 border-default rounded-md bg-background text-[13px] focus:outline-none focus:ring-1 focus:ring-default-300 focus:border-default min-h-[80px] placeholder:text-default-400"
                     placeholder="Record details of conversation..."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}

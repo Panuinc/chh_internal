@@ -34,7 +34,7 @@ function PrimarySidebar({
 
   if (collapsed) {
     return (
-      <aside className="flex flex-col items-center w-[50px] h-full bg-background border-r border-default shrink-0">
+      <aside className="flex flex-col items-center w-[50px] h-full bg-background border-r-1 border-default shrink-0">
         <div className="flex items-center justify-center h-10 shrink-0">
           <Link href="/home">
             <Image src="/logo/logo-01.png" alt="logo" width={24} height={24} />
@@ -51,7 +51,7 @@ function PrimarySidebar({
             </div>
           </Link>
 
-          <div className="w-5 border-t border-default" />
+          <div className="w-5 border-t-1 border-default" />
 
           {modules.map((module) => {
             const Icon = module.icon;
@@ -69,7 +69,7 @@ function PrimarySidebar({
           })}
         </nav>
 
-        <div className="flex flex-col items-center gap-2 p-2 border-t border-default shrink-0">
+        <div className="flex flex-col items-center gap-2 p-2 border-t-1 border-default shrink-0">
           <button
             onClick={onToggleCollapse}
             title="Expand sidebar"
@@ -120,8 +120,8 @@ function PrimarySidebar({
   const ungrouped = modules.filter((m) => !groupedIds.includes(m.id));
 
   return (
-    <aside className="flex flex-col w-[200px] h-full bg-background border-r border-default shrink-0">
-      <div className="flex items-center justify-between p-2 h-10 shrink-0 border-b border-default">
+    <aside className="flex flex-col w-[200px] h-full bg-background border-r-1 border-default shrink-0">
+      <div className="flex items-center justify-between p-2 h-10 shrink-0 border-b-1 border-default">
         <Link href="/home" className="flex items-center gap-2">
           <Image src="/logo/logo-01.png" alt="logo" width={22} height={22} />
           <span className="text-[13px] font-semibold text-foreground tracking-tight">
@@ -150,7 +150,7 @@ function PrimarySidebar({
       </div>
 
       <div>
-        <div className="border-t border-default" />
+        <div className="border-t-1 border-default" />
       </div>
 
       <nav className="flex-1 overflow-y-auto p-2 space-y-3">
@@ -213,7 +213,7 @@ function PrimarySidebar({
         )}
       </nav>
 
-      <div className="p-2 border-t border-default shrink-0">
+      <div className="p-2 border-t-1 border-default shrink-0">
         <Dropdown placement="right-end">
           <DropdownTrigger>
             <button className="flex items-center gap-2 w-full p-2 rounded-md text-default-500 hover:bg-default-100 hover:text-default-700 transition-colors cursor-pointer">
@@ -276,7 +276,7 @@ function CollapsibleMenuItem({ item }) {
       </button>
 
       {open && children.length > 0 && (
-        <div className="p-2 border-l border-default space-y-px">
+        <div className="p-2 border-l-1 border-default space-y-px">
           {children.map((child) => {
             const isActive =
               pathname === child.href ||
@@ -308,8 +308,8 @@ function SecondaryPanel({ moduleId }) {
   const title = menu?.title || moduleId;
 
   return (
-    <aside className="flex flex-col w-[220px] h-full bg-background border-r border-default shrink-0">
-      <div className="p-2 h-10 flex items-center shrink-0 border-b border-default">
+    <aside className="flex flex-col w-[220px] h-full bg-background border-r-1 border-default shrink-0">
+      <div className="p-2 h-10 flex items-center shrink-0 border-b-1 border-default">
         <span className="text-[13px] font-semibold text-foreground capitalize truncate">
           {title}
         </span>

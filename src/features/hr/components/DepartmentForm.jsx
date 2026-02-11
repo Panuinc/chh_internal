@@ -15,8 +15,8 @@ export default function UIDepartmentForm({
   return (
     <div className="flex flex-col w-full h-full overflow-auto p-2">
       <div className="w-full h-full">
-        <div className="bg-background rounded-lg border border-default h-full flex flex-col">
-          <div className="p-2 border-b border-default">
+        <div className="bg-background rounded-lg border-1 border-default h-full flex flex-col">
+          <div className="p-2 border-b-1 border-default">
             <h2 className="text-[13px] font-semibold text-foreground">
               {mode === "create" ? "Create Department" : "Update Department"}
             </h2>
@@ -76,7 +76,7 @@ export default function UIDepartmentForm({
               )}
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-default ">
+            <div className="flex items-center justify-between pt-4 border-t-1 border-default ">
               <span className="text-xs text-default-400">
                 {mode === "create" ? `Create by: ${operatedBy}` : `Update by: ${operatedBy}`}
               </span>

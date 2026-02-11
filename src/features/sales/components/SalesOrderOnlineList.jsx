@@ -478,7 +478,7 @@ function Top10SKUChart({ data }) {
             {data.map((item, index) => (
               <tr
                 key={item.name}
-                className="border-b border-default hover:bg-default-50"
+                className="border-b-1 border-default hover:bg-default-50"
               >
                 <td className="p-2">
                   <span
@@ -619,7 +619,7 @@ function DateRangeFilter({
   const hasFilter = fromDate || toDate;
 
   return (
-    <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg border border-default">
+    <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg border-1 border-default">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-foreground" />
@@ -752,7 +752,7 @@ function ExecutiveSummaryCard({
 function ChannelBadge({ icon: Icon, label, count, total }) {
   const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
   return (
-    <div className="flex items-center gap-2 p-2 bg-background border border-default rounded-lg">
+    <div className="flex items-center gap-2 p-2 bg-background border-1 border-default rounded-lg">
       <Icon className="w-4 h-4 text-default-500" />
       <div className="flex flex-col">
         <span className="text-xs text-default-500">{label}</span>
@@ -936,7 +936,7 @@ function OrderDetailModal({
             <OrderLinesTable lines={lines} />
           </div>
 
-          <div className="flex justify-end border-t border-default pt-4">
+          <div className="flex justify-end border-t-1 border-default pt-4">
             <div className="flex flex-col items-end gap-2">
               <p className="text-sm">
                 Subtotal:{" "}
@@ -1038,8 +1038,8 @@ function ItemQuantitySelector({
               key={item.itemNumber || idx}
               className={`flex items-center gap-2 p-2 rounded-lg ${
                 isSelected
-                  ? "bg-background border border-default shadow-sm"
-                  : "bg-default-50/50 border border-default"
+                  ? "bg-background border-1 border-default shadow-sm"
+                  : "bg-default-50/50 border-1 border-default"
               }`}
             >
               <Checkbox
@@ -1414,8 +1414,8 @@ function SlipPreviewModal({
           {totalPieces > 0 ? (
             <div className="flex flex-col w-full bg-default-100 rounded-lg p-2 gap-2">
               <div className="flex flex-col w-full bg-background rounded-lg overflow-hidden">
-                <div className="flex flex-row items-stretch border-b border-default">
-                  <div className="flex items-center justify-center w-[15%] p-2 border-r border-default">
+                <div className="flex flex-row items-stretch border-b-1 border-default">
+                  <div className="flex items-center justify-center w-[15%] p-2 border-r-1 border-default">
                     <Image
                       src="/logo/logo-03.png"
                       alt="Logo"
@@ -1440,12 +1440,12 @@ function SlipPreviewModal({
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-center w-[15%] p-2 border-l border-default text-xl font-bold">
+                  <div className="flex items-center justify-center w-[15%] p-2 border-l-1 border-default text-xl font-bold">
                     {currentPiece}/{totalPieces}
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center w-full p-2 border-b border-default bg-background">
+                <div className="flex flex-col items-center justify-center w-full p-2 border-b-1 border-default bg-background">
                   <Barcode
                     value={previewBarcodeValue}
                     format="CODE128"
@@ -1461,7 +1461,7 @@ function SlipPreviewModal({
                   />
                 </div>
 
-                <div className="flex flex-col p-2 border-b border-default gap-2">
+                <div className="flex flex-col p-2 border-b-1 border-default gap-2">
                   <div className="flex gap-2">
                     <span className="font-semibold w-12 text-sm">To:</span>
                     <span className="font-bold text-base">
@@ -1498,7 +1498,7 @@ function SlipPreviewModal({
 
                 <div className="flex flex-col h-40 overflow-auto">
                   {currentItem ? (
-                    <div className="flex p-2 text-sm border-b border-default bg-default-50">
+                    <div className="flex p-2 text-sm border-b-1 border-default bg-default-50">
                       <span className="w-10 text-center font-bold">1</span>
                       <div className="flex-1 flex flex-col">
                         <span className="whitespace-pre-wrap break-words font-medium">
@@ -1524,7 +1524,7 @@ function SlipPreviewModal({
                   )}
                 </div>
 
-                <div className="flex border-t border-default">
+                <div className="flex border-t-1 border-default">
                   <div className="flex flex-col flex-1 p-2 text-lg text-danger gap-2">
                     <p className="font-bold">
                       ❗Please record a video while unboxing the parcel
@@ -1572,7 +1572,7 @@ function SlipPreviewModal({
             </div>
           </div>
 
-          <div className="flex flex-col w-full p-2 bg-default-50 border border-default rounded-lg">
+          <div className="flex flex-col w-full p-2 bg-default-50 border-1 border-default rounded-lg">
             <div className="flex items-center gap-2">
               <Checkbox
                 isSelected={useCustomAddress}
@@ -2071,7 +2071,7 @@ export default function UISalesOrderOnline({
           </div>
         </div>
 
-        <div className="flex flex-col w-full p-2 gap-2 border-t border-default">
+        <div className="flex flex-col w-full p-2 gap-2 border-t-1 border-default">
           <div className="flex items-center gap-2">
             <Target className="w-5 h-5 text-success" />
             <h2 className="text-lg font-semibold">

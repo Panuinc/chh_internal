@@ -9,11 +9,7 @@
 }
 
 .border-default {
-  border: 1px solid #DFDFDF;
-}
-
-.border-default {
-  border: 1px solid #EBEBEB;
+  border-color: #EBEBEB;
 }
 
 .bg-content1 {

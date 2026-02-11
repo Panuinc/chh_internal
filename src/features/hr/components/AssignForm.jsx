@@ -28,8 +28,8 @@ export default function UIAssignForm({
   return (
     <div className="flex flex-col w-full h-full overflow-auto p-2">
       <div className="w-full h-full">
-        <div className="bg-background rounded-lg border border-default h-full flex flex-col">
-          <div className="p-2 border-b border-default">
+        <div className="bg-background rounded-lg border-1 border-default h-full flex flex-col">
+          <div className="p-2 border-b-1 border-default">
             <h2 className="text-[13px] font-semibold text-foreground">
               Assign Permissions
             </h2>
@@ -79,7 +79,7 @@ export default function UIAssignForm({
                     key={group.category}
                     className="flex flex-col items-start justify-start w-full gap-2"
                   >
-                    <div className="flex items-center justify-between w-full pb-2 border-b border-default">
+                    <div className="flex items-center justify-between w-full pb-2 border-b-1 border-default">
                       <Checkbox
                         size="md"
                         radius="sm"
@@ -120,9 +120,9 @@ export default function UIAssignForm({
                         return (
                           <div
                             key={subGroup.subCategory}
-                            className="flex flex-col w-full gap-2 p-2 bg-default-50 rounded-lg border border-default"
+                            className="flex flex-col w-full gap-2 p-2 bg-default-50 rounded-lg border-1 border-default"
                           >
-                            <div className="flex items-center justify-between w-full pb-2 border-b border-default">
+                            <div className="flex items-center justify-between w-full pb-2 border-b-1 border-default">
                               <Checkbox
                                 size="md"
                                 radius="sm"
@@ -192,7 +192,7 @@ export default function UIAssignForm({
               })}
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-default ">
+            <div className="flex items-center justify-between pt-4 border-t-1 border-default ">
               <span className="text-xs text-default-400">
                 Update by: {operatedBy}
               </span>

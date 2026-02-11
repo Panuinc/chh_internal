@@ -121,7 +121,7 @@ export default function UIProfile({ user }) {
 
         <div className="flex flex-col xl:flex-row gap-2">
           <div className="xl:w-80 shrink-0 space-y-4">
-            <div className="bg-background rounded-lg border border-default p-2">
+            <div className="bg-background rounded-lg border-1 border-default p-2">
               <div className="flex flex-col items-center gap-2">
                 <Avatar
                   name={initials}
@@ -139,7 +139,7 @@ export default function UIProfile({ user }) {
               </div>
             </div>
 
-            <div className="bg-background rounded-lg border border-default p-2 space-y-3">
+            <div className="bg-background rounded-lg border-1 border-default p-2 space-y-3">
               <div className="flex items-center gap-2 p-2 bg-default-50 rounded-md">
                 <Mail className="w-4 h-4 text-default-400" />
                 <div>
@@ -167,7 +167,7 @@ export default function UIProfile({ user }) {
               </div>
             </div>
 
-            <div className="bg-background rounded-lg border border-default p-2">
+            <div className="bg-background rounded-lg border-1 border-default p-2">
               <p className="text-xs font-medium text-default-400 uppercase tracking-wider">Permissions</p>
               <div className="flex flex-wrap gap-2">
                 {isSuperAdmin ? (
@@ -198,8 +198,8 @@ export default function UIProfile({ user }) {
           </div>
 
           <div className="flex-1">
-            <div className="bg-background rounded-lg border border-default">
-              <div className="flex items-center gap-2 p-2 border-b border-default">
+            <div className="bg-background rounded-lg border-1 border-default">
+              <div className="flex items-center gap-2 p-2 border-b-1 border-default">
                 <User className="w-4 h-4 text-default-500" />
                 <h3 className="text-[13px] font-semibold text-foreground">Change Password</h3>
               </div>

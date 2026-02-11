@@ -52,7 +52,7 @@ export default function UIProduction({ menu }) {
   if (!menu) {
     return (
       <div className="flex items-center justify-center w-full h-full p-2">
-        <div className="flex items-center gap-2 p-2 bg-default-50 rounded-lg border border-default">
+        <div className="flex items-center gap-2 p-2 bg-default-50 rounded-lg border-1 border-default">
           <AlertCircle className="w-4 h-4 text-default-400" />
           <span className="text-[13px] text-default-500">Module configuration not found</span>
         </div>

@@ -83,7 +83,7 @@ const RowsPerPageSelector = ({ onChange }) => (
   <label className="flex items-center gap-2 text-[12px] text-default-500 whitespace-nowrap">
     Rows:
     <select
-      className="p-2 border border-default rounded text-[12px] text-default-600 bg-background focus:outline-none focus:border-default"
+      className="p-2 border-1 border-default rounded text-[12px] text-default-600 bg-background focus:outline-none focus:border-default"
       onChange={onChange}
       defaultValue="5"
     >
@@ -213,8 +213,8 @@ export default function DataTable({
   );
 
   return (
-    <div className="flex flex-col w-full h-full bg-background rounded-lg border border-default overflow-hidden">
-      <div className="shrink-0 flex flex-col gap-2 p-2 border-b border-default">
+    <div className="flex flex-col w-full h-full bg-background rounded-lg border-1 border-default overflow-hidden">
+      <div className="shrink-0 flex flex-col gap-2 p-2 border-b-1 border-default">
         <div className="flex flex-col xl:flex-row items-center gap-2">
           <Input
             isClearable
@@ -293,7 +293,7 @@ export default function DataTable({
         </Table>
       </div>
 
-      <div className="shrink-0 flex items-center justify-between p-2 border-t border-default bg-default-50/50">
+      <div className="shrink-0 flex items-center justify-between p-2 border-t-1 border-default bg-default-50/50">
         <span className="text-[12px] text-default-400">
           Page {page} of {totalPages}
         </span>

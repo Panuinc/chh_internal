@@ -1085,7 +1085,7 @@ export const EnhancedEngineeringDrawing = memo(
 
     return (
       <div className="relative w-full h-full flex flex-col bg-default-100 rounded-lg overflow-hidden">
-        <div className="flex items-center justify-between p-2 bg-default-50 border-b border-default gap-2 flex-wrap">
+        <div className="flex items-center justify-between p-2 bg-default-50 border-b-1 border-default gap-2 flex-wrap">
           <div className="flex items-center gap-2">
             <Chip size="md" variant="shadow">
               {Math.round(zoomLevel * 100)}%
@@ -1107,7 +1107,7 @@ export const EnhancedEngineeringDrawing = memo(
               </PopoverTrigger>
               <PopoverContent className="w-64">
                 <div className="p-2 space-y-2">
-                  <div className="flex justify-between items-center pb-2 border-b border-default gap-2">
+                  <div className="flex justify-between items-center pb-2 border-b-1 border-default gap-2">
                     <span className="font-semibold text-[13px]">Layers</span>
                     <div className="flex gap-2">
                       <Button
@@ -1219,7 +1219,7 @@ export const EnhancedEngineeringDrawing = memo(
           >
             {({ zoomIn, zoomOut, resetTransform, centerView }) => (
               <>
-                <div className="absolute botto right-4 z-10 flex flex-col gap-2 bg-background/90 backdrop-blur-sm rounded-lg p-2 shadow-md border border-default">
+                <div className="absolute botto right-4 z-10 flex flex-col gap-2 bg-background/90 backdrop-blur-sm rounded-lg p-2 shadow-md border-1 border-default">
                   <Tooltip content="Zoom In" placement="left">
                     <Button
                       color="default"
@@ -2003,7 +2003,7 @@ export const EnhancedEngineeringDrawing = memo(
           </TransformWrapper>
         </div>
 
-        <div className="flex items-center justify-between p-2 bg-default-50 border-t border-default text-xs text-default-500">
+        <div className="flex items-center justify-between p-2 bg-default-50 border-t-1 border-default text-xs text-default-500">
           <div className="flex items-center gap-2">
             <span>
               Door: {T}×{W}×{H} mm
@@ -2073,14 +2073,14 @@ export const UIDoorBom = ({
       ref={formRef}
       className="flex flex-col items-center justify-start w-full h-full gap-2 overflow-auto"
     >
-      <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-fit p-2 gap-2 border border-default">
-        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border border-default">
+      <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-fit p-2 gap-2 border-1 border-default">
+        <div className="flex items-center justify-center w-full h-full p-2 gap-2 border-1 border-default">
           🚪 Door Configuration System
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-fit p-2 gap-2 border border-default">
-        <div className="grid grid-cols-1 xl:grid-cols-2 p-2 gap-2 w-full h-full border border-default">
+      <div className="flex flex-col items-center justify-center w-full xl:w-8/12 h-fit p-2 gap-2 border-1 border-default">
+        <div className="grid grid-cols-1 xl:grid-cols-2 p-2 gap-2 w-full h-full border-1 border-default">
           <Card className="w-full">
             <CardHeader className="bg-foreground text-background">
               <div className="flex items-center gap-2">
@@ -2838,7 +2838,7 @@ export const UIDoorBom = ({
                 )}
 
                 <div className="grid grid-cols-4 gap-2">
-                  <div className="p-2 rounded-lg text-center border border-default">
+                  <div className="p-2 rounded-lg text-center border-1 border-default">
                     <div className="font-bold text-lg text-foreground">
                       {cuttingPlan.totalStocks}
                     </div>
@@ -2846,7 +2846,7 @@ export const UIDoorBom = ({
                       Stocks Used
                     </div>
                   </div>
-                  <div className="p-2 rounded-lg text-center border border-default">
+                  <div className="p-2 rounded-lg text-center border-1 border-default">
                     <div className="font-bold text-lg text-foreground">
                       {cuttingPlan.efficiency}
                     </div>
@@ -2854,7 +2854,7 @@ export const UIDoorBom = ({
                       Efficiency
                     </div>
                   </div>
-                  <div className="p-2 rounded-lg text-center border border-default">
+                  <div className="p-2 rounded-lg text-center border-1 border-default">
                     <div className="font-bold text-lg text-foreground">
                       {cuttingPlan.usedLength}
                     </div>
@@ -2862,7 +2862,7 @@ export const UIDoorBom = ({
                       Used (mm)
                     </div>
                   </div>
-                  <div className="p-2 rounded-lg text-center border border-default">
+                  <div className="p-2 rounded-lg text-center border-1 border-default">
                     <div className="font-bold text-lg text-foreground">
                       {cuttingPlan.totalWaste}
                     </div>
@@ -2872,7 +2872,7 @@ export const UIDoorBom = ({
                   </div>
                 </div>
 
-                <div className="border border-default rounded-lg overflow-hidden">
+                <div className="border-1 border-default rounded-lg overflow-hidden">
                   <div className="p-2 text-xs font-semibold bg-default-100">
                     📋 Parts List (saw kerf allowance {cuttingPlan.sawKerf} mm)
                   </div>
@@ -2910,7 +2910,7 @@ export const UIDoorBom = ({
                   </div>
                 </div>
 
-                <div className="border border-default rounded-lg overflow-hidden">
+                <div className="border-1 border-default rounded-lg overflow-hidden">
                   <div className="p-2 text-xs font-semibold bg-default-100">
                     🪵 Cutting Plan (stock length {cuttingPlan.stockLength}mm ×{" "}
                     {cuttingPlan.totalStocks} pcs)
@@ -2921,7 +2921,7 @@ export const UIDoorBom = ({
                         <div className="text-xs text-default-600">
                           Stock {stockIdx + 1}
                         </div>
-                        <div className="relative h-8 rounded border border-default overflow-hidden bg-default-100">
+                        <div className="relative h-8 rounded border-1 border-default overflow-hidden bg-default-100">
                           {(() => {
                             let offset = 0;
                             return stock.pieces.map((piece, pieceIdx) => {
@@ -3036,7 +3036,7 @@ export const UIDoorBom = ({
           )}
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-1 p-2 gap-2 w-full h-full border border-default">
+        <div className="grid grid-cols-1 xl:grid-cols-1 p-2 gap-2 w-full h-full border-1 border-default">
           <Card className="w-full">
             <CardHeader className="bg-foreground text-background flex justify-between items-center">
               <div className="flex items-center gap-2">

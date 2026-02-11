@@ -14,7 +14,7 @@ export default function UISignIn({
 }) {
   return (
     <div className="flex w-full h-full">
-      <div className="relative flex flex-col items-center justify-center w-full lg:w-[480px] lg:min-w-[480px] p-2 bg-background border-r border-default">
+      <div className="relative flex flex-col items-center justify-center w-full lg:w-[480px] lg:min-w-[480px] p-2 bg-background border-r-1 border-default">
         <div className="w-full max-w-[340px]">
           <div className="flex items-center gap-2">
             <Image

@@ -55,8 +55,8 @@ export default function UIMemoForm({
   return (
     <div className="flex flex-col w-full h-full overflow-auto p-2">
       <div className="w-full h-full">
-        <div className="bg-background rounded-lg border border-default h-full flex flex-col">
-          <div className="p-2 border-b border-default">
+        <div className="bg-background rounded-lg border-1 border-default h-full flex flex-col">
+          <div className="p-2 border-b-1 border-default">
             <h2 className="text-[13px] font-semibold text-foreground">
               {mode === "create" ? "Create Memo" : "Edit Memo"}
             </h2>
@@ -89,7 +89,7 @@ export default function UIMemoForm({
             </div>
 
             {isUpdate && (
-              <div className="flex items-center justify-center w-full p-2 gap-2 border-b border-default bg-default-50 rounded-lg">
+              <div className="flex items-center justify-center w-full p-2 gap-2 border-b-1 border-default bg-default-50 rounded-lg">
                 <span className="font-bold text-default-700 text-sm">Status:</span>
                 <Chip color={STATUS_COLORS[status]} variant="flat" size="md">
                   {STATUS_LABELS[status]}
@@ -102,7 +102,7 @@ export default function UIMemoForm({
               </div>
             )}
 
-            <div className="flex flex-col w-full gap-2 border-b border-default pb-4">
+            <div className="flex flex-col w-full gap-2 border-b-1 border-default pb-4">
               <div className="font-bold text-foreground text-sm">
                 To: Mr. Jongkom Chuchaisri
               </div>
@@ -193,7 +193,7 @@ export default function UIMemoForm({
             </div>
 
             <div className="flex flex-col xl:flex-row items-stretch gap-2 w-full">
-              <div className="flex flex-col items-center justify-center flex-1 p-2 gap-2 border border-default rounded-lg bg-default-50">
+              <div className="flex flex-col items-center justify-center flex-1 p-2 gap-2 border-1 border-default rounded-lg bg-default-50">
                 <div className="font-medium text-foreground text-sm">
                   {formData.requesterName || operatedBy || "-"}
                 </div>
@@ -244,7 +244,7 @@ export default function UIMemoForm({
               </div>
             </div>
 
-            <div className="flex items-center justify-end pt-4 border-t border-default gap-2">
+            <div className="flex items-center justify-end pt-4 border-t-1 border-default gap-2">
               {canEdit && !isReadOnly && (
                 <Button
                   type="submit"

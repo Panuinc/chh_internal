@@ -6,7 +6,8 @@
       "WebFetch(domain:deepwiki.com)",
       "WebFetch(domain:github.com)",
       "Read(//e/**)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(powershell:*)"
     ]
   }
 }

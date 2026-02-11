@@ -12,7 +12,7 @@ import { useDashboardAnalytics } from "@/features/home";
 
 function UserProfileCard({ user }) {
   return (
-    <div className="flex flex-col items-center gap-2 p-2 bg-background rounded-lg border border-default">
+    <div className="flex flex-col items-center gap-2 p-2 bg-background rounded-lg border-1 border-default">
       <div className="flex items-center justify-center">
         <Image
           src={user.avatar}
@@ -31,7 +31,7 @@ function UserProfileCard({ user }) {
         </div>
       </div>
 
-      <div className="flex flex-col w-full gap-2 pt-3 border-t border-default">
+      <div className="flex flex-col w-full gap-2 pt-3 border-t-1 border-default">
         <UserInfoRow
           label="Role"
           value={user.isSuperAdmin ? "Super Admin" : "User"}
@@ -175,7 +175,7 @@ export default function UIHome({ user, modules }) {
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center justify-center p-2 bg-background rounded-lg border border-default">
+                <div className="flex items-center justify-center p-2 bg-background rounded-lg border-1 border-default">
                   <p className="text-[13px] text-default-400">
                     No modules available. Please contact administrator.
                   </p>

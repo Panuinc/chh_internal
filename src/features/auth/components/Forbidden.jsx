@@ -8,7 +8,7 @@ export default function UIForbidden() {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full bg-default-100">
       <div className="flex flex-col items-center gap-2 max-w-md text-center">
-        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-background border border-default">
+        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-background border-1 border-default">
           <ShieldX className="w-6 h-6 text-default-400" />
         </div>
         <h1 className="text-lg font-semibold text-foreground">

@@ -343,7 +343,7 @@ function CameraModal({ isOpen, onClose, onCapture, label }) {
 
 function QrCodeCard({ label, qrCodeInfo, onOpenScanner, onClear, error }) {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border border-default">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border-1 border-default">
       <div className="flex items-center justify-center w-full gap-2 text-sm font-medium text-default-700">
         <QrCode size={16} />
         {label}
@@ -417,7 +417,7 @@ function PhotoCaptureCard({
   error,
 }) {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border border-default">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border-1 border-default">
       <div className="flex items-center justify-center w-full gap-2 text-sm font-medium text-default-700">
         <Camera size={16} />
         {label}
@@ -519,8 +519,8 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
     <>
       <div className="flex flex-col w-full h-full overflow-auto p-2">
         <div className="w-full h-full">
-          <div className="bg-background rounded-lg border border-default h-full flex flex-col">
-            <div className="p-2 border-b border-default">
+          <div className="bg-background rounded-lg border-1 border-default h-full flex flex-col">
+            <div className="p-2 border-b-1 border-default">
               <h2 className="text-[13px] font-semibold text-foreground">Patrol Record</h2>
               <p className="text-[12px] text-default-400">Scan QR Code and take a photo of the checkpoint</p>
             </div>
@@ -568,7 +568,7 @@ export default function UIPatrolForm({ formHandler, operatedBy }) {
           </div>
         </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-default">
+              <div className="flex items-center justify-between pt-4 border-t-1 border-default">
                 <span className="text-xs text-default-400">
                   Created by: {operatedBy}
                 </span>

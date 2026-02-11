@@ -539,7 +539,7 @@ function PhotoCaptureCard({
     capturedImage || (existingImage ? `/api/uploads/${existingImage}` : null);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border border-default">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border-1 border-default">
       <div className="flex items-center justify-center w-full gap-2 text-sm font-medium text-default-700">
         <Camera size={16} />
         {label}
@@ -624,7 +624,7 @@ function DocumentCaptureCard({
       : parsedExistingImages.map((path) => `/api/uploads/${path}`);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border border-default">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2 gap-2 bg-background rounded-lg border-1 border-default">
       <div className="flex items-center justify-center w-full gap-2 text-sm font-medium text-default-700">
         <FileText size={16} />
         {label}
@@ -767,8 +767,8 @@ export default function UIVisitorForm({
     <>
       <div className="flex flex-col w-full h-full overflow-auto p-2">
         <div className="w-full h-full">
-          <div className="bg-background rounded-lg border border-default h-full flex flex-col">
-            <div className="p-2 border-b border-default">
+          <div className="bg-background rounded-lg border-1 border-default h-full flex flex-col">
+            <div className="p-2 border-b-1 border-default">
               <h2 className="text-[13px] font-semibold text-foreground">
                 {mode === "create" ? "Register Visitor" : "Edit Visitor"}
               </h2>
@@ -1008,7 +1008,7 @@ export default function UIVisitorForm({
           </div>
         </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-default">
+              <div className="flex items-center justify-between pt-4 border-t-1 border-default">
                 <span className="text-xs text-default-400">
                   {mode === "create" ? `Create by: ${operatedBy}` : `Update by: ${operatedBy}`}
                 </span>

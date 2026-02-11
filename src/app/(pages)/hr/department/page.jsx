@@ -230,7 +230,7 @@ function DepartmentPageContent() {
   if (mode === "create") {
     return (
       <div className="flex flex-col w-full h-full">
-        <div className="flex items-center gap-2 p-2 border-b border-default">
+        <div className="flex items-center gap-2 p-2 border-b-1 border-default">
           <button
             onClick={handleBackToList}
             className="text-sm text-primary hover:underline"
@@ -251,7 +251,7 @@ function DepartmentPageContent() {
     if (departmentLoading) {
       return (
         <div className="flex flex-col w-full h-full">
-          <div className="flex items-center gap-2 p-2 border-b border-default">
+          <div className="flex items-center gap-2 p-2 border-b-1 border-default">
             <button
               onClick={handleBackToList}
               className="text-sm text-primary hover:underline"
@@ -268,7 +268,7 @@ function DepartmentPageContent() {
 
     return (
       <div className="flex flex-col w-full h-full">
-        <div className="flex items-center gap-2 p-2 border-b border-default">
+        <div className="flex items-center gap-2 p-2 border-b-1 border-default">
           <button
             onClick={handleBackToList}
             className="text-sm text-primary hover:underline"

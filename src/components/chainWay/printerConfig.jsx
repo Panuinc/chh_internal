@@ -44,7 +44,7 @@ export function PrinterStatusBadge({ className = "" }) {
 
   return (
     <div className={`inline-flex items-center gap-2 ${className}`}>
-      <div className="flex items-center gap-2 p-2 rounded-md bg-default-50 border border-default">
+      <div className="flex items-center gap-2 p-2 rounded-md bg-default-50 border-1 border-default">
         <StatusDot connected={isConnected} loading={printerLoading} />
         <span className="text-xs text-default-600">
           {printerLoading
@@ -414,8 +414,8 @@ export function PrinterSettings({
       )}
 
       <div className="space-y-4">
-        <div className="rounded-lg border border-default">
-          <div className="flex items-center gap-2 p-2 border-b border-default">
+        <div className="rounded-lg border-1 border-default">
+          <div className="flex items-center gap-2 p-2 border-b-1 border-default">
             <Wifi className="w-4 h-4 text-default-500" />
             <span className="text-[13px] font-semibold text-foreground">
               Connection
@@ -472,8 +472,8 @@ export function PrinterSettings({
           </div>
         </div>
 
-        <div className="rounded-lg border border-default">
-          <div className="flex items-center gap-2 p-2 border-b border-default">
+        <div className="rounded-lg border-1 border-default">
+          <div className="flex items-center gap-2 p-2 border-b-1 border-default">
             <Activity className="w-4 h-4 text-default-500" />
             <span className="text-[13px] font-semibold text-foreground">
               Actions
@@ -489,7 +489,7 @@ export function PrinterSettings({
                   className="flex items-center justify-between p-2 hover:bg-default-50 transition-colors"
                 >
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-md bg-default-50 border border-default flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-md bg-default-50 border-1 border-default flex items-center justify-center">
                       <Icon className={`w-4 h-4 ${action.color}`} />
                     </div>
                     <div>
