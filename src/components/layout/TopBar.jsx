@@ -74,7 +74,7 @@ export default function TopBar({
           <Bell className="w-[15px] h-[15px]" strokeWidth={1.5} />
         </button>
 
-        <div className="hidden xl:flex items-center gap-2  border-l border-default">
+        <div className="hidden xl:flex items-center gap-2">
           <div className="text-right">
             <div className="text-[11px] font-medium text-default-700 leading-tight">
               {userName}
