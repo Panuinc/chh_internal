@@ -60,7 +60,11 @@ import {
 import { DataTable, Loading } from "@/components";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
-import { useFGStockOnline } from "@/features/sales/hooks/useSalesOrderOnline";
+import {
+  useFGStockOnline,
+  useCustomersOnline,
+  parseContactCode,
+} from "@/features/sales/hooks/useSalesOrderOnline";
 import { COMPANY_INFO } from "@/lib/chainWay/config";
 import { getItemLines, getCommentLines } from "@/lib/chainWay/utils";
 
@@ -119,7 +123,7 @@ function getMonthName(dateString) {
   return months[date.getMonth()];
 }
 
-function calculateOrderStats(orders) {
+function calculateOrderStats(orders, customerMap = {}) {
   if (!orders || orders.length === 0) {
     return {
       totalOrders: 0,
@@ -128,6 +132,8 @@ function calculateOrderStats(orders) {
       avgOrderValue: 0,
       productBreakdown: [],
       channelBreakdown: [],
+      customerGroupBreakdown: [],
+      projectTypeBreakdown: [],
       monthlyData: [],
       topSKUs: [],
       uniqueCustomers: 0,
@@ -135,7 +141,6 @@ function calculateOrderStats(orders) {
       repeatCustomers: 0,
       repeatRate: 0,
       topCustomers: [],
-      geoDistribution: [],
       fulfillmentRate: 0,
       shippedOrders: 0,
       avgItemsPerOrder: 0,
@@ -159,7 +164,6 @@ function calculateOrderStats(orders) {
   const customerOrderCount = {};
   const customerRevenue = {};
   const customerNames = {};
-  const cityStats = {};
   let shippedOrders = 0;
 
   orders.forEach((order) => {
@@ -170,13 +174,6 @@ function calculateOrderStats(orders) {
     if (!customerNames[custNum]) {
       customerNames[custNum] = order.customerName || custNum;
     }
-
-    const city = (order.shipToCity || "").trim() || "Unknown";
-    if (!cityStats[city]) {
-      cityStats[city] = { orders: 0, revenue: 0 };
-    }
-    cityStats[city].orders += 1;
-    cityStats[city].revenue += order.totalAmountExcludingTax || 0;
 
     if (order.fullyShipped === true) shippedOrders++;
 
@@ -245,40 +242,57 @@ function calculateOrderStats(orders) {
       color: ["#006FEE", "#17C964", "#F5A524", "#9353D3", "#F31260"][index % 5],
     }));
 
-  const channelStats = { Facebook: 0, Line: 0, Website: 0, Others: 0 };
-  orders.forEach((order) => {
-    const extDoc = (order.externalDocumentNumber || "").toLowerCase();
-    const custName = (order.customerName || "").toLowerCase();
+  const channelStats = {};
+  const groupStats = {};
+  const typeStats = {};
 
-    if (
-      extDoc.includes("fb") ||
-      extDoc.includes("facebook") ||
-      custName.includes("facebook")
-    ) {
-      channelStats.Facebook++;
-    } else if (extDoc.includes("line") || custName.includes("line")) {
-      channelStats.Line++;
-    } else if (extDoc.includes("web") || custName.includes("web")) {
-      channelStats.Website++;
-    } else {
-      channelStats["Others"]++;
-    }
+  orders.forEach((order) => {
+    const cust = customerMap[order.customerNumber];
+    const parsed = cust?.parsed || parseContactCode(null);
+
+    const ch = parsed.channelLabel || "Other";
+    const chColor = parsed.channelColor || "#71717A";
+    if (!channelStats[ch]) channelStats[ch] = { orders: 0, color: chColor };
+    channelStats[ch].orders++;
+
+    const gr = parsed.groupLabel || "Other";
+    if (!groupStats[gr]) groupStats[gr] = 0;
+    groupStats[gr]++;
+
+    const tp = parsed.typeLabel || "Other";
+    if (!typeStats[tp]) typeStats[tp] = 0;
+    typeStats[tp]++;
   });
 
   const channelBreakdown = Object.entries(channelStats)
-    .filter(([_, count]) => count > 0)
-    .map(([name, orderCount]) => ({
+    .map(([name, data]) => ({ name, orders: data.orders, color: data.color }))
+    .sort((a, b) => b.orders - a.orders);
+
+  const groupColors = [
+    "#006FEE",
+    "#17C964",
+    "#F5A524",
+    "#9353D3",
+    "#F31260",
+    "#0E793C",
+    "#C4841D",
+  ];
+  const customerGroupBreakdown = Object.entries(groupStats)
+    .map(([name, count], i) => ({
       name,
-      orders: orderCount,
-      color:
-        name === "Facebook"
-          ? "#006FEE"
-          : name === "Line"
-            ? "#17C964"
-            : name === "Website"
-              ? "#9353D3"
-              : "#F5A524",
-    }));
+      orders: count,
+      color: groupColors[i % groupColors.length],
+    }))
+    .sort((a, b) => b.orders - a.orders);
+
+  const typeColors = ["#006FEE", "#17C964", "#F5A524", "#9353D3"];
+  const projectTypeBreakdown = Object.entries(typeStats)
+    .map(([name, count], i) => ({
+      name,
+      orders: count,
+      color: typeColors[i % typeColors.length],
+    }))
+    .sort((a, b) => b.orders - a.orders);
 
   const monthStats = {};
   orders.forEach((order) => {
@@ -346,15 +360,6 @@ function calculateOrderStats(orders) {
     .sort((a, b) => b.revenue - a.revenue)
     .slice(0, 10);
 
-  const geoDistribution = Object.entries(cityStats)
-    .map(([city, data]) => ({
-      name: city,
-      orders: data.orders,
-      revenue: data.revenue,
-    }))
-    .sort((a, b) => b.revenue - a.revenue)
-    .slice(0, 10);
-
   const fulfillmentRate =
     totalOrders > 0 ? ((shippedOrders / totalOrders) * 100).toFixed(1) : 0;
   const avgItemsPerOrder =
@@ -367,6 +372,8 @@ function calculateOrderStats(orders) {
     avgOrderValue,
     productBreakdown,
     channelBreakdown,
+    customerGroupBreakdown,
+    projectTypeBreakdown,
     monthlyData,
     topSKUs,
     uniqueCustomers,
@@ -374,7 +381,6 @@ function calculateOrderStats(orders) {
     repeatCustomers,
     repeatRate,
     topCustomers,
-    geoDistribution,
     fulfillmentRate,
     shippedOrders,
     avgItemsPerOrder,
@@ -913,7 +919,10 @@ function FGStockTable({ items, loading: stockLoading, orders }) {
 
   const inStock = filteredItems.filter((i) => i.inventory > 0);
   const outOfStock = filteredItems.filter((i) => (i.inventory || 0) <= 0);
-  const totalStock = filteredItems.reduce((sum, i) => sum + (i.inventory || 0), 0);
+  const totalStock = filteredItems.reduce(
+    (sum, i) => sum + (i.inventory || 0),
+    0,
+  );
 
   return (
     <div className="flex flex-col gap-2">
@@ -2198,6 +2207,7 @@ export default function UISalesOrderOnline({
 
   const { isConnected } = useRFIDSafe();
   const { items: fgStockItems, loading: fgStockLoading } = useFGStockOnline();
+  const { customerMap } = useCustomersOnline();
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [previewOrder, setPreviewOrder] = useState(null);
@@ -2210,8 +2220,8 @@ export default function UISalesOrderOnline({
   }, [orders, fromDate, toDate]);
 
   const stats = useMemo(() => {
-    return calculateOrderStats(filteredOrders);
-  }, [filteredOrders]);
+    return calculateOrderStats(filteredOrders, customerMap);
+  }, [filteredOrders, customerMap]);
 
   const total = stats.totalOrders;
   const totalAmount = stats.totalAmount;
@@ -2496,12 +2506,26 @@ export default function UISalesOrderOnline({
             <MonthlySalesChart data={stats.monthlyData} />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
             <div className="flex flex-col gap-2 p-3 bg-default-50/50 rounded-lg">
               <span className="text-xs font-medium text-default-500 uppercase tracking-wider">
                 Channel
               </span>
               <ChannelSalesChart data={stats.channelBreakdown} />
+            </div>
+
+            <div className="flex flex-col gap-2 p-3 bg-default-50/50 rounded-lg">
+              <span className="text-xs font-medium text-default-500 uppercase tracking-wider">
+                Customer Group
+              </span>
+              <ChannelSalesChart data={stats.customerGroupBreakdown} />
+            </div>
+
+            <div className="flex flex-col gap-2 p-3 bg-default-50/50 rounded-lg">
+              <span className="text-xs font-medium text-default-500 uppercase tracking-wider">
+                Project Type
+              </span>
+              <ChannelSalesChart data={stats.projectTypeBreakdown} />
             </div>
 
             <div className="flex flex-col gap-2 p-3 bg-default-50/50 rounded-lg">

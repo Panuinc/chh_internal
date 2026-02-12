@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 const API_URL = "/api/sales/salesOrderOnline";
 
@@ -278,10 +278,108 @@ export function useFGStockOnline() {
   return { items, loading, error, refetch };
 }
 
+const CHANNEL_MAP = {
+  L: { label: "Line", color: "#06C755" },
+  FB: { label: "Facebook", color: "#1877F2" },
+  IN: { label: "Instagram", color: "#E4405F" },
+  SP: { label: "Shopee", color: "#EE4D2D" },
+  TT: { label: "TikTok", color: "#010101" },
+  LZ: { label: "Lazada", color: "#0F146D" },
+  W: { label: "Website", color: "#9353D3" },
+};
+
+const GROUP_MAP = {
+  CLT: "ลูกค้าทั่วไป",
+  OWN: "เจ้าของโครงการ",
+  DEV: "Developer",
+  MC: "ผู้รับเหมาหลัก",
+  SUB: "ผู้รับเหมาช่วง",
+  ARCH: "สถาปนิก",
+  PM: "ที่ปรึกษาโครงการ",
+};
+
+const TYPE_MAP = {
+  RES: "ที่อยู่อาศัย",
+  COM: "อาคารพาณิชย์",
+  IND: "อุตสาหกรรม",
+  INFRA: "สาธารณูปโภค",
+};
+
+export function parseContactCode(contact) {
+  if (!contact) return { channelCode: null, groupCode: null, typeCode: null };
+
+  const parts = contact.split("-").map((p) => p.trim().toUpperCase());
+  const channelCode = parts[0] || null;
+  const groupCode = parts[1] || null;
+  const typeCode = parts[2] || null;
+
+  return {
+    channelCode,
+    channelLabel: CHANNEL_MAP[channelCode]?.label || channelCode || "Other",
+    channelColor: CHANNEL_MAP[channelCode]?.color || "#71717A",
+    groupCode,
+    groupLabel: GROUP_MAP[groupCode] || groupCode || "Other",
+    typeCode,
+    typeLabel: TYPE_MAP[typeCode] || typeCode || "Other",
+  };
+}
+
+const CUSTOMERS_API_URL = "/api/sales/customers";
+
+export function useCustomersOnline() {
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchData = useCallback(async (signal) => {
+    try {
+      setError(null);
+      setLoading(true);
+
+      const result = await fetchWithAbort(CUSTOMERS_API_URL, {}, signal);
+
+      if (result.success === false) {
+        throw new Error(result.error || "Failed to fetch customers");
+      }
+
+      const data = result.data || [];
+      const enriched = data.map((c) => ({
+        ...c,
+        parsed: parseContactCode(c.contact),
+      }));
+
+      setCustomers(enriched);
+    } catch (err) {
+      if (err.name === "AbortError") return;
+      setError(err.message);
+      setCustomers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchData(controller.signal);
+    return () => controller.abort();
+  }, [fetchData]);
+
+  const customerMap = useMemo(() => {
+    const map = {};
+    customers.forEach((c) => {
+      map[c.no] = c;
+    });
+    return map;
+  }, [customers]);
+
+  return { customers, customerMap, loading, error };
+}
+
 const salesOrderOnlineHooks = {
   useSalesOrdersOnline,
   useSalesOrderOnline,
   useFGStockOnline,
+  useCustomersOnline,
 };
 
 export default salesOrderOnlineHooks;

@@ -2,6 +2,8 @@ export {
   useSalesOrdersOnline,
   useSalesOrderOnline,
   useFGStockOnline,
+  useCustomersOnline,
+  parseContactCode,
 } from "./useSalesOrderOnline";
 
 export {
