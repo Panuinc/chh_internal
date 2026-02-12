@@ -46,8 +46,9 @@ import {
 } from "lucide-react";
 import Barcode from "react-barcode";
 import {
-  AreaChart,
-  Area,
+  ComposedChart,
+  Bar,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -383,7 +384,90 @@ function calculateOrderStats(orders) {
   };
 }
 
+function SalesTooltip({ active, payload }) {
+  if (!active || !payload?.length) return null;
+  const d = payload[0].payload;
+  return (
+    <div className="bg-white rounded-lg shadow-lg border border-default-200 p-3 text-xs">
+      <div className="font-semibold text-sm mb-1.5">{d.month}</div>
+      <div className="flex justify-between gap-6">
+        <span className="text-default-500">Sales</span>
+        <span className="font-medium">{formatCurrency(d.sales)} THB</span>
+      </div>
+      <div className="flex justify-between gap-6">
+        <span className="text-default-500">Target</span>
+        <span className="font-medium">
+          {formatCurrency(MONTHLY_TARGET)} THB
+        </span>
+      </div>
+      <div className="flex justify-between gap-6">
+        <span className="text-default-500">Achievement</span>
+        <span
+          className={`font-bold ${d.achievement >= 100 ? "text-success" : "text-warning"}`}
+        >
+          {d.achievement}%
+        </span>
+      </div>
+      {d.change !== null && (
+        <div className="flex justify-between gap-6 border-t border-default-100 mt-1.5 pt-1.5">
+          <span className="text-default-500">vs Prev Month</span>
+          <span
+            className={`font-bold ${d.change >= 0 ? "text-success" : "text-danger"}`}
+          >
+            {d.change >= 0 ? "+" : ""}
+            {d.change.toFixed(1)}%
+          </span>
+        </div>
+      )}
+      <div className="flex justify-between gap-6">
+        <span className="text-default-500">Orders</span>
+        <span className="font-medium">{d.orders}</span>
+      </div>
+    </div>
+  );
+}
+
+function SalesBarLabel({ x, y, index, chartData }) {
+  const d = chartData?.[index];
+  if (!d || d.change === null) return null;
+  const isUp = d.change >= 0;
+  return (
+    <text
+      x={x}
+      y={y - 14}
+      textAnchor="middle"
+      fontSize={9}
+      fontWeight="600"
+      fill={isUp ? "#17C964" : "#F31260"}
+    >
+      {isUp ? "\u25B2" : "\u25BC"} {Math.abs(d.change).toFixed(1)}%
+    </text>
+  );
+}
+
 function MonthlySalesChart({ data }) {
+  const chartData = useMemo(
+    () =>
+      data.map((d, i) => {
+        const prev = i > 0 ? data[i - 1].sales : null;
+        const change =
+          prev && prev > 0 ? ((d.sales - prev) / prev) * 100 : null;
+        const achievement =
+          MONTHLY_TARGET > 0 ? (d.sales / MONTHLY_TARGET) * 100 : 0;
+        return {
+          ...d,
+          change,
+          achievement: Math.round(achievement * 10) / 10,
+        };
+      }),
+    [data],
+  );
+
+  const renderLabel = useCallback(
+    (props) => <SalesBarLabel {...props} chartData={chartData} />,
+    [chartData],
+  );
+
   if (data.length === 0) {
     return (
       <div className="w-full h-48 flex items-center justify-center text-default-400 text-sm">
@@ -392,75 +476,120 @@ function MonthlySalesChart({ data }) {
     );
   }
 
+  const maxSales = Math.max(...chartData.map((d) => d.sales), MONTHLY_TARGET);
+
   return (
-    <div className="w-full h-56">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart
-          data={data}
-          margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-        >
-          <defs>
-            <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#006FEE" stopOpacity={0.15} />
-              <stop offset="100%" stopColor="#006FEE" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid vertical={false} stroke="#f0f0f0" />
-          <XAxis
-            dataKey="month"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 11, fill: "#a1a1aa" }}
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 11, fill: "#a1a1aa" }}
-            tickFormatter={(v) =>
-              v >= 1000000
-                ? `${(v / 1000000).toFixed(1)}M`
-                : `${(v / 1000).toFixed(0)}K`
-            }
-            width={45}
-          />
-          <Tooltip
-            formatter={(value) => [`${formatCurrency(value)} THB`, "Sales"]}
-            contentStyle={{
-              border: "none",
-              borderRadius: "8px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-              fontSize: "12px",
-            }}
-            cursor={{ stroke: "#e5e7eb" }}
-          />
-          <ReferenceLine
-            y={MONTHLY_TARGET}
-            stroke="#F5A524"
-            strokeDasharray="6 4"
-            strokeWidth={1.5}
-            label={{
-              value: "Target",
-              position: "right",
-              fontSize: 10,
-              fill: "#F5A524",
-            }}
-          />
-          <Area
-            type="monotone"
-            dataKey="sales"
-            stroke="#006FEE"
-            strokeWidth={2}
-            fill="url(#salesGrad)"
-            dot={{ r: 3, fill: "#006FEE", strokeWidth: 0 }}
-            activeDot={{
-              r: 5,
-              fill: "#006FEE",
-              strokeWidth: 2,
-              stroke: "#fff",
-            }}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+    <div className="flex flex-col gap-2">
+      <div className="w-full h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart
+            data={chartData}
+            margin={{ top: 25, right: 15, left: 0, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#006FEE" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="#006FEE" stopOpacity={0.3} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              vertical={false}
+              stroke="#f3f4f6"
+              strokeDasharray="3 3"
+            />
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: "#a1a1aa" }}
+            />
+            <YAxis
+              yAxisId="sales"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: "#a1a1aa" }}
+              tickFormatter={(v) =>
+                v >= 1000000
+                  ? `${(v / 1000000).toFixed(1)}M`
+                  : `${(v / 1000).toFixed(0)}K`
+              }
+              width={42}
+              domain={[0, Math.ceil(maxSales * 1.15)]}
+            />
+            <Tooltip
+              content={<SalesTooltip />}
+              cursor={{ fill: "rgba(0,0,0,0.03)" }}
+            />
+            <ReferenceLine
+              yAxisId="sales"
+              y={MONTHLY_TARGET}
+              stroke="#F5A524"
+              strokeDasharray="6 3"
+              strokeWidth={1.5}
+              label={{
+                value: `Target ${formatNumber(MONTHLY_TARGET)}`,
+                position: "insideTopRight",
+                fontSize: 9,
+                fill: "#F5A524",
+                fontWeight: 600,
+              }}
+            />
+            <Bar
+              yAxisId="sales"
+              dataKey="sales"
+              fill="url(#barGrad)"
+              radius={[4, 4, 0, 0]}
+              barSize={32}
+              label={renderLabel}
+            />
+            <Line
+              yAxisId="sales"
+              type="monotone"
+              dataKey="sales"
+              stroke="#006FEE"
+              strokeWidth={2}
+              dot={{ r: 4, fill: "#fff", stroke: "#006FEE", strokeWidth: 2 }}
+              activeDot={{
+                r: 6,
+                fill: "#006FEE",
+                stroke: "#fff",
+                strokeWidth: 2,
+              }}
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="flex flex-wrap gap-1">
+        {chartData.map((d) => {
+          const isHit = d.achievement >= 100;
+          return (
+            <div
+              key={d.month}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded text-[10px] ${
+                isHit
+                  ? "bg-success-50 text-success-700"
+                  : "bg-default-50 text-default-600"
+              }`}
+            >
+              <span className="font-medium">{d.month}</span>
+              <span
+                className={`font-bold ${isHit ? "text-success" : d.achievement >= 80 ? "text-warning" : "text-danger"}`}
+              >
+                {d.achievement}%
+              </span>
+              {d.change !== null && (
+                <span
+                  className={`${d.change >= 0 ? "text-success" : "text-danger"}`}
+                >
+                  ({d.change >= 0 ? "+" : ""}
+                  {d.change.toFixed(1)}%)
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -712,6 +841,18 @@ const SHIPPING_COST_PER_PIECE = 150;
 const PACKING_COST_PER_PIECE = 25;
 
 function FGStockTable({ items, loading: stockLoading, orders }) {
+  const [stockSearch, setStockSearch] = useState("");
+
+  const filteredItems = useMemo(() => {
+    if (!stockSearch.trim()) return items;
+    const q = stockSearch.toLowerCase();
+    return items.filter(
+      (item) =>
+        (item.number || "").toLowerCase().includes(q) ||
+        (item.displayName || "").toLowerCase().includes(q),
+    );
+  }, [items, stockSearch]);
+
   const salesDataMap = useMemo(() => {
     const dataMap = {};
     if (!orders || orders.length === 0) return dataMap;
@@ -770,17 +911,26 @@ function FGStockTable({ items, loading: stockLoading, orders }) {
     );
   }
 
-  const inStock = items.filter((i) => i.inventory > 0);
-  const outOfStock = items.filter((i) => (i.inventory || 0) <= 0);
-  const totalStock = items.reduce((sum, i) => sum + (i.inventory || 0), 0);
+  const inStock = filteredItems.filter((i) => i.inventory > 0);
+  const outOfStock = filteredItems.filter((i) => (i.inventory || 0) <= 0);
+  const totalStock = filteredItems.reduce((sum, i) => sum + (i.inventory || 0), 0);
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-4 text-sm">
+      <div className="flex flex-wrap items-center gap-4 text-sm">
+        <Input
+          size="sm"
+          placeholder="Search item..."
+          value={stockSearch}
+          onValueChange={setStockSearch}
+          className="w-48"
+          isClearable
+          onClear={() => setStockSearch("")}
+        />
         <span className="text-default-500">
           Total:{" "}
           <span className="font-medium text-foreground">
-            {items.length} items
+            {filteredItems.length} items
           </span>
         </span>
         <span className="text-default-500">
@@ -829,7 +979,7 @@ function FGStockTable({ items, loading: stockLoading, orders }) {
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => {
+            {filteredItems.map((item) => {
               const cost = item.unitCost || 0;
               const sales = salesDataMap[item.number];
               const avgSelling = sales?.avgPrice || 0;
