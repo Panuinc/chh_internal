@@ -168,9 +168,120 @@ export function useSalesOrderOnline(orderId) {
   return { order, loading, error, refetch };
 }
 
+const FG_API_URL = "/api/warehouse/finishedGoods";
+const DIMENSION_API_URL = "/api/warehouse/dimensionValues";
+const ONLINE_PROJECT_NAME = "CHH - Online";
+
+function extractFGItems(result) {
+  if (result?.data?.catFinishedGoodsItems)
+    return result.data.catFinishedGoodsItems;
+  if (result?.data && Array.isArray(result.data)) return result.data;
+  if (result?.catFinishedGoodsItems) return result.catFinishedGoodsItems;
+  if (Array.isArray(result)) return result;
+  return [];
+}
+
+function extractProjectCode(itemNumber) {
+  if (!itemNumber) return null;
+  const parts = itemNumber.split("-");
+  if (parts.length >= 3 && parts[0] === "FG") return parts[1];
+  return null;
+}
+
+export function useFGStockOnline() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchData = useCallback(async (signal) => {
+    try {
+      setError(null);
+      setLoading(true);
+
+      const fgResult = await fetchWithAbort(
+        `${FG_API_URL}?includeZeroInventory=true&limit=500`,
+        {},
+        signal,
+      );
+
+      if (fgResult.success === false) {
+        throw new Error(fgResult.error || "Failed to fetch FG items");
+      }
+
+      const allItems = extractFGItems(fgResult);
+
+      const projectCodes = new Set();
+      allItems.forEach((item) => {
+        const code = extractProjectCode(item.number);
+        if (code) projectCodes.add(code);
+      });
+
+      if (projectCodes.size === 0) {
+        setItems([]);
+        return;
+      }
+
+      const dimResult = await fetchWithAbort(
+        `${DIMENSION_API_URL}?codes=${Array.from(projectCodes).join(",")}&dimensionCode=PROJECT`,
+        {},
+        signal,
+      );
+
+      let onlineProjectCode = null;
+      if (dimResult.success && dimResult.data) {
+        const onlineProject = dimResult.data.find(
+          (d) =>
+            d.displayName === ONLINE_PROJECT_NAME ||
+            d.displayName?.toLowerCase().includes("online"),
+        );
+        if (onlineProject) {
+          onlineProjectCode = onlineProject.code;
+        }
+      }
+
+      if (!onlineProjectCode) {
+        setItems([]);
+        return;
+      }
+
+      const onlineItems = allItems
+        .filter((item) => extractProjectCode(item.number) === onlineProjectCode)
+        .map((item) => ({
+          ...item,
+          projectCode: onlineProjectCode,
+          projectName: ONLINE_PROJECT_NAME,
+          productCode: item.number?.split("-").slice(2).join("-") || "",
+        }))
+        .sort((a, b) => (b.inventory || 0) - (a.inventory || 0));
+
+      setItems(onlineItems);
+    } catch (err) {
+      if (err.name === "AbortError") return;
+      setError(err.message);
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchData(controller.signal);
+    return () => controller.abort();
+  }, [fetchData]);
+
+  const refetch = useCallback(() => {
+    const controller = new AbortController();
+    return fetchData(controller.signal);
+  }, [fetchData]);
+
+  return { items, loading, error, refetch };
+}
+
 const salesOrderOnlineHooks = {
   useSalesOrdersOnline,
   useSalesOrderOnline,
+  useFGStockOnline,
 };
 
 export default salesOrderOnlineHooks;

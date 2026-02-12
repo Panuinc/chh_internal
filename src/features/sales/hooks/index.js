@@ -1,6 +1,7 @@
 export {
   useSalesOrdersOnline,
   useSalesOrderOnline,
+  useFGStockOnline,
 } from "./useSalesOrderOnline";
 
 export {

@@ -40,30 +40,26 @@ import {
   TrendingDown,
   ShoppingCart,
   Target,
-  Users,
   BarChart3,
-  Facebook,
-  Globe,
-  MessageCircle,
   Filter,
   X,
 } from "lucide-react";
 import Barcode from "react-barcode";
 import {
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
+  ReferenceLine,
   ResponsiveContainer,
-  Cell,
 } from "recharts";
 
 import { DataTable, Loading } from "@/components";
 import { PrinterStatusBadge, PrinterSettings } from "@/components/chainWay";
 import { useRFIDSafe } from "@/hooks";
+import { useFGStockOnline } from "@/features/sales/hooks/useSalesOrderOnline";
 import { COMPANY_INFO } from "@/lib/chainWay/config";
 import { getItemLines, getCommentLines } from "@/lib/chainWay/utils";
 
@@ -388,136 +384,139 @@ function calculateOrderStats(orders) {
 }
 
 function MonthlySalesChart({ data }) {
-  const chartData = data.map((d) => ({ ...d, target: MONTHLY_TARGET }));
-
-  if (chartData.length === 0) {
+  if (data.length === 0) {
     return (
-      <div className="w-full h-64 flex items-center justify-center text-default-400">
-        No sales data available
+      <div className="w-full h-48 flex items-center justify-center text-default-400 text-sm">
+        No data
       </div>
     );
   }
 
   return (
-    <div className="w-full h-64">
+    <div className="w-full h-56">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={chartData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+        <AreaChart
+          data={data}
+          margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#6b7280" />
+          <defs>
+            <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#006FEE" stopOpacity={0.15} />
+              <stop offset="100%" stopColor="#006FEE" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid vertical={false} stroke="#f0f0f0" />
+          <XAxis
+            dataKey="month"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 11, fill: "#a1a1aa" }}
+          />
           <YAxis
-            tick={{ fontSize: 12 }}
-            stroke="#6b7280"
-            tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 11, fill: "#a1a1aa" }}
+            tickFormatter={(v) =>
+              v >= 1000000
+                ? `${(v / 1000000).toFixed(1)}M`
+                : `${(v / 1000).toFixed(0)}K`
+            }
+            width={45}
           />
           <Tooltip
-            formatter={(value) => `${formatCurrency(value)} THB`}
+            formatter={(value) => [`${formatCurrency(value)} THB`, "Sales"]}
             contentStyle={{
-              backgroundColor: "#fff",
-              border: "1px solid #e5e7eb",
+              border: "none",
               borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              fontSize: "12px",
+            }}
+            cursor={{ stroke: "#e5e7eb" }}
+          />
+          <ReferenceLine
+            y={MONTHLY_TARGET}
+            stroke="#F5A524"
+            strokeDasharray="6 4"
+            strokeWidth={1.5}
+            label={{
+              value: "Target",
+              position: "right",
+              fontSize: 10,
+              fill: "#F5A524",
             }}
           />
-          <Legend />
-          <Bar
+          <Area
+            type="monotone"
             dataKey="sales"
-            name="Actual Sales"
-            fill="#006FEE"
-            radius={[4, 4, 0, 0]}
+            stroke="#006FEE"
+            strokeWidth={2}
+            fill="url(#salesGrad)"
+            dot={{ r: 3, fill: "#006FEE", strokeWidth: 0 }}
+            activeDot={{
+              r: 5,
+              fill: "#006FEE",
+              strokeWidth: 2,
+              stroke: "#fff",
+            }}
           />
-          <Bar
-            dataKey="target"
-            name="Target"
-            fill="#F5A524"
-            radius={[4, 4, 0, 0]}
-            opacity={0.3}
-          />
-        </BarChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );
 }
 
 function ProductSalesChart({ data }) {
-  if (data.length === 0) {
-    return (
-      <div className="w-full h-64 flex items-center justify-center text-default-400">
-        No product data available
-      </div>
-    );
-  }
+  if (data.length === 0) return null;
+  const maxQty = Math.max(...data.map((d) => d.quantity));
 
   return (
-    <div className="w-full h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={data}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis
-            dataKey="name"
-            tick={{ fontSize: 11 }}
-            stroke="#6b7280"
-            interval={0}
-            angle={0}
-          />
-          <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" />
-          <Tooltip
-            formatter={(value) => `${value} pcs`}
-            contentStyle={{
-              backgroundColor: "#fff",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-            }}
-          />
-          <Bar dataKey="quantity" name="Quantity" radius={[4, 4, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="flex flex-col gap-1.5 mt-1">
+      {data.map((item) => (
+        <div key={item.name} className="flex items-center gap-2 text-xs">
+          <span className="w-20 truncate text-default-600">{item.name}</span>
+          <div className="flex-1 h-5 bg-default-100 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${maxQty > 0 ? (item.quantity / maxQty) * 100 : 0}%`,
+                backgroundColor: item.color,
+                minWidth: item.quantity > 0 ? "4px" : "0",
+              }}
+            />
+          </div>
+          <span className="w-14 text-right font-medium text-default-700">
+            {item.quantity}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
 
 function ChannelSalesChart({ data }) {
-  if (data.length === 0) {
-    return (
-      <div className="w-full h-64 flex items-center justify-center text-default-400">
-        No channel data available
-      </div>
-    );
-  }
+  if (data.length === 0) return null;
+  const maxOrders = Math.max(...data.map((d) => d.orders));
 
   return (
-    <div className="w-full h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={data}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#6b7280" />
-          <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" />
-          <Tooltip
-            formatter={(value) => `${value} orders`}
-            contentStyle={{
-              backgroundColor: "#fff",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-            }}
-          />
-          <Bar dataKey="orders" name="Order Count" radius={[4, 4, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="flex flex-col gap-1.5 mt-1">
+      {data.map((item) => (
+        <div key={item.name} className="flex items-center gap-2 text-xs">
+          <span className="w-16 truncate text-default-600">{item.name}</span>
+          <div className="flex-1 h-5 bg-default-100 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${maxOrders > 0 ? (item.orders / maxOrders) * 100 : 0}%`,
+                backgroundColor: item.color,
+                minWidth: item.orders > 0 ? "4px" : "0",
+              }}
+            />
+          </div>
+          <span className="w-10 text-right font-medium text-default-700">
+            {item.orders}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -525,160 +524,128 @@ function ChannelSalesChart({ data }) {
 function Top10SKUChart({ data }) {
   if (data.length === 0) {
     return (
-      <div className="w-full h-64 flex items-center justify-center text-default-400">
-        No SKU data available
+      <div className="w-full h-32 flex items-center justify-center text-default-400 text-sm">
+        No SKU data
       </div>
     );
   }
 
-  return (
-    <div className="w-full">
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data}
-            layout="vertical"
-            margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
-          >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="#e5e7eb"
-              horizontal={false}
-            />
-            <XAxis type="number" tick={{ fontSize: 11 }} stroke="#6b7280" />
-            <YAxis
-              type="category"
-              dataKey="name"
-              tick={{ fontSize: 10 }}
-              stroke="#6b7280"
-              width={95}
-            />
-            <Tooltip
-              formatter={(value, name, props) => {
-                if (name === "quantity") return [`${value} pcs`, "Sales Qty"];
-                return [formatCurrency(value) + " THB", "Revenue"];
-              }}
-              labelFormatter={(label) => `${label}`}
-              contentStyle={{
-                backgroundColor: "#fff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                fontSize: "12px",
-              }}
-            />
-            <Bar dataKey="quantity" name="quantity" radius={[0, 4, 4, 0]}>
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+  const maxQty = Math.max(...data.map((d) => d.quantity));
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-default-50">
-              <th className="p-2 text-left font-medium">Rank</th>
-              <th className="p-2 text-left font-medium">SKU Code</th>
-              <th className="p-2 text-left font-medium">Description</th>
-              <th className="p-2 text-right font-medium">Quantity</th>
-              <th className="p-2 text-right font-medium">Revenue</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr
-                key={item.name}
-                className="border-b-1 border-default hover:bg-default-50"
-              >
-                <td className="p-2">
-                  <span
-                    className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                      index === 0
-                        ? "bg-amber-50 text-warning"
-                        : index === 1
-                          ? "bg-default-100 text-foreground"
-                          : index === 2
-                            ? "bg-red-50 text-danger"
-                            : "bg-default-50 text-default-500"
-                    }`}
-                  >
-                    {index + 1}
-                  </span>
-                </td>
-                <td className="p-2 font-mono text-xs">{item.name}</td>
-                <td className="p-2 text-default-700">{item.description}</td>
-                <td className="p-2 text-right font-medium">
-                  {item.quantity} pcs
-                </td>
-                <td className="p-2 text-right">
-                  {formatCurrency(item.revenue)} THB
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+  return (
+    <div className="flex flex-col gap-1">
+      {data.map((item, index) => (
+        <div
+          key={item.name}
+          className="flex items-center gap-2 py-1 group hover:bg-default-50 rounded px-1 transition-colors"
+        >
+          <span
+            className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0 ${
+              index === 0
+                ? "bg-amber-100 text-amber-700"
+                : index === 1
+                  ? "bg-gray-100 text-gray-600"
+                  : index === 2
+                    ? "bg-orange-100 text-orange-600"
+                    : "text-default-400"
+            }`}
+          >
+            {index + 1}
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-default-500 truncate max-w-[120px]">
+                {item.name}
+              </span>
+              <span className="text-xs text-default-400 truncate hidden sm:inline">
+                {item.description}
+              </span>
+            </div>
+            <div className="h-1.5 bg-default-100 rounded-full mt-0.5 overflow-hidden">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${maxQty > 0 ? (item.quantity / maxQty) * 100 : 0}%`,
+                  backgroundColor: item.color,
+                  minWidth: item.quantity > 0 ? "4px" : "0",
+                }}
+              />
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <div className="text-xs font-medium">{item.quantity} pcs</div>
+            <div className="text-[10px] text-default-400">
+              {formatCurrency(item.revenue)}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
 function SmartInsightsRow({ stats }) {
+  const insights = [
+    {
+      label: "Fulfillment",
+      value: `${stats.fulfillmentRate}%`,
+      sub: `${stats.shippedOrders}/${stats.totalOrders}`,
+    },
+    {
+      label: "MoM Growth",
+      value: stats.momGrowth ? `${stats.momGrowth.percentage}%` : "—",
+      sub: stats.momGrowth
+        ? `vs ${stats.momGrowth.prevMonth}`
+        : "Need 2+ months",
+      color:
+        stats.momGrowth?.direction === "up"
+          ? "text-success"
+          : stats.momGrowth
+            ? "text-danger"
+            : "",
+      icon:
+        stats.momGrowth?.direction === "up"
+          ? TrendingUp
+          : stats.momGrowth
+            ? TrendingDown
+            : null,
+    },
+    {
+      label: "Avg/Order",
+      value: `${stats.avgItemsPerOrder} pcs`,
+      sub: `${formatNumber(stats.totalItems)} total`,
+    },
+    {
+      label: "Best Month",
+      value: stats.bestMonth?.name || "—",
+      sub: stats.bestMonth ? `${formatNumber(stats.bestMonth.sales)} THB` : "",
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-      <div className="flex flex-col p-2 bg-default-50 rounded-lg border-1 border-default">
-        <span className="text-xs text-default-500">Fulfillment Rate</span>
-        <span className="text-lg font-bold">{stats.fulfillmentRate}%</span>
-        <span className="text-xs text-default-400">
-          {stats.shippedOrders} / {stats.totalOrders} shipped
-        </span>
-      </div>
-
-      <div className="flex flex-col p-2 bg-default-50 rounded-lg border-1 border-default">
-        <span className="text-xs text-default-500">MoM Growth</span>
-        {stats.momGrowth ? (
-          <>
+    <div className="grid grid-cols-4 gap-1">
+      {insights.map((item) => {
+        const Icon = item.icon;
+        return (
+          <div
+            key={item.label}
+            className="flex flex-col px-3 py-2 rounded-lg bg-default-50/80"
+          >
+            <span className="text-[10px] uppercase tracking-wider text-default-400">
+              {item.label}
+            </span>
             <div
-              className={`flex items-center gap-1 text-lg font-bold ${stats.momGrowth.direction === "up" ? "text-success" : "text-danger"}`}
+              className={`flex items-center gap-1 text-sm font-semibold ${item.color || ""}`}
             >
-              {stats.momGrowth.direction === "up" ? (
-                <TrendingUp className="w-4 h-4" />
-              ) : (
-                <TrendingDown className="w-4 h-4" />
-              )}
-              {stats.momGrowth.percentage}%
+              {Icon && <Icon className="w-3 h-3" />}
+              {item.value}
             </div>
-            <span className="text-xs text-default-400">
-              vs {stats.momGrowth.prevMonth}
-            </span>
-          </>
-        ) : (
-          <span className="text-sm text-default-400">Need 2+ months</span>
-        )}
-      </div>
-
-      <div className="flex flex-col p-2 bg-default-50 rounded-lg border-1 border-default">
-        <span className="text-xs text-default-500">Avg Items/Order</span>
-        <span className="text-lg font-bold">{stats.avgItemsPerOrder} pcs</span>
-        <span className="text-xs text-default-400">
-          {formatNumber(stats.totalItems)} total items
-        </span>
-      </div>
-
-      <div className="flex flex-col p-2 bg-default-50 rounded-lg border-1 border-default">
-        <span className="text-xs text-default-500">Best Month</span>
-        {stats.bestMonth ? (
-          <>
-            <span className="text-lg font-bold">{stats.bestMonth.name}</span>
-            <span className="text-xs text-default-400">
-              {formatNumber(stats.bestMonth.sales)} THB
-            </span>
-          </>
-        ) : (
-          <span className="text-sm text-default-400">No data</span>
-        )}
-      </div>
+            {item.sub && (
+              <span className="text-[10px] text-default-400">{item.sub}</span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -686,129 +653,253 @@ function SmartInsightsRow({ stats }) {
 function TopCustomersTable({ data }) {
   if (data.length === 0) {
     return (
-      <div className="w-full h-40 flex items-center justify-center text-default-400">
-        No customer data available
+      <div className="w-full h-20 flex items-center justify-center text-default-400 text-sm">
+        No customer data
       </div>
     );
   }
 
+  const maxRevenue = Math.max(...data.map((d) => d.revenue));
+
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="bg-default-50">
-            <th className="p-2 text-left font-medium">#</th>
-            <th className="p-2 text-left font-medium">Customer</th>
-            <th className="p-2 text-right font-medium">Orders</th>
-            <th className="p-2 text-right font-medium">Revenue</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((customer, index) => (
-            <tr
-              key={customer.customerNumber}
-              className="border-b-1 border-default hover:bg-default-50"
-            >
-              <td className="p-2">
-                <span
-                  className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                    index === 0
-                      ? "bg-amber-50 text-warning"
-                      : index === 1
-                        ? "bg-default-100 text-foreground"
-                        : index === 2
-                          ? "bg-red-50 text-danger"
-                          : "bg-default-50 text-default-500"
-                  }`}
-                >
-                  {index + 1}
-                </span>
-              </td>
-              <td className="p-2">
-                <div className="flex flex-col">
-                  <span className="font-medium truncate max-w-[200px]">
-                    {customer.customerName}
-                  </span>
-                  <span className="text-xs text-default-500">
-                    {customer.customerNumber}
-                  </span>
-                </div>
-              </td>
-              <td className="p-2 text-right">{customer.orderCount}</td>
-              <td className="p-2 text-right font-medium">
-                {formatCurrency(customer.revenue)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="flex flex-col gap-1">
+      {data.map((customer, index) => (
+        <div
+          key={customer.customerNumber}
+          className="flex items-center gap-2 py-1 px-1 hover:bg-default-50 rounded transition-colors"
+        >
+          <span
+            className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0 ${
+              index === 0
+                ? "bg-amber-100 text-amber-700"
+                : index === 1
+                  ? "bg-gray-100 text-gray-600"
+                  : index === 2
+                    ? "bg-orange-100 text-orange-600"
+                    : "text-default-400"
+            }`}
+          >
+            {index + 1}
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium truncate">
+              {customer.customerName}
+            </div>
+            <div className="h-1 bg-default-100 rounded-full mt-0.5 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary"
+                style={{
+                  width: `${maxRevenue > 0 ? (customer.revenue / maxRevenue) * 100 : 0}%`,
+                }}
+              />
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <div className="text-xs font-medium">
+              {formatCurrency(customer.revenue)}
+            </div>
+            <div className="text-[10px] text-default-400">
+              {customer.orderCount} orders
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
-function GeoDistributionChart({ data }) {
-  if (data.length === 0) {
+const SHIPPING_COST_PER_PIECE = 150;
+
+function FGStockTable({ items, loading: stockLoading, orders }) {
+  const salesDataMap = useMemo(() => {
+    const dataMap = {};
+    if (!orders || orders.length === 0) return dataMap;
+
+    orders.forEach((order) => {
+      const lines = order.salesOrderLines || [];
+      lines.forEach((line) => {
+        if (line.lineType !== "Item" || !line.itemNumber) return;
+        const qty = line.quantity || 0;
+        const amount = line.amountExcludingTax || line.netAmount || 0;
+        if (qty <= 0) return;
+
+        if (!dataMap[line.itemNumber]) {
+          dataMap[line.itemNumber] = {
+            totalAmount: 0,
+            totalQty: 0,
+            orderCount: 0,
+            orders: new Set(),
+          };
+        }
+        dataMap[line.itemNumber].totalAmount += amount;
+        dataMap[line.itemNumber].totalQty += qty;
+        dataMap[line.itemNumber].orders.add(order.number);
+      });
+    });
+
+    const result = {};
+    for (const [itemNo, data] of Object.entries(dataMap)) {
+      const avgPrice =
+        data.totalQty > 0
+          ? Math.round((data.totalAmount / data.totalQty) * 100) / 100
+          : 0;
+      result[itemNo] = {
+        avgPrice,
+        totalQty: data.totalQty,
+        totalAmount: Math.round(data.totalAmount * 100) / 100,
+        orderCount: data.orders.size,
+      };
+    }
+    return result;
+  }, [orders]);
+
+  if (stockLoading) {
     return (
-      <div className="w-full h-64 flex items-center justify-center text-default-400">
-        No geographic data available
+      <div className="w-full h-40 flex items-center justify-center text-default-400">
+        Loading FG stock...
       </div>
     );
   }
 
-  const colors = [
-    "#006FEE",
-    "#17C964",
-    "#F5A524",
-    "#9353D3",
-    "#F31260",
-    "#71717A",
-    "#0E793C",
-    "#C4841D",
-    "#7828C8",
-    "#A1A1AA",
-  ];
+  if (items.length === 0) {
+    return (
+      <div className="w-full h-40 flex items-center justify-center text-default-400">
+        No FG stock data for Online project
+      </div>
+    );
+  }
+
+  const inStock = items.filter((i) => i.inventory > 0);
+  const outOfStock = items.filter((i) => (i.inventory || 0) <= 0);
+  const totalStock = items.reduce((sum, i) => sum + (i.inventory || 0), 0);
 
   return (
-    <div className="w-full h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={data}
-          layout="vertical"
-          margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
-        >
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="#e5e7eb"
-            horizontal={false}
-          />
-          <XAxis type="number" tick={{ fontSize: 11 }} stroke="#6b7280" />
-          <YAxis
-            type="category"
-            dataKey="name"
-            tick={{ fontSize: 11 }}
-            stroke="#6b7280"
-            width={75}
-          />
-          <Tooltip
-            formatter={(value, name) => {
-              if (name === "revenue")
-                return [`${formatCurrency(value)} THB`, "Revenue"];
-              return [`${value} orders`, "Orders"];
-            }}
-            contentStyle={{
-              backgroundColor: "#fff",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              fontSize: "12px",
-            }}
-          />
-          <Bar dataKey="orders" name="Orders" radius={[0, 4, 4, 0]}>
-            {data.map((_, index) => (
-              <Cell key={`cell-${index}`} fill={colors[index % 10]} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-4 text-sm">
+        <span className="text-default-500">
+          Total:{" "}
+          <span className="font-medium text-foreground">
+            {items.length} items
+          </span>
+        </span>
+        <span className="text-default-500">
+          In Stock:{" "}
+          <span className="font-medium text-success">{inStock.length}</span>
+        </span>
+        <span className="text-default-500">
+          Out of Stock:{" "}
+          <span className="font-medium text-danger">{outOfStock.length}</span>
+        </span>
+        <span className="text-default-500">
+          Total Qty:{" "}
+          <span className="font-medium text-foreground">
+            {formatNumber(totalStock)}
+          </span>
+        </span>
+        <span className="text-default-500">
+          Shipping:{" "}
+          <span className="font-medium text-foreground">
+            {formatNumber(SHIPPING_COST_PER_PIECE)} THB/pc
+          </span>
+        </span>
+      </div>
+
+      <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+        <table className="w-full text-sm">
+          <thead className="sticky top-0 bg-default-100 z-10">
+            <tr>
+              <th className="p-2 text-left font-medium">Item No.</th>
+              <th className="p-2 text-left font-medium">Description</th>
+              <th className="p-2 text-right font-medium">Stock</th>
+              <th className="p-2 text-right font-medium">Unit Cost</th>
+              <th className="p-2 text-right font-medium">Shipping</th>
+              <th className="p-2 text-right font-medium">Total Cost</th>
+              <th className="p-2 text-right font-medium">Avg Selling</th>
+              <th className="p-2 text-right font-medium">Gross Profit</th>
+              <th className="p-2 text-right font-medium">Margin</th>
+              <th className="p-2 text-right font-medium">Total Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => {
+              const cost = item.unitCost || 0;
+              const sales = salesDataMap[item.number];
+              const avgSelling = sales?.avgPrice || 0;
+              const totalRevenue = sales?.totalAmount || 0;
+              const shipping = SHIPPING_COST_PER_PIECE;
+              const totalCost = cost + shipping;
+              const profit = avgSelling > 0 ? avgSelling - totalCost : 0;
+              const margin = avgSelling > 0 ? (profit / avgSelling) * 100 : 0;
+
+              return (
+                <tr
+                  key={item.id || item.number}
+                  className="border-b-1 border-default hover:bg-default-50"
+                >
+                  <td className="p-2 font-mono text-xs">{item.number}</td>
+                  <td className="p-2 truncate max-w-[200px]">
+                    {item.displayName || "-"}
+                  </td>
+                  <td className="p-2 text-right">
+                    <span
+                      className={`font-medium ${(item.inventory || 0) > 0 ? "text-success" : "text-danger"}`}
+                    >
+                      {item.inventory || 0}
+                    </span>
+                  </td>
+                  <td className="p-2 text-right">
+                    {cost > 0 ? formatCurrency(cost) : "-"}
+                  </td>
+                  <td className="p-2 text-right text-default-500">
+                    {formatCurrency(shipping)}
+                  </td>
+                  <td className="p-2 text-right font-medium">
+                    {cost > 0 ? formatCurrency(totalCost) : "-"}
+                  </td>
+                  <td className="p-2 text-right">
+                    {avgSelling > 0 ? (
+                      formatCurrency(avgSelling)
+                    ) : (
+                      <span className="text-default-400">No sales</span>
+                    )}
+                  </td>
+                  <td className="p-2 text-right">
+                    {avgSelling > 0 ? (
+                      <span
+                        className={`font-medium ${profit > 0 ? "text-success" : "text-danger"}`}
+                      >
+                        {formatCurrency(profit)}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+                  <td className="p-2 text-right">
+                    {avgSelling > 0 ? (
+                      <span
+                        className={`font-medium ${margin > 0 ? "text-success" : "text-danger"}`}
+                      >
+                        {margin.toFixed(1)}%
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+                  <td className="p-2 text-right">
+                    {totalRevenue > 0 ? (
+                      <span className="font-medium">
+                        {formatCurrency(totalRevenue)}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -1033,21 +1124,6 @@ function ExecutiveSummaryCard({
           <span>{trendValue}</span>
         </div>
       )}
-    </div>
-  );
-}
-
-function ChannelBadge({ icon: Icon, label, count, total }) {
-  const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
-  return (
-    <div className="flex items-center gap-2 p-2 bg-background border-1 border-default rounded-lg">
-      <Icon className="w-4 h-4 text-default-500" />
-      <div className="flex flex-col">
-        <span className="text-xs text-default-500">{label}</span>
-        <span className="text-sm font-medium">
-          {count} orders ({percentage}%)
-        </span>
-      </div>
     </div>
   );
 }
@@ -1959,6 +2035,7 @@ export default function UISalesOrderOnline({
   } = useDisclosure();
 
   const { isConnected } = useRFIDSafe();
+  const { items: fgStockItems, loading: fgStockLoading } = useFGStockOnline();
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [previewOrder, setPreviewOrder] = useState(null);
@@ -2250,148 +2327,96 @@ export default function UISalesOrderOnline({
 
           <SmartInsightsRow stats={stats} />
 
-          <div className="p-2 bg-default-50/50 rounded-lg">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-foreground" />
-              <span className="font-medium">Monthly Sales vs Target</span>
-            </div>
+          <div className="p-3 bg-default-50/50 rounded-lg">
+            <span className="text-xs font-medium text-default-500 uppercase tracking-wider">
+              Monthly Sales
+            </span>
             <MonthlySalesChart data={stats.monthlyData} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-foreground" />
-                <span className="font-medium">Sales by Channel</span>
-              </div>
-              {stats.channelBreakdown.length > 0 ? (
-                <div className="flex flex-col gap-2">
-                  {stats.channelBreakdown.map((channel) => (
-                    <ChannelBadge
-                      key={channel.name}
-                      icon={
-                        channel.name === "Facebook"
-                          ? Facebook
-                          : channel.name === "Line"
-                            ? MessageCircle
-                            : Globe
-                      }
-                      label={channel.name}
-                      count={channel.orders}
-                      total={stats.totalOrders}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-sm text-default-400">No channel data</div>
-              )}
+            <div className="flex flex-col gap-2 p-3 bg-default-50/50 rounded-lg">
+              <span className="text-xs font-medium text-default-500 uppercase tracking-wider">
+                Channel
+              </span>
               <ChannelSalesChart data={stats.channelBreakdown} />
             </div>
 
-            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <Package className="w-4 h-4 text-success" />
-                <span className="font-medium">Sales by Product</span>
-              </div>
-              <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg">
-                {stats.productBreakdown.length > 0 ? (
-                  stats.productBreakdown.map((product) => (
-                    <div
-                      key={product.name}
-                      className="flex justify-between text-sm"
-                    >
-                      <span>{product.name}</span>
-                      <span className="font-medium">
-                        {product.quantity} pcs
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-sm text-default-400">
-                    No product data
-                  </div>
-                )}
-              </div>
+            <div className="flex flex-col gap-2 p-3 bg-default-50/50 rounded-lg">
+              <span className="text-xs font-medium text-default-500 uppercase tracking-wider">
+                Product
+              </span>
               <ProductSalesChart data={stats.productBreakdown} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-foreground" />
-                <span className="font-medium">Customer Analytics</span>
-              </div>
-              <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg">
-                <div className="flex justify-between text-sm">
-                  <span>Total Unique Customers</span>
+            <div className="flex flex-col gap-2 p-3 bg-default-50/50 rounded-lg">
+              <span className="text-xs font-medium text-default-500 uppercase tracking-wider">
+                Customers
+              </span>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-default-500">Unique</span>
                   <span className="font-medium">{stats.uniqueCustomers}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span>New Customers (1 order)</span>
+                <div className="flex justify-between">
+                  <span className="text-default-500">Per Customer</span>
+                  <span className="font-medium">
+                    {stats.uniqueCustomers > 0
+                      ? (stats.totalOrders / stats.uniqueCustomers).toFixed(1)
+                      : 0}{" "}
+                    orders
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-default-500">New</span>
                   <span className="font-medium text-success">
                     {stats.newCustomers}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span>Repeat Customers (2+ orders)</span>
+                <div className="flex justify-between">
+                  <span className="text-default-500">Repeat</span>
                   <span className="font-medium text-primary">
-                    {stats.repeatCustomers}
-                  </span>
-                </div>
-                <Divider />
-                <div className="flex justify-between text-sm">
-                  <span>Repeat Rate</span>
-                  <span className="font-bold text-primary">
-                    {stats.repeatRate}%
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Orders per Customer</span>
-                  <span className="font-medium">
-                    {stats.uniqueCustomers > 0
-                      ? (stats.totalOrders / stats.uniqueCustomers).toFixed(1)
-                      : 0}
+                    {stats.repeatCustomers} ({stats.repeatRate}%)
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-foreground" />
-                <span className="font-medium">Top 10 Customers by Revenue</span>
-              </div>
+            <div className="flex flex-col gap-2 p-3 bg-default-50/50 rounded-lg">
+              <span className="text-xs font-medium text-default-500 uppercase tracking-wider">
+                Top Customers
+              </span>
               <TopCustomersTable data={stats.topCustomers} />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-foreground" />
-                <span className="font-medium">
-                  Geographic Distribution (Top Cities)
-                </span>
-              </div>
-              <GeoDistributionChart data={stats.geoDistribution} />
-            </div>
-
-            <div className="p-2 bg-default-50/50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-danger" />
-                <span className="font-medium">Top 10 Best Selling SKUs</span>
-              </div>
-              <Top10SKUChart data={stats.topSKUs} />
-            </div>
+          <div className="flex flex-col gap-2 p-3 bg-default-50/50 rounded-lg">
+            <span className="text-xs font-medium text-default-500 uppercase tracking-wider">
+              Top SKUs
+            </span>
+            <Top10SKUChart data={stats.topSKUs} />
           </div>
         </div>
 
         <div className="flex flex-col w-full p-2 gap-2">
-          <div className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-default-600" />
-            <h2 className="text-lg font-semibold">Order List</h2>
+          <span className="text-xs font-medium text-default-500 uppercase tracking-wider px-1">
+            FG Stock — CHH Online
+          </span>
+          <div className="p-2 bg-default-50/50 rounded-lg">
+            <FGStockTable
+              items={fgStockItems}
+              loading={fgStockLoading}
+              orders={orders}
+            />
           </div>
+        </div>
+
+        <div className="flex flex-col w-full p-2 gap-2">
+          <span className="text-xs font-medium text-default-500 uppercase tracking-wider px-1">
+            Order List
+          </span>
           {loading ? (
             <div className="flex items-center justify-center w-full h-64 gap-2">
               <Loading />
