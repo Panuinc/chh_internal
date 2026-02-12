@@ -38,7 +38,7 @@ export function EmployeeRoleForm({
           e.preventDefault();
           onSubmit();
         }}
-        className="flex flex-col items-center justify-start w-full xl:w-8/12 h-full gap-2 border-l-2 border-r-2 border-default overflow-auto p-2"
+        className="flex flex-col items-center justify-start w-full h-full gap-2 border-l-2 border-r-2 border-default overflow-auto p-2"
       >
         <div className="flex flex-col xl:flex-row items-center justify-center w-full h-fit gap-2">
           <div className="flex items-center justify-center w-full h-full gap-2">
