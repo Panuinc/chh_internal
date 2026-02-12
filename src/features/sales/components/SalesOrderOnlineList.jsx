@@ -1,7 +1,19 @@
 "use client";
 
-import React, { useMemo, useCallback, useState, useEffect, useRef } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import React, {
+  useMemo,
+  useCallback,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/modal";
 import { Button } from "@heroui/button";
 import { Image } from "@heroui/image";
 import { useDisclosure } from "@heroui/modal";
@@ -129,7 +141,7 @@ function calculateOrderStats(orders) {
 
   const totalOrders = orders.length;
   const totalAmount = orders.reduce(
-    (sum, o) => sum + (o.totalAmountIncludingTax || 0),
+    (sum, o) => sum + (o.totalAmountExcludingTax || 0),
     0,
   );
   const avgOrderValue = totalOrders > 0 ? totalAmount / totalOrders : 0;
@@ -180,7 +192,7 @@ function calculateOrderStats(orders) {
       }
       skuStats[itemNumber].quantity += line.quantity || 0;
       skuStats[itemNumber].revenue +=
-        line.amountIncludingTax || line.netAmount || 0;
+        line.amountExcludingTax || line.netAmount || 0;
     });
   });
 
@@ -248,7 +260,7 @@ function calculateOrderStats(orders) {
     if (!monthStats[monthKey]) {
       monthStats[monthKey] = { month: monthLabel, sales: 0, orders: 0 };
     }
-    monthStats[monthKey].sales += order.totalAmountIncludingTax || 0;
+    monthStats[monthKey].sales += order.totalAmountExcludingTax || 0;
     monthStats[monthKey].orders += 1;
   });
 
@@ -496,9 +508,7 @@ function Top10SKUChart({ data }) {
                   </span>
                 </td>
                 <td className="p-2 font-mono text-xs">{item.name}</td>
-                <td className="p-2 text-default-700">
-                  {item.description}
-                </td>
+                <td className="p-2 text-default-700">{item.description}</td>
                 <td className="p-2 text-right font-medium">
                   {item.quantity} pcs
                 </td>
@@ -517,7 +527,10 @@ function Top10SKUChart({ data }) {
 function formatDateForInput(date) {
   if (!date) return "";
   const d = new Date(date);
-  return d.toISOString().split("T")[0];
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function getStartOfMonth() {
@@ -654,9 +667,7 @@ function DateRangeFilter({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <div className="flex flex-col gap-2">
-          <label className="text-xs text-default-500">
-            Start Date (From)
-          </label>
+          <label className="text-xs text-default-500">Start Date (From)</label>
           <Input
             type="date"
             value={fromDate}
@@ -666,9 +677,7 @@ function DateRangeFilter({
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-xs text-default-500">
-            End Date (To)
-          </label>
+          <label className="text-xs text-default-500">End Date (To)</label>
           <Input
             type="date"
             value={toDate}
@@ -684,9 +693,7 @@ function DateRangeFilter({
           <Calendar className="w-4 h-4 text-foreground" />
           <span className="text-sm text-foreground">
             Showing data:{" "}
-            {fromDate
-              ? new Date(fromDate).toLocaleDateString("en-US")
-              : "All"}
+            {fromDate ? new Date(fromDate).toLocaleDateString("en-US") : "All"}
             {" - "}
             {toDate ? new Date(toDate).toLocaleDateString("en-US") : "Present"}
           </span>
@@ -727,9 +734,7 @@ function ExecutiveSummaryCard({
         <div className="flex flex-col">
           <span className="text-xs opacity-70">{title}</span>
           <span className="text-2xl font-bold">{value}</span>
-          {subValue && (
-            <span className="text-xs opacity-60">{subValue}</span>
-          )}
+          {subValue && <span className="text-xs opacity-60">{subValue}</span>}
         </div>
         {Icon && <Icon className="w-5 h-5 opacity-60" />}
       </div>
@@ -1527,8 +1532,9 @@ function SlipPreviewModal({
                 <div className="flex border-t-1 border-default">
                   <div className="flex flex-col flex-1 p-2 text-lg text-danger gap-2">
                     <p className="font-bold">
-                      ❗Please record a video while unboxing the parcel
-                      for use as evidence for product claims. No evidence, no claims accepted.
+                      ❗Please record a video while unboxing the parcel for use
+                      as evidence for product claims. No evidence, no claims
+                      accepted.
                     </p>
                   </div>
 
@@ -1548,16 +1554,13 @@ function SlipPreviewModal({
             </div>
           ) : (
             <div className="flex items-center justify-center w-full h-40 bg-default-50 rounded-lg">
-              <p className="text-default-400">
-                Please select at least 1 item
-              </p>
+              <p className="text-default-400">Please select at least 1 item</p>
             </div>
           )}
 
           <div className="flex flex-col w-full p-2 bg-default-50 rounded-lg">
             <p className="text-sm font-semibold">
-              Print Summary ({filteredItems.length} items, {totalPieces}{" "}
-              slips):
+              Print Summary ({filteredItems.length} items, {totalPieces} slips):
             </p>
             <div className="flex flex-col gap-2 text-xs max-h-32 overflow-auto">
               {filteredItems.map((item, idx) => (
@@ -1805,15 +1808,21 @@ export default function UISalesOrderOnline({
       <div className="hidden xl:flex items-center gap-2 shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-xs text-default-500">Total Orders</span>
-          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{total}</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">
+            {total}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-default-500">Total Items</span>
-          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{totalItems}</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">
+            {totalItems}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-default-500">Total Amount</span>
-          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">{formatCurrency(totalAmount)}</span>
+          <span className="text-xs font-semibold text-foreground bg-default-100 p-2 rounded">
+            {formatCurrency(totalAmount)}
+          </span>
         </div>
         {(fromDate || toDate) && (
           <div className="flex items-center gap-2">
@@ -1823,7 +1832,9 @@ export default function UISalesOrderOnline({
               {fromDate && toDate && " - "}
               {toDate && new Date(toDate).toLocaleDateString("en-US")}
             </span>
-            <span className="text-xs font-semibold text-amber-700 bg-amber-50 p-2 rounded">of {orders.length}</span>
+            <span className="text-xs font-semibold text-amber-700 bg-amber-50 p-2 rounded">
+              of {orders.length}
+            </span>
           </div>
         )}
         <div className="flex items-center gap-2">
@@ -1946,9 +1957,7 @@ export default function UISalesOrderOnline({
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
-                <span className="text-sm text-default-500">
-                  By Channel
-                </span>
+                <span className="text-sm text-default-500">By Channel</span>
                 {stats.channelBreakdown.length > 0 ? (
                   stats.channelBreakdown.map((channel) => (
                     <ChannelBadge
@@ -2008,7 +2017,9 @@ export default function UISalesOrderOnline({
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>New Customers (Est.)</span>
-                    <span className="font-medium">{stats.newLeads} customers</span>
+                    <span className="font-medium">
+                      {stats.newLeads} customers
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Repeat Customers (Est.)</span>
@@ -2074,9 +2085,7 @@ export default function UISalesOrderOnline({
         <div className="flex flex-col w-full p-2 gap-2 border-t-1 border-default">
           <div className="flex items-center gap-2">
             <Target className="w-5 h-5 text-success" />
-            <h2 className="text-lg font-semibold">
-              Sales Performance
-            </h2>
+            <h2 className="text-lg font-semibold">Sales Performance</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
