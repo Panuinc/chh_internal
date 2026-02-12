@@ -709,6 +709,7 @@ function TopCustomersTable({ data }) {
 }
 
 const SHIPPING_COST_PER_PIECE = 150;
+const PACKING_COST_PER_PIECE = 25;
 
 function FGStockTable({ items, loading: stockLoading, orders }) {
   const salesDataMap = useMemo(() => {
@@ -802,6 +803,12 @@ function FGStockTable({ items, loading: stockLoading, orders }) {
             {formatNumber(SHIPPING_COST_PER_PIECE)} THB/pc
           </span>
         </span>
+        <span className="text-default-500">
+          Packing:{" "}
+          <span className="font-medium text-foreground">
+            {formatNumber(PACKING_COST_PER_PIECE)} THB/pc
+          </span>
+        </span>
       </div>
 
       <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
@@ -813,6 +820,7 @@ function FGStockTable({ items, loading: stockLoading, orders }) {
               <th className="p-2 text-right font-medium">Stock</th>
               <th className="p-2 text-right font-medium">Unit Cost</th>
               <th className="p-2 text-right font-medium">Shipping</th>
+              <th className="p-2 text-right font-medium">Packing</th>
               <th className="p-2 text-right font-medium">Total Cost</th>
               <th className="p-2 text-right font-medium">Avg Selling</th>
               <th className="p-2 text-right font-medium">Gross Profit</th>
@@ -827,7 +835,8 @@ function FGStockTable({ items, loading: stockLoading, orders }) {
               const avgSelling = sales?.avgPrice || 0;
               const totalRevenue = sales?.totalAmount || 0;
               const shipping = SHIPPING_COST_PER_PIECE;
-              const totalCost = cost + shipping;
+              const packing = PACKING_COST_PER_PIECE;
+              const totalCost = cost + shipping + packing;
               const profit = avgSelling > 0 ? avgSelling - totalCost : 0;
               const margin = avgSelling > 0 ? (profit / avgSelling) * 100 : 0;
 
@@ -852,6 +861,9 @@ function FGStockTable({ items, loading: stockLoading, orders }) {
                   </td>
                   <td className="p-2 text-right text-default-500">
                     {formatCurrency(shipping)}
+                  </td>
+                  <td className="p-2 text-right text-default-500">
+                    {formatCurrency(packing)}
                   </td>
                   <td className="p-2 text-right font-medium">
                     {cost > 0 ? formatCurrency(totalCost) : "-"}
