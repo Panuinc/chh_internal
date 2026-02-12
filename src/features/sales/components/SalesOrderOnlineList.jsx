@@ -41,9 +41,6 @@ import {
   ShoppingCart,
   Target,
   Users,
-  Repeat,
-  MousePointerClick,
-  Smile,
   BarChart3,
   Facebook,
   Globe,
@@ -92,6 +89,9 @@ const orderLinesColumns = [
   { name: "Ship Date", uid: "shipmentDate", width: 120 },
 ];
 
+const MONTHLY_TARGET = 1500000;
+const YEARLY_TARGET = 18000000;
+
 function formatCurrency(value) {
   return new Intl.NumberFormat("th-TH", {
     minimumFractionDigits: 2,
@@ -133,9 +133,18 @@ function calculateOrderStats(orders) {
       channelBreakdown: [],
       monthlyData: [],
       topSKUs: [],
-      newLeads: 0,
-      repeatCustomers: 0,
       uniqueCustomers: 0,
+      newCustomers: 0,
+      repeatCustomers: 0,
+      repeatRate: 0,
+      topCustomers: [],
+      geoDistribution: [],
+      fulfillmentRate: 0,
+      shippedOrders: 0,
+      avgItemsPerOrder: 0,
+      momGrowth: null,
+      bestMonth: null,
+      monthCount: 1,
     };
   }
 
@@ -150,7 +159,30 @@ function calculateOrderStats(orders) {
   const skuStats = {};
   let totalItemCount = 0;
 
+  const customerOrderCount = {};
+  const customerRevenue = {};
+  const customerNames = {};
+  const cityStats = {};
+  let shippedOrders = 0;
+
   orders.forEach((order) => {
+    const custNum = order.customerNumber || "Unknown";
+    customerOrderCount[custNum] = (customerOrderCount[custNum] || 0) + 1;
+    customerRevenue[custNum] =
+      (customerRevenue[custNum] || 0) + (order.totalAmountExcludingTax || 0);
+    if (!customerNames[custNum]) {
+      customerNames[custNum] = order.customerName || custNum;
+    }
+
+    const city = (order.shipToCity || "").trim() || "Unknown";
+    if (!cityStats[city]) {
+      cityStats[city] = { orders: 0, revenue: 0 };
+    }
+    cityStats[city].orders += 1;
+    cityStats[city].revenue += order.totalAmountExcludingTax || 0;
+
+    if (order.fullyShipped === true) shippedOrders++;
+
     const lines = order.salesOrderLines || [];
     lines.forEach((line) => {
       if (line.lineType !== "Item") return;
@@ -219,17 +251,17 @@ function calculateOrderStats(orders) {
   const channelStats = { Facebook: 0, Line: 0, Website: 0, Others: 0 };
   orders.forEach((order) => {
     const extDoc = (order.externalDocumentNumber || "").toLowerCase();
-    const customerName = (order.customerName || "").toLowerCase();
+    const custName = (order.customerName || "").toLowerCase();
 
     if (
       extDoc.includes("fb") ||
       extDoc.includes("facebook") ||
-      customerName.includes("facebook")
+      custName.includes("facebook")
     ) {
       channelStats.Facebook++;
-    } else if (extDoc.includes("line") || customerName.includes("line")) {
+    } else if (extDoc.includes("line") || custName.includes("line")) {
       channelStats.Line++;
-    } else if (extDoc.includes("web") || customerName.includes("web")) {
+    } else if (extDoc.includes("web") || custName.includes("web")) {
       channelStats.Website++;
     } else {
       channelStats["Others"]++;
@@ -238,9 +270,9 @@ function calculateOrderStats(orders) {
 
   const channelBreakdown = Object.entries(channelStats)
     .filter(([_, count]) => count > 0)
-    .map(([name, orders]) => ({
+    .map(([name, orderCount]) => ({
       name,
-      orders,
+      orders: orderCount,
       color:
         name === "Facebook"
           ? "#006FEE"
@@ -264,13 +296,72 @@ function calculateOrderStats(orders) {
     monthStats[monthKey].orders += 1;
   });
 
-  const monthlyData = Object.values(monthStats).sort((a, b) =>
-    a.month.localeCompare(b.month),
-  );
+  const sortedMonthKeys = Object.keys(monthStats).sort();
+  const monthlyData = sortedMonthKeys.map((key) => monthStats[key]);
+  const monthCount = sortedMonthKeys.length || 1;
 
-  const uniqueCustomers = new Set(orders.map((o) => o.customerNumber)).size;
-  const newLeads = Math.ceil(uniqueCustomers * 0.8);
-  const repeatCustomers = Math.floor(uniqueCustomers * 0.2);
+  let momGrowth = null;
+  if (sortedMonthKeys.length >= 2) {
+    const lastKey = sortedMonthKeys[sortedMonthKeys.length - 1];
+    const prevKey = sortedMonthKeys[sortedMonthKeys.length - 2];
+    const lastSales = monthStats[lastKey].sales;
+    const prevSales = monthStats[prevKey].sales;
+    if (prevSales > 0) {
+      const pct = (((lastSales - prevSales) / prevSales) * 100).toFixed(1);
+      momGrowth = {
+        percentage: pct,
+        direction: lastSales >= prevSales ? "up" : "down",
+        lastMonth: monthStats[lastKey].month,
+        prevMonth: monthStats[prevKey].month,
+      };
+    }
+  }
+
+  let bestMonth = null;
+  if (sortedMonthKeys.length > 0) {
+    const bestKey = sortedMonthKeys.reduce((best, key) =>
+      monthStats[key].sales > monthStats[best].sales ? key : best,
+    );
+    bestMonth = {
+      name: monthStats[bestKey].month,
+      sales: monthStats[bestKey].sales,
+      orders: monthStats[bestKey].orders,
+    };
+  }
+
+  const uniqueCustomers = Object.keys(customerOrderCount).length;
+  const repeatCustomers = Object.values(customerOrderCount).filter(
+    (c) => c > 1,
+  ).length;
+  const newCustomers = uniqueCustomers - repeatCustomers;
+  const repeatRate =
+    uniqueCustomers > 0
+      ? ((repeatCustomers / uniqueCustomers) * 100).toFixed(1)
+      : 0;
+
+  const topCustomers = Object.entries(customerRevenue)
+    .map(([custNum, revenue]) => ({
+      customerNumber: custNum,
+      customerName: customerNames[custNum],
+      revenue,
+      orderCount: customerOrderCount[custNum],
+    }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 10);
+
+  const geoDistribution = Object.entries(cityStats)
+    .map(([city, data]) => ({
+      name: city,
+      orders: data.orders,
+      revenue: data.revenue,
+    }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 10);
+
+  const fulfillmentRate =
+    totalOrders > 0 ? ((shippedOrders / totalOrders) * 100).toFixed(1) : 0;
+  const avgItemsPerOrder =
+    totalOrders > 0 ? (totalItemCount / totalOrders).toFixed(1) : 0;
 
   return {
     totalOrders,
@@ -281,14 +372,23 @@ function calculateOrderStats(orders) {
     channelBreakdown,
     monthlyData,
     topSKUs,
-    newLeads,
-    repeatCustomers,
     uniqueCustomers,
+    newCustomers,
+    repeatCustomers,
+    repeatRate,
+    topCustomers,
+    geoDistribution,
+    fulfillmentRate,
+    shippedOrders,
+    avgItemsPerOrder,
+    momGrowth,
+    bestMonth,
+    monthCount,
   };
 }
 
 function MonthlySalesChart({ data }) {
-  const chartData = data.map((d) => ({ ...d, target: 1500000 }));
+  const chartData = data.map((d) => ({ ...d, target: MONTHLY_TARGET }));
 
   if (chartData.length === 0) {
     return (
@@ -524,6 +624,195 @@ function Top10SKUChart({ data }) {
   );
 }
 
+function SmartInsightsRow({ stats }) {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+      <div className="flex flex-col p-2 bg-default-50 rounded-lg border-1 border-default">
+        <span className="text-xs text-default-500">Fulfillment Rate</span>
+        <span className="text-lg font-bold">{stats.fulfillmentRate}%</span>
+        <span className="text-xs text-default-400">
+          {stats.shippedOrders} / {stats.totalOrders} shipped
+        </span>
+      </div>
+
+      <div className="flex flex-col p-2 bg-default-50 rounded-lg border-1 border-default">
+        <span className="text-xs text-default-500">MoM Growth</span>
+        {stats.momGrowth ? (
+          <>
+            <div
+              className={`flex items-center gap-1 text-lg font-bold ${stats.momGrowth.direction === "up" ? "text-success" : "text-danger"}`}
+            >
+              {stats.momGrowth.direction === "up" ? (
+                <TrendingUp className="w-4 h-4" />
+              ) : (
+                <TrendingDown className="w-4 h-4" />
+              )}
+              {stats.momGrowth.percentage}%
+            </div>
+            <span className="text-xs text-default-400">
+              vs {stats.momGrowth.prevMonth}
+            </span>
+          </>
+        ) : (
+          <span className="text-sm text-default-400">Need 2+ months</span>
+        )}
+      </div>
+
+      <div className="flex flex-col p-2 bg-default-50 rounded-lg border-1 border-default">
+        <span className="text-xs text-default-500">Avg Items/Order</span>
+        <span className="text-lg font-bold">{stats.avgItemsPerOrder} pcs</span>
+        <span className="text-xs text-default-400">
+          {formatNumber(stats.totalItems)} total items
+        </span>
+      </div>
+
+      <div className="flex flex-col p-2 bg-default-50 rounded-lg border-1 border-default">
+        <span className="text-xs text-default-500">Best Month</span>
+        {stats.bestMonth ? (
+          <>
+            <span className="text-lg font-bold">{stats.bestMonth.name}</span>
+            <span className="text-xs text-default-400">
+              {formatNumber(stats.bestMonth.sales)} THB
+            </span>
+          </>
+        ) : (
+          <span className="text-sm text-default-400">No data</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TopCustomersTable({ data }) {
+  if (data.length === 0) {
+    return (
+      <div className="w-full h-40 flex items-center justify-center text-default-400">
+        No customer data available
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-default-50">
+            <th className="p-2 text-left font-medium">#</th>
+            <th className="p-2 text-left font-medium">Customer</th>
+            <th className="p-2 text-right font-medium">Orders</th>
+            <th className="p-2 text-right font-medium">Revenue</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((customer, index) => (
+            <tr
+              key={customer.customerNumber}
+              className="border-b-1 border-default hover:bg-default-50"
+            >
+              <td className="p-2">
+                <span
+                  className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
+                    index === 0
+                      ? "bg-amber-50 text-warning"
+                      : index === 1
+                        ? "bg-default-100 text-foreground"
+                        : index === 2
+                          ? "bg-red-50 text-danger"
+                          : "bg-default-50 text-default-500"
+                  }`}
+                >
+                  {index + 1}
+                </span>
+              </td>
+              <td className="p-2">
+                <div className="flex flex-col">
+                  <span className="font-medium truncate max-w-[200px]">
+                    {customer.customerName}
+                  </span>
+                  <span className="text-xs text-default-500">
+                    {customer.customerNumber}
+                  </span>
+                </div>
+              </td>
+              <td className="p-2 text-right">{customer.orderCount}</td>
+              <td className="p-2 text-right font-medium">
+                {formatCurrency(customer.revenue)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function GeoDistributionChart({ data }) {
+  if (data.length === 0) {
+    return (
+      <div className="w-full h-64 flex items-center justify-center text-default-400">
+        No geographic data available
+      </div>
+    );
+  }
+
+  const colors = [
+    "#006FEE",
+    "#17C964",
+    "#F5A524",
+    "#9353D3",
+    "#F31260",
+    "#71717A",
+    "#0E793C",
+    "#C4841D",
+    "#7828C8",
+    "#A1A1AA",
+  ];
+
+  return (
+    <div className="w-full h-64">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={data}
+          layout="vertical"
+          margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="#e5e7eb"
+            horizontal={false}
+          />
+          <XAxis type="number" tick={{ fontSize: 11 }} stroke="#6b7280" />
+          <YAxis
+            type="category"
+            dataKey="name"
+            tick={{ fontSize: 11 }}
+            stroke="#6b7280"
+            width={75}
+          />
+          <Tooltip
+            formatter={(value, name) => {
+              if (name === "revenue")
+                return [`${formatCurrency(value)} THB`, "Revenue"];
+              return [`${value} orders`, "Orders"];
+            }}
+            contentStyle={{
+              backgroundColor: "#fff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+              fontSize: "12px",
+            }}
+          />
+          <Bar dataKey="orders" name="Orders" radius={[0, 4, 4, 0]}>
+            {data.map((_, index) => (
+              <Cell key={`cell-${index}`} fill={colors[index % 10]} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 function formatDateForInput(date) {
   if (!date) return "";
   const d = new Date(date);
@@ -702,12 +991,6 @@ function DateRangeFilter({
     </div>
   );
 }
-
-const customerSatisfactionStatus = {
-  message: "Will be implemented in February, Week 3",
-  effectiveDate: "Early March 2025",
-  description: "QR code scan form printed on packing slip label",
-};
 
 function ExecutiveSummaryCard({
   title,
@@ -1906,9 +2189,7 @@ export default function UISalesOrderOnline({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-foreground" />
-              <h2 className="text-lg font-semibold">
-                Monthly Executive Summary
-              </h2>
+              <h2 className="text-lg font-semibold">Executive Summary</h2>
             </div>
             {(fromDate || toDate) && (
               <Chip color="primary" variant="flat" size="sm">
@@ -1921,7 +2202,17 @@ export default function UISalesOrderOnline({
             <ExecutiveSummaryCard
               title="Total Online Sales"
               value={`${formatNumber(stats.totalAmount)} THB`}
-              subValue={`Target: ${formatNumber(1500000)} THB (${stats.totalAmount > 0 ? ((stats.totalAmount / 1500000) * 100).toFixed(1) : 0}%)`}
+              subValue={(() => {
+                const target =
+                  fromDate || toDate
+                    ? stats.monthCount * MONTHLY_TARGET
+                    : YEARLY_TARGET;
+                const pct =
+                  stats.totalAmount > 0
+                    ? ((stats.totalAmount / target) * 100).toFixed(1)
+                    : 0;
+                return `Target: ${formatNumber(target)} THB (${pct}%)`;
+              })()}
               icon={ShoppingCart}
               color="primary"
             />
@@ -1929,6 +2220,7 @@ export default function UISalesOrderOnline({
             <ExecutiveSummaryCard
               title="Order Count"
               value={`${formatNumber(stats.totalOrders)} Orders`}
+              subValue={`${stats.uniqueCustomers} unique customers`}
               icon={Calendar}
               color="default"
             />
@@ -1936,6 +2228,7 @@ export default function UISalesOrderOnline({
             <ExecutiveSummaryCard
               title="Total Items"
               value={`${formatNumber(stats.totalItems)} pcs`}
+              subValue={`${stats.avgItemsPerOrder} avg per order`}
               icon={Package}
               color="success"
             />
@@ -1945,21 +2238,35 @@ export default function UISalesOrderOnline({
               value={`${formatNumber(Math.round(stats.avgOrderValue))} THB`}
               subValue={`From ${stats.totalOrders} orders`}
               icon={Target}
+              trend={stats.momGrowth?.direction}
+              trendValue={
+                stats.momGrowth
+                  ? `${stats.momGrowth.percentage}% vs ${stats.momGrowth.prevMonth}`
+                  : undefined
+              }
               color="warning"
             />
           </div>
 
-          <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
-            <div className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-default-600" />
-              <span className="font-medium">Order Count and Details</span>
-            </div>
+          <SmartInsightsRow stats={stats} />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-              <div className="flex flex-col gap-2">
-                <span className="text-sm text-default-500">By Channel</span>
-                {stats.channelBreakdown.length > 0 ? (
-                  stats.channelBreakdown.map((channel) => (
+          <div className="p-2 bg-default-50/50 rounded-lg">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-foreground" />
+              <span className="font-medium">Monthly Sales vs Target</span>
+            </div>
+            <MonthlySalesChart data={stats.monthlyData} />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-foreground" />
+                <span className="font-medium">Sales by Channel</span>
+              </div>
+              {stats.channelBreakdown.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {stats.channelBreakdown.map((channel) => (
                     <ChannelBadge
                       key={channel.name}
                       icon={
@@ -1973,181 +2280,110 @@ export default function UISalesOrderOnline({
                       count={channel.orders}
                       total={stats.totalOrders}
                     />
-                  ))
-                ) : (
-                  <div className="text-sm text-default-400">
-                    No channel data
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <span className="text-sm text-default-500">By Product</span>
-                <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg">
-                  {stats.productBreakdown.length > 0 ? (
-                    stats.productBreakdown.map((product) => (
-                      <div
-                        key={product.name}
-                        className="flex justify-between text-sm"
-                      >
-                        <span>{product.name}</span>
-                        <span className="font-medium">
-                          {product.quantity} pcs
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-sm text-default-400">
-                      No product data
-                    </div>
-                  )}
+                  ))}
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <span className="text-sm text-default-500">
-                  By Customer Type
-                </span>
-                <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg">
-                  <div className="flex justify-between text-sm">
-                    <span>Owner (B2C)</span>
-                    <span className="font-medium">
-                      {stats.uniqueCustomers} customers
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>New Customers (Est.)</span>
-                    <span className="font-medium">
-                      {stats.newLeads} customers
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Repeat Customers (Est.)</span>
-                    <span className="font-medium">
-                      {stats.repeatCustomers} customers
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-2 bg-default-50/50 rounded-lg">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-foreground" />
-              <span className="font-medium">
-                Sales Comparison Chart (Monthly)
-              </span>
-            </div>
-            <MonthlySalesChart data={stats.monthlyData} />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <MousePointerClick className="w-4 h-4 text-foreground" />
-                <span className="font-medium">Conversion Rate</span>
-                <Chip color="warning" variant="flat" size="sm">
-                  Coming Soon
-                </Chip>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-sm text-default-500">
-                  Visitor to customer conversion rate - Under development
-                </span>
-              </div>
-              <p className="text-xs text-default-400">
-                * Will integrate with Analytics data in the future
-              </p>
+              ) : (
+                <div className="text-sm text-default-400">No channel data</div>
+              )}
+              <ChannelSalesChart data={stats.channelBreakdown} />
             </div>
 
             <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <Smile className="w-4 h-4 text-warning" />
-                <span className="font-medium">Customer Satisfaction Score</span>
-                <span className="p-2 text-xs bg-amber-50 text-warning rounded-full">
-                  Coming Soon
-                </span>
-              </div>
-              <p className="text-sm text-default-600">
-                {customerSatisfactionStatus.message}
-              </p>
-              <p className="text-xs text-default-400">
-                Effective: {customerSatisfactionStatus.effectiveDate}
-              </p>
-              <p className="text-xs text-default-400">
-                {customerSatisfactionStatus.description}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col w-full p-2 gap-2 border-t-1 border-default">
-          <div className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-success" />
-            <h2 className="text-lg font-semibold">Sales Performance</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-            <ExecutiveSummaryCard
-              title="New Leads"
-              value={`${stats.uniqueCustomers} customers`}
-              subValue={`New ~${stats.newLeads} | Repeat ~${stats.repeatCustomers} customers`}
-              icon={Users}
-              color="success"
-            />
-
-            <ExecutiveSummaryCard
-              title="Closing Rate"
-              value={`${stats.uniqueCustomers > 0 ? ((stats.totalOrders / stats.uniqueCustomers) * 100).toFixed(1) : 0}%`}
-              subValue={`Closed ${stats.totalOrders} out of ${stats.uniqueCustomers} customers`}
-              icon={Target}
-              color="primary"
-            />
-
-            <ExecutiveSummaryCard
-              title="Repeat Customers (Est.)"
-              value={`${stats.repeatCustomers} customers`}
-              subValue="Customers who made repeat purchases"
-              icon={Repeat}
-              color="warning"
-            />
-
-            <ExecutiveSummaryCard
-              title="Total Orders Summary"
-              value={`${stats.totalOrders} Orders`}
-              subValue={`Total value ${formatNumber(stats.totalAmount)} THB`}
-              icon={ShoppingCart}
-              color="default"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <div className="p-2 bg-default-50/50 rounded-lg">
               <div className="flex items-center gap-2">
                 <Package className="w-4 h-4 text-success" />
                 <span className="font-medium">Sales by Product</span>
               </div>
+              <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg">
+                {stats.productBreakdown.length > 0 ? (
+                  stats.productBreakdown.map((product) => (
+                    <div
+                      key={product.name}
+                      className="flex justify-between text-sm"
+                    >
+                      <span>{product.name}</span>
+                      <span className="font-medium">
+                        {product.quantity} pcs
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm text-default-400">
+                    No product data
+                  </div>
+                )}
+              </div>
               <ProductSalesChart data={stats.productBreakdown} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-foreground" />
+                <span className="font-medium">Customer Analytics</span>
+              </div>
+              <div className="flex flex-col gap-2 p-2 bg-default-50 rounded-lg">
+                <div className="flex justify-between text-sm">
+                  <span>Total Unique Customers</span>
+                  <span className="font-medium">{stats.uniqueCustomers}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>New Customers (1 order)</span>
+                  <span className="font-medium text-success">
+                    {stats.newCustomers}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Repeat Customers (2+ orders)</span>
+                  <span className="font-medium text-primary">
+                    {stats.repeatCustomers}
+                  </span>
+                </div>
+                <Divider />
+                <div className="flex justify-between text-sm">
+                  <span>Repeat Rate</span>
+                  <span className="font-bold text-primary">
+                    {stats.repeatRate}%
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Orders per Customer</span>
+                  <span className="font-medium">
+                    {stats.uniqueCustomers > 0
+                      ? (stats.totalOrders / stats.uniqueCustomers).toFixed(1)
+                      : 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-foreground" />
+                <span className="font-medium">Top 10 Customers by Revenue</span>
+              </div>
+              <TopCustomersTable data={stats.topCustomers} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            <div className="flex flex-col gap-2 p-2 bg-default-50/50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-foreground" />
+                <span className="font-medium">
+                  Geographic Distribution (Top Cities)
+                </span>
+              </div>
+              <GeoDistributionChart data={stats.geoDistribution} />
             </div>
 
             <div className="p-2 bg-default-50/50 rounded-lg">
               <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-foreground" />
-                <span className="font-medium">Sales by Channel</span>
+                <TrendingUp className="w-5 h-5 text-danger" />
+                <span className="font-medium">Top 10 Best Selling SKUs</span>
               </div>
-              <ChannelSalesChart data={stats.channelBreakdown} />
+              <Top10SKUChart data={stats.topSKUs} />
             </div>
-          </div>
-
-          <div className="p-2 bg-default-50/50 rounded-lg">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-danger" />
-              <h3 className="font-semibold text-lg">
-                Top 10 Best Selling SKUs of the Month
-              </h3>
-            </div>
-            <Top10SKUChart data={stats.topSKUs} />
           </div>
         </div>
 

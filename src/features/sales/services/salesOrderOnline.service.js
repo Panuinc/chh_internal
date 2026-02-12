@@ -70,8 +70,6 @@ async function fetchSalesOrders(params) {
 
   const url = `${SALES_ORDER_ENDPOINT}?${queryParts.join("&")}`;
 
-  console.log("[SalesOrderOnline] Fetching SalesOrders (ODataV4):", url);
-
   const result = await bcClient.get(url);
   return Array.isArray(result) ? result : result?.value || [];
 }
@@ -98,8 +96,6 @@ async function fetchOrderTotals(params) {
 
   const url = `${STANDARD_API_ENDPOINT}?${queryParts.join("&")}`;
 
-  console.log("[SalesOrderOnline] Fetching totals (Standard API):", url);
-
   try {
     const result = await bcClient.get(url);
     const items = Array.isArray(result) ? result : result?.value || [];
@@ -113,15 +109,8 @@ async function fetchOrderTotals(params) {
       };
     }
 
-    console.log(
-      `[SalesOrderOnline] Fetched totals for ${items.length} orders from Standard API`,
-    );
     return totalsMap;
   } catch (error) {
-    console.warn(
-      "[SalesOrderOnline] Failed to fetch Standard API totals, will use calculated totals:",
-      error.message,
-    );
     return {};
   }
 }
@@ -140,10 +129,6 @@ async function fetchSalesLines(orderNumbers) {
   queryParts.push(`$top=5000`);
 
   const url = `${SALES_LINES_ENDPOINT}?${queryParts.join("&")}`;
-
-  console.log(
-    `[SalesOrderOnline] Fetching SalesLines for ${orderNumbers.length} orders`,
-  );
 
   const result = await bcClient.get(url);
   return Array.isArray(result) ? result : result?.value || [];
