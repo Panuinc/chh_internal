@@ -8,7 +8,8 @@
       "Read(//e/**)",
       "Bash(node -e:*)",
       "Bash(powershell:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(dir:*)"
     ]
   }
 }

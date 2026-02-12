@@ -1,4 +1,4 @@
-import { SubMenu, KpiCard, ChartCard, MiniBarChart, Loading } from "@/components";
+import { KpiCard, ChartCard, MiniBarChart, Loading } from "@/components";
 import Image from "next/image";
 import {
   Users,
@@ -26,9 +26,7 @@ function UserProfileCard({ user }) {
         <div className="text-[13px] font-semibold text-foreground">
           {user.name}
         </div>
-        <div className="text-[12px] text-default-400">
-          {user.email}
-        </div>
+        <div className="text-[12px] text-default-400">{user.email}</div>
       </div>
 
       <div className="flex flex-col w-full gap-2 pt-3 border-t-1 border-default">
@@ -134,9 +132,7 @@ export default function UIHome({ user, modules }) {
     <div className="flex flex-col w-full h-full overflow-auto">
       <div className="w-full h-full p-2 space-y-5">
         <div className="flex flex-col gap-2">
-          <h1 className="text-lg font-semibold text-foreground">
-             Dashboard
-          </h1>
+          <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
           <p className="text-[13px] text-default-400">
             Overview of your enterprise operations and key metrics.
           </p>
@@ -161,27 +157,6 @@ export default function UIHome({ user, modules }) {
                 <UserProfileCard user={user} />
               </div>
             )}
-
-            <div className="flex-1">
-              {modules.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-2">
-                  {modules.map((module) => (
-                    <SubMenu
-                      key={module.id}
-                      href={module.href}
-                      text={module.text}
-                      icon={module.icon}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex items-center justify-center p-2 bg-background rounded-lg border-1 border-default">
-                  <p className="text-[13px] text-default-400">
-                    No modules available. Please contact administrator.
-                  </p>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>

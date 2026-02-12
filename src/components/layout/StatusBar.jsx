@@ -9,7 +9,7 @@ export default function StatusBar() {
   const currentModule = segments[0] || "home";
 
   return (
-    <footer className="hidden xl:flex items-center justify-between h-7 p-2 bg-default-50 border-t-1 border-default shrink-0">
+    <footer className="hidden xl:flex items-center justify-between h-7 p-2 bg-background border-t-1 border-default shrink-0">
       <div className="flex items-center gap-2">
         <span className="text-[10px] text-default-400 font-medium">
           EverGreen Internal v1.0
