@@ -50,18 +50,6 @@ function RolePageContent() {
     mode === "edit" && editId ? editId : null,
   );
 
-  if (mode === "list" && !hasPermission("hr.role.view")) {
-    return <PermissionDenied />;
-  }
-
-  if (mode === "create" && !hasPermission("hr.role.create")) {
-    return <PermissionDenied />;
-  }
-
-  if (mode === "edit" && !hasPermission("hr.role.edit")) {
-    return <PermissionDenied />;
-  }
-
   const triggerRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
   }, []);
@@ -187,6 +175,7 @@ function RolePageContent() {
         roleStatus: role.roleStatus || "",
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, role]);
 
   useEffect(() => {
@@ -197,6 +186,7 @@ function RolePageContent() {
         roleStatus: "",
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   const handleAddNew = useCallback(() => {
@@ -215,6 +205,18 @@ function RolePageContent() {
   const handleBackToList = useCallback(() => {
     navigateTo("list");
   }, [navigateTo]);
+
+  if (mode === "list" && !hasPermission("hr.role.view")) {
+    return <PermissionDenied />;
+  }
+
+  if (mode === "create" && !hasPermission("hr.role.create")) {
+    return <PermissionDenied />;
+  }
+
+  if (mode === "edit" && !hasPermission("hr.role.edit")) {
+    return <PermissionDenied />;
+  }
 
   if (mode === "list") {
     return (

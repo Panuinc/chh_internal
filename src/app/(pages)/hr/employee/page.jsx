@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EmployeeList, EmployeeForm, useEmployee, useDepartments, useRoles } from "@/features/hr";
-import { Loading } from "@/components";
+import { Loading, PermissionDenied } from "@/components";
 import { useSessionUser } from "@/features/auth/hooks/useSessionUser";
 import { useFormHandler, useMenu } from "@/hooks";
 import { showToast } from "@/components/ui/Toast";
@@ -52,18 +52,6 @@ function EmployeePageContent() {
   const { employee, loading: employeeLoading } = useEmployee(
     mode === "edit" && editId ? editId : null,
   );
-
-  if (mode === "list" && !hasPermission("hr.employee.view")) {
-    return <PermissionDenied />;
-  }
-
-  if (mode === "create" && !hasPermission("hr.employee.create")) {
-    return <PermissionDenied />;
-  }
-
-  if (mode === "edit" && !hasPermission("hr.employee.edit")) {
-    return <PermissionDenied />;
-  }
 
   const triggerRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
@@ -216,6 +204,7 @@ function EmployeePageContent() {
         employeeRoleId: employee.employeeRoleId || "",
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, employee]);
 
   useEffect(() => {
@@ -236,6 +225,7 @@ function EmployeePageContent() {
         employeeRoleId: "",
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   const handleAddNew = useCallback(() => {
@@ -254,6 +244,18 @@ function EmployeePageContent() {
   const handleBackToList = useCallback(() => {
     navigateTo("list");
   }, [navigateTo]);
+
+  if (mode === "list" && !hasPermission("hr.employee.view")) {
+    return <PermissionDenied />;
+  }
+
+  if (mode === "create" && !hasPermission("hr.employee.create")) {
+    return <PermissionDenied />;
+  }
+
+  if (mode === "edit" && !hasPermission("hr.employee.edit")) {
+    return <PermissionDenied />;
+  }
 
   if (mode === "list") {
     return (

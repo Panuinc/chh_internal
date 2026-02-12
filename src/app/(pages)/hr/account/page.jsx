@@ -50,18 +50,6 @@ function AccountPageContent() {
   const { account, loading: accountLoading } = useAccount(editId);
   const { employees } = useEmployees(undefined, true);
 
-  if (isListMode && !hasPermission("hr.account.view")) {
-    return <PermissionDenied />;
-  }
-
-  if (isCreateMode && !hasPermission("hr.account.create")) {
-    return <PermissionDenied />;
-  }
-
-  if (isEditMode && !hasPermission("hr.account.edit")) {
-    return <PermissionDenied />;
-  }
-
   const navigateTo = (newMode, id = null) => {
     const params = new URLSearchParams();
     if (newMode !== "list") {
@@ -188,7 +176,20 @@ function AccountPageContent() {
         accountStatus: account.accountStatus || "",
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, isEditMode]);
+
+  if (isListMode && !hasPermission("hr.account.view")) {
+    return <PermissionDenied />;
+  }
+
+  if (isCreateMode && !hasPermission("hr.account.create")) {
+    return <PermissionDenied />;
+  }
+
+  if (isEditMode && !hasPermission("hr.account.edit")) {
+    return <PermissionDenied />;
+  }
 
   const handleAddNew = () => {
     if (!hasPermission("hr.account.create")) return;

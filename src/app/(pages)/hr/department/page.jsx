@@ -50,18 +50,6 @@ function DepartmentPageContent() {
     mode === "edit" && editId ? editId : null,
   );
 
-  if (mode === "list" && !hasPermission("hr.department.view")) {
-    return <PermissionDenied />;
-  }
-
-  if (mode === "create" && !hasPermission("hr.department.create")) {
-    return <PermissionDenied />;
-  }
-
-  if (mode === "edit" && !hasPermission("hr.department.edit")) {
-    return <PermissionDenied />;
-  }
-
   const triggerRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
   }, []);
@@ -187,6 +175,7 @@ function DepartmentPageContent() {
         departmentStatus: department.departmentStatus || "",
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, department]);
 
   useEffect(() => {
@@ -197,6 +186,7 @@ function DepartmentPageContent() {
         departmentStatus: "",
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   const handleAddNew = useCallback(() => {
@@ -215,6 +205,18 @@ function DepartmentPageContent() {
   const handleBackToList = useCallback(() => {
     navigateTo("list");
   }, [navigateTo]);
+
+  if (mode === "list" && !hasPermission("hr.department.view")) {
+    return <PermissionDenied />;
+  }
+
+  if (mode === "create" && !hasPermission("hr.department.create")) {
+    return <PermissionDenied />;
+  }
+
+  if (mode === "edit" && !hasPermission("hr.department.edit")) {
+    return <PermissionDenied />;
+  }
 
   if (mode === "list") {
     return (

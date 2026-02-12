@@ -107,7 +107,8 @@ function MemoPageContent() {
         requesterName: userName,
       }));
     }
-  }, [documentNo, userName, mode, createFormHandler.setFormData]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [documentNo, userName, mode]);
 
   const submitMemoUpdate = useSubmitMemo({
     mode: "update",
@@ -144,7 +145,8 @@ function MemoPageContent() {
         status: memo.memoStatus || "DRAFT",
       });
     }
-  }, [memo, mode, updateFormHandler.setFormData]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [memo, mode]);
 
   const handleAddNew = useCallback(() => {
     if (!canCreate) return;

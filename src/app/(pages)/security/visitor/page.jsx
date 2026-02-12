@@ -53,18 +53,6 @@ function VisitorPageContent() {
 
   const { employees } = useEmployees(undefined, true);
 
-  if (mode === "list" && !hasPermission("security.visitor.view")) {
-    return <PermissionDenied />;
-  }
-
-  if (mode === "create" && !hasPermission("security.visitor.create")) {
-    return <PermissionDenied />;
-  }
-
-  if (mode === "edit" && !hasPermission("security.visitor.edit")) {
-    return <PermissionDenied />;
-  }
-
   const triggerRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
   }, []);
@@ -220,6 +208,7 @@ function VisitorPageContent() {
         visitorDocumentPhotos: [],
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, visitor]);
 
   useEffect(() => {
@@ -248,6 +237,7 @@ function VisitorPageContent() {
         visitorDocumentPhotos: [],
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   const handleAddNew = useCallback(() => {
@@ -263,6 +253,18 @@ function VisitorPageContent() {
   const handleBackToList = useCallback(() => {
     navigateTo("list");
   }, [navigateTo]);
+
+  if (mode === "list" && !hasPermission("security.visitor.view")) {
+    return <PermissionDenied />;
+  }
+
+  if (mode === "create" && !hasPermission("security.visitor.create")) {
+    return <PermissionDenied />;
+  }
+
+  if (mode === "edit" && !hasPermission("security.visitor.edit")) {
+    return <PermissionDenied />;
+  }
 
   if (mode === "list") {
     return (

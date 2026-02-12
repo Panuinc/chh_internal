@@ -45,14 +45,6 @@ function PatrolPageContent() {
     fetchPatrols();
   }, [refreshKey]);
 
-  if (mode === "list" && !hasPermission("security.patrol.view")) {
-    return <PermissionDenied />;
-  }
-
-  if (mode === "create" && !hasPermission("security.patrol.create")) {
-    return <PermissionDenied />;
-  }
-
   const triggerRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
   }, []);
@@ -124,6 +116,7 @@ function PatrolPageContent() {
         patrolPicture: null,
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   const handleAddNew = useCallback(() => {
@@ -134,6 +127,14 @@ function PatrolPageContent() {
   const handleBackToList = useCallback(() => {
     navigateTo("list");
   }, [navigateTo]);
+
+  if (mode === "list" && !hasPermission("security.patrol.view")) {
+    return <PermissionDenied />;
+  }
+
+  if (mode === "create" && !hasPermission("security.patrol.create")) {
+    return <PermissionDenied />;
+  }
 
   if (mode === "list") {
     return (

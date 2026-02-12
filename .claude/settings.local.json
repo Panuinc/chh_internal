@@ -7,7 +7,8 @@
       "WebFetch(domain:github.com)",
       "Read(//e/**)",
       "Bash(node -e:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(npm run lint)"
     ]
   }
 }
