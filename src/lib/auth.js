@@ -146,11 +146,13 @@ export const authOptions = {
         token.isSuperAdmin = user.isSuperAdmin;
         token.refreshToken = user.refreshToken;
         token.refreshTokenExpires = user.refreshTokenExpires;
-        token.accessTokenExpires = Date.now() + ACCESS_TOKEN_MAX_AGE * 1000;
+        // Store expiresAt as seconds (Unix timestamp) to match JWT exp claim format
+        token.expiresAt = Math.floor(Date.now() / 1000) + ACCESS_TOKEN_MAX_AGE;
       }
 
       if (trigger === "update" && session) {
-        token.accessTokenExpires = Date.now() + ACCESS_TOKEN_MAX_AGE * 1000;
+        // Update expiresAt as seconds (Unix timestamp) to match JWT exp claim format
+        token.expiresAt = Math.floor(Date.now() / 1000) + ACCESS_TOKEN_MAX_AGE;
         if (session.refreshToken) {
           token.refreshToken = session.refreshToken;
         }
@@ -173,10 +175,11 @@ export const authOptions = {
         session.user.lastName = token.lastName;
         session.user.permissions = token.permissions;
         session.user.isSuperAdmin = token.isSuperAdmin;
-        session.user.accessTokenExpires = token.accessTokenExpires;
+        // expiresAt is in seconds, convert to milliseconds for session
+        session.user.accessTokenExpires = token.expiresAt * 1000;
 
-        const expiresIn = token.accessTokenExpires - Date.now();
-        session.user.accessTokenExpired = expiresIn < 5 * 60 * 1000;
+        const expiresInMs = token.expiresAt * 1000 - Date.now();
+        session.user.accessTokenExpired = expiresInMs < 5 * 60 * 1000;
       }
       return session;
     },
