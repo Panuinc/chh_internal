@@ -39,6 +39,7 @@
     "@heroui/tooltip": "^2.2.27",
     "@heroui/user": "^2.2.25",
     "@prisma/client": "6.18.0",
+    "@supabase/supabase-js": "^2.95.3",
     "bcryptjs": "^3.0.3",
     "canvas": "^3.2.1",
     "framer-motion": "^12.23.25",
